@@ -6,14 +6,13 @@ import * as un from './utils-note';
 const QUANT = 10;
 // 10 10 10 10 10
 // 0  1  2  3  4
-type TickInfo = {
+type TicksInfo = {
   [key: string]: {
-    note: string; // вид исходной ноты переданной для воспроизведения
+    notes: string; // вид исходных нот переданных для воспроизведения
     duration: number;
     pause: number;
 
-    noteLat: string;
-    soundInfo: KeyInfo;
+    soundInfo: KeyInfo | KeyInfo[];
     instrCode: number;
     instr: any;
   };
@@ -27,7 +26,7 @@ type LoopInfo = {
   volume: number;
 };
 
-type LoopInfo2 = TickInfo & LoopInfo;
+type LoopAndTicksInfo = LoopInfo & TicksInfo;
 
 function isPresent(value: any): boolean {
   return value !== null && value !== undefined;
@@ -107,7 +106,7 @@ export class Player3 extends Sound {
   private ticker: Ticker | TickerOld;
 
   gains: { [key: string]: GainNode } = {} as any;
-  loops: { [key: string]: LoopInfo2 } = {};
+  loops: { [key: string]: LoopAndTicksInfo } = {};
 
   connect({
     ctx,
@@ -149,7 +148,7 @@ export class Player3 extends Sound {
       }
     });
 
-    console.log('play: maxTick, loops', totalTickCount);
+    //console.log('play: maxTick, loops', totalTickCount);
     const startTime = this.ctx.currentTime;
 
     ee.emit('prepare', loops);
@@ -288,9 +287,32 @@ export class Player3 extends Sound {
 
     result.notes = arr;
 
-    // console.log('noteLineInfo', result);
+    //console.log('noteLineInfo', result);
 
     return result as any;
+  }
+
+  // до+ре+му
+  getSoundInfoArr(notes: string): KeyInfo[] {
+    const result: KeyInfo[] = [];
+
+    notes = (notes || '').trim();
+    if (!notes) return [];
+
+    let subArr = notes.split('+');
+
+    subArr.forEach((note) => {
+      note = this.getNoteSame(note);
+
+      if (!note) return;
+
+      const noteLat = this.getNoteLat(note);
+      const soundInfo = (this.playingKey || {})[noteLat];
+
+      result.push(soundInfo);
+    });
+
+    return result.filter((item) => !!item);
   }
 
   getSked(props: {
@@ -299,7 +321,7 @@ export class Player3 extends Sound {
     quant: number;
     isDrum?: boolean;
     instrCode?: number;
-  }): LoopInfo2 {
+  }): LoopAndTicksInfo {
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
     const { noteLine, qms, quant, isDrum } = props;
 
@@ -319,14 +341,14 @@ export class Player3 extends Sound {
 
     let offsetQ = 0;
     let offsetMs = 0;
-    const sked: LoopInfo2 = {
+    const sked: LoopAndTicksInfo = {
       isDrum,
     } as any;
 
     arr.forEach((item, i) => {
       let subArr = item.split('-');
 
-      let note = this.getNoteSame(subArr[0]) || '__';
+      let soundInfoArr = this.getSoundInfoArr(subArr[0]);
 
       let durationQ = parseInt(subArr[1], 10);
       durationQ = isNaN(durationQ) ? 0 : durationQ;
@@ -342,21 +364,19 @@ export class Player3 extends Sound {
       offsetQ = offsetQ + durationQ + pauseQ;
       offsetMs = offsetQ * qms;
 
-      const noteLat = this.getNoteLat(note);
-      const soundInfo = (this.playingKey || {})[noteLat];
       const instrCode = isPresent(props.instrCode)
         ? props.instrCode
-        : (soundInfo || {}).instr;
+        : (soundInfoArr[0] || {}).instr;
+
       const instr = this.instruments[instrCode];
 
-      if (note !== '__') {
+      if (soundInfoArr.length) {
         sked[tickNumber] = {
-          note,
+          notes: subArr[0],
           duration: Math.round(duration),
           pause: Math.round(pause),
-          soundInfo,
+          soundInfo: soundInfoArr,
           instrCode,
-          noteLat,
           instr,
         };
       }
@@ -379,9 +399,9 @@ export class Player3 extends Sound {
     mode?: 'full' | 'prev';
     bpm: number;
     isDrum?: boolean;
-    instr?: number;
+    instrCodeOrAlias?: string | number;
     volume?: number;
-  }): LoopInfo2 {
+  }): LoopAndTicksInfo {
     const qms = 60000 / params.bpm / 100;
     let tick = -1;
     let repeated = 0;
@@ -389,7 +409,9 @@ export class Player3 extends Sound {
     this.loopId++;
     const loopId = this.loopId;
 
-    let { noteLine, repeat, mode, isDrum } = params;
+    let { noteLine, repeat, mode, isDrum, instrCodeOrAlias } = params;
+
+    //console.log('instrCodeOrAlias', instrCodeOrAlias);
 
     repeat = repeat || 1;
     mode = mode || 'full';
@@ -409,7 +431,7 @@ export class Player3 extends Sound {
       isDrum,
     });
 
-    console.log('SKED', sked);
+    //console.log('SKED', sked);
 
     sked.id = loopId;
     sked.repeat = repeat;
@@ -424,16 +446,14 @@ export class Player3 extends Sound {
         const item = sked[tick];
 
         this.getSoundMidi({
-          //note: item.note,
-          //noteLat: item.noteLat,
           duration: item.duration,
           pause: item.pause,
           isDrum: params.isDrum,
-          instrCode: item.instrCode, // instrCode
-          soundInfo: item.soundInfo,
+          instrCode: item.instrCode,
           instr: item.instr,
-          volume,
+          soundInfo: item.soundInfo,
           when: eeParams.when,
+          volume,
         });
       }
 
@@ -474,7 +494,7 @@ export class Player3 extends Sound {
     ee.on('stop', null, onStop);
     ee.on('clear', null, onClear);
 
-    // console.log('schedule', sked);
+    //console.log('schedule', sked);
 
     return sked as any;
   }

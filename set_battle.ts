@@ -57,15 +57,34 @@ const content = `
 `.trim();
 
 const parts = `
-<tick@ b120>
+<tick4@ b120>
 -  : 1   2   3   4   :
 @sn: x   x   x   x   :
+--------------------------------------------------------------------------------
+<tick3@ b120>
+-  : 1   2   3   :
+@sn: x   x   x   :
 --------------------------------------------------------------------------------
 <simple44@ b120>
 -  : 1   2   3   4   :
 @hc: x x x x x x x x :
 @sn:     2       4   :
 @bd: 1       3       :
+--------------------------------------------------------------------------------
+<btl_Су1$ b120>
+$organ: су-100
+--------------------------------------------------------------------------------
+<btl_До4$ b120>
+$organ: до-400
+--------------------------------------------------------------------------------
+<btl_До3$ b120>
+$organ: до-300
+--------------------------------------------------------------------------------
+<btl_Но4$ b120>
+$organ: но-400
+--------------------------------------------------------------------------------
+<btl_Фу3$ b120>
+$organ: фу-300
 --------------------------------------------------------------------------------
 <pgIntro$ b120>
 $organ: му-50 фу-50 фу-50 фу-50 му-50 фу-50 фу-50 фу-50
@@ -117,7 +136,19 @@ $organ: 200 му-50 му-50
 -  : 1   2   3   4   :
 @sn:           x x   :
 --------------------------------------------------------------------------------
-<pause@ b120>
+<pause1@ b120>
+-  : 1   :
+@hc:     :
+--------------------------------------------------------------------------------
+<pause2@ b120>
+-  : 1   2   :
+@hc:         :
+--------------------------------------------------------------------------------
+<pause3@ b120>
+-  : 1   2   3   :
+@hc:             :
+--------------------------------------------------------------------------------
+<pause4@ b120>
 -  : 1   2   3   4   :
 @hc:                 :
 --------------------------------------------------------------------------------
@@ -130,49 +161,16 @@ $organ: 200 му-50 му-50
 @hc: x x x x x x x x :
 `.trim();
 
-const petGunBreak = `
+const harmony = `
 <out b120 r1>
-tick@
-simple44@-1 pgMain$-1
-pgOut@ pgOut$
-pgBreakOnE1@ pgBrakeOnE1$
-pgBreakOnH@  pgBreakOnH$
-hat8@-1
-hat@-1 pgIntro$-1
-pause@
-
-<out b120 r1>
-tick@
-simple44@-2 pgMain$-2
-simple44@-1 pgToEs$-1
-esSyMyVyMy@-1 esSyMyVyMy$
-simple44@-2 pgMain$-2
-simple44@-1 pgToEs$-1
-esSyMyVyMy@-1 esSyMyVyMy$
-pause@
-
-${parts}
-`;
-
-const drums = `
-<out b120 r1>
-tick@
-hat@-2 pgIntro$-2
-simple44@-2 pgMain$-2
-simple44@-8 pgMain$-8
-simple44@-7 pgMain$-7
-pgOut@ pgOut$
-pgBreakOnE1@ pgBrakeOnE1$
-pgBreakOnH@  pgBreakOnH$
-hat8@-1
-
-hat@-2 pgIntro$-2
-simple44@-2 pgMain$-2
-simple44@-1 pgToEs$-1
-esSyMyVyMy@-1 esSyMyVyMy$
-simple44@-2 pgMain$-2
-simple44@-1 pgToEs$-1
-esSyMyVyMy@-1 esSyMyVyMy$
+tick3@
+pause1@ btl_Су1$
+pause4@ btl_До4$
+pause4@ btl_Но4$
+pause3@ btl_Фу3$
+pause1@ btl_Су1$
+pause3@ btl_До3$
+pause1@ btl_Су1$
 
 ${parts}
 `;
@@ -190,7 +188,8 @@ simple44@
 
 export default {
   content,
-  drums,
-  break: petGunBreak,
-  tracks: [{ key: 'beat44', value: beat44, name: 'бит 4/4' }],
+  tracks: [
+    { key: 'beat44', value: beat44, name: 'бит 4/4' },
+    { key: 'harmony', value: harmony, name: 'Гармония' },
+  ],
 };

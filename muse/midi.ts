@@ -32,12 +32,30 @@ export const MIDI_INSTR = 162; // 633
 // 597 598 ы
 // 580
 
+export const voiceCodes = {
+  organ: 162,
+  bass: 366,
+};
+
 export const drumCodes = {
   hc: 'drum_42',
   ho: 'drum_46',
   sn: 'drum_40',
   bd: 'drum_35',
 };
+
+export const instrAlias = {
+  ...voiceCodes,
+  ...drumCodes,
+};
+
+export function getInstrCodeBy(val: number | string): number | string {
+  if (typeof val === 'number') return val;
+
+  val = val.replace('$', '').replace('@', '');
+
+  return instrAlias[val] || '';
+}
 
 export const drumKeys = {
   /**/
@@ -383,18 +401,18 @@ export const defaultSynthSettings = byDefault;
 //     Gunshot: 1382 - 1394
 
 export enum Drums {
-  bassDrum2 = 35,
-  bassDrum1 = 36,
+  bassDrum2 = 35, // bd
+  bassDrum1 = 36, // bd
   sideRimshot = 37, // Stick/Rimshot
-  snare1 = 38,
-  handClap = 39,
-  snare2 = 40,
-  lowTom2 = 41,
-  hiHatClosed = 42,
+  snare1 = 38, // sn
+  handClap = 39, //
+  snare2 = 40, // sn
+  lowTom2 = 41, //
+  hiHatClosed = 42, // hc
   lowTom1 = 43,
   hiHatPedal = 44,
   midTom2 = 45,
-  hiHatOpened = 46,
+  hiHatOpened = 46, // ho
   midTom1 = 47,
   highTom2 = 48,
   crashCymbal1 = 49,

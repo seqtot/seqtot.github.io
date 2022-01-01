@@ -19,6 +19,7 @@ import { setVc } from './set-vc';
 // Framework7.use([Panel]);
 
 const appEl = document.getElementById('app');
+const defRoute = '/set/set_Battle/'; // /set/set_E/ /set/set_Battle/
 
 const leftPanel = `
 <div
@@ -107,7 +108,7 @@ const appTpl = `
   </div>
   
 <!-- Your main view, should have "view-main" class -->
-<div class="view view-main view-init safe-areas" data-url="/set/set_E">
+<div class="view view-main view-init safe-areas" data-url="${defRoute}">
 
 </div>
 `;
@@ -130,13 +131,13 @@ const app = new Framework7({
   ],
   on: {
     init: function () {
-      // console.log('App initialized', arguments.length, this);
+      //console.log('App initialized', arguments.length, this);
     },
     // pageInit: function () {
-    //   console.log('Page initialized', arguments.length, arguments[0]);
+    //console.log('Page initialized', arguments.length, arguments[0]);
     // },
     // pageMounted: function () {
-    //   console.log('Page mounted', arguments.length);
+    //console.log('Page mounted', arguments.length);
     // }
   },
 });
@@ -147,13 +148,13 @@ const app = new Framework7({
 //   },
 // });
 
-// console.log('APP', app);
+//console.log('APP', app);
 
 // var panel = app.panel.create({
 //   el: '.panel-left',
 //   // on: {
 //   //   opened: function () {
-//   //     console.log('Panel opened')
+//          //console.log('Panel opened')
 //   //   }
 //   // }
 // });

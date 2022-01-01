@@ -220,13 +220,13 @@ export class SetVc {
         byId(`${this.getId('action-play-' + item.key)}`).addEventListener(
           'click',
           (evt: MouseEvent) => {
-            console.log('subscribViewDrumsEvents', item.key);
+            //console.log('subscribViewDrumsEvents', item.key);
 
             const track = this.setInfo.tracks.find(
               (track) => track.key === item.key
             );
 
-            console.log(track);
+            //console.log(track);
 
             if (!track) return;
 
@@ -245,7 +245,7 @@ export class SetVc {
     dyName('action-drums', dyName('panel-right-content')).addEventListener(
       'click',
       () => {
-        console.log('action-info');
+        //console.log('action-info');
         this.setViewDrums();
       }
     );
@@ -253,7 +253,7 @@ export class SetVc {
     dyName('action-info', dyName('panel-right-content')).addEventListener(
       'click',
       () => {
-        console.log('action-info');
+        //console.log('action-info');
         this.setViewInfo();
       }
     );
@@ -280,7 +280,7 @@ export class SetVc {
       bpm,
       isDrum: false, // isDrum,
       repeat,
-      instr: 162, // instrAlias[key],
+      instrCodeOrAlias: 162, // instrAlias[key],
     }).id;
 
     uniPlayer.play([loopId]);
@@ -295,29 +295,31 @@ export class SetVc {
     uniPlayer.clear();
 
     const allBlocks = un.getBlocks(text);
+
     const out = un.findBlockById(allBlocks, 'out');
+
     // const bpm = un.getOutBpm(out.rows); // 130
     const bpm = this.bpm;
     const repeat = repeatCount || un.getOutRepeat(out.rows); // 2
-
-    const instrAlias = {
-      $organ: 162,
-      $bass: 366,
-    };
-
     const outBlocks = un.getOutBlocksInfo(allBlocks);
+
+    //console.log('outBlocks', outBlocks);
+
     const outLoops = outBlocks.map((block) => {
-      return Object.keys(block.instrs).map((key) => {
-        const noteLine = block.instrs[key];
-        const isDrum = key.startsWith('@');
+      return Object.keys(block.instrs).map((instrKey) => {
+        const noteLine = block.instrs[instrKey];
+        const isDrum = instrKey.startsWith('@');
         const loopRepeat = un.getRepeatCount(noteLine);
+
+        const instrCode = instrKey.split('-')[0];
+        console.log('key', instrCode);
 
         return uniPlayer.addLoop({
           noteLine,
           bpm,
           isDrum,
           repeat: block.repeat,
-          instr: instrAlias[key],
+          instrCodeOrAlias: instrCode,
         }).id;
       });
     });

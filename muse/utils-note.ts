@@ -203,6 +203,8 @@ export function findBlockById(blocks: BlockInfo[], id: string): BlockInfo {
 
 // return: [[25, 25, 25, 25], [50, 50]]
 export function getDrumQuartersInfo(arr: string[]): [number[]] {
+  //console.log('getDrumQuartersInfo', arr);
+
   let text = arr.find((item) => item.startsWith('-')).split(':')[1];
   text = text.trimLeft();
   text = text.replace(/\d\d/g, '| ');
@@ -286,6 +288,16 @@ export function getDrumInstruments(arr: string[]): { [key: string]: string } {
   return result;
 }
 
+export function getOutType(val: string): 'drum' | 'voice' | '' {
+  val = val || '';
+
+  if (/\$/.test(val)) return 'voice';
+
+  if (/@/.test(val)) return 'drum';
+
+  return '';
+}
+
 export function getOutBlocksInfo(blocks: BlockInfo[]): {
   instrs: string[];
   repeat: number;
@@ -301,11 +313,31 @@ export function getOutBlocksInfo(blocks: BlockInfo[]): {
     });
 
   // цикл по строка out
-  rows.forEach((row) => {
+  rows.forEach((row, i) => {
     const rowArr = (row || '')
       .split(' ')
       .map((item) => item.trim())
       .filter((item) => !!item);
+
+    // rowArr.forEach((item) => {
+    //   const type = getOutType(item);
+
+    //   if (!type) return;
+
+    //   const arr = item.split('-');
+    //   const blockId = (arr[0] || '').trim();
+    //   let repeat = parseInt(arr[1], 10) || 1;
+    //   repeat = isNaN(repeat) ? 1 : repeat;
+    //   let block = findBlockById(blocks, blockId);
+
+    //   if (block && type === 'drum') {
+    //     let instrs = getDrumInstruments(block.rows);
+
+    //     Object.keys(instrs).forEach((key) => {
+    //       instrs[key] = `r${repeat} ` + instrs[key];
+    //     });
+    //   }
+    // });
 
     const drumArr = (rowArr[0] || '').split('-');
     const noteArr = (rowArr[1] || '').split('-');
