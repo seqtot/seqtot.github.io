@@ -19,7 +19,7 @@ import { setVc } from './set-vc';
 // Framework7.use([Panel]);
 
 const appEl = document.getElementById('app');
-const defRoute = '/set/set_Battle/'; // /set/set_E/ /set/set_Battle/
+const defRoute = '/set/set_E/'; // /set/set_E/ /set/set_Battle/
 
 const leftPanel = `
 <div
