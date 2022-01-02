@@ -1,3 +1,4 @@
+import { drumKeys, drumCodes } from './drums';
 // Import stylesheets
 // https://github.com/surikov/webaudiofont
 // https://musescore.com/user/28057257/scores/6616725
@@ -37,13 +38,6 @@ export const voiceCodes = {
   bass: 366,
 };
 
-export const drumCodes = {
-  hc: 'drum_42',
-  ho: 'drum_46',
-  sn: 'drum_40',
-  bd: 'drum_35',
-};
-
 export const instrAlias = {
   ...voiceCodes,
   ...drumCodes,
@@ -56,49 +50,6 @@ export function getInstrCodeBy(val: number | string): number | string {
 
   return instrAlias[val] || '';
 }
-
-export const drumKeys = {
-  /**/
-  KeyX: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: 35, // бочка
-    noteLat: 'bd',
-    noteRus: 'бб',
-  },
-  KeyZ: {},
-  ShiftLeft: {},
-  /**/
-  KeyS: {},
-  KeyA: {},
-  CapsLock: {},
-  /**/
-  KeyW: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: 40, // малый барабан
-    noteLat: 'sn',
-    noteRus: 'мб',
-  },
-  KeyQ: {},
-  Tab: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: 42, // хэт закрытый
-    noteLat: 'hc',
-    noteRus: 'хз',
-  },
-  /**/
-  Digit2: {},
-  Digit1: {},
-  Backquote: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: 46, // хэт открытый
-    noteLat: 'ho',
-    noteRus: 'хо',
-  },
-};
 
 export const twoVoice = {
   octaves: {
@@ -399,53 +350,3 @@ export const defaultSynthSettings = byDefault;
 //     Helicopter: 1339 - 1364
 //     Applause: 1365 - 1381
 //     Gunshot: 1382 - 1394
-
-export enum Drums {
-  bassDrum2 = 35, // bd
-  bassDrum1 = 36, // bd
-  sideRimshot = 37, // Stick/Rimshot
-  snare1 = 38, // sn
-  handClap = 39, //
-  snare2 = 40, // sn
-  lowTom2 = 41, //
-  hiHatClosed = 42, // hc
-  lowTom1 = 43,
-  hiHatPedal = 44,
-  midTom2 = 45,
-  hiHatOpened = 46, // ho
-  midTom1 = 47,
-  highTom2 = 48,
-  crashCymbal1 = 49,
-  highTom1 = 50,
-  rideCymbal1 = 51,
-  chineseCymbal = 52,
-  rideBell = 53,
-  tambourine = 54,
-  splashCymbal = 55,
-  cowbell = 56,
-  crashCymbal2 = 57,
-  vibraSlap = 58,
-  rideCymbal2 = 59,
-  highBongo = 60,
-  lowBongo = 61,
-  muteHighConga = 62,
-  openHighConga = 63,
-  lowConga = 64,
-  highTimbale = 65,
-  lowTimbale = 66,
-  highAgogo = 67,
-  lowAgogo = 68,
-  cabasa = 69,
-  maracas = 70,
-  shortWhistle = 71,
-  longWhistle = 72,
-  shortGuiro = 73,
-  longGuiro = 74,
-  claves = 75,
-  highWoodBlock = 76,
-  lowWoodBlock = 77,
-  muteCuica = 78,
-  openCuica = 79,
-  muteTriangle = 80,
-  openTriangle = 81,
-}

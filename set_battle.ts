@@ -186,10 +186,20 @@ simple44@
 @bd: 1       3       :
 `.trim();
 
+const test = `
+<out b120 r1000>
+test44@
+
+<test44@ b120>
+-           : 1   2   3   4   :
+@sideRimshot: x   x   x   x   :
+`.trim();
+
 export default {
   content,
   tracks: [
     { key: 'beat44', value: beat44, name: 'бит 4/4' },
     { key: 'harmony', value: harmony, name: 'Гармония' },
+    { key: 'test', value: test, name: 'Тест' },
   ],
 };

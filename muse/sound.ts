@@ -7,7 +7,7 @@ import {
   noteLatByNoteHash,
 } from './freq';
 import { fullOctaveBlocks } from './keyboard';
-import { drumCodes } from './midi';
+import { drumCodes } from './drums';
 import * as un from './utils-note';
 
 const instruments: { [code: number]: any } = {};
@@ -111,9 +111,11 @@ export class Sound {
   }
 
   getNoteSame(val: string): string {
-    val = (val || '').toLocaleLowerCase().trim();
+    val = (val || '').trim();
 
-    let result = freqByNoteHash[val] ? val : '';
+    let result = freqByNoteHash[val.toLocaleLowerCase()]
+      ? val.toLocaleLowerCase()
+      : '';
 
     result = result || (drumCodes[val] ? val : '');
 
@@ -121,10 +123,12 @@ export class Sound {
   }
 
   getNoteLat(val: string): string {
-    val = (val || '').toLocaleLowerCase().trim();
-    let result = noteLatByNoteHash[val];
+    val = (val || '').trim();
+
+    let result = noteLatByNoteHash[val.toLocaleLowerCase()];
 
     result = freqByNoteHash[result] ? result : '';
+
     result = result || (drumCodes[val] ? val : '');
 
     return result;
@@ -174,6 +178,16 @@ export class Sound {
 
     Object.keys(settings.drums).forEach((key) => {
       const info = settings.drums[key] as KeyInfo;
+
+      if (info && !info.instr) {
+        playingKey[key] = {
+          ...info,
+          instr: 'drum_undefined' as any,
+        };
+
+        return;
+      }
+
       const drumIndex = this.fontPlayer.loader.findDrum(info.instr);
       const drumInfo = this.fontPlayer.loader.drumInfo(drumIndex);
       this.addDrumSound(info.instr);

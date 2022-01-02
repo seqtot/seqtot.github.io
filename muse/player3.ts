@@ -431,7 +431,7 @@ export class Player3 extends Sound {
       isDrum,
     });
 
-    //console.log('SKED', sked);
+    //console.log('sked', sked);
 
     sked.id = loopId;
     sked.repeat = repeat;
@@ -524,6 +524,9 @@ export class Player3 extends Sound {
 
   setSettings(settings: any): { [key: string]: KeyInfo } {
     const playingKey = this.getSettingsForKeys(settings);
+
+    // console.log('setSettings', settings);
+    // console.log('playingKey 1', { ...playingKey });
 
     Object.keys(playingKey).forEach((key) => {
       const item = playingKey[key];
