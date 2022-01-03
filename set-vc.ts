@@ -312,7 +312,6 @@ export class SetVc {
         const loopRepeat = un.getRepeatCount(noteLine);
 
         const instrCode = instrKey.split('-')[0];
-        console.log('key', instrCode);
 
         return uniPlayer.addLoop({
           noteLine,

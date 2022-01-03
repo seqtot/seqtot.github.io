@@ -188,11 +188,175 @@ simple44@
 
 const test = `
 <out b120 r1000>
-test44@
+woodBlock@
 
-<test44@ b120>
+<out b120 r1000>
+handClap@
+sideRimshot@
+cuica@
+triangle@
+woodBlock@
+guiro@
+whistle@
+cabasa@
+maracas@
+claves@
+agogo@
+timbale@
+conga@
+cymbal@
+bongo@
+vibraSlap@
+tambourine@
+bell@
+hiHat@
+lowTom@
+midTom@
+highTom@
+snare@
+bassDrum@
+
+
+<bassDrum@ b120>
 -           : 1   2   3   4   :
-@sideRimshot: x   x   x   x   :
+@bd1        : x   x           :
+@bd2        :         x   x   :
+
+
+<snare@ b120>
+-           : 1   2   3   4   :
+@sn1        : x   x           :
+@sn2        :         x   x   :
+
+
+<lowTom@ b120>
+-        : 1   2   3   4   :
+@lowTom2 : x   x           :
+@lowTom1 :         x   x   :
+
+
+<midTom@ b120>
+-        : 1   2   3   4   :
+@midTom2 : x   x           :
+@midTom1 :         x   x   :
+
+
+<highTom@ b120>
+-         : 1   2   3   4   :
+@highTom2 : x   x           :
+@highTom1 :         x   x   :
+
+
+<whistle@ b120>
+-             : 1   2   3   4   :
+@shortWhistle : x   x           :
+@longWhistle  :         x   x   :
+
+
+<guiro@ b120>
+-           : 1   2   3   4   :
+@shortGuiro : x   x           :
+@longGuiro  :         x   x   :
+
+
+<conga@ b120>
+-              : 1   2   3   4   5   6   :
+@muteHighConga : x   x                   :
+@openHighConga :         x   x           :
+@lowConga      :                 x   x   :
+
+
+<cabasa@ b120>
+-        : 1   2   3   4   :
+@cabasa  : x   x   x   x   :
+
+
+<maracas@ b120>
+-        : 1   2   3   4   :
+@maracas : x   x   x   x   :
+
+
+<claves@ b120>
+-       : 1   2   3   4   :
+@claves : x   x   x   x   :
+
+
+<timbale@ b120>
+-            : 1   2   3   4   :
+@highTimbale : x   x           :
+@lowTimbale  :         x   x   :
+
+
+<agogo@ b120>
+-          : 1   2   3   4   :
+@highAgogo : x   x           :
+@lowAgogo  :         x   x   :
+
+
+<hiHat@ b120>
+-           : 1   2   3   4   5   6   :
+@ho         : x   x                   :
+@hc         :         x   x           :
+@hp         :                 x   x   :
+
+
+<cymbal@ b120>
+-              : 1   2   3   4   5   6   7   8   9   10  11  12  :
+@crashCymbal2  : x   x                                           :
+@crashCymbal1  :         x   x                                   :
+@splashCymbal  :                 x   x                           :
+@rideCymbal2   :                         x   x                   :
+@rideCymbal1   :                                 x   x           :
+@chineseCymbal :                                         x   x   :
+
+<bell@ b120>
+-         : 1   2   3   4   :
+@rideBell : x   x           :
+@cowbell  :         x   x   :
+
+
+<bongo@ b120>
+-          : 1   2   3   4   :
+@highBongo : x   x           :
+@lowBongo  :         x   x   :
+
+
+<triangle@ b120>
+-             : 1   2   3   4   :
+@muteTriangle : x   x           :
+@openTriangle :         x   x   :
+
+
+<woodBlock@ b120>
+-              : 1   2   3   4   :
+@highWoodBlock : x   x           :
+@lowWoodBlock  :         x   x   :
+
+
+<cuica@ b120>
+-          : 1   2   3   4   :
+@muteCuica : x   x           :
+@openCuica :         x   x   :
+
+
+<tambourine@ b120>
+-           : 1   2   3   4   :
+@tambourine : x x x x x x x x :
+
+
+<vibraSlap@ b120>
+-           : 1   2   3   4   :
+@vibraSlap  : x x x x x x x x :
+
+
+<handClap@ b120>
+-           : 1   2   3   4   :
+@handClap   : x   x   x   x   :
+
+<sideRimshot@ b120>
+-            : 1   2   3   4   :
+@sideRimshot : x   x   x   x   :
+
 `.trim();
 
 export default {

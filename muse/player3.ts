@@ -525,16 +525,17 @@ export class Player3 extends Sound {
   setSettings(settings: any): { [key: string]: KeyInfo } {
     const playingKey = this.getSettingsForKeys(settings);
 
-    // console.log('setSettings', settings);
-    // console.log('playingKey 1', { ...playingKey });
+    //console.log('setSettings', settings);
+    //console.log('playingKey 1', { ...playingKey });
 
     Object.keys(playingKey).forEach((key) => {
       const item = playingKey[key];
-
-      playingKey[item.noteLat] = item;
+      delete playingKey[key];
       item.freq = freqByNoteHash[item.noteLat];
 
-      delete playingKey[key];
+      if (item && item.noteLat) {
+        playingKey[item.noteLat] = item;
+      }
     });
 
     this.playingKey = playingKey;
