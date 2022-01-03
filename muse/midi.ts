@@ -1,4 +1,4 @@
-import { drumKeys, drumCodes } from './drums';
+import { drumKeys, drumCodes, drumInfo } from './drums';
 // Import stylesheets
 // https://github.com/surikov/webaudiofont
 // https://musescore.com/user/28057257/scores/6616725
@@ -143,9 +143,9 @@ export const byDefault = {
   // drums: drumKeys,
 };
 
-export const drumSettings = {
+export const voiceAndDrumsSettings = {
   ...byDefault,
-  drums: drumKeys,
+  drums: drumInfo, // drumKeys
 };
 
 export const defaultSynthSettings = byDefault;

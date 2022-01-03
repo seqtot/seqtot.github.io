@@ -74,6 +74,15 @@ const parts = `
 <btl_Су1$ b120>
 $organ: су-100
 --------------------------------------------------------------------------------
+<btl_Су3$ b120>
+$organ: су-300
+--------------------------------------------------------------------------------
+<btl_Су4$ b120>
+$organ: су-400
+--------------------------------------------------------------------------------
+<btl_СуСуСу_СуФуСу_СуФуСу$ b120>
+$organ: су-50 су-50 су-50  су-50 фу-50 су-50  су-50 фу-50 су-50
+--------------------------------------------------------------------------------
 <btl_До4$ b120>
 $organ: до-400
 --------------------------------------------------------------------------------
@@ -85,6 +94,12 @@ $organ: но-400
 --------------------------------------------------------------------------------
 <btl_Фу3$ b120>
 $organ: фу-300
+--------------------------------------------------------------------------------
+<btl_Фу3Су1$ b120>
+$organ: фу-300 су-100
+--------------------------------------------------------------------------------
+<btl_Су3Ро1$ b120>
+$organ: су-300 ро-100
 --------------------------------------------------------------------------------
 <pgIntro$ b120>
 $organ: му-50 фу-50 фу-50 фу-50 му-50 фу-50 фу-50 фу-50
@@ -164,13 +179,38 @@ $organ: 200 му-50 му-50
 const harmony = `
 <out b120 r1>
 tick3@
-pause1@ btl_Су1$
-pause4@ btl_До4$
-pause4@ btl_Но4$
-pause3@ btl_Фу3$
-pause1@ btl_Су1$
-pause3@ btl_До3$
-pause1@ btl_Су1$
+btl_TukTuk@ btl_Су1$
+btl_44@     btl_До4$
+btl_44@     btl_Но4$
+btl_44@     btl_Фу3Су1$
+btl_34@     btl_До3$
+btl_TukTuk@ btl_Су1$
+btl_44@     btl_До4$
+btl_44@     btl_Но4$
+btl_44@     btl_Су3Ро1$
+btl_44@     btl_СуСуСу_СуФуСу_СуФуСу$
+
+<btl_TukTuk@ b120>
+-  : 1   :
+@sn: x x :
+
+<btl_44@ b120>
+-  : 1     2     3     4     :
+@hc: x  x  x  x  x  x  x  x  :
+@sn:       2           4     :
+@bd: 1           3           :
+
+<btl_34@ b120>
+-  : 1     2     3     :
+@hc: x  x  x  x  x  x  :
+@sn:       2           :
+@bd: 1           3     :
+
+<btl_14@ b120>
+-  : 1     :
+@hc: x  x  :
+@sn:       :
+@bd: 1     :
 
 ${parts}
 `;
@@ -188,63 +228,101 @@ simple44@
 
 const test = `
 <out b120 r1000>
-woodBlock@
+cowbell@
+rideBell@
+handClap@
+maracas@
+tambourine@
+triangle@
+timbale@
 
 <out b120 r1000>
-handClap@
-sideRimshot@
+conga@
+bongo@
 cuica@
-triangle@
 woodBlock@
 guiro@
 whistle@
 cabasa@
-maracas@
 claves@
 agogo@
-timbale@
-conga@
-cymbal@
-bongo@
 vibraSlap@
-tambourine@
-bell@
+
+<out b120 r1000>
 hiHat@
+snare@
+bassDrum@
 lowTom@
 midTom@
 highTom@
-snare@
-bassDrum@
+sideRimshot@
+crashCymbal@
+rideCymbal@
+splashCymbal@
+chineseCymbal@
 
-
-<bassDrum@ b120>
--           : 1   2   3   4   :
-@bd1        : x   x           :
-@bd2        :         x   x   :
+<hiHat@ b120>
+-  : 1   2   3   4   5   6   :
+@ho: x   x                   :
+@hc:         x   x           :
+@hp:                 x   x   :
 
 
 <snare@ b120>
--           : 1   2   3   4   :
-@sn1        : x   x           :
-@sn2        :         x   x   :
+-   : 1   2   3   4   :
+@sn : x   x           :
+@sn1:         x   x   :
+
+
+<bassDrum@ b120>
+-   : 1   2   3   4   :
+@bd : x   x           :
+@bd1:         x   x   :
 
 
 <lowTom@ b120>
--        : 1   2   3   4   :
-@lowTom2 : x   x           :
-@lowTom1 :         x   x   :
+-   : 1   2   3   4   :
+@tl2: x   x           :
+@tl1:         x   x   :
 
 
 <midTom@ b120>
--        : 1   2   3   4   :
-@midTom2 : x   x           :
-@midTom1 :         x   x   :
+-   : 1   2   3   4   :
+@tm2: x   x           :
+@tm1:         x   x   :
 
 
 <highTom@ b120>
--         : 1   2   3   4   :
-@highTom2 : x   x           :
-@highTom1 :         x   x   :
+-   : 1   2   3   4   :
+@th2: x   x           :
+@th1:         x   x   :
+
+
+<sideRimshot@ b120>
+-            : 1   2   3   4   :
+@sideRimshot : x   x   x   x   :
+
+
+<crashCymbal@ b120>
+-              : 1   2   3   4   :
+@crashCymbal2  : x   x           :
+@crashCymbal1  :         x   x   :
+
+
+<rideCymbal@ b120>
+-             : 1   2   3   4   :
+@rideCymbal2  : x   x           :
+@rideCymbal1  :         x   x   :
+
+
+<splashCymbal@ b120>
+-             : 1   2   3   4   :
+@splashCymbal : x   x   x   x   :
+
+
+<chineseCymbal@ b120>
+-             : 1   2   3   4   :
+@chineseCymbal: x   x   x   x   :
 
 
 <whistle@ b120>
@@ -293,26 +371,13 @@ bassDrum@
 @lowAgogo  :         x   x   :
 
 
-<hiHat@ b120>
--           : 1   2   3   4   5   6   :
-@ho         : x   x                   :
-@hc         :         x   x           :
-@hp         :                 x   x   :
-
-
-<cymbal@ b120>
--              : 1   2   3   4   5   6   7   8   9   10  11  12  :
-@crashCymbal2  : x   x                                           :
-@crashCymbal1  :         x   x                                   :
-@splashCymbal  :                 x   x                           :
-@rideCymbal2   :                         x   x                   :
-@rideCymbal1   :                                 x   x           :
-@chineseCymbal :                                         x   x   :
-
-<bell@ b120>
+<rideBell@ b120>
 -         : 1   2   3   4   :
-@rideBell : x   x           :
-@cowbell  :         x   x   :
+@rideBell : x   x   x   x   :
+
+<cowbell@ b120>
+-         : 1   2   3   4   :
+@cowbell  : x   x   x   x   :
 
 
 <bongo@ b120>
@@ -352,10 +417,6 @@ bassDrum@
 <handClap@ b120>
 -           : 1   2   3   4   :
 @handClap   : x   x   x   x   :
-
-<sideRimshot@ b120>
--            : 1   2   3   4   :
-@sideRimshot : x   x   x   x   :
 
 `.trim();
 

@@ -1,4 +1,53 @@
-export const Drums = {
+export type DrumType =
+  | 'hiHatOpened'
+  | 'hiHatPedal'
+  | 'hiHatClosed'
+  | 'snare2'
+  | 'snare1'
+  | 'sideRimshot'
+  | 'bassDrum2'
+  | 'bassDrum1'
+  | 'handClap'
+  | 'lowTom2'
+  | 'lowTom1'
+  | 'midTom2'
+  | 'midTom1'
+  | 'highTom2'
+  | 'highTom1'
+  | 'crashCymbal1'
+  | 'rideCymbal1'
+  | 'rideCymbal2'
+  | 'chineseCymbal'
+  | 'splashCymbal'
+  | 'crashCymbal2'
+  | 'rideBell'
+  | 'tambourine'
+  | 'maracas'
+  | 'cowbell'
+  | 'vibraSlap'
+  | 'highBongo'
+  | 'lowBongo'
+  | 'muteHighConga'
+  | 'openHighConga'
+  | 'lowConga'
+  | 'highTimbale'
+  | 'lowTimbale'
+  | 'highAgogo'
+  | 'lowAgogo'
+  | 'cabasa'
+  | 'shortWhistle'
+  | 'longWhistle'
+  | 'shortGuiro'
+  | 'longGuiro'
+  | 'claves'
+  | 'highWoodBlock'
+  | 'lowWoodBlock'
+  | 'muteCuica'
+  | 'openCuica'
+  | 'muteTriangle'
+  | 'openTriangle';
+
+export const Drums: Record<DrumType, number> = {
   bassDrum2: 35, // bd
   bassDrum1: 36,
   sideRimshot: 37,
@@ -53,10 +102,8 @@ export const drumCodes = {
   ho: 'drum_46',
   hp: 'drum_44',
   bd: 'drum_35',
-  bd2: 'drum_35',
   bd1: 'drum_36',
   sn: 'drum_40',
-  sn2: 'drum_40',
   sn1: 'drum_38',
 
   sideRimshot: 'drum_37',
@@ -67,11 +114,17 @@ export const drumCodes = {
   cowbell: 'drum_56',
 
   lowTom2: 'drum_41',
+  tl2: 'drum_41',
   lowTom1: 'drum_43',
+  tl1: 'drum_43',
   midTom2: 'drum_45',
+  tm2: 'drum_45',
   midTom1: 'drum_47',
+  tm1: 'drum_47',
   highTom2: 'drum_48',
+  th2: 'drum_48',
   highTom1: 'drum_50',
+  th1: 'drum_50',
 
   crashCymbal2: 'drum_57',
   crashCymbal1: 'drum_49',
@@ -113,60 +166,45 @@ export const drumCodes = {
   openTriangle: 'drum_81',
 };
 
-export const drumKeys = {
-  /**/
-  KeyX: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: Drums.bassDrum2,
-    noteLat: 'bd',
-    noteRus: 'бб',
-  },
-  KeyZ: {},
-  ShiftLeft: {},
-  /**/
-  KeyS: {},
-  KeyA: {},
-  CapsLock: {},
-  /**/
-  KeyW: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: Drums.snare2,
-    noteLat: 'sn',
-    noteRus: 'мб',
-  },
-  KeyQ: {},
-  Tab: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: Drums.hiHatClosed,
-    noteLat: 'hc',
-    noteRus: 'хз',
-  },
-  /**/
-  Digit2: {},
-  Digit1: {},
-  Backquote: {
+export const drumInfo: Record<
+  DrumType,
+  {
+    octave: string;
+    volume: number;
+    instr: number;
+    instrCode?: number;
+    noteLat: string;
+    noteRus: string;
+  }
+> = {
+  hiHatOpened: {
     octave: 'drum',
     volume: 0.5,
     instr: Drums.hiHatOpened,
     noteLat: 'ho',
     noteRus: 'хо',
   },
-  bassDrum1: {
+  hiHatClosed: {
     octave: 'drum',
     volume: 0.5,
-    instr: Drums.bassDrum1,
-    noteLat: 'bd1',
-    noteRus: 'бб1',
+    instr: Drums.hiHatClosed,
+    noteLat: 'hc',
+    noteRus: 'хз',
   },
-  bassDrum2: {
+  hiHatPedal: {
     octave: 'drum',
     volume: 0.5,
-    instr: Drums.bassDrum2, // bd
-    noteLat: 'bd2',
-    noteRus: 'бб2',
+    instr: Drums.hiHatPedal,
+    noteLat: 'hp',
+    noteRus: 'хп',
+  },
+
+  snare2: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: Drums.snare2,
+    noteLat: 'sn',
+    noteRus: 'мб',
   },
   snare1: {
     octave: 'drum',
@@ -175,14 +213,6 @@ export const drumKeys = {
     noteLat: 'sn1',
     noteRus: 'мб1',
   },
-  snare2: {
-    octave: 'drum',
-    volume: 0.5,
-    instr: Drums.snare2,
-    noteLat: 'sn2',
-    noteRus: 'мб2',
-  },
-
   sideRimshot: {
     // удар по ободу
     octave: 'drum',
@@ -191,63 +221,63 @@ export const drumKeys = {
     noteLat: 'sideRimshot',
     noteRus: 'sideRimshot',
   },
-  handClap: {
-    // хлопок в ладоши
+
+  bassDrum2: {
     octave: 'drum',
     volume: 0.5,
-    instr: Drums.handClap,
-    noteLat: 'handClap',
-    noteRus: 'handClap',
+    instr: Drums.bassDrum2, // bd
+    noteLat: 'bd',
+    noteRus: 'бб',
   },
+  bassDrum1: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: Drums.bassDrum1,
+    noteLat: 'bd1',
+    noteRus: 'бб1',
+  },
+
   lowTom2: {
     octave: 'drum',
     volume: 0.5,
     instr: Drums.lowTom2,
-    noteLat: 'lowTom2',
-    noteRus: 'lowTom2',
+    noteLat: 'tl2',
+    noteRus: 'тл2',
   },
   lowTom1: {
     octave: 'drum',
     volume: 0.5,
     instr: Drums.lowTom1,
-    noteLat: 'lowTom1',
-    noteRus: 'lowTom1',
+    noteLat: 'tl1',
+    noteRus: 'тл1',
   },
   midTom2: {
     octave: 'drum',
     volume: 0.5,
     instr: Drums.midTom2,
-    noteLat: 'midTom2',
-    noteRus: 'midTom2',
+    noteLat: 'tm2',
+    noteRus: 'тм2',
   },
   midTom1: {
     octave: 'drum',
     volume: 0.5,
     instr: Drums.midTom1,
-    noteLat: 'midTom1',
-    noteRus: 'midTom1',
+    noteLat: 'tm1',
+    noteRus: 'тм1',
   },
   highTom2: {
     octave: 'drum',
     volume: 0.5,
     instr: Drums.highTom2,
-    noteLat: 'highTom2',
-    noteRus: 'highTom2',
+    noteLat: 'th2',
+    noteRus: 'тх2',
   },
   highTom1: {
     octave: 'drum',
     volume: 0.5,
     instr: Drums.highTom1,
-    noteLat: 'highTom1',
-    noteRus: 'highTom1',
-  },
-  hiHatPedal: {
-    // highHatPedal
-    octave: 'drum',
-    volume: 0.5,
-    instr: Drums.hiHatPedal,
-    noteLat: 'hp',
-    noteRus: 'хп',
+    noteLat: 'th1',
+    noteRus: 'тх1',
   },
 
   crashCymbal2: {
@@ -302,6 +332,15 @@ export const drumKeys = {
     instr: Drums.chineseCymbal,
     noteLat: 'chineseCymbal',
     noteRus: 'chineseCymbal',
+  },
+
+  handClap: {
+    // хлопок в ладоши
+    octave: 'drum',
+    volume: 0.5,
+    instr: Drums.handClap,
+    noteLat: 'handClap',
+    noteRus: 'handClap',
   },
 
   rideBell: {
@@ -500,4 +539,23 @@ export const drumKeys = {
     noteLat: 'openTriangle',
     noteRus: 'openCuica',
   },
+};
+
+export const drumKeys = {
+  /**/
+  KeyX: drumInfo.bassDrum2,
+  KeyZ: {},
+  ShiftLeft: {},
+  /**/
+  KeyS: {},
+  KeyA: {},
+  CapsLock: {},
+  /**/
+  KeyW: drumInfo.snare2,
+  KeyQ: {},
+  Tab: drumInfo.hiHatClosed,
+  /**/
+  Digit2: {},
+  Digit1: {},
+  Backquote: drumInfo.hiHatOpened,
 };

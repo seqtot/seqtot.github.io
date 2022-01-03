@@ -7,7 +7,7 @@ import { ComponentContext } from 'framework7/types/modules/component/component';
 import { Props } from 'framework7/types/modules/component/snabbdom/modules/props';
 import { byId, dyName } from './utils';
 import { Player3 } from './muse/player3';
-import { drumSettings } from './muse/midi';
+import { voiceAndDrumsSettings } from './muse/midi';
 import * as un from './muse/utils-note';
 import { Range } from 'framework7/types';
 
@@ -17,7 +17,7 @@ import setBattle from './set_battle';
 const ctx: AudioContext = new AudioContext();
 const uniPlayer = new Player3();
 uniPlayer.connect({ ctx });
-uniPlayer.setSettings(drumSettings);
+uniPlayer.setSettings(voiceAndDrumsSettings);
 
 function getWithDataAttr<T extends HTMLElement = HTMLElement>(
   name: string,
