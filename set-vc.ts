@@ -10,6 +10,7 @@ import { Player3 } from './muse/player3';
 import { voiceAndDrumsSettings } from './muse/midi';
 import * as un from './muse/utils-note';
 import { Range } from 'framework7/types';
+import { getInstrCodeBy } from './muse/midi';
 
 import setE from './set_E';
 import setBattle from './set_battle';
@@ -18,6 +19,7 @@ const ctx: AudioContext = new AudioContext();
 const uniPlayer = new Player3();
 uniPlayer.connect({ ctx });
 uniPlayer.setSettings(voiceAndDrumsSettings);
+uniPlayer.addMidiSound(697); // sax
 
 function getWithDataAttr<T extends HTMLElement = HTMLElement>(
   name: string,
@@ -311,14 +313,15 @@ export class SetVc {
         const isDrum = instrKey.startsWith('@');
         const loopRepeat = un.getRepeatCount(noteLine);
 
-        const instrCode = instrKey.split('-')[0];
+        let instrCode: string | number = instrKey.split('-')[0];
+        instrCode = isDrum ? undefined : getInstrCodeBy(instrCode);
 
         return uniPlayer.addLoop({
           noteLine,
           bpm,
           isDrum,
           repeat: block.repeat,
-          instrCodeOrAlias: instrCode,
+          instrCode,
         }).id;
       });
     });

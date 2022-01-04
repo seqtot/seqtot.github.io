@@ -36,6 +36,7 @@ export const MIDI_INSTR = 162; // 633
 export const voiceCodes = {
   organ: 162,
   bass: 366,
+  sax: 697,
 };
 
 export const instrAlias = {
@@ -44,6 +45,8 @@ export const instrAlias = {
 };
 
 export function getInstrCodeBy(val: number | string): number | string {
+  if (!val) return '';
+
   if (typeof val === 'number') return val;
 
   val = val.replace('$', '').replace('@', '');

@@ -179,7 +179,6 @@ export class Player3 extends Sound {
     soundInfo: KeyInfo | KeyInfo[];
     duration: number; // ms
     pause: number;
-    instrCode: number | string;
     isDrum?: boolean;
     volume?: number;
     instr?: any;
@@ -320,7 +319,7 @@ export class Player3 extends Sound {
     qms: number; // с разрядами
     quant: number;
     isDrum?: boolean;
-    instrCode?: number;
+    instrCode?: any;
   }): LoopAndTicksInfo {
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
     const { noteLine, qms, quant, isDrum } = props;
@@ -399,7 +398,7 @@ export class Player3 extends Sound {
     mode?: 'full' | 'prev';
     bpm: number;
     isDrum?: boolean;
-    instrCodeOrAlias?: string | number;
+    instrCode?: string | number;
     volume?: number;
   }): LoopAndTicksInfo {
     const qms = 60000 / params.bpm / 100;
@@ -409,7 +408,7 @@ export class Player3 extends Sound {
     this.loopId++;
     const loopId = this.loopId;
 
-    let { noteLine, repeat, mode, isDrum, instrCodeOrAlias } = params;
+    let { noteLine, repeat, mode, isDrum, instrCode } = params;
 
     //console.log('instrCodeOrAlias', instrCodeOrAlias);
 
@@ -429,6 +428,7 @@ export class Player3 extends Sound {
       qms,
       quant: QUANT,
       isDrum,
+      instrCode,
     });
 
     //console.log('sked', sked);
@@ -449,7 +449,6 @@ export class Player3 extends Sound {
           duration: item.duration,
           pause: item.pause,
           isDrum: params.isDrum,
-          instrCode: item.instrCode,
           instr: item.instr,
           soundInfo: item.soundInfo,
           when: eeParams.when,

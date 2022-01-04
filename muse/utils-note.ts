@@ -229,14 +229,14 @@ export function getDrumQuartersInfo(arr: string[]): [number[]] {
 export function getNoteInstruments(arr: string[]): { [key: string]: string } {
   let instrs = arr
     .filter((item) => item.startsWith('$'))
-    .reduce((acc, item) => {
+    .reduce((acc, item, i) => {
       const arr = item.split(':');
       const instr = (arr[0] || '').trim();
       let noteLine = (arr[1] || '').trim();
 
       noteLine = noteLine.replace(/[{}]/g, ' ').trim(); // {}
 
-      acc[instr] = noteLine;
+      acc[`${instr}-${i}`] = noteLine;
 
       return acc;
     }, {});
@@ -305,12 +305,23 @@ export function getOutBlocksInfo(blocks: BlockInfo[]): {
   const out = findBlockById(blocks, 'out');
   const result: any[] = [];
 
+  if (!out) {
+    console.warn('Block OUT not found');
+    return result;
+  }
+
   // строки для вывода в out
   const rows = out.rows
     .map((item) => item.trim())
     .filter((item, i) => {
       return i && item && !item.startsWith('#');
     });
+
+  if (!Array.isArray(rows) || !rows.length) {
+    console.warn('Bad rows', out);
+
+    return result;
+  }
 
   // цикл по строка out
   rows.forEach((row, i) => {
@@ -319,59 +330,52 @@ export function getOutBlocksInfo(blocks: BlockInfo[]): {
       .map((item) => item.trim())
       .filter((item) => !!item);
 
-    // rowArr.forEach((item) => {
-    //   const type = getOutType(item);
+    const headArr = (rowArr[0] || '').split('-');
 
-    //   if (!type) return;
+    // ведущий цикл, пока это ударные
+    let headId = headArr[0].trim();
+    let headRepeat = parseInt(headArr[1], 10) || 1;
+    headRepeat = isNaN(headRepeat) ? 1 : headRepeat;
 
-    //   const arr = item.split('-');
-    //   const blockId = (arr[0] || '').trim();
-    //   let repeat = parseInt(arr[1], 10) || 1;
-    //   repeat = isNaN(repeat) ? 1 : repeat;
-    //   let block = findBlockById(blocks, blockId);
-
-    //   if (block && type === 'drum') {
-    //     let instrs = getDrumInstruments(block.rows);
-
-    //     Object.keys(instrs).forEach((key) => {
-    //       instrs[key] = `r${repeat} ` + instrs[key];
-    //     });
-    //   }
-    // });
-
-    const drumArr = (rowArr[0] || '').split('-');
-    const noteArr = (rowArr[1] || '').split('-');
-
-    // ударные
-    let drumId = drumArr[0].trim();
-    let drumRepeat = parseInt(drumArr[1], 10) || 1;
-    drumRepeat = isNaN(drumRepeat) ? 1 : drumRepeat;
-
-    let block = findBlockById(blocks, drumId);
+    let block = findBlockById(blocks, headId);
     let instrs = getDrumInstruments(block.rows);
 
     Object.keys(instrs).forEach((key) => {
-      instrs[key] = `r${drumRepeat} ` + instrs[key];
+      instrs[key] = `head r${headRepeat} ` + instrs[key];
     });
 
-    // ноты
-    if (noteArr[0]) {
-      let noteId = noteArr[0].trim();
-      let noteRepeat = parseInt(noteArr[1], 10) || 1;
-      let noteVolume = getVolumeFromString(noteArr.join(' '));
+    for (let j = 1; j < rowArr.length; j++) {
+      const item = rowArr[j];
+      const type = getOutType(item);
 
-      noteRepeat = isNaN(noteRepeat) ? 1 : noteRepeat;
-      block = findBlockById(blocks, noteId);
-      let noteInstrs = getNoteInstruments(block.rows);
+      // if (!type) break;
 
-      Object.keys(noteInstrs).forEach((key) => {
-        instrs[key] = `r${noteRepeat} ` + `v${noteVolume} ` + noteInstrs[key];
-      });
+      const noteArr = (item || '').split('-');
+
+      if (noteArr[0]) {
+        let noteId = noteArr[0].trim();
+        let noteRepeat = parseInt(noteArr[1], 10) || 1;
+        let noteVolume = getVolumeFromString(noteArr.join(' '));
+
+        noteRepeat = isNaN(noteRepeat) ? 1 : noteRepeat;
+        block = findBlockById(blocks, noteId);
+
+        if (!block) {
+          throw new Error(`Block not <${noteId}> found`);
+        }
+
+        let noteInstrs = getNoteInstruments(block.rows);
+
+        Object.keys(noteInstrs).forEach((key) => {
+          instrs[`${key}-${j}`] =
+            `r${noteRepeat} ` + `v${noteVolume} ` + noteInstrs[key];
+        });
+      }
     }
 
     result.push({
       instrs,
-      repeat: drumRepeat,
+      repeat: headRepeat,
     });
   });
 
