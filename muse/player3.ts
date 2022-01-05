@@ -24,6 +24,7 @@ type LoopInfo = {
   repeat: number;
   isDrum: boolean;
   volume: number;
+  isHead?: boolean;
 };
 
 type LoopAndTicksInfo = LoopInfo & TicksInfo;
@@ -121,37 +122,50 @@ export class Player3 extends Sound {
     return this;
   }
 
-  play(loopsArr?: (string | number)[]) {
+  play(loopIdsArr?: (string | number)[]) {
     let totalTickCount = 0;
+    let totalTickCountByHead = 0;
     this.stop(true);
 
     this.ticker = new TickerOld(this.ctx);
 
     this.loopDfr = new un.Deferred();
 
-    const loops = (loopsArr || []).reduce((acc, item) => {
+    const loopIdsObj = (loopIdsArr || []).reduce((acc, item) => {
       acc[item] = item;
 
       return acc;
     }, {});
 
-    Object.keys(loops).forEach((key) => {
-      //console.log(this.loops[key]);
+    Object.keys(loopIdsObj).forEach((key) => {
+      const loopInfo = this.loops[key];
+
+      // console.log(this.loops[key]);
+
       // if (!this.loops[key].isDrum) {
       //   return;
       // }
 
-      const tickCount = this.loops[key].tickCount * this.loops[key].repeat;
+      const tickCount = loopInfo.tickCount * loopInfo.repeat;
+      const headTickCount = loopInfo.isHead ? tickCount : 0;
 
       if (tickCount > totalTickCount) {
         totalTickCount = tickCount;
       }
+
+      if (headTickCount > totalTickCountByHead) {
+        totalTickCountByHead = tickCount;
+      }
     });
+
+    if (totalTickCountByHead) {
+      totalTickCount = totalTickCountByHead;
+    }
 
     //console.log('play: maxTick, loops', totalTickCount);
     const startTime = this.ctx.currentTime;
 
-    ee.emit('prepare', loops);
+    ee.emit('prepare', loopIdsObj);
 
     let currTick = -1;
     const endTick = totalTickCount - 2; // выходим из цикла на тик раньше, это костылёк
@@ -324,6 +338,8 @@ export class Player3 extends Sound {
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
     const { noteLine, qms, quant, isDrum } = props;
 
+    let isHead = /head /.test(noteLine);
+
     // this.getNoteLineInfo(noteLine);
 
     let arr: string[] = noteLine
@@ -385,6 +401,7 @@ export class Player3 extends Sound {
     offsetMs = offsetQ * qms;
 
     sked.tickCount = Math.floor(offsetMs / quant);
+    sked.isHead = isHead;
 
     (sked as any)['_noteLine'] = noteLine;
     (sked as any)['_totalQ'] = offsetQ;

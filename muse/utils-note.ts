@@ -330,47 +330,46 @@ export function getOutBlocksInfo(blocks: BlockInfo[]): {
       .map((item) => item.trim())
       .filter((item) => !!item);
 
-    const headArr = (rowArr[0] || '').split('-');
+    let headRepeat = 1;
+    let currRepeat = 1;
+    let block: BlockInfo;
+    let instrs: { [key: string]: string } = {};
 
-    // ведущий цикл, пока это ударные
-    let headId = headArr[0].trim();
-    let headRepeat = parseInt(headArr[1], 10) || 1;
-    headRepeat = isNaN(headRepeat) ? 1 : headRepeat;
-
-    let block = findBlockById(blocks, headId);
-    let instrs = getDrumInstruments(block.rows);
-
-    Object.keys(instrs).forEach((key) => {
-      instrs[key] = `head r${headRepeat} ` + instrs[key];
-    });
-
-    for (let j = 1; j < rowArr.length; j++) {
+    for (let j = 0; j < rowArr.length; j++) {
       const item = rowArr[j];
       const type = getOutType(item);
+      const itemInfo = (item || '').split('-');
+      let currInstrs: { [key: string]: string };
+      let itemId = itemInfo[0].trim();
+      let volume: number;
+      let head = '';
 
-      // if (!type) break;
+      currRepeat = parseInt(itemInfo[1], 10) || 1;
+      currRepeat = isNaN(currRepeat) ? 1 : currRepeat;
+      volume = getVolumeFromString(itemInfo.join(' '));
 
-      const noteArr = (item || '').split('-');
+      block = findBlockById(blocks, itemId);
 
-      if (noteArr[0]) {
-        let noteId = noteArr[0].trim();
-        let noteRepeat = parseInt(noteArr[1], 10) || 1;
-        let noteVolume = getVolumeFromString(noteArr.join(' '));
-
-        noteRepeat = isNaN(noteRepeat) ? 1 : noteRepeat;
-        block = findBlockById(blocks, noteId);
-
-        if (!block) {
-          throw new Error(`Block not <${noteId}> found`);
-        }
-
-        let noteInstrs = getNoteInstruments(block.rows);
-
-        Object.keys(noteInstrs).forEach((key) => {
-          instrs[`${key}-${j}`] =
-            `r${noteRepeat} ` + `v${noteVolume} ` + noteInstrs[key];
-        });
+      if (!block) {
+        throw new Error(`Block not <${itemId}> found`);
       }
+
+      if (j === 0) {
+        head = 'head';
+        headRepeat = currRepeat;
+      }
+
+      if (type === 'drum') {
+        currInstrs = getDrumInstruments(block.rows);
+      } else {
+        currInstrs = getNoteInstruments(block.rows);
+      }
+
+      Object.keys(currInstrs).forEach((key) => {
+        instrs[
+          `${key}-${j}`
+        ] = `${head} r${currRepeat} v${volume} ${currInstrs[key]}`;
+      });
     }
 
     result.push({
