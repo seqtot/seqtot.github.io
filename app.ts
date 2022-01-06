@@ -20,8 +20,8 @@ import { setVc } from './set-vc';
 
 const appEl = document.getElementById('app');
 
-const defRoute = '/set/set_E/';
-// const defRoute = '/set/set_Battle/';
+//const defRoute = '/set/set_E/';
+const defRoute = '/set/set_Battle/';
 
 const leftPanel = `
 <div
