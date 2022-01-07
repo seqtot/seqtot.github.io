@@ -26,18 +26,20 @@ import { drumKeys, drumCodes, drumInfo } from './drums';
 
 //     Guitar Fret Noise: 1273 - 1282
 //     Breath Noise: 1283 - 1292
-export const MIDI_INSTR = 162; // 633
-
-// 580 581 594 а5T5T
-// 595 у
-// 597 598 ы
-// 580
+export const MIDI_INSTR = 168; // 633
 
 export const voiceCodes = {
-  organ: 162,
+  organ: 168,
   bass: 366,
-  sax: 697,
+  sax: 697, // 697
+  piccolo: 762, // 768
+  flute: 776, // 771
+  panFlute: 790,
+  recorder: 781,
 };
+
+// Pan Flute 790+
+// Recorder 781
 
 export const instrAlias = {
   ...voiceCodes,
