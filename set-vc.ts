@@ -7,7 +7,7 @@ import { ComponentContext } from 'framework7/types/modules/component/component';
 import { Props } from 'framework7/types/modules/component/snabbdom/modules/props';
 import { byId, dyName } from './utils';
 import { Player3 } from './muse/player3';
-import { voiceAndDrumsSettings } from './muse/midi';
+import { voiceAndDrumsSettings, MIDI_INSTR } from './muse/midi';
 import * as un from './muse/utils-note';
 import { Range } from 'framework7/types';
 import { getInstrCodeBy } from './muse/midi';
@@ -269,7 +269,7 @@ export class SetVc {
     });
   }
 
-  tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
+  async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
     repeat = repeat || 1;
     text = (text || '').trim();
 
@@ -282,8 +282,10 @@ export class SetVc {
       bpm,
       isDrum: false, // isDrum,
       repeat,
-      instrCode: 162, // instrAlias[key],
+      instrCode: MIDI_INSTR, // instrAlias[key],
     }).id;
+
+    await uniPlayer.waitLoadingAllInstruments();
 
     uniPlayer.play([loopId]);
   }
@@ -333,6 +335,8 @@ export class SetVc {
     //console.log('LOOPS', uniPlayer.loops);
 
     let breakLoop: boolean = false;
+
+    await uniPlayer.waitLoadingAllInstruments();
 
     for (let i = 0; i < repeat; i++) {
       if (breakLoop) break;

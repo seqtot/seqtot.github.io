@@ -13,6 +13,8 @@ import * as un from './utils-note';
 const instruments: { [code: number]: any } = {};
 const loadingInstruments: { [code: number]: boolean } = {};
 const drumKeys: { [code: string]: number } = {};
+const fontPlayer = new WebAudioFontPlayer();
+const DRUM_PREFIX = 'drum_';
 
 export type KeyInfo = {
   oscil?: OscillatorNode;
@@ -57,56 +59,133 @@ export class Sound {
   // fontInfo: any;
   // fontInstr: any;
 
-  get instruments(): { [code: number]: any } {
+  static get Instruments(): { [code: number]: any } {
     return instruments;
   }
 
+  get instruments(): { [code: number]: any } {
+    return Sound.Instruments;
+  }
+
   get loadingInstruments(): { [code: number]: any } {
+    return Sound.LoadingInstruments;
+  }
+
+  static get LoadingInstruments(): { [code: number]: any } {
     return loadingInstruments;
   }
 
-  get drumKeys(): { [code: string]: number } {
+  static get DrumKeys(): { [code: string]: number } {
     return drumKeys;
   }
 
-  addMidiSound(instumentId: number) {
-    if (this.instruments[instumentId] || this.loadingInstruments[instumentId]) {
+  get drumKeys(): { [code: string]: number } {
+    return Sound.DrumKeys;
+  }
+
+  async waitLoadingAllInstruments(): Promise<unknown> {
+    const dfr = new un.Deferred();
+
+    if (!Object.keys(Sound.LoadingInstruments).length) {
+      dfr.resolve(true);
+
+      return dfr.promise;
+    }
+
+    let interval = setInterval(() => {
+      if (!Object.keys(Sound.LoadingInstruments).length) {
+        clearInterval(interval);
+
+        dfr.resolve(true);
+      }
+    }, 100);
+
+    return dfr.promise;
+  }
+
+  static AddSound(id: string | number) {
+    if (!id) {
       return;
     }
 
-    const fontInfo = this.fontPlayer.loader.instrumentInfo(instumentId);
+    if (typeof id === 'number') {
+      Sound.AddToneSound(id);
 
-    this.loadingInstruments[instumentId] = true;
+      return;
+    }
 
-    this.fontPlayer.loader.startLoad(this.ctx, fontInfo.url, fontInfo.variable);
-    this.fontPlayer.loader.waitLoad(() => {
-      this.instruments[instumentId] = window[fontInfo.variable];
-      delete this.loadingInstruments[instumentId];
+    let drumId = parseInt(id.replace(DRUM_PREFIX, ''), 10);
+    drumId = isNaN(drumId) ? null : drumId;
+
+    if (!drumId) {
+      return;
+    }
+
+    Sound.AddDrumSound(drumId);
+  }
+
+  addMidiSound(id: number) {
+    Sound.AddToneSound(id);
+  }
+
+  addToneSound(id: number) {
+    Sound.AddToneSound(id);
+  }
+
+  static AddToneSound(id: number) {
+    if (!id) {
+      return;
+    }
+
+    if (Sound.Instruments[id] || Sound.LoadingInstruments[id]) {
+      return;
+    }
+
+    const fontInfo = fontPlayer.loader.instrumentInfo(id);
+
+    Sound.LoadingInstruments[id] = true;
+
+    fontPlayer.loader.startLoad(
+      new AudioContext() /*this.ctx*/,
+      fontInfo.url,
+      fontInfo.variable
+    );
+    fontPlayer.loader.waitLoad(() => {
+      Sound.Instruments[id] = window[fontInfo.variable];
+      delete Sound.LoadingInstruments[id];
     });
   }
 
   addDrumSound(drumId: number) {
+    Sound.AddDrumSound(drumId);
+  }
+
+  static AddDrumSound(drumId: number) {
     if (!drumId) {
       return;
     }
 
     // console.log(this.fontPlayer.loader.drumKeys()); //
     // console.log(this.fontPlayer.loader.drumTitles()); //
-    const drumIndex = this.fontPlayer.loader.findDrum(drumId);
-    const drumInfo = this.fontPlayer.loader.drumInfo(drumIndex);
-    const id = 'drum_' + drumId;
-    this.drumKeys[id] = drumInfo.pitch;
+    const drumIndex = fontPlayer.loader.findDrum(drumId);
+    const drumInfo = fontPlayer.loader.drumInfo(drumIndex);
+    const id = DRUM_PREFIX + drumId;
+    Sound.DrumKeys[id] = drumInfo.pitch;
 
-    if (this.instruments[id] || this.loadingInstruments[id]) {
+    if (Sound.Instruments[id] || Sound.LoadingInstruments[id]) {
       return;
     }
 
-    this.loadingInstruments[id] = true;
-    this.fontPlayer.loader.startLoad(this.ctx, drumInfo.url, drumInfo.variable);
+    Sound.LoadingInstruments[id] = true;
+    fontPlayer.loader.startLoad(
+      new AudioContext() /*this.ctx*/,
+      drumInfo.url,
+      drumInfo.variable
+    );
 
-    this.fontPlayer.loader.waitLoad(() => {
-      this.instruments[id] = window[drumInfo.variable];
-      delete this.loadingInstruments[id];
+    fontPlayer.loader.waitLoad(() => {
+      Sound.Instruments[id] = window[drumInfo.variable];
+      delete Sound.LoadingInstruments[id];
     });
   }
 
@@ -182,7 +261,7 @@ export class Sound {
       if (info && !info.instr) {
         playingKey[key] = {
           ...info,
-          instr: 'drum_undefined' as any,
+          instr: (DRUM_PREFIX + 'undefined') as any,
         };
 
         return;
@@ -195,7 +274,7 @@ export class Sound {
       playingKey[key] = {
         ...info,
         code: drumInfo.pitch,
-        instr: ('drum_' + info.instr) as any,
+        instr: (DRUM_PREFIX + info.instr) as any,
       };
     });
 
