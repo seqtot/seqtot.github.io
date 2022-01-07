@@ -62,7 +62,7 @@ export const setVc = (props: Props, context: any) => {
 
 export class SetVc {
   view: 'info' | 'drums' = 'info';
-  bpm = 100;
+  bpmMultiple = 100;
 
   constructor(
     public props: Props,
@@ -126,17 +126,17 @@ export class SetVc {
     const content = `
       <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
         <div style="padding: 1rem .5rem 1rem .5rem;">
-          bpm: четвертей в минуту
+          % ускорения
           <div 
             class="range-slider"
             data-name="slider"
             data-label="true"
             data-min="0"   
-            data-max="300"
+            data-max="200"
             data-step="1"
-            data-value="120"
+            data-value="100"
             data-scale="true"
-            data-scale-steps="12"
+            data-scale-steps="10"
             data-scale-sub-steps="5"
           >
           </div>
@@ -151,7 +151,7 @@ export class SetVc {
       el: dyName('slider', this.pageEl),
       on: {
         changed: (range: any) => {
-          this.bpm = range.value;
+          this.bpmMultiple = range.value;
         },
       },
     });
@@ -165,17 +165,17 @@ export class SetVc {
     const content = `
       <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
         <div style="padding: 1rem .5rem 1rem .5rem;">
-          bpm: четвертей в минуту
+          % ускорения
           <div 
             class="range-slider"
             data-name="slider"
             data-label="true"
             data-min="0"   
-            data-max="300"
+            data-max="200"
             data-step="1"
-            data-value="120"
+            data-value="100"
             data-scale="true"
-            data-scale-steps="12"
+            data-scale-steps="10"
             data-scale-sub-steps="5"
           >
           </div>
@@ -193,7 +193,7 @@ export class SetVc {
       el: dyName('slider', this.pageEl),
       on: {
         changed: (range: any) => {
-          this.bpm = range.value;
+          this.bpmMultiple = range.value;
         },
       },
     });
@@ -282,7 +282,7 @@ export class SetVc {
       bpm,
       isDrum: false, // isDrum,
       repeat,
-      instrCodeOrAlias: 162, // instrAlias[key],
+      instrCode: 162, // instrAlias[key],
     }).id;
 
     uniPlayer.play([loopId]);
@@ -300,8 +300,9 @@ export class SetVc {
 
     const out = un.findBlockById(allBlocks, 'out');
 
-    // const bpm = un.getOutBpm(out.rows); // 130
-    const bpm = this.bpm;
+    let bpm = un.getOutBpm(out.rows); // 130
+    bpm = Math.round((bpm * this.bpmMultiple) / 100);
+
     const repeat = repeatCount || un.getOutRepeat(out.rows); // 2
     const outBlocks = un.getOutBlocksInfo(allBlocks);
 
