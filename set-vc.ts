@@ -19,11 +19,14 @@ const ctx: AudioContext = new AudioContext();
 const uniPlayer = new Player3();
 uniPlayer.connect({ ctx });
 uniPlayer.setSettings(voiceAndDrumsSettings);
+uniPlayer.addMidiSound(366); // bass
 uniPlayer.addMidiSound(697); // sax
 uniPlayer.addMidiSound(776); // flute
 uniPlayer.addMidiSound(762); // piccolo
 uniPlayer.addMidiSound(790); // Pan Flute
 uniPlayer.addMidiSound(781); // Recorder
+uniPlayer.addMidiSound(320); // gdm guidar drive mute
+uniPlayer.addMidiSound(137); // xlph xylophone
 
 function getWithDataAttr<T extends HTMLElement = HTMLElement>(
   name: string,

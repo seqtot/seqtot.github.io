@@ -36,6 +36,8 @@ export const voiceCodes = {
   flute: 776, // 771
   panFlute: 790,
   recorder: 781,
+  gdm: 320, // guitar drive mute
+  xlph: 137, // xylophone
 };
 
 // Pan Flute 790+

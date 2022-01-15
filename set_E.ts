@@ -135,11 +135,11 @@ const parts = `
 @sn:     2       4   :
 @bd: 1       3       :
 --------------------------------------------------------------------------------
-<pg_0Ха00$>
+<pg_оХаОО_ritm$>
 
-$organ: му-50 фу-50 фу-50 фу-50 му-50 фу-50 фу-50 фу-50
+$bass: му-50 фу-50 фу-50 фу-50 му-50 фу-50 фу-50 фу-50
 --------------------------------------------------------------------------------
-<pg_00ЦаЦуЩаЩуПаХу$>
+<pg_00ЦаЦуЩаЩуПаХу_ritm$>
 $organ: му-50 му-50 ву-50 му-50 су-50 му-50 лу-50 зу-50
 --------------------------------------------------------------------------------
 <pgToEs$>
@@ -178,7 +178,7 @@ $organ: 50 мо-100 ку-50  лу-100 му-50 су-100 d400
 @sn:     2     x x x :
 @bd: 1       3       :
 
-<pg_00ЦаЦуЩа$>
+<pg_00ЦаЦуЩа_ritm$>
 $organ: му-50 му-50 ву-50 му-50 су-50 150
 --------------------------------------------------------------------------------
 <pgBreakOnE1@>
@@ -186,7 +186,7 @@ $organ: му-50 му-50 ву-50 му-50 су-50 150
 @hc: x x x x x x x x :
 @sn: x         x x   :
 
-<pgBrakeOnE1$>
+<pgBrakeOnE1_ritm$>
 $organ: му-50 200 му-50 му-50 50
 --------------------------------------------------------------------------------
 <pgBreakOnH@>
@@ -194,7 +194,7 @@ $organ: му-50 200 му-50 му-50 50
 @hc: x x x x x x x x :
 @sn:           x x   :
 
-<pgBreakOnH$>
+<pgBreakOnH_ritm$>
 $organ: 250 бу-50 бу-50 50
 --------------------------------------------------------------------------------
 <peterGunnE2$>
@@ -220,20 +220,20 @@ $organ: 200 му-50 му-50
 const petGunBreak = `
 <out b120 r1>
 tick@
-simple44@-1 pg_00ЦаЦуЩаЩуПаХу$-1
-pg_00ЦаЦуЩа@ pg_00ЦаЦуЩа$
-pgBreakOnE1@ pgBrakeOnE1$
-pgBreakOnH@  pgBreakOnH$
+simple44@-1 pg_00ЦаЦуЩаЩуПаХу_ritm$-1
+pg_00ЦаЦуЩа@ pg_00ЦаЦуЩа_ritm$
+pgBreakOnE1@ pgBrakeOnE1_ritm$
+pgBreakOnH@  pgBreakOnH_ritm$
 hat8@-1
-hat@-1 pg_0Ха00$-1
+hat@-1 pg_оХаОО_ritm$-1
 pause@
 
 <out b120 r1>
 tick@
-simple44@-2 pg_00ЦаЦуЩаЩуПаХу$-2
+simple44@-2 pg_00ЦаЦуЩаЩуПаХу_ritm$-2
 simple44@-1 pgToEs$-1
 esMyVyMyVy@-1 esMyVyMyVy$
-simple44@-2 pg_00ЦаЦуЩаЩуПаХу$-2
+simple44@-2 pg_00ЦаЦуЩаЩуПаХу_ritm$-2
 simple44@-1 pgToEs$-1
 esMyVyMyVy@-1 esMyVyMyVy$
 pause@
@@ -245,20 +245,20 @@ const full = `
 <out b120 r1>
 tick@
 
-hat@-2 pg_0Ха00$-2
-simple44@-2 pg_00ЦаЦуЩаЩуПаХу$-2
-simple44@-8 pg_00ЦаЦуЩаЩуПаХу$-8
-simple44@-7 pg_00ЦаЦуЩаЩуПаХу$-7
-pg_00ЦаЦуЩа@ pg_00ЦаЦуЩа$
-pgBreakOnE1@ pgBrakeOnE1$
-pgBreakOnH@  pgBreakOnH$
+hat@-2       pg_оХаОО_ritm$-2
+simple44@-2  pg_00ЦаЦуЩаЩуПаХу_ritm$-2
+simple44@-8  pg_00ЦаЦуЩаЩуПаХу_ritm$-8
+simple44@-7  pg_00ЦаЦуЩаЩуПаХу_ritm$-7
+pg_00ЦаЦуЩа@ pg_00ЦаЦуЩа_ritm$
+pgBreakOnE1@ pgBrakeOnE1_ritm$
+pgBreakOnH@  pgBreakOnH_ritm$
 hat8@-1
 
-hat@-2 pg_0Ха00$-2
-simple44@-2 pg_00ЦаЦуЩаЩуПаХу$-2
+hat@-2 pg_оХаОО_ritm$-2
+simple44@-2 pg_00ЦаЦуЩаЩуПаХу_ritm$-2
 simple44@-1 pgToEs$-1
 esMyVyMyVy@-1 esMyVyMyVy$
-simple44@-2 pg_00ЦаЦуЩаЩуПаХу$-2
+simple44@-2 pg_00ЦаЦуЩаЩуПаХу_ritm$-2
 simple44@-1 pgToEs$-1
 esMyVyMyVy@-1 esMyVyMyVy$
 

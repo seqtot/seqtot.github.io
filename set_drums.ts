@@ -385,6 +385,200 @@ simple44@
 @bd: 1       3       :
 `.trim();
 
+const test = `
+<out b120 r1000>
+cowbell@
+rideBell@
+handClap@
+maracas@
+tambourine@
+triangle@
+timbale@
+
+<out b120 r1000>
+conga@
+bongo@
+cuica@
+woodBlock@
+guiro@
+whistle@
+cabasa@
+claves@
+agogo@
+vibraSlap@
+
+<out b120 r1000>
+hiHat@
+snare@
+bassDrum@
+lowTom@
+midTom@
+highTom@
+sideRimshot@
+crashCymbal@
+rideCymbal@
+splashCymbal@
+chineseCymbal@
+
+<hiHat@>
+-  : 1   2   3   4   5   6   :
+@ho: x   x                   :
+@hc:         x   x           :
+@hp:                 x   x   :
+
+
+<snare@>
+-   : 1   2   3   4   :
+@sn : x   x           :
+@sn1:         x   x   :
+
+
+<bassDrum@>
+-   : 1   2   3   4   :
+@bd : x   x           :
+@bd1:         x   x   :
+
+
+<lowTom@>
+-   : 1   2   3   4   :
+@tl2: x   x           :
+@tl1:         x   x   :
+
+
+<midTom@>
+-   : 1   2   3   4   :
+@tm2: x   x           :
+@tm1:         x   x   :
+
+
+<highTom@>
+-   : 1   2   3   4   :
+@th2: x   x           :
+@th1:         x   x   :
+
+
+<sideRimshot@>
+-            : 1   2   3   4   :
+@sideRimshot : x   x   x   x   :
+
+
+<crashCymbal@>
+-              : 1   2   3   4   :
+@crashCymbal2  : x   x           :
+@crashCymbal1  :         x   x   :
+
+
+<rideCymbal@>
+-             : 1   2   3   4   :
+@rideCymbal2  : x   x           :
+@rideCymbal1  :         x   x   :
+
+
+<splashCymbal@>
+-             : 1   2   3   4   :
+@splashCymbal : x   x   x   x   :
+
+
+<chineseCymbal@>
+-             : 1   2   3   4   :
+@chineseCymbal: x   x   x   x   :
+
+
+<whistle@>
+-             : 1   2   3   4   :
+@shortWhistle : x   x           :
+@longWhistle  :         x   x   :
+
+
+<guiro@>
+-           : 1   2   3   4   :
+@shortGuiro : x   x           :
+@longGuiro  :         x   x   :
+
+
+<conga@>
+-              : 1   2   3   4   5   6   :
+@muteHighConga : x   x                   :
+@openHighConga :         x   x           :
+@lowConga      :                 x   x   :
+
+
+<cabasa@>
+-        : 1   2   3   4   :
+@cabasa  : x   x   x   x   :
+
+
+<maracas@>
+-        : 1   2   3   4   :
+@maracas : x   x   x   x   :
+
+
+<claves@>
+-       : 1   2   3   4   :
+@claves : x   x   x   x   :
+
+
+<timbale@>
+-            : 1   2   3   4   :
+@highTimbale : x   x           :
+@lowTimbale  :         x   x   :
+
+
+<agogo@>
+-          : 1   2   3   4   :
+@highAgogo : x   x           :
+@lowAgogo  :         x   x   :
+
+
+<rideBell@>
+-         : 1   2   3   4   :
+@rideBell : x   x   x   x   :
+
+<cowbell@>
+-         : 1   2   3   4   :
+@cowbell  : x   x   x   x   :
+
+
+<bongo@>
+-          : 1   2   3   4   :
+@highBongo : x   x           :
+@lowBongo  :         x   x   :
+
+
+<triangle@>
+-             : 1   2   3   4   :
+@muteTriangle : x   x           :
+@openTriangle :         x   x   :
+
+
+<woodBlock@>
+-              : 1   2   3   4   :
+@highWoodBlock : x   x           :
+@lowWoodBlock  :         x   x   :
+
+
+<cuica@>
+-          : 1   2   3   4   :
+@muteCuica : x   x           :
+@openCuica :         x   x   :
+
+
+<tambourine@>
+-           : 1   2   3   4   :
+@tambourine : x x x x x x x x :
+
+
+<vibraSlap@>
+-           : 1   2   3   4   :
+@vibraSlap  : x x x x x x x x :
+
+
+<handClap@>
+-           : 1   2   3   4   :
+@handClap   : x   x   x   x   :
+
+`.trim();
+
 const test2 = `
 <out b70 r1>
 tick4@
