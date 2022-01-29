@@ -12,8 +12,9 @@ import * as un from './muse/utils-note';
 import { Range } from 'framework7/types';
 import { getInstrCodeBy } from './muse/midi';
 
-import setE from './set_E';
-import setBattle from './set_battle';
+import setE from './sets/set_E';
+import setBattle from './sets/set_battle';
+import setItsMyLife from './sets/set_ItsMyLife';
 
 const ctx: AudioContext = new AudioContext();
 const uniPlayer = new Player3();
@@ -38,6 +39,7 @@ function getWithDataAttr<T extends HTMLElement = HTMLElement>(
 const sets = {
   set_E: setE,
   set_Battle: setBattle,
+  set_ItsMyLife: setItsMyLife,
 };
 
 export const setVc = (props: Props, context: any) => {

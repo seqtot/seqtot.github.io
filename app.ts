@@ -20,8 +20,9 @@ import { setVc } from './set-vc';
 
 const appEl = document.getElementById('app');
 
-const defRoute = '/set/set_E/';
+// const defRoute = '/set/set_E/';
 //const defRoute = '/set/set_Battle/';
+const defRoute = '/set/set_ItsMyLife/';
 
 const leftPanel = `
 <div
@@ -51,6 +52,11 @@ const leftPanel = `
                 data-view=".view-main"
                 class="panel-close"
               >Продолжается бой</a>
+              <a
+                href="/set/set_ItsMyLife/"
+                data-view=".view-main"
+                class="panel-close"
+              >Its my life</a>
             </li>
           </ul>
         </div>      
