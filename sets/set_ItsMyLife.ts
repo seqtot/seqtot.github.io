@@ -175,27 +175,30 @@ $organ: 50
 
 const melody = `
 <out b120 r1000>
+iml_IAintGonnaBeJustAFaceInTheCrowd_YoureGonnaHearMyVoiceWhenIShoutItOutLoud_drum@
+iml_ItsMyLife_ItsNowOrNever_drum@
+
 tick4@
 iml_Риф_drum@
 iml_ThisAintASongForTheBrokenHearted_drum@
 iml_NoSilentPrayerForTheFaithDeparted_drum@
 iml_IAintGonnaBeJustAFaceInTheCrowd_YoureGonnaHearMyVoiceWhenIShoutItOutLoud_drum@
-iml_ItsMy_drum@
+iml_ItsMyLife_ItsNowOrNever_drum@
 
 #simple44_drum@-4
 pause400@
 
-<iml_ItsMy_drum@>
--  : 1   |   |   |   :
-@sn: x   x           :
-@bd: x   x           :
-
+<iml_ItsMyLife_ItsNowOrNever_drum@>
+-  : |   |   1   |   |   |   2   |   |   |   3   |   :
+@hc:         x   x x x x x x x x x x x x x x x x x x :
+@sn:             x       x       x       x       x   :
+@bd:         x       x       x       x       x       :
 
 <iml_IAintGonnaBeJustAFaceInTheCrowd_YoureGonnaHearMyVoiceWhenIShoutItOutLoud_drum@>
--  : 1   |   |   |   2   |   |   |   3   |   |   |   4   |   |   |   :
-@hc: x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x :
-@sn:     2       4       2       4       2       4       2       4   :
-@bd: 1       3       1       3       1       3       1       3       :
+-  : 1   |   |   |   2   |   |   |   3   |   |   |   4   |   |   |   5   |   :
+@hc: x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x         :
+@sn:     2       4       2       4       2       4       2       4   x   x   :
+@bd: 1       3       1       3       1       3       1       3       x   x   :
 
 <iml_NoSilentPrayerForTheFaithDeparted_drum@>
 -  : 1   |   |   |   2   |   |   |   3   |   |   |   4   |   |   |   :
@@ -234,7 +237,7 @@ export default {
   content,
   tracks: [
     { key: 'beat44', value: beat44, name: 'бит 4/4: bpm120' },
-    { key: 'harmony', value: melody, name: 'Барабан: bpm:120' },
+    // { key: 'harmony', value: melody, name: 'Барабан: bpm:120' },
   ],
 };
 
