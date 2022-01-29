@@ -137,6 +137,12 @@ const parts = `
 @sn:     2       4   :
 @bd: 1       3       :
 --------------------------------------------------------------------------------
+<simple44_drum@>
+-  : 1   2   3   4   :
+@hc: x x x x x x x x :
+@sn:     2       4   :
+@bd: 1       3       :
+--------------------------------------------------------------------------------
 <btl_Су1$>
 $organ: су-100
 --------------------------------------------------------------------------------
@@ -198,6 +204,12 @@ $organ: су-300 ро-100
 
 const melody = `
 <out b120 r1000>
+tick4@
+iml_Риф_drum@
+iml_ThisAintASongForTheBrokenHearted_drum@
+simple44_drum@-4
+
+<out b120 r1000>
 tick3@
 btl_Вход@     btl_Вход_voice$
 pause50$
@@ -240,6 +252,18 @@ btl_44@     btl_СуСуСу_СуФуСу_СуФуСу$
 
 <pause50$>
 $organ: 50
+
+<iml_Риф_drum@>
+-  : 1   |   |   |   2   |   |   |   3   |   |   |   4   |   |   |   :
+@hc:         x x x x x x x x x x x x         x x x x x x x x x x x x :
+@sn: x   x                           x   x       x       x       x   :
+@bd: x   x     x     x     x x x     x   x         x x       x x     :
+
+<iml_ThisAintASongForTheBrokenHearted_drum@>
+-  : 1   |   |   |   2   |   |   |   3   |   |   |   4   |   |   |   :
+@hc:                               x x x x x x x x x x x x x x x x x :
+@sn: x                           x       x       x       x       x   :
+@bd: x                         x     x       x       x       x       :
 
 <btl_Вход@>
 -  : 1   |   |   |   2   |   |   :
@@ -435,7 +459,7 @@ ${parts}
 `;
 
 const beat44 = `
-<out b100 r1000>
+<out b120 r1000>
 simple44@
 
 <simple44@>
@@ -511,8 +535,8 @@ ${parts}
 export default {
   content,
   tracks: [
-    { key: 'beat44', value: beat44, name: 'бит 4/4: bpm100' },
-    // { key: 'harmony', value: melody, name: 'Мелодия: bpm:120' },
+    { key: 'beat44', value: beat44, name: 'бит 4/4: bpm120' },
+    { key: 'harmony', value: melody, name: 'Мелодия: bpm:120' },
     // { key: 'test', value: test, name: 'Тест' },
     // { key: 'test2', value: test2, name: 'Тест2' },
   ],
