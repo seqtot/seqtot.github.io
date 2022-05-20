@@ -23,6 +23,12 @@ export type BlockInfo = {
   volume?: number;
 };
 
+function trimLeft(val: any): string {
+  if (val === null && val === undefined) return '';
+
+  return val.toString().replace(/^\s+/, '');
+}
+
 export function getOutBpm(
   strOrArr: string | string[],
   byDefault = 120
@@ -202,11 +208,9 @@ export function findBlockById(blocks: BlockInfo[], id: string): BlockInfo {
 }
 
 // return: [[25, 25, 25, 25], [50, 50]]
-export function getDrumQuartersInfo(arr: string[]): [number[]] {
-  //console.log('getDrumQuartersInfo', arr);
-
+export function getDrumQuartersInfo(arr: string[]): number[][] {
   let text = arr.find((item) => item.startsWith('-')).split(':')[1];
-  text = text.trimLeft();
+  text = trimLeft(text); // text.trimLeft();
   text = text.replace(/\d\d/g, '| ');
   text = text.replace(/\d/g, '|');
 
@@ -215,7 +219,7 @@ export function getDrumQuartersInfo(arr: string[]): [number[]] {
     .split('|')
     .filter((item) => !!item);
 
-  quarters = quarters.map((quarter) => {
+  let result = quarters.map((quarter) => {
     if (quarter.length === 6) {
       return [17, 17, 16, 17, 17, 16];
     }
@@ -223,7 +227,7 @@ export function getDrumQuartersInfo(arr: string[]): [number[]] {
     return Array(quarter.length).fill(Math.round(100 / quarter.length));
   });
 
-  return quarters;
+  return result;
 }
 
 export function getNoteInstruments(arr: string[]): { [key: string]: string } {
@@ -382,7 +386,7 @@ export function getOutBlocksInfo(blocks: BlockInfo[]): {
 }
 
 export function clearNoteLine(val: string): string {
-  val = (val || '').trim();
+  val = (val || '').replace(/\r\n/g, '\n').trim();
 
   if (!val) {
     return val;
@@ -397,6 +401,19 @@ export function clearNoteLine(val: string): string {
   val = val.trim();
 
   return val;
+}
+
+export function getBeatsByBpm(
+  bpm: number,
+  count: number,
+  delayMs: number = 0
+): number[] {
+  const quarterMs = Math.round(60000 / bpm);
+
+  const result = new Array(count).fill(quarterMs);
+  result.unshift(delayMs);
+
+  return result;
 }
 
 // 'hello #ff'.replace(/#.*$/, '')
