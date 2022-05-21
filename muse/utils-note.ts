@@ -24,7 +24,7 @@ export type BlockInfo = {
 };
 
 function trimLeft(val: any): string {
-  if (val === null && val === undefined) return '';
+  val = (val || '').toString();
 
   return val.toString().replace(/^\s+/, '');
 }
