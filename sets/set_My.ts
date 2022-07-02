@@ -10,8 +10,14 @@ const info = `
 <a data-note-line="b60 му-100">
   E (!-1-)
 </a>
+<br/>
 <a data-note-line="b60 му-100 бу-100 мо-100 бу-100">о_7аПаПу</a>
 <a data-note-line="b60 му-100 бу-100 зо-100 бу-100">о_7а9а9у</a>
+<br/>
+<a data-note-line="b60 зо-100 бу-100 зо-100 бу-100">
+  зо (%) о9у9а9у
+</a>
+
 <br/>
 <a data-note-line=" 
   b60
@@ -26,8 +32,13 @@ const info = `
 <a data-note-line="b60 су-100">
   G (z 1-)
 </a>
+<br/>
 <a data-note-line="b60 су-100 ро-100 со-100 ро-100">о7аПаПу</a>
 <a data-note-line="b60 су-100 ро-100 бо-100 ро-100">о7а9а9у</a>
+<br/>
+<a data-note-line="b60 бо-100 ро-100 бо-100 ро-100">
+  бо (b 5= ) о9у9а9у
+</a>
 <br/>
 <a data-note-line="
   b60
