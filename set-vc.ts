@@ -15,6 +15,7 @@ import { getInstrCodeBy } from './muse/midi';
 import setE from './sets/set_E';
 import setBattle from './sets/set_battle';
 import setItsMyLife from './sets/set_ItsMyLife';
+import setMy from './sets/set_My';
 
 const ctx: AudioContext = new AudioContext();
 const uniPlayer = new Player3();
@@ -40,6 +41,7 @@ const sets = {
   set_E: setE,
   set_Battle: setBattle,
   set_ItsMyLife: setItsMyLife,
+  set_My: setMy,
 };
 
 export const setVc = (props: Props, context: any) => {

@@ -56,7 +56,12 @@ const leftPanel = `
                 href="/set/set_ItsMyLife/"
                 data-view=".view-main"
                 class="panel-close"
-              >Its my life</a>
+              >Its my life</a>              
+              <a
+                href="/set/set_My/"
+                data-view=".view-main"
+                class="panel-close"
+              >test</a>
             </li>
           </ul>
         </div>      
