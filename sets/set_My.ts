@@ -39,11 +39,11 @@ const info = `
 <a data-note-line="b60 су-100 ро-100 со-100 ро-100">о7аПаПу</a>
 <a data-note-line="b60 су-100 ро-100 бо-100 ро-100">о7а9а9у</a>
 <br/>
-<a data-note-line="b60 бо-100 ро-100 бо-100 ро-100">
-  b (b 5= ) о9у9а9у
+<a data-note-line="b60 бо-100">
+  b B (5=)
 </a>
 <a data-note-line="b60 бо-100 ро-100 бо-100 ро-100">
-  b (b 5= ) о9у9а9у
+  бо9у9а9у
 </a>
 <br/>
 <a data-note-line="
