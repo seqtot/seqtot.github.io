@@ -5,17 +5,20 @@ const info = `
 <pre style="font-family: monospace; margin: .5rem 0 0;">
 </pre>
 
-<div style="font-size: 1.5rem; font-family: monospace;">
+<div style="font-size: 1.75rem; font-family: monospace;">
 
 <a data-note-line="b60 му-100">
-  E (!-1-)
+  !E (-1-)
 </a>
 <br/>
 <a data-note-line="b60 му-100 бу-100 мо-100 бу-100">о_7аПаПу</a>
 <a data-note-line="b60 му-100 бу-100 зо-100 бу-100">о_7а9а9у</a>
 <br/>
+<a data-note-line="b60 зо-100">
+  % G# Ab (4=5-)
+</a>
 <a data-note-line="b60 зо-100 бу-100 зо-100 бу-100">
-  зо (%) о9у9а9у
+  зо9у9а9у
 </a>
 
 <br/>
@@ -30,14 +33,17 @@ const info = `
 <br/><br/>
 
 <a data-note-line="b60 су-100">
-  G (z 1-)
+  z G (1-)
 </a>
 <br/>
 <a data-note-line="b60 су-100 ро-100 со-100 ро-100">о7аПаПу</a>
 <a data-note-line="b60 су-100 ро-100 бо-100 ро-100">о7а9а9у</a>
 <br/>
 <a data-note-line="b60 бо-100 ро-100 бо-100 ро-100">
-  бо (b 5= ) о9у9а9у
+  b (b 5= ) о9у9а9у
+</a>
+<a data-note-line="b60 бо-100 ро-100 бо-100 ро-100">
+  b (b 5= ) о9у9а9у
 </a>
 <br/>
 <a data-note-line="
