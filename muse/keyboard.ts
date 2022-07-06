@@ -216,22 +216,22 @@ export const defaultSynthSettings = {
   octaves: {
     left1: {
       octave: 'e',
-      volume: 0.5,
+      volume: 0.1,
       instr: 0,
     },
     left2: {
       octave: 'a',
-      volume: 0.5,
+      volume: 0.2,
       instr: 0,
     },
     right2: {
       octave: 'o',
-      volume: 0.5,
+      volume: 0.3,
       instr: 0,
     },
     right1: {
       octave: 'y',
-      volume: 0.5,
+      volume: 0.4,
       instr: 0,
     },
     right0: {

@@ -5,7 +5,7 @@ const info = `
 <pre style="font-family: monospace; margin: .5rem 0 0;">
 </pre>
 
-<div style="font-size: 1.2rem; font-family: monospace;">
+<div style="font-size: 1.1rem; font-family: monospace;">
 
 <a data-note-line="b60 бы-50">бы|</a>
 &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>

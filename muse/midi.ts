@@ -123,7 +123,7 @@ export const byDefault = {
   octaves: {
     left1: {
       octave: 'e',
-      volume: 0.5,
+      volume: 0.3,
       instr: MIDI_INSTR,
     },
     left2: {
@@ -133,17 +133,17 @@ export const byDefault = {
     },
     right2: {
       octave: 'o',
-      volume: 0.5,
+      volume: 0.8,
       instr: MIDI_INSTR,
     },
     right1: {
       octave: 'y',
-      volume: 0.5,
+      volume: 1,
       instr: MIDI_INSTR,
     },
     right0: {
       octave: 'u',
-      volume: 0.5,
+      volume: 1,
       instr: MIDI_INSTR,
     },
   },
