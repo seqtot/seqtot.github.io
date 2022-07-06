@@ -5,10 +5,10 @@ const info = `
 <pre style="font-family: monospace; margin: .5rem 0 0;">
 </pre>
 
-<div style="font-size: 1.75rem; font-family: monospace;">
+<div style="font-size: 1.2rem; font-family: monospace;">
 
 <a data-note-line="b60 бы-50">бы|</a>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
 <a data-note-line="b60 ду-50">~</a>
 <a data-note-line="b60 му-50">!</a>
 <a data-note-line="b60 зу-50">@</a>
@@ -18,6 +18,9 @@ const info = `
 <a data-note-line="b60 да-50">^</a>
 <a data-note-line="b60 ма-50">&</a>
 <a data-note-line="b60 за-50">*</a>
+<a data-note-line="b60 де-50">(</a>
+<a data-note-line="b60 ме-50">)</a>
+<a data-note-line="b60 зе-50">_</a>
 <br/>
 <a data-note-line="b60 ту-50">?</a>
 <a data-note-line="b60 фу-50">q</a>
@@ -28,6 +31,9 @@ const info = `
 <a data-note-line="b60 та-50">y</a>
 <a data-note-line="b60 фа-50">u</a>
 <a data-note-line="b60 ла-50">i</a>
+<a data-note-line="b60 те-50">o</a>
+<a data-note-line="b60 фе-50">p</a>
+<a data-note-line="b60 ле-50">[</a>
 <br/>
 <a data-note-line="b60 ру-50">?</a>
 <a data-note-line="b60 ву-50">a</a>
@@ -38,6 +44,9 @@ const info = `
 <a data-note-line="b60 ра-50">h</a>
 <a data-note-line="b60 ва-50">j</a>
 <a data-note-line="b60 ка-50">k</a>
+<a data-note-line="b60 ре-50">l</a>
+<a data-note-line="b60 ве-50">;</a>
+<a data-note-line="b60 ке-50">'</a>
 <br/>
 <a data-note-line="b60 ну-50">?</a>
 <a data-note-line="b60 су-50">z</a>
@@ -48,8 +57,15 @@ const info = `
 <a data-note-line="b60 на-50">n</a>
 <a data-note-line="b60 са-50">m</a>
 <a data-note-line="b60 ба-50">,</a>
+<a data-note-line="b60 не-50">.</a>
+<a data-note-line="b60 се-50">/</a>
+<a data-note-line="b60 бе-50">?</a>
+</div>
 
-<br/><br/>
+<br/>
+
+<div style="font-size: 1.75rem; font-family: monospace;">
+
 
 <!-- Am -->
 
