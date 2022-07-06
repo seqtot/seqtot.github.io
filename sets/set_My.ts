@@ -7,10 +7,10 @@ const info = `
 
 <div style="font-size: 1.75rem; font-family: monospace;">
 
-<a data-note-line="b60 бы-50">бы</a><br/>
-
+<a data-note-line="b60 бы-50">бы|</a>
+&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
 <a data-note-line="b60 ду-50">~</a>
-<a data-note-line="b60 му-50">$</a>
+<a data-note-line="b60 му-50">!</a>
 <a data-note-line="b60 зу-50">@</a>
 <a data-note-line="b60 до-50">#</a>
 <a data-note-line="b60 мо-50">$</a>
