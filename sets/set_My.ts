@@ -4,6 +4,22 @@ const info = `
 <!--b>TEST</b-->
 <!--pre style="font-family: monospace; margin: .5rem 0 0;"></pre-->
 
+<div style="font-size: .9rem; font-family: monospace;">
+
+<div    style="margin: 0; display: inline-block; width: .9rem; text-align: center;
+    border: 1px solid lightgrey; border-right: none;">
+    !</div><!--
+--><div style="margin: 0; display: inline-block; width: .9rem; text-align: center;
+    border: 1px solid lightgrey; border-right: none;">
+    @</div><!--
+--><div style="margin: 0; display: inline-block; width: .9rem; text-align: center;
+    border: 1px solid lightgrey; border-right: none;">
+    w</div><!--
+-->
+
+</div>
+
+
 <div style="font-size: 1.1rem; font-family: monospace;">
 
 &nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
