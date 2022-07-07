@@ -1,66 +1,65 @@
 const info = `
 <div style="margin: .5rem;">
-  <b>TEST</b>
-  
-<pre style="font-family: monospace; margin: .5rem 0 0;">
-</pre>
+
+<!--b>TEST</b-->
+<!--pre style="font-family: monospace; margin: .5rem 0 0;"></pre-->
 
 <div style="font-size: 1.1rem; font-family: monospace;">
 
-<a data-note-line="b60 бы-50">бы|</a>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
-<a data-note-line="b60 ду-50">~</a>
-<a data-note-line="b60 му-50">!</a>
-<a data-note-line="b60 зу-50">@</a>
-<a data-note-line="b60 до-50">#</a>
-<a data-note-line="b60 мо-50">$</a>
-<a data-note-line="b60 зо-50">%</a>
-<a data-note-line="b60 да-50">^</a>
-<a data-note-line="b60 ма-50">&</a>
-<a data-note-line="b60 за-50">*</a>
-<a data-note-line="b60 де-50">(</a>
-<a data-note-line="b60 ме-50">)</a>
-<a data-note-line="b60 зе-50">_</a>
+&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+<a style="user-select: none;" data-note-key="b60 ду-50">~</a>
+<a style="user-select: none;" data-note-key="b60 му-50">!</a>
+<a style="user-select: none;" data-note-key="b60 зу-50">@</a>
+<a style="user-select: none;" data-note-key="b60 до-50">#</a>
+<a style="user-select: none;" data-note-key="b60 мо-50">$</a>
+<a style="user-select: none;" data-note-key="b60 зо-50">%</a>
+<a style="user-select: none;" data-note-key="b60 да-50">^</a>
+<a style="user-select: none;" data-note-key="b60 ма-50">&</a>
+<a style="user-select: none;" data-note-key="b60 за-50">*</a>
+<a style="user-select: none;" data-note-key="b60 де-50">(</a>
+<a style="user-select: none;" data-note-key="b60 ме-50">)</a>
+<a style="user-select: none;" data-note-key="b60 зе-50">_</a>
 <br/>
-<a data-note-line="b60 ту-50">?</a>
-<a data-note-line="b60 фу-50">q</a>
-<a data-note-line="b60 лу-50">w</a>
-<a data-note-line="b60 то-50">e</a>
-<a data-note-line="b60 фо-50">r</a>
-<a data-note-line="b60 ло-50">t</a>
-<a data-note-line="b60 та-50">y</a>
-<a data-note-line="b60 фа-50">u</a>
-<a data-note-line="b60 ла-50">i</a>
-<a data-note-line="b60 те-50">o</a>
-<a data-note-line="b60 фе-50">p</a>
-<a data-note-line="b60 ле-50">[</a>
+<a style="user-select: none;" data-note-key="b60 ту-50">?</a>
+<a style="user-select: none;" data-note-key="b60 фу-50">q</a>
+<a style="user-select: none;" data-note-key="b60 лу-50">w</a>
+<a style="user-select: none;" data-note-key="b60 то-50">e</a>
+<a style="user-select: none;" data-note-key="b60 фо-50">r</a>
+<a style="user-select: none;" data-note-key="b60 ло-50">t</a>
+<a style="user-select: none;" data-note-key="b60 та-50">y</a>
+<a style="user-select: none;" data-note-key="b60 фа-50">u</a>
+<a style="user-select: none;" data-note-key="b60 ла-50">i</a>
+<a style="user-select: none;" data-note-key="b60 те-50">o</a>
+<a style="user-select: none;" data-note-key="b60 фе-50">p</a>
+<a style="user-select: none;" data-note-key="b60 ле-50">[</a>
 <br/>
-<a data-note-line="b60 ру-50">?</a>
-<a data-note-line="b60 ву-50">a</a>
-<a data-note-line="b60 ку-50">s</a>
-<a data-note-line="b60 ро-50">d</a>
-<a data-note-line="b60 во-50">f</a>
-<a data-note-line="b60 ко-50">g</a>
-<a data-note-line="b60 ра-50">h</a>
-<a data-note-line="b60 ва-50">j</a>
-<a data-note-line="b60 ка-50">k</a>
-<a data-note-line="b60 ре-50">l</a>
-<a data-note-line="b60 ве-50">;</a>
-<a data-note-line="b60 ке-50">'</a>
+<a style="user-select: none;" data-note-key="b60 ру-50">?</a>
+<a style="user-select: none;" data-note-key="b60 ву-50">a</a>
+<a style="user-select: none;" data-note-key="b60 ку-50">s</a>
+<a style="user-select: none;" data-note-key="b60 ро-50">d</a>
+<a style="user-select: none;" data-note-key="b60 во-50">f</a>
+<a style="user-select: none;" data-note-key="b60 ко-50">g</a>
+<a style="user-select: none;" data-note-key="b60 ра-50">h</a>
+<a style="user-select: none;" data-note-key="b60 ва-50">j</a>
+<a style="user-select: none;" data-note-key="b60 ка-50">k</a>
+<a style="user-select: none;" data-note-key="b60 ре-50">l</a>
+<a style="user-select: none;" data-note-key="b60 ве-50">;</a>
+<a style="user-select: none;" data-note-key="b60 ке-50">'</a>
 <br/>
-<a data-note-line="b60 ну-50">?</a>
-<a data-note-line="b60 су-50">z</a>
-<a data-note-line="b60 бу-50">x</a>
-<a data-note-line="b60 но-50">c</a>
-<a data-note-line="b60 со-50">v</a>
-<a data-note-line="b60 бо-50">b</a>
-<a data-note-line="b60 на-50">n</a>
-<a data-note-line="b60 са-50">m</a>
-<a data-note-line="b60 ба-50">,</a>
-<a data-note-line="b60 не-50">.</a>
-<a data-note-line="b60 се-50">/</a>
-<a data-note-line="b60 бе-50">?</a>
+<a style="user-select: none;" data-note-key="b60 ну-50">?</a>
+<a style="user-select: none;" data-note-key="b60 су-50">z</a>
+<a style="user-select: none;" data-note-key="b60 бу-50">x</a>
+<a style="user-select: none;" data-note-key="b60 но-50">c</a>
+<a style="user-select: none;" data-note-key="b60 со-50">v</a>
+<a style="user-select: none;" data-note-key="b60 бо-50">b</a>
+<a style="user-select: none;" data-note-key="b60 на-50">n</a>
+<a style="user-select: none;" data-note-key="b60 са-50">m</a>
+<a style="user-select: none;" data-note-key="b60 ба-50">,</a>
+<a style="user-select: none;" data-note-key="b60 не-50">.</a>
+<a style="user-select: none;" data-note-key="b60 се-50">/</a>
+<a style="user-select: none;" data-note-key="b60 бе-50">?</a>
 </div>
+<a data-note-line="b60 бы-50">бы</a>
 
 <br/>
 

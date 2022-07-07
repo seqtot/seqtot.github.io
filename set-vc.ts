@@ -278,6 +278,14 @@ export class SetVc {
         });
       });
     });
+
+    getWithDataAttr('note-key', this.pageEl)?.forEach((el) => {
+      el.addEventListener('mousedown', (evt: MouseEvent) => {
+        this.tryPlayTextLine({
+          text: el?.dataset?.noteKey,
+        });
+      });
+    });
   }
 
   async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
