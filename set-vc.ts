@@ -280,7 +280,7 @@ export class SetVc {
     });
 
     getWithDataAttr('note-key', this.pageEl)?.forEach((el) => {
-      el.addEventListener('mousedown', (evt: MouseEvent) => {
+      el.addEventListener('pointerdown', (evt: MouseEvent) => {
         this.tryPlayTextLine({
           text: el?.dataset?.noteKey,
         });
