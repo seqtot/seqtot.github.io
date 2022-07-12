@@ -1,81 +1,73 @@
+function getKey(note: string, symbol: string, duration: number = 25): string {
+  let step = note[0];
+
+  let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
+  let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
+    ? 'border: none;'
+    : '';
+
+  let border = borderNone || 'border: 1px solid lightgrey;';
+
+  return `<div
+    style="
+      box-sizing: border-box;    
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+      font-size: 1.4rem;
+      width: 1.4rem;
+      user-select: none;
+      text-align: center;
+      ${border}
+      font-weight: ${fontW};" 
+
+      data-note-key="b60 ${note}-${duration}"
+
+      >${symbol}</div>`
+    .replace(/\n/g, ' ')
+    .replace(/ +/g, ' ');
+}
+
+//    margin: 0; display: inline-block; width: .9rem; text-align: center;
+//    border: 1px solid lightgrey; border-right: none;
+
+function getKeyboard(): string {
+  const keyboard = `
+<div style="font-family: monospace; padding: .9rem; user-select: none;">
+${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
+${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
+${getKey('da', '^')}${getKey('ma', '&')}${getKey('za', '*')}
+${getKey('de', '(')}${getKey('me', ')')}${getKey('ze', '_')}
+<br/>
+${getKey('ty', '?')}${getKey('fy', 'q')}${getKey('ly', 'w')}
+${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
+${getKey('ta', 'y')}${getKey('fa', 'u')}${getKey('la', 'i')}
+${getKey('te', 'o')}${getKey('fe', 'p')}${getKey('le', '[')}
+<br/>
+${getKey('ry', '?')}${getKey('vy', 'a')}${getKey('ky', 's')}
+${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
+${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
+${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
+<br/>
+${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
+${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
+${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
+${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
+</div>
+${getKey('bu', 'бы')}
+
+`.replace(/\n/g, '');
+
+  return keyboard;
+}
+
 const info = `
 <div style="margin: .5rem;">
 
 <!--b>TEST</b-->
 <!--pre style="font-family: monospace; margin: .5rem 0 0;"></pre-->
 
-<div style="font-size: .9rem; font-family: monospace;">
-
-<div    style="margin: 0; display: inline-block; width: .9rem; text-align: center;
-    border: 1px solid lightgrey; border-right: none;">
-    !</div><!--
---><div style="margin: 0; display: inline-block; width: .9rem; text-align: center;
-    border: 1px solid lightgrey; border-right: none;">
-    @</div><!--
---><div style="margin: 0; display: inline-block; width: .9rem; text-align: center;
-    border: 1px solid lightgrey; border-right: none;">
-    w</div><!--
--->
-
-</div>
-
-
-<div style="font-size: 1.1rem; font-family: monospace;">
-
-&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
-<a style="user-select: none;" data-note-key="b60 ду-50">~</a>
-<a style="user-select: none;" data-note-key="b60 му-50">!</a>
-<a style="user-select: none;" data-note-key="b60 зу-50">@</a>
-<a style="user-select: none;" data-note-key="b60 до-50">#</a>
-<a style="user-select: none;" data-note-key="b60 мо-50">$</a>
-<a style="user-select: none;" data-note-key="b60 зо-50">%</a>
-<a style="user-select: none;" data-note-key="b60 да-50">^</a>
-<a style="user-select: none;" data-note-key="b60 ма-50">&</a>
-<a style="user-select: none;" data-note-key="b60 за-50">*</a>
-<a style="user-select: none;" data-note-key="b60 де-50">(</a>
-<a style="user-select: none;" data-note-key="b60 ме-50">)</a>
-<a style="user-select: none;" data-note-key="b60 зе-50">_</a>
-<br/>
-<a style="user-select: none;" data-note-key="b60 ту-50">?</a>
-<a style="user-select: none;" data-note-key="b60 фу-50">q</a>
-<a style="user-select: none;" data-note-key="b60 лу-50">w</a>
-<a style="user-select: none;" data-note-key="b60 то-50">e</a>
-<a style="user-select: none;" data-note-key="b60 фо-50">r</a>
-<a style="user-select: none;" data-note-key="b60 ло-50">t</a>
-<a style="user-select: none;" data-note-key="b60 та-50">y</a>
-<a style="user-select: none;" data-note-key="b60 фа-50">u</a>
-<a style="user-select: none;" data-note-key="b60 ла-50">i</a>
-<a style="user-select: none;" data-note-key="b60 те-50">o</a>
-<a style="user-select: none;" data-note-key="b60 фе-50">p</a>
-<a style="user-select: none;" data-note-key="b60 ле-50">[</a>
-<br/>
-<a style="user-select: none;" data-note-key="b60 ру-50">?</a>
-<a style="user-select: none;" data-note-key="b60 ву-50">a</a>
-<a style="user-select: none;" data-note-key="b60 ку-50">s</a>
-<a style="user-select: none;" data-note-key="b60 ро-50">d</a>
-<a style="user-select: none;" data-note-key="b60 во-50">f</a>
-<a style="user-select: none;" data-note-key="b60 ко-50">g</a>
-<a style="user-select: none;" data-note-key="b60 ра-50">h</a>
-<a style="user-select: none;" data-note-key="b60 ва-50">j</a>
-<a style="user-select: none;" data-note-key="b60 ка-50">k</a>
-<a style="user-select: none;" data-note-key="b60 ре-50">l</a>
-<a style="user-select: none;" data-note-key="b60 ве-50">;</a>
-<a style="user-select: none;" data-note-key="b60 ке-50">'</a>
-<br/>
-<a style="user-select: none;" data-note-key="b60 ну-50">?</a>
-<a style="user-select: none;" data-note-key="b60 су-50">z</a>
-<a style="user-select: none;" data-note-key="b60 бу-50">x</a>
-<a style="user-select: none;" data-note-key="b60 но-50">c</a>
-<a style="user-select: none;" data-note-key="b60 со-50">v</a>
-<a style="user-select: none;" data-note-key="b60 бо-50">b</a>
-<a style="user-select: none;" data-note-key="b60 на-50">n</a>
-<a style="user-select: none;" data-note-key="b60 са-50">m</a>
-<a style="user-select: none;" data-note-key="b60 ба-50">,</a>
-<a style="user-select: none;" data-note-key="b60 не-50">.</a>
-<a style="user-select: none;" data-note-key="b60 се-50">/</a>
-<a style="user-select: none;" data-note-key="b60 бе-50">?</a>
-</div>
-<a data-note-line="b60 бы-50">бы</a>
+${getKeyboard()}
 
 <br/>
 
