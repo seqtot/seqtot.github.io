@@ -20,8 +20,8 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
       margin: 0;
       padding: 0;
       display: inline-block;
-      font-size: 1.3rem;
-      width: 1.3rem;
+      font-size: 1.25rem;
+      width: 1.25rem;
       user-select: none;
       text-align: center;
       ${border}
@@ -84,13 +84,13 @@ const info = `
 ${getKeyboard()}
 
 <div style="font-size: 1.5rem; font-family: monospace;">
-мо оЦу оПаХуЦу    <br/>
-мо оПаЦу ЩуЦу     <br/>
-бу щуПаЦу оПаХуЦу <br/>
-мо оЦуЩуЩа  щуЩа  <br/>
-_ ЧаЦуЦуЦа        <br/>
-ро цуЩуЦуЦу йаЩуЦуЦа <br/>
-мо оЦуЦаПу паЦуЦаПу  <br/>
+моЦу оПаХуЦу    <br/>
+моПаЦу ЩуЦу     <br/>
+буПаЦу оПаХуЦу <br/>
+моЦуЩуЩа  щуЩа  <br/>
+воЦуЦуЦа цуЩуЦуЦу <br/>
+соЩуЦуЦа <br/>
+моЦуЦаПу паЦуЦаПу  <br/>
 </div>
 
 <!--оЦуЩуЦу                               (ма)<br/>
