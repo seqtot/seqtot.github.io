@@ -186,7 +186,10 @@ export const noteByCodeHash = {
   Digit0: 'су',
   Minus: 'ну',
 
-  Equal: 'бы',
+  KeyBu: 'бы',
+  KeyKu: 'кы',
+  KeyLu: 'лы',
+  KeyZu: 'зы',
 };
 
 export const fullOctaveBlocks: { name: string; value: any }[] = [

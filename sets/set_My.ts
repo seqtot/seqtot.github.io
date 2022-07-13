@@ -5,8 +5,14 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
   let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
     ? 'border: none;'
     : '';
+  let fontColor = 'black';
 
-  let border = borderNone || 'border: 1px solid lightgrey;';
+  if (note[1] === 'u') {
+    borderNone = 'border: none;';
+    fontColor = 'lightgray';
+  }
+
+  let border = borderNone || 'border: 1px solid grey;';
 
   return `<div
     style="
@@ -19,6 +25,7 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
       user-select: none;
       text-align: center;
       ${border}
+      color: ${fontColor};
       font-weight: ${fontW};" 
 
       data-note-key="b60 ${note}-${duration}"
@@ -33,28 +40,35 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
 
 function getKeyboard(): string {
   const keyboard = `
-<div style="font-family: monospace; padding: .9rem; user-select: none;">
+<div style="
+    font-family: monospace;
+    user-select: none;    
+    padding: .9rem; padding-left: 0;"
+>
+${getKey('zu', '?')}
 ${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
 ${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
 ${getKey('da', '^')}${getKey('ma', '&')}${getKey('za', '*')}
 ${getKey('de', '(')}${getKey('me', ')')}${getKey('ze', '_')}
 <br/>
+${getKey('lu', '?')}
 ${getKey('ty', '?')}${getKey('fy', 'q')}${getKey('ly', 'w')}
 ${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
 ${getKey('ta', 'y')}${getKey('fa', 'u')}${getKey('la', 'i')}
 ${getKey('te', 'o')}${getKey('fe', 'p')}${getKey('le', '[')}
 <br/>
+${getKey('ku', '?')}
 ${getKey('ry', '?')}${getKey('vy', 'a')}${getKey('ky', 's')}
 ${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
 ${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
 ${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
 <br/>
+${getKey('bu', '?')}
 ${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
 ${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
 ${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
 ${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
 </div>
-${getKey('bu', 'бы')}
 
 `.replace(/\n/g, '');
 
@@ -69,7 +83,19 @@ const info = `
 
 ${getKeyboard()}
 
-<br/>
+<div style="font-size: 1.5rem; font-family: monospace;">
+мо оЦу оПаХуЦу    <br/>
+мо оПаЦу ЩуЦу     <br/>
+бу щуПаЦу оПаХуЦу <br/>
+мо оЦуЩуЦа  щуЦа  <br/>
+_ ЧаЦуЦуЦа        <br/>
+ро цуЩуЦуЦу йаЩуЦуЦа <br/>
+мо оЦуЦаПу паЦуЦаПу  <br/>
+</div>
+
+<!--оЦуЩуЦу                               (ма)<br/>
+пуЩаЩуЦу щуЩаЦа щаЩу паЦуЩу цуЦа щаЩу (мо)<br/>
+о_ЩаЩуЦу щуЩаЦа щаЩу паЦуЩу цуЦа щаЩу (мо)<br/>-->
 
 <div style="font-size: 1.75rem; font-family: monospace;">
 
