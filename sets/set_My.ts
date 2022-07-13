@@ -20,8 +20,8 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
       margin: 0;
       padding: 0;
       display: inline-block;
-      font-size: 1.25rem;
-      width: 1.25rem;
+      font-size: 1.3rem;
+      width: 1.3rem;
       user-select: none;
       text-align: center;
       ${border}
