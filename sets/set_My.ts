@@ -77,8 +77,10 @@ const info = `
 <!--b>TEST</b-->
 <!--pre style="font-family: monospace; margin: .5rem 0 0;"></pre-->
 
-${getKey('bu', 'бы')}
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 1.5rem" data-name="clear-keys-color">clear</span>
+${getKey('bu', 'бы')}&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="font-size: 1.5rem" data-name="clear-keys-color">
+  !clear
+</span>
 
 ${getKeyboard()}
 
