@@ -9,7 +9,7 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
 
   if (note[1] === 'u') {
     borderNone = 'border: none;';
-    fontColor = 'lightgray';
+    // fontColor = 'lightgray';
   }
 
   let border = borderNone || 'border: 1px solid grey;';
@@ -20,8 +20,8 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
       margin: 0;
       padding: 0;
       display: inline-block;
-      font-size: 1.35rem;
-      width: 1.35rem;
+      font-size: 1.5rem;
+      width: 1.5rem;
       user-select: none;
       text-align: center;
       ${border}
@@ -43,27 +43,23 @@ function getKeyboard(): string {
 <div style="
     font-family: monospace;
     user-select: none;    
-    padding: .9rem; padding-left: 0;"
+    padding: 0.5rem 0 0.5rem 0.5rem;"
 >
-${getKey('zu', '?')}
 ${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
 ${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
 ${getKey('da', '^')}${getKey('ma', '&')}${getKey('za', '*')}
 ${getKey('de', '(')}${getKey('me', ')')}${getKey('ze', '_')}
 <br/>
-${getKey('lu', '?')}
 ${getKey('ty', '?')}${getKey('fy', 'q')}${getKey('ly', 'w')}
 ${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
 ${getKey('ta', 'y')}${getKey('fa', 'u')}${getKey('la', 'i')}
 ${getKey('te', 'o')}${getKey('fe', 'p')}${getKey('le', '[')}
 <br/>
-${getKey('ku', '?')}
 ${getKey('ry', '?')}${getKey('vy', 'a')}${getKey('ky', 's')}
 ${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
 ${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
 ${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
 <br/>
-${getKey('bu', '?')}
 ${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
 ${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
 ${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
@@ -80,6 +76,9 @@ const info = `
 
 <!--b>TEST</b-->
 <!--pre style="font-family: monospace; margin: .5rem 0 0;"></pre-->
+
+${getKey('bu', 'бы')}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 1.5rem" data-name="clear-keys-color">clear</span>
 
 ${getKeyboard()}
 

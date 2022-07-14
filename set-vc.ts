@@ -34,7 +34,7 @@ function getWithDataAttr<T extends HTMLElement = HTMLElement>(
   name: string,
   el?: HTMLElement
 ): T[] {
-  return (el || document).querySelectorAll(`[data-${name}]`) as any;
+  return ((el || document).querySelectorAll(`[data-${name}]`) as any) || [];
 }
 
 const sets = {
@@ -279,13 +279,26 @@ export class SetVc {
       });
     });
 
-    getWithDataAttr('note-key', this.pageEl)?.forEach((el) => {
+    getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
       el.addEventListener('pointerdown', (evt: MouseEvent) => {
+        el.style.backgroundColor = 'lightgray';
+
         this.tryPlayTextLine({
           text: el?.dataset?.noteKey,
         });
       });
     });
+
+    // очистка цвета
+    let el = dyName('clear-keys-color');
+    console.log();
+    if (el) {
+      el.addEventListener('click', () => {
+        getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
+          el.style.backgroundColor = 'white';
+        });
+      });
+    }
   }
 
   async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
