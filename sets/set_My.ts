@@ -1,7 +1,7 @@
 function getKeyStep(
   step: string,
   symbol: string,
-  duration: number = 25
+  withBorder?: 'left' | 'right'
 ): string {
   // let step = note[0];
 
@@ -18,6 +18,16 @@ function getKeyStep(
 
   //let border = borderNone || 'border: 1px solid grey;';
   let border = 'border: 1px solid grey;';
+  let borderSide = '';
+
+  if (withBorder === 'left') {
+    borderSide = 'border-left: 2px solid black;';
+  }
+
+  if (withBorder === 'right') {
+    borderSide = 'border-right: 2px solid black;';
+  }
+
   let fontWeight = 400;
 
   return `<div
@@ -26,15 +36,17 @@ function getKeyStep(
       margin: 0;
       padding: 0;
       display: inline-block;
-      font-size: 1.5rem;
-      width: 2.5rem;
-      height: 2.5rem;
+      font-size: 1.3rem;
+      width: 2.3rem;
+      height: 2.3rem;
       user-select: none;
       text-align: center;
       ${border}
+      ${borderSide}
       color: ${fontColor};
       font-weight: ${fontWeight};" 
       data-name="note-step:${step}"
+      data-relative-key="${step}"
       >${symbol}</div>`
     .replace(/\n/g, ' ')
     .replace(/ +/g, ' ');
@@ -84,29 +96,37 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
 function getKeyboard2(): string {
   return `
 <div style="display: flex; flex-direction: column; align-items: center; user-select: none;">
-<div>
-${getKeyStep('9', '9а')}
-${getKeyStep('10', 'жа')}
-${getKeyStep('11', 'га')}
-${getKeyStep('12', 'йа')}
+
+<div style="user-select: none;">
 ${getKeyStep('13', '13')}
 ${getKeyStep('14', '14')}
 ${getKeyStep('15', '15')}
-${getKeyStep('16', '16')}
+${getKeyStep('16', '16', 'right')}
+${getKeyStep('17', '17', 'left')}
+${getKeyStep('18', '18')}
+${getKeyStep('19', '19')}
+${getKeyStep('20', '20')}
 </div>
 
-<div>
-${getKeyStep('3', 'ща')}
-${getKeyStep('4', 'ча')}
-${getKeyStep('5', 'па')}
-${getKeyStep('6', 'ша')}
-${getKeyStep('7', '7а')}
-${getKeyStep('8', '8а')}
+<div style="user-select: none;">
+${getKeyStep('07', '7а')}
+${getKeyStep('08', '8а')}
+${getKeyStep('09', '9а', 'right')}
+${getKeyStep('10', 'жа', 'left')}
+${getKeyStep('11', 'га')}
+${getKeyStep('12', 'йа')}
 </div>
 
-<div>
-${getKeyStep('1', 'ха')}
-${getKeyStep('2', 'ца')}
+<div style="user-select: none;">
+${getKeyStep('03', 'ща')}
+${getKeyStep('04', 'ча', 'right')}
+${getKeyStep('05', 'па', 'left')}
+${getKeyStep('06', 'ша')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('1', 'ха', 'right')}
+${getKeyStep('2', 'ца', 'left')}
 </div>
 </div>
 
@@ -114,32 +134,40 @@ ${getKeyStep('2', 'ца')}
 оЩаЩу хаЦаЩуЦу цуЦуХаЩа
 </div>
 
-<div style="display: flex; flex-direction: column; align-items: center;">
+<div style="display: flex; flex-direction: column; align-items: center; user-select: none;">
 
-<div>
-${getKeyStep('-2', 'цу')}
-${getKeyStep('-1', 'ху')}
+<div style="user-select: none;">
+${getKeyStep('-02', 'цу', 'right')}
+${getKeyStep('-01', 'ху', 'left')}
 </div>
 
-<div>
-${getKeyStep('-8', '8у')}
-${getKeyStep('-7', '7у')}
-${getKeyStep('-6', 'шу')}
-${getKeyStep('-5', 'пу')}
-${getKeyStep('-4', 'чу')}
-${getKeyStep('-3', 'щу')}
+<div style="user-select: none;">
+${getKeyStep('-06', 'шу')}
+${getKeyStep('-05', 'пу', 'right')}
+${getKeyStep('-04', 'чу', 'left')}
+${getKeyStep('-03', 'щу')}
 </div>
 
-<div>
-${getKeyStep('-16', '16')}
+<div style="user-select: none;">
+${getKeyStep('-12', 'йу')}
+${getKeyStep('-11', 'гу')}
+${getKeyStep('-10', 'жу', 'right')}
+${getKeyStep('-09', '9у', 'left')}
+${getKeyStep('-08', '8у')}
+${getKeyStep('-07', '7у')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-20', '20')}
+${getKeyStep('-19', '19')}
+${getKeyStep('-18', '18')}
+${getKeyStep('-17', '17', 'right')}
+${getKeyStep('-16', '16', 'left')}
 ${getKeyStep('-15', '15')}
 ${getKeyStep('-14', '14')}
 ${getKeyStep('-13', '13')}
-${getKeyStep('-12', 'йу')}
-${getKeyStep('-11', 'гу')}
-${getKeyStep('-10', 'жу')}
-${getKeyStep('-9', '9у')}
 </div>
+
 </div>
 
 
