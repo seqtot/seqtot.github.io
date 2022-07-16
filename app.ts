@@ -24,6 +24,18 @@ const appEl = document.getElementById('app');
 //const defRoute = '/set/set_Battle/';
 const defRoute = '/set/set_ItsMyLife/';
 
+let linkToTest = `
+<a
+  href="/set/set_My/"
+  data-view=".view-main"
+  class="panel-close"
+  >test</a>
+`.trim();
+
+if (!/devitband/.test(window.location.href)) {
+  linkToTest = '';
+}
+
 const leftPanel = `
 <div
   class="panel panel-left panel-cover panel-init theme-dark"
@@ -57,11 +69,7 @@ const leftPanel = `
                 data-view=".view-main"
                 class="panel-close"
               >Its my life</a>              
-              <a
-                href="/set/set_My/"
-                data-view=".view-main"
-                class="panel-close"
-              >test</a>
+              ${linkToTest}
             </li>
           </ul>
         </div>      
