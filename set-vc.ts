@@ -289,14 +289,34 @@ export class SetVc {
       });
     });
 
+    const clearColor = () => {
+      // console.log(window.location.href);
+
+      getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
+        el.style.backgroundColor = 'white';
+      });
+    };
+
     // очистка цвета
     let el = dyName('clear-keys-color');
-    console.log();
+    if (el) {
+      el.addEventListener('click', () => clearColor());
+    }
+
+    el = dyName('select-random-key');
     if (el) {
       el.addEventListener('click', () => {
-        getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-          el.style.backgroundColor = 'white';
-        });
+        const val =
+          un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
+
+        const key = dyName(`note-val-${val}`);
+
+        if (key) {
+          clearColor();
+          key.style.backgroundColor = 'lightgray';
+        }
+
+        console.log(val);
       });
     }
   }

@@ -72,6 +72,7 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
       font-weight: ${fontW};" 
 
       data-note-key="b60 ${note}-${duration}"
+      data-name="note-val-${note}"
 
       >${symbol}</div>`
     .replace(/\n/g, ' ')
@@ -170,9 +171,12 @@ ${getKeyStep('ry', 'жу')}<br/>
 </div>
 <br/-->
 
-${getKey('bu', 'бы')}&nbsp;&nbsp;&nbsp;&nbsp;
+${getKey('bu', 'бы')}
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
-  !clear
+  &nbsp;&nbsp;&nbsp;!clr
+</span>
+<span style="user-select: none; font-size: 1.5rem" data-name="select-random-key">
+  &nbsp;&nbsp;!rnd
 </span>
 
 ${getKeyboard()}

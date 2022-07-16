@@ -233,3 +233,11 @@ export function dyName<T extends HTMLElement = HTMLElement>(
 export function isPresent(val: any) {
   return val !== null || val !== undefined;
 }
+
+export function getRandomElement(arr: any[] | string): any {
+  const length = arr ? arr.length : 0;
+
+  const i = Math.floor(Math.random() * length);
+
+  return arr[i];
+}
