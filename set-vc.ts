@@ -319,6 +319,13 @@ export class SetVc {
         console.log(val);
       });
     }
+
+    getWithDataAttr('relative-key', this.pageEl)?.forEach((el: HTMLElement) => {
+      el.addEventListener('pointerdown', () => {
+        // relativeKey
+        console.log(el.dataset);
+      });
+    });
   }
 
   async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {

@@ -95,7 +95,13 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
 
 function getKeyboard2(): string {
   return `
-<div style="display: flex; flex-direction: column; align-items: center; user-select: none;">
+<div 
+  style="
+    display: flex; flex-direction: column; align-items: center; user-select: none;
+  "
+  data-name="relative-keyboard-wrapper"
+  data-relative-keyboard-base=""
+>
 
 <div style="user-select: none;">
 ${getKeyStep('13', '13')}
@@ -130,7 +136,7 @@ ${getKeyStep('2', 'ца', 'left')}
 </div>
 </div>
 
-<div style="font-size: 1.5rem">
+<div style="font-size: 1.5rem; user-select: none;">
 оЩаЩу хаЦаЩуЦу цуЦуХаЩа
 </div>
 
