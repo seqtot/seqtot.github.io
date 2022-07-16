@@ -1,3 +1,46 @@
+function getKeyStep(
+  note: string,
+  symbol: string,
+  duration: number = 25
+): string {
+  let step = note[0];
+
+  let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
+  let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
+    ? 'border: none;'
+    : '';
+  let fontColor = 'black';
+
+  // if (note[1] === 'u') {
+  //   borderNone = 'border: none;';
+  //   // fontColor = 'lightgray';
+  // }
+
+  //let border = borderNone || 'border: 1px solid grey;';
+  let border = 'border: 1px solid grey;';
+  fontW = 400;
+
+  return `<div
+    style="
+      box-sizing: border-box;    
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+      font-size: 1.5rem;
+      width: 2rem;
+      user-select: none;
+      text-align: center;
+      ${border}
+      color: ${fontColor};
+      font-weight: ${fontW};" 
+
+      data-note-key="b60 ${note}-${duration}"
+
+      >${symbol}</div>`
+    .replace(/\n/g, ' ')
+    .replace(/ +/g, ' ');
+}
+
 function getKey(note: string, symbol: string, duration: number = 25): string {
   let step = note[0];
 
@@ -76,6 +119,56 @@ const info = `
 
 <!--b>TEST</b-->
 <!--pre style="font-family: monospace; margin: .5rem 0 0;"></pre-->
+
+<!--div style="display: flex; align-items: self-end; margin-left: 6rem;">
+<div style="width: 2rem;">
+${getKeyStep('lo', '9а')}<br/>
+${getKeyStep('vo', 'ша')}<br/>
+${getKeyStep('no', 'ща')}<br/>
+${getKeyStep('do', '0')}<br/>
+</div>
+<div style="width: 2rem; padding-bottom: 1rem;">
+${getKeyStep('ko', 'жа')}<br/>
+${getKeyStep('so', '7а')}<br/>
+${getKeyStep('mo', 'ча')}<br/>
+${getKeyStep('to', 'ха')}<br/>
+</div>
+
+<div style="width: 2rem; padding-bottom: 2rem;">
+${getKeyStep('bo', 'га')}<br/>
+${getKeyStep('zo', '8а')}<br/>
+${getKeyStep('fo', 'па')}<br/>
+${getKeyStep('ro', 'ца')}<br/>
+</div>
+
+
+</div>
+
+<div style="font-size: 1.5rem">
+оЩаЩу хаЦаЩуЦу цуЦуХаЩа
+</div>
+
+<div style="display: flex; align-items: self-start; margin-left: 4rem;">
+
+<div style="width: 2rem; padding-top: 1.25rem;">
+${getKeyStep('by', 'ху')}<br/>
+${getKeyStep('ly', 'щу')}<br/>
+${getKeyStep('sy', 'пу')}<br/>
+${getKeyStep('fy', '7у')}<br/>
+${getKeyStep('ny', '9у')}<br/>
+${getKeyStep('ty', 'гу')}<br/>
+</div>
+
+<div style="width: 2rem;">
+${getKeyStep('do', '0')}<br/>
+${getKeyStep('ky', 'цу')}<br/>
+${getKeyStep('zy', 'чу')}<br/>
+${getKeyStep('vy', 'шу')}<br/>
+${getKeyStep('my', '8у')}<br/>
+${getKeyStep('ry', 'жу')}<br/>
+</div>
+</div>
+<br/-->
 
 ${getKey('bu', 'бы')}&nbsp;&nbsp;&nbsp;&nbsp;
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
