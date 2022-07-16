@@ -315,15 +315,54 @@ export class SetVc {
           clearColor();
           key.style.backgroundColor = 'lightgray';
         }
-
-        console.log(val);
       });
     }
 
     getWithDataAttr('relative-key', this.pageEl)?.forEach((el: HTMLElement) => {
       el.addEventListener('pointerdown', () => {
-        // relativeKey
-        console.log(el.dataset);
+        const wrapper = dyName('relative-keyboard-wrapper');
+
+        if (!wrapper) {
+          return;
+        }
+
+        let baseNote = wrapper.dataset.relativeKeyboardBase || 'do';
+        let note = un.getNoteByOffset(baseNote, el.dataset.relativeKey);
+
+        if (!note) {
+          return;
+        }
+
+        wrapper.dataset.relativeKeyboardBase = note;
+
+        getWithDataAttr('set-note', this.pageEl)?.forEach((el: HTMLElement) => {
+          el.style.backgroundColor = 'white';
+        });
+
+        if (dyName(`set-note-${note}`)) {
+          dyName(`set-note-${note}`).style.backgroundColor = 'lightgray';
+        }
+
+        this.tryPlayTextLine({ text: `b60 ${note}-25` });
+      });
+    });
+
+    getWithDataAttr('set-note', this.pageEl)?.forEach((el: HTMLElement) => {
+      el.addEventListener('pointerdown', () => {
+        const wrapper = dyName('relative-keyboard-wrapper');
+
+        if (!wrapper) {
+          return;
+        }
+
+        getWithDataAttr('set-note', this.pageEl)?.forEach((el: HTMLElement) => {
+          el.style.backgroundColor = 'white';
+        });
+
+        el.style.backgroundColor = 'lightgray';
+        const note = el.innerText.trim();
+        wrapper.dataset.relativeKeyboardBase = note;
+        this.tryPlayTextLine({ text: `b60 ${note}-25` });
       });
     });
   }

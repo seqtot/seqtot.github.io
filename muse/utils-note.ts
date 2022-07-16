@@ -425,3 +425,27 @@ export function getRandomElement(arr: any[] | string): any {
 }
 
 // 'hello #ff'.replace(/#.*$/, '')
+export function getNoteByOffset(
+  pNote: string,
+  pOffset: string | number
+): string {
+  pNote = (pNote || '').toLowerCase();
+
+  let noteOrder = `
+      du tu ru nu mu fu vu su zu lu ku bu
+      dy ty ry ny my fy vy sy zy ly ky by
+      do to ro no mo fo vo so zo lo ko bo
+      da ta ra na ma fa va sa za la ka ba
+      de te re ne me fe ve se ze le ke be
+      di ti ri ni mi fi vi si zi li ki bi
+    `
+    .replace(/\n/g, ' ')
+    .split(' ')
+    .filter((item) => !!item);
+
+  const offset: number = parseInt(<string>pOffset, 10);
+
+  let index = noteOrder.findIndex((item) => item === pNote);
+
+  return noteOrder[index + offset] || '';
+}
