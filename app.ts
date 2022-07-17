@@ -21,8 +21,9 @@ import { setVc } from './set-vc';
 const appEl = document.getElementById('app');
 
 // const defRoute = '/set/set_E/';
-//const defRoute = '/set/set_Battle/';
-const defRoute = '/set/set_ItsMyLife/';
+// const defRoute = '/set/set_Battle/';
+// const defRoute = '/set/set_ItsMyLife/';
+const defRoute = '/set/set_blackNight/';
 
 let linkToTest = `
 <a
@@ -54,6 +55,11 @@ const leftPanel = `
         <div class="list links-list" style="margin-top: 0;">
           <ul>
             <li>
+              <a
+                href="/set/set_blackNight/"
+                data-view=".view-main"
+                class="panel-close"
+              >Black Night</a>
               <a
                 href="/set/set_E/"
                 data-view=".view-main"

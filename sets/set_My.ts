@@ -171,7 +171,7 @@ ${getKeyStep('2', 'ца', 'left')}
 </div>
 
 <div data-relative-key="0" style="font-size: 1.5rem; user-select: none;">
-оЩаЩу хаЦаЩуЦу цуЦуХаЩа
+оХуХаЦаХа оЦаЦа оЦаЦуЦуЦуХу
 </div>
 
 <div style="display: flex; flex-direction: column; align-items: center; user-select: none;">
