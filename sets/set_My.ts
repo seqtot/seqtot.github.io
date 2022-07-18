@@ -145,7 +145,11 @@ function getKeyboard2(): string {
 
 <div data-relative-key="0" style="font-size: 1.5rem; user-select: none;">
 оЯ цуЦа чуЧа пуПа 7у<br/>
-7а чуЧа пуПа 8у8а 7у
+7а чуЧа пуПа 8у8а 7у<br/>
+<br/>
+о8аЧуЩаЦу пуЩаХуХуПуЧаХу 
+хуЦуЦаОЦуЦа оЦуЦаОЦуЦа
+
 </div>
 
 <div style="display: flex; flex-direction: column; align-items: center; user-select: none;">
