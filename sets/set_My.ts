@@ -181,6 +181,42 @@ ${getKeyStep('10', 'жа', 'b')}
 ${getKeyStep('11', 'га', 'b')}
 ${getKeyStep('12', 'я', 'lbr')}
 </div>
+
+<!-- -->
+
+<div style="user-select: none;">
+${getKeyStep('-16', '16', 'tl')}
+${getKeyStep('-15', '15', 't')}
+${getKeyStep('-14', '14', 'trb')}
+${getKeyStep('-13', '13', 'tr')}
+${getKeyStep('13', '13', 'lt')}
+${getKeyStep('14', '14', 'ltb')}
+${getKeyStep('15', '15', 't')}
+${getKeyStep('16', '16', 'tr')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-20', '20', 'l')}
+${getKeyStep('-19', '19', 'rb')}
+${getKeyStep('-18', '18', '')}
+${getKeyStep('-17', '17', 'r', 'orange')}
+${getKeyStep('17', '17', 'l', 'orange')}
+${getKeyStep('18', '18', '')}
+${getKeyStep('19', '19', 'lb')}
+${getKeyStep('20', '20', 'r')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-24', '24', 'rbl')}
+${getKeyStep('-23', '23', 'b')}
+${getKeyStep('-22', '22', 'b')}
+${getKeyStep('-21', '21', 'rb')}
+${getKeyStep('21', '21', 'lb')}
+${getKeyStep('22', '22', 'b')}
+${getKeyStep('23', '23', 'b')}
+${getKeyStep('24', '24', 'lbr')}
+</div>
+
 </div>
 
 </div>
