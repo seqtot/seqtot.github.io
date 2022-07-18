@@ -1,7 +1,8 @@
 function getKeyStep(
   step: string,
   symbol: string,
-  withBorder?: 'left' | 'right'
+  withBorder: string = '',
+  bgColor: string = 'white'
 ): string {
   // let step = note[0];
 
@@ -20,12 +21,20 @@ function getKeyStep(
   let border = 'border: 1px solid grey;';
   let borderSide = '';
 
-  if (withBorder === 'left') {
-    borderSide = 'border-left: 2px solid black;';
+  if (withBorder.includes('t')) {
+    borderSide += 'border-top: 2px solid black;';
   }
 
-  if (withBorder === 'right') {
-    borderSide = 'border-right: 2px solid black;';
+  if (withBorder.includes('r')) {
+    borderSide += 'border-right: 2px solid black;';
+  }
+
+  if (withBorder.includes('b')) {
+    borderSide += 'border-bottom: 2px solid black;';
+  }
+
+  if (withBorder.includes('l')) {
+    borderSide += 'border-left: 2px solid black;';
   }
 
   let fontWeight = 400;
@@ -44,6 +53,7 @@ function getKeyStep(
       ${border}
       ${borderSide}
       color: ${fontColor};
+      background-color: ${bgColor};
       font-weight: ${fontWeight};" 
       data-name="note-step:${step}"
       data-relative-key="${step}"
@@ -133,43 +143,6 @@ function getKeyboard2(): string {
 <span data-set-note data-name="set-note-bo" style="user-select: none; margin-right: .5rem;">bo</span>
 </div>
 
-<br/>
-<div style="user-select: none;">
-${getKeyStep('13', '13')}
-${getKeyStep('14', '14')}
-${getKeyStep('15', '15')}
-${getKeyStep('16', '16', 'right')}
-${getKeyStep('17', '17', 'left')}
-${getKeyStep('18', '18')}
-${getKeyStep('19', '19')}
-${getKeyStep('20', '20')}
-</div>
-
-<div style="user-select: none;">
-${getKeyStep('07', '7а')}
-${getKeyStep('08', '8а')}
-${getKeyStep('09', '9а', 'right')}
-${getKeyStep('10', 'жа', 'left')}
-${getKeyStep('11', 'га')}
-${getKeyStep('12', 'йа')}
-</div>
-
-<div style="user-select: none;">
-<div style="display: inline-block; user-select: none; margin-right: 2.5rem;">prev</div>
-${getKeyStep('03', 'ща')}
-${getKeyStep('04', 'ча', 'right')}
-${getKeyStep('05', 'па', 'left')}
-${getKeyStep('06', 'ша')}
-<div style="display: inline-block; user-select: none; margin-left: 2.5rem;">next</div>
-</div>
-
-<div style="user-select: none;">
-
-${getKeyStep('1', 'ха', 'right')}
-${getKeyStep('2', 'ца', 'left')}
-</div>
-</div>
-
 <div data-relative-key="0" style="font-size: 1.5rem; user-select: none;">
 оХуХаЦаХа оЦаЦа оЦаЦуЦуЦуХу
 </div>
@@ -177,35 +150,37 @@ ${getKeyStep('2', 'ца', 'left')}
 <div style="display: flex; flex-direction: column; align-items: center; user-select: none;">
 
 <div style="user-select: none;">
-${getKeyStep('-02', 'цу', 'right')}
-${getKeyStep('-01', 'ху', 'left')}
+${getKeyStep('-04', 'чу', 'tlb')}
+${getKeyStep('-03', 'щу', 'tb')}
+${getKeyStep('-02', 'цу', 'trb')}
+${getKeyStep('-01', 'ху', 'trb')}
+${getKeyStep('01', 'ха', 'ltb')}
+${getKeyStep('02', 'ца', 'ltb')}
+${getKeyStep('03', 'ща', 'tb')}
+${getKeyStep('04', 'ча', 'trb')}
 </div>
 
 <div style="user-select: none;">
-${getKeyStep('-06', 'шу')}
-${getKeyStep('-05', 'пу', 'right')}
-${getKeyStep('-04', 'чу', 'left')}
-${getKeyStep('-03', 'щу')}
+${getKeyStep('-08', '8y', 'lb')}
+${getKeyStep('-07', '7y', 'rb')}
+${getKeyStep('-06', 'шу', 'b')}
+${getKeyStep('-05', 'пу', 'rb', 'orange')}
+${getKeyStep('05', 'па', 'lb', 'orange')}
+${getKeyStep('06', 'ша', 'b')}
+${getKeyStep('07', '7а', 'lb')}
+${getKeyStep('08', '8а', 'rb')}
 </div>
 
 <div style="user-select: none;">
-${getKeyStep('-12', 'йу')}
-${getKeyStep('-11', 'гу')}
-${getKeyStep('-10', 'жу', 'right')}
-${getKeyStep('-09', '9у', 'left')}
-${getKeyStep('-08', '8у')}
-${getKeyStep('-07', '7у')}
+${getKeyStep('-12', 'ю', 'rbl')}
+${getKeyStep('-11', 'гу', 'b')}
+${getKeyStep('-10', 'жу', 'b')}
+${getKeyStep('-09', '9у', 'rb')}
+${getKeyStep('09', '9а', 'lb')}
+${getKeyStep('10', 'жа', 'b')}
+${getKeyStep('11', 'га', 'b')}
+${getKeyStep('12', 'я', 'lbr')}
 </div>
-
-<div style="user-select: none;">
-${getKeyStep('-20', '20')}
-${getKeyStep('-19', '19')}
-${getKeyStep('-18', '18')}
-${getKeyStep('-17', '17', 'right')}
-${getKeyStep('-16', '16', 'left')}
-${getKeyStep('-15', '15')}
-${getKeyStep('-14', '14')}
-${getKeyStep('-13', '13')}
 </div>
 
 </div>
