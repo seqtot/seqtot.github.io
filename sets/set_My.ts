@@ -22,19 +22,19 @@ function getKeyStep(
   let borderSide = '';
 
   if (withBorder.includes('t')) {
-    borderSide += 'border-top: 2px solid black;';
+    borderSide += 'border-top: 3px solid black;';
   }
 
   if (withBorder.includes('r')) {
-    borderSide += 'border-right: 2px solid black;';
+    borderSide += 'border-right: 3px solid black;';
   }
 
   if (withBorder.includes('b')) {
-    borderSide += 'border-bottom: 2px solid black;';
+    borderSide += 'border-bottom: 3px solid black;';
   }
 
   if (withBorder.includes('l')) {
-    borderSide += 'border-left: 2px solid black;';
+    borderSide += 'border-left: 3px solid black;';
   }
 
   let fontWeight = 400;
@@ -150,25 +150,25 @@ function getKeyboard2(): string {
 <div style="display: flex; flex-direction: column; align-items: center; user-select: none;">
 
 <div style="user-select: none;">
-${getKeyStep('-04', 'чу', 'tlb')}
-${getKeyStep('-03', 'щу', 'tb')}
+${getKeyStep('-04', 'чу', 'tl')}
+${getKeyStep('-03', 'щу', 't')}
 ${getKeyStep('-02', 'цу', 'trb')}
-${getKeyStep('-01', 'ху', 'trb')}
-${getKeyStep('01', 'ха', 'ltb')}
+${getKeyStep('-01', 'ху', 'tr')}
+${getKeyStep('01', 'ха', 'lt')}
 ${getKeyStep('02', 'ца', 'ltb')}
-${getKeyStep('03', 'ща', 'tb')}
-${getKeyStep('04', 'ча', 'trb')}
+${getKeyStep('03', 'ща', 't')}
+${getKeyStep('04', 'ча', 'tr')}
 </div>
 
 <div style="user-select: none;">
-${getKeyStep('-08', '8y', 'lb')}
+${getKeyStep('-08', '8y', 'l')}
 ${getKeyStep('-07', '7y', 'rb')}
-${getKeyStep('-06', 'шу', 'b')}
-${getKeyStep('-05', 'пу', 'rb', 'orange')}
-${getKeyStep('05', 'па', 'lb', 'orange')}
-${getKeyStep('06', 'ша', 'b')}
+${getKeyStep('-06', 'шу', '')}
+${getKeyStep('-05', 'пу', 'r', 'orange')}
+${getKeyStep('05', 'па', 'l', 'orange')}
+${getKeyStep('06', 'ша', '')}
 ${getKeyStep('07', '7а', 'lb')}
-${getKeyStep('08', '8а', 'rb')}
+${getKeyStep('08', '8а', 'r')}
 </div>
 
 <div style="user-select: none;">
