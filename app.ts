@@ -20,10 +20,12 @@ import { setVc } from './set-vc';
 
 const appEl = document.getElementById('app');
 
+const isDev = /devitband/.test(window.location.href);
+
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
-const defRoute = '/set/set_blackNight/';
+const defRoute = isDev ? '/set/set_My/' : '/set/set_blackNight/';
 
 let linkToTest = `
 <a
@@ -33,7 +35,7 @@ let linkToTest = `
   >test</a>
 `.trim();
 
-if (!/devitband/.test(window.location.href)) {
+if (!isDev) {
   linkToTest = '';
 }
 

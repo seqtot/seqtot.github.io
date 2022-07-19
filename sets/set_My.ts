@@ -144,11 +144,14 @@ function getKeyboard2(): string {
 </div>
 
 <div data-relative-key="0" style="font-size: 1.5rem; user-select: none;">
-оЯ цуЦа чуЧа пуПа 7у<br/>
-7а чуЧа пуПа 8у8а 7у<br/>
-<br/>
-о8аЧуЩаЦу пуЩаХуХуПуЧаХу 
-хуЦуЦаОЦуЦа оЦуЦаОЦуЦа
+
+<!--оЯ цуЦа чуЧа пуПа 7у<br/>
+7а чуЧа пуПа 8у8а 7у<br/>-->
+
+о8аЧуЩаЦу (пу)<br/>
+пуЩаХуХуПуЧаХу (ху)<br/>
+хуЦуЦаОЦуЦа (o)<br/>
+оЦуЦаОЦуЦа
 
 </div>
 
@@ -190,36 +193,36 @@ ${getKeyStep('12', 'я', 'lbr')}
 <!-- -->
 
 <div style="user-select: none;">
-${getKeyStep('-16', '16', 'tl')}
-${getKeyStep('-15', '15', 't')}
-${getKeyStep('-14', '14', 'trb')}
+${getKeyStep('-16', '16', 'tlr')}
+${getKeyStep('-15', '15', 'tb')}
+${getKeyStep('-14', '14', 't')}
 ${getKeyStep('-13', '13', 'tr')}
 ${getKeyStep('13', '13', 'lt')}
-${getKeyStep('14', '14', 'ltb')}
-${getKeyStep('15', '15', 't')}
-${getKeyStep('16', '16', 'tr')}
+${getKeyStep('14', '14', 't')}
+${getKeyStep('15', '15', 'tb')}
+${getKeyStep('16', '16', 'trl')}
 </div>
 
 <div style="user-select: none;">
 ${getKeyStep('-20', '20', 'l')}
-${getKeyStep('-19', '19', 'rb')}
-${getKeyStep('-18', '18', '')}
+${getKeyStep('-19', '19', 'r')}
+${getKeyStep('-18', '18', 'b')}
 ${getKeyStep('-17', '17', 'r', 'orange')}
 ${getKeyStep('17', '17', 'l', 'orange')}
-${getKeyStep('18', '18', '')}
-${getKeyStep('19', '19', 'lb')}
+${getKeyStep('18', '18', 'b')}
+${getKeyStep('19', '19', 'l')}
 ${getKeyStep('20', '20', 'r')}
 </div>
 
 <div style="user-select: none;">
-${getKeyStep('-24', '24', 'rbl')}
+${getKeyStep('-24', '24', 'lb')}
 ${getKeyStep('-23', '23', 'b')}
 ${getKeyStep('-22', '22', 'b')}
-${getKeyStep('-21', '21', 'rb')}
-${getKeyStep('21', '21', 'lb')}
+${getKeyStep('-21', '21', 'rbl')}
+${getKeyStep('21', '21', 'lbr')}
 ${getKeyStep('22', '22', 'b')}
 ${getKeyStep('23', '23', 'b')}
-${getKeyStep('24', '24', 'lbr')}
+${getKeyStep('24', '24', 'br')}
 </div>
 
 </div>
@@ -283,6 +286,9 @@ ${getKey('bu', 'бы')}
 ${getKeyboard()}
 
 <div style="font-size: 1.5rem; font-family: monospace;">
+
+<!-- li -->
+
 моЦу оПаХуЦу    <br/>
 моПаЦу ЩуЦу     <br/>
 буПаЦу оПаХуЦу <br/>
