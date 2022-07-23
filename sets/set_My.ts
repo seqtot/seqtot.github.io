@@ -105,53 +105,21 @@ function getKey(note: string, symbol: string, duration: number = 25): string {
 
 function getKeyboard2(): string {
   return `
-<div 
-  style="
-    display: flex; flex-direction: column; align-items: center; user-select: none;
-  "
-  data-name="relative-keyboard-wrapper"
-  data-relative-keyboard-base=""
->
-
-<div >
-<span data-set-note data-name="set-note-dy" style="user-select: none; margin-right: .5rem;">dy</span>
-<span data-set-note data-name="set-note-ty" style="user-select: none; margin-right: .5rem;">ty</span>
-<span data-set-note data-name="set-note-ry" style="user-select: none; margin-right: .5rem;">ry</span>
-<span data-set-note data-name="set-note-ny" style="user-select: none; margin-right: .5rem;">ny</span>
-<span data-set-note data-name="set-note-my" style="user-select: none; margin-right: .5rem;">my</span>
-<span data-set-note data-name="set-note-fy" style="user-select: none; margin-right: .5rem;">fy</span>
-<span data-set-note data-name="set-note-vy" style="user-select: none; margin-right: .5rem;">vy</span>
-<span data-set-note data-name="set-note-sy" style="user-select: none; margin-right: .5rem;">sy</span>
-<span data-set-note data-name="set-note-zy" style="user-select: none; margin-right: .5rem;">zy</span>
-<span data-set-note data-name="set-note-ly" style="user-select: none; margin-right: .5rem;">ly</span>
-<span data-set-note data-name="set-note-ky" style="user-select: none; margin-right: .5rem;">ky</span>
-<span data-set-note data-name="set-note-by" style="user-select: none; margin-right: .5rem;">by</span>
-</div>
-
-<div>
-<span data-set-note data-name="set-note-do" style="user-select: none; margin-right: .5rem;">do</span>
-<span data-set-note data-name="set-note-to" style="user-select: none; margin-right: .5rem;">to</span>
-<span data-set-note data-name="set-note-ro" style="user-select: none; margin-right: .5rem;">ro</span>
-<span data-set-note data-name="set-note-no" style="user-select: none; margin-right: .5rem;">no</span>
-<span data-set-note data-name="set-note-mo" style="user-select: none; margin-right: .5rem;">mo</span>
-<span data-set-note data-name="set-note-fo" style="user-select: none; margin-right: .5rem;">fo</span>
-<span data-set-note data-name="set-note-vo" style="user-select: none; margin-right: .5rem;">vo</span>
-<span data-set-note data-name="set-note-so" style="user-select: none; margin-right: .5rem;">so</span>
-<span data-set-note data-name="set-note-zo" style="user-select: none; margin-right: .5rem;">zo</span>
-<span data-set-note data-name="set-note-lo" style="user-select: none; margin-right: .5rem;">lo</span>
-<span data-set-note data-name="set-note-ko" style="user-select: none; margin-right: .5rem;">ko</span>
-<span data-set-note data-name="set-note-bo" style="user-select: none; margin-right: .5rem;">bo</span>
-</div>
 
 <div data-relative-key="0" style="font-size: 1.5rem; user-select: none;">
 
-<!--оЯ цуЦа чуЧа пуПа 7у<br/>
-7а чуЧа пуПа 8у8а 7у<br/>-->
-
-о8аЧуЩаЦу (пу)<br/>
-пуЩаХуХуПуЧаХу (ху)<br/>
-хуЦуЦаОЦуЦа (o)<br/>
-оЦуЦаОЦуЦа
+(да)&nbsp;оПуЩаЦаЦу 
+(со)&nbsp;о8аЩуЦуЦаЦу 
+(на)&nbsp;оЩуЦуЦа 
+(да)&nbsp;оЩаЩуПуЩаЦа 
+(да)&nbsp;оЩаХуЦуЦу 
+(са)&nbsp;оЩа7уЧа 
+(на)&nbsp;оХуЦуЦу 
+(да)&nbsp;оЩаХуЦуЦу 
+(да)&nbsp;оЩаХуЦуЦу 
+(ко)&nbsp;о9аЩаЦуХуЦуЦу 
+(на)&nbsp;оХуЦуЦу 
+(на)&nbsp;оХуЦу 
 
 </div>
 
@@ -172,8 +140,8 @@ ${getKeyStep('04', 'ча', 'tr')}
 ${getKeyStep('-08', '8y', 'l')}
 ${getKeyStep('-07', '7y', 'rb')}
 ${getKeyStep('-06', 'шу', '')}
-${getKeyStep('-05', 'пу', 'r', 'orange')}
-${getKeyStep('05', 'па', 'l', 'orange')}
+${getKeyStep('-05', 'пу', 'r')}
+${getKeyStep('05', 'па', 'l')}
 ${getKeyStep('06', 'ша', '')}
 ${getKeyStep('07', '7а', 'lb')}
 ${getKeyStep('08', '8а', 'r')}
@@ -190,8 +158,6 @@ ${getKeyStep('11', 'га', 'b')}
 ${getKeyStep('12', 'я', 'lbr')}
 </div>
 
-<!-- -->
-
 <div style="user-select: none;">
 ${getKeyStep('-16', '16', 'tlr')}
 ${getKeyStep('-15', '15', 'tb')}
@@ -207,8 +173,8 @@ ${getKeyStep('16', '16', 'trl')}
 ${getKeyStep('-20', '20', 'l')}
 ${getKeyStep('-19', '19', 'r')}
 ${getKeyStep('-18', '18', 'b')}
-${getKeyStep('-17', '17', 'r', 'orange')}
-${getKeyStep('17', '17', 'l', 'orange')}
+${getKeyStep('-17', '17', 'r')}
+${getKeyStep('17', '17', 'l')}
 ${getKeyStep('18', '18', 'b')}
 ${getKeyStep('19', '19', 'l')}
 ${getKeyStep('20', '20', 'r')}
@@ -225,6 +191,77 @@ ${getKeyStep('23', '23', 'b')}
 ${getKeyStep('24', '24', 'br')}
 </div>
 
+</div>
+
+<br/>
+
+<div 
+  style="
+    display: flex; flex-direction: column; align-items: center; user-select: none;
+    font-family: monospace;
+  "
+  data-name="relative-keyboard-wrapper"
+  data-relative-keyboard-base=""
+>
+
+<div style="user-select: none;">
+<span data-set-note data-name="set-note-de" style="user-select: none; margin-right: .5rem;">de</span>
+<span data-set-note data-name="set-note-te" style="user-select: none; margin-right: .5rem;">te</span>
+<span data-set-note data-name="set-note-re" style="user-select: none; margin-right: .5rem;">re</span>
+<span data-set-note data-name="set-note-ne" style="user-select: none; margin-right: .5rem;">ne</span>
+<span data-set-note data-name="set-note-me" style="user-select: none; margin-right: .5rem;">me</span>
+<span data-set-note data-name="set-note-fe" style="user-select: none; margin-right: .5rem;">fe</span>
+<span data-set-note data-name="set-note-ve" style="user-select: none; margin-right: .5rem;">ve</span>
+<span data-set-note data-name="set-note-se" style="user-select: none; margin-right: .5rem;">se</span>
+<span data-set-note data-name="set-note-ze" style="user-select: none; margin-right: .5rem;">ze</span>
+<span data-set-note data-name="set-note-le" style="user-select: none; margin-right: .5rem;">le</span>
+<span data-set-note data-name="set-note-ke" style="user-select: none; margin-right: .5rem;">ke</span>
+<span data-set-note data-name="set-note-be" style="user-select: none; margin-right: .5rem;">be</span>
+</div>
+
+<div style="user-select: none;">
+<span data-set-note data-name="set-note-da" style="user-select: none; margin-right: .5rem;">da</span>
+<span data-set-note data-name="set-note-ta" style="user-select: none; margin-right: .5rem;">ta</span>
+<span data-set-note data-name="set-note-ra" style="user-select: none; margin-right: .5rem;">ra</span>
+<span data-set-note data-name="set-note-na" style="user-select: none; margin-right: .5rem;">na</span>
+<span data-set-note data-name="set-note-ma" style="user-select: none; margin-right: .5rem;">ma</span>
+<span data-set-note data-name="set-note-fa" style="user-select: none; margin-right: .5rem;">fa</span>
+<span data-set-note data-name="set-note-va" style="user-select: none; margin-right: .5rem;">va</span>
+<span data-set-note data-name="set-note-sa" style="user-select: none; margin-right: .5rem;">sa</span>
+<span data-set-note data-name="set-note-za" style="user-select: none; margin-right: .5rem;">za</span>
+<span data-set-note data-name="set-note-la" style="user-select: none; margin-right: .5rem;">la</span>
+<span data-set-note data-name="set-note-ka" style="user-select: none; margin-right: .5rem;">ka</span>
+<span data-set-note data-name="set-note-ba" style="user-select: none; margin-right: .5rem;">ba</span>
+</div>
+
+<div style="user-select: none;">
+<span data-set-note data-name="set-note-do" style="user-select: none; margin-right: .5rem;">do</span>
+<span data-set-note data-name="set-note-to" style="user-select: none; margin-right: .5rem;">to</span>
+<span data-set-note data-name="set-note-ro" style="user-select: none; margin-right: .5rem;">ro</span>
+<span data-set-note data-name="set-note-no" style="user-select: none; margin-right: .5rem;">no</span>
+<span data-set-note data-name="set-note-mo" style="user-select: none; margin-right: .5rem;">mo</span>
+<span data-set-note data-name="set-note-fo" style="user-select: none; margin-right: .5rem;">fo</span>
+<span data-set-note data-name="set-note-vo" style="user-select: none; margin-right: .5rem;">vo</span>
+<span data-set-note data-name="set-note-so" style="user-select: none; margin-right: .5rem;">so</span>
+<span data-set-note data-name="set-note-zo" style="user-select: none; margin-right: .5rem;">zo</span>
+<span data-set-note data-name="set-note-lo" style="user-select: none; margin-right: .5rem;">lo</span>
+<span data-set-note data-name="set-note-ko" style="user-select: none; margin-right: .5rem;">ko</span>
+<span data-set-note data-name="set-note-bo" style="user-select: none; margin-right: .5rem;">bo</span>
+</div>
+
+<div style="user-select: none;">
+<span data-set-note data-name="set-note-dy" style="user-select: none; margin-right: .5rem;">dy</span>
+<span data-set-note data-name="set-note-ty" style="user-select: none; margin-right: .5rem;">ty</span>
+<span data-set-note data-name="set-note-ry" style="user-select: none; margin-right: .5rem;">ry</span>
+<span data-set-note data-name="set-note-ny" style="user-select: none; margin-right: .5rem;">ny</span>
+<span data-set-note data-name="set-note-my" style="user-select: none; margin-right: .5rem;">my</span>
+<span data-set-note data-name="set-note-fy" style="user-select: none; margin-right: .5rem;">fy</span>
+<span data-set-note data-name="set-note-vy" style="user-select: none; margin-right: .5rem;">vy</span>
+<span data-set-note data-name="set-note-sy" style="user-select: none; margin-right: .5rem;">sy</span>
+<span data-set-note data-name="set-note-zy" style="user-select: none; margin-right: .5rem;">zy</span>
+<span data-set-note data-name="set-note-ly" style="user-select: none; margin-right: .5rem;">ly</span>
+<span data-set-note data-name="set-note-ky" style="user-select: none; margin-right: .5rem;">ky</span>
+<span data-set-note data-name="set-note-by" style="user-select: none; margin-right: .5rem;">by</span>
 </div>
 
 </div>
