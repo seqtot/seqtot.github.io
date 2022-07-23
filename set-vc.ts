@@ -288,6 +288,14 @@ export class SetVc {
         this.tryPlayTextLine({
           text: el?.dataset?.noteKey,
         });
+
+        const wrapper = dyName('relative-keyboard-wrapper');
+
+        if (!wrapper) {
+          return;
+        }
+
+        wrapper.dataset.relativeKeyboardBase = el?.dataset?.noteLat;
       });
     });
 
