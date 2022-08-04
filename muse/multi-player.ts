@@ -318,9 +318,18 @@ export class MultiPlayer {
 
   pause() {}
 
-  async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
+  async tryPlayTextLine({
+    text,
+    repeat,
+    bpmMultiple,
+  }: {
+    text: string;
+    repeat?: number;
+    bpmMultiple?: number;
+  }) {
     repeat = repeat || 1;
     text = (text || '').trim();
+    bpmMultiple = bpmMultiple || 100;
 
     this.midiPlayer.stopAndClear();
     const noteLine = un.clearNoteLine(text);
@@ -336,7 +345,7 @@ export class MultiPlayer {
 
     await this.midiPlayer.waitLoadingAllInstruments();
 
-    this.midiPlayer.play([loopId]);
+    return this.midiPlayer.play([loopId]);
   }
 
   /**
@@ -349,8 +358,10 @@ export class MultiPlayer {
     beatOffsetMs?: number; // jjkl delete ?
     beatsMs?: number[];
     bpm?: number;
+    bpmMultiple?: number;
   }): OutLoopsInfo {
     //console.log('getLoopsInfo', params);
+    params.bpmMultiple = params.bpmMultiple || 100;
 
     let beatsMs: number[] = Array.isArray(params.beatsMs)
       ? [...params.beatsMs]
@@ -371,6 +382,12 @@ export class MultiPlayer {
     let startRowBeatIndex = 0;
     let bpm = params.bpm || un.getOutBpm(outBlock.head, 0);
     bpm = beatsMs.length ? 0 : bpm;
+
+    if (bpm) {
+      bpm = un.parseInteger((bpm * params.bpmMultiple) / 100);
+    }
+
+    console.log(bpm, beatsMs);
 
     let durationQ = 0;
     let durationMs = 0;
@@ -440,6 +457,7 @@ export class MultiPlayer {
     beatOffsetMs?: number;
     beatsWithOffsetMs?: number[];
     bpm?: number;
+    bpmMultiple?: number;
     startTimeSec?: number;
     outLoops?: OutLoopsInfo;
     notClear?: boolean;
@@ -447,6 +465,7 @@ export class MultiPlayer {
     if (!params.notClear) {
       this.midiPlayer.stopAndClear();
     }
+    params.bpmMultiple = params.bpmMultiple || 100;
     const outLoops = params.outLoops || this.getLoopsInfo(params);
     const beatOffsetMs = params.beatOffsetMs || 0;
 

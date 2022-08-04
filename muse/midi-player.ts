@@ -65,7 +65,7 @@ export class MidiPlayer extends Sound {
     return this;
   }
 
-  play(loopIdsArr?: (string | number)[]) {
+  async play(loopIdsArr?: (string | number)[]) {
     let totalTickCount = 0;
     let totalTickCountByHead = 0;
     this.stop({

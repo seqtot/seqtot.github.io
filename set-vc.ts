@@ -16,7 +16,6 @@ import setItsMyLife from './sets/set_ItsMyLife';
 import setMy from './sets/set_My';
 import setBlackNight from './sets/set_blackNight';
 
-const ctx: AudioContext = new AudioContext();
 const multiPlayer = new MultiPlayer();
 
 Sound.AddSound(366); // bass
@@ -375,13 +374,13 @@ export class SetVc {
   }
 
   async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
-    repeat = repeat || 1;
-    text = (text || '').trim();
+    // repeat = repeat || 1;
+    // text = (text || '').trim();
 
-    const noteLine = un.clearNoteLine(text);
-    const bpm = un.getBpmFromString(noteLine);
+    // const noteLine = un.clearNoteLine(text);
+    // const bpm = un.getBpmFromString(noteLine);
 
-    multiPlayer.tryPlayTextLine({ text, repeat });
+    return multiPlayer.tryPlayTextLine({ text, repeat });
 
     // const loopId = uniPlayer.addLoop({
     //   noteLine,
@@ -406,7 +405,9 @@ export class SetVc {
     multiPlayer.tryPlayMidiBlock({
       blocks: text,
       repeatCount,
+      bpmMultiple: this.bpmMultiple,
     });
+
     //   uniPlayer.clear();
 
     //   const allBlocks = un.getBlocks(text);
