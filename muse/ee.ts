@@ -1,3 +1,5 @@
+'use babel';
+
 // https://github.com/developit/mitt
 
 // https://netbasal.com/when-to-unsubscribe-in-angular-d61c6b21bad3

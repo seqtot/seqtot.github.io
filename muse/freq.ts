@@ -1,3 +1,5 @@
+'use babel';
+
 // CapsLock
 // vowel
 // И - третья i - С6

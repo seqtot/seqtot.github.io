@@ -1,3 +1,5 @@
+'use babel';
+
 export type DrumType =
   | 'hiHatOpened'
   | 'hiHatPedal'

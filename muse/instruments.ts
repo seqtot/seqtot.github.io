@@ -1,3 +1,5 @@
+'use babel';
+
 import { drumCodes } from './drums';
 
 // https://surikov.github.io/webaudiofont/examples/customsample.html

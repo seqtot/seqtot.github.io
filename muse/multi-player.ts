@@ -1,3 +1,5 @@
+'use babel';
+
 import { Sound } from './sound';
 import { MidiPlayer } from './midi-player';
 import { toneAndDrumPlayerSettings, MIDI_INSTR } from './keyboards';

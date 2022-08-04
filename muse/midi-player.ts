@@ -1,3 +1,5 @@
+'use babel';
+
 import { freqByNoteHash } from './freq';
 import { Sound, PlayingItem, KeyInfo } from './sound';
 import { EventEmitter } from './ee';

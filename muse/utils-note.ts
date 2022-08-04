@@ -1,3 +1,5 @@
+'use babel';
+
 export type StringHash = { [key: string]: string };
 
 import { NoteLineInfo } from './typing';

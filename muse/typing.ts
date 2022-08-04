@@ -1,3 +1,5 @@
+'use babel';
+
 export type NoteLineInfo = {
   notes: {
     note: string;

@@ -1,3 +1,5 @@
+'use babel';
+
 import { drumKeysRight, drumInfo, drumCodes } from './drums';
 
 export const MIDI_INSTR = 168;

@@ -1,3 +1,5 @@
+'use babel';
+
 export class Ticker {
   private interval: number = null;
 
