@@ -6,11 +6,9 @@ import { Page } from 'framework7/types/components/page/page';
 import { ComponentContext } from 'framework7/types/modules/component/component';
 import { Props } from 'framework7/types/modules/component/snabbdom/modules/props';
 import { byId, dyName } from './utils';
-import { Player3 } from './muse/player3';
-import { voiceAndDrumsSettings, MIDI_INSTR } from './muse/midi';
+import { Sound } from './muse/sound';
+import { MultiPlayer } from './muse/multi-player';
 import * as un from './muse/utils-note';
-import { Range } from 'framework7/types';
-import { getInstrCodeBy } from './muse/midi';
 
 import setE from './sets/set_E';
 import setBattle from './sets/set_battle';
@@ -19,17 +17,16 @@ import setMy from './sets/set_My';
 import setBlackNight from './sets/set_blackNight';
 
 const ctx: AudioContext = new AudioContext();
-const uniPlayer = new Player3();
-uniPlayer.connect({ ctx });
-uniPlayer.setSettings(voiceAndDrumsSettings);
-uniPlayer.addMidiSound(366); // bass
-uniPlayer.addMidiSound(697); // sax
-uniPlayer.addMidiSound(776); // flute
-uniPlayer.addMidiSound(762); // piccolo
-uniPlayer.addMidiSound(790); // Pan Flute
-uniPlayer.addMidiSound(781); // Recorder
-uniPlayer.addMidiSound(320); // gdm guidar drive mute
-uniPlayer.addMidiSound(137); // xlph xylophone
+const multiPlayer = new MultiPlayer();
+
+Sound.AddSound(366); // bass
+Sound.AddSound(697); // sax
+Sound.AddSound(776); // flute
+Sound.AddSound(762); // piccolo
+Sound.AddSound(790); // Pan Flute
+Sound.AddSound(781); // Recorder
+Sound.AddSound(320); // gdm guidar drive mute
+Sound.AddSound(137); // xlph xylophone
 
 function getWithDataAttr<T extends HTMLElement = HTMLElement>(
   name: string,
@@ -381,79 +378,85 @@ export class SetVc {
     repeat = repeat || 1;
     text = (text || '').trim();
 
-    uniPlayer.clear();
     const noteLine = un.clearNoteLine(text);
     const bpm = un.getBpmFromString(noteLine);
 
-    const loopId = uniPlayer.addLoop({
-      noteLine,
-      bpm,
-      isDrum: false, // isDrum,
-      repeat,
-      instrCode: MIDI_INSTR, // instrAlias[key],
-    }).id;
+    multiPlayer.tryPlayTextLine({ text, repeat });
 
-    await uniPlayer.waitLoadingAllInstruments();
+    // const loopId = uniPlayer.addLoop({
+    //   noteLine,
+    //   bpm,
+    //   isDrum: false, // isDrum,
+    //   repeat,
+    //   instrCode: MIDI_INSTR, // instrAlias[key],
+    // }).id;
 
-    uniPlayer.play([loopId]);
+    // await uniPlayer.waitLoadingAllInstruments();
+
+    // uniPlayer.play([loopId]);
   }
 
   stop() {
-    uniPlayer.clear();
-    uniPlayer.stop();
+    multiPlayer.clearMidiPlayer();
+    // uniPlayer.clear();
+    // uniPlayer.stop();
   }
 
   async play(text: string, repeatCount?: number) {
-    uniPlayer.clear();
-
-    const allBlocks = un.getBlocks(text);
-
-    const out = un.findBlockById(allBlocks, 'out');
-
-    let bpm = un.getOutBpm(out.rows); // 130
-    bpm = Math.round((bpm * this.bpmMultiple) / 100);
-
-    const repeat = repeatCount || un.getOutRepeat(out.rows); // 2
-    const outBlocks = un.getOutBlocksInfo(allBlocks);
-
-    //console.log('outBlocks', outBlocks);
-
-    const outLoops = outBlocks.map((block) => {
-      return Object.keys(block.instrs).map((instrKey) => {
-        const noteLine = block.instrs[instrKey];
-        const isDrum = instrKey.startsWith('@');
-        const loopRepeat = un.getRepeatCount(noteLine);
-
-        let instrCode: string | number = instrKey.split('-')[0];
-        instrCode = isDrum ? undefined : getInstrCodeBy(instrCode);
-
-        return uniPlayer.addLoop({
-          noteLine,
-          bpm,
-          isDrum,
-          repeat: block.repeat,
-          instrCode,
-        }).id;
-      });
+    multiPlayer.tryPlayMidiBlock({
+      blocks: text,
+      repeatCount,
     });
+    //   uniPlayer.clear();
 
-    //console.log('allBlocks', allBlocks);
-    //console.log('outBlocks', outBlocks);
-    //console.log('getOutDrumBlockInstrs.outLoops', outLoops);
-    //console.log('LOOPS', uniPlayer.loops);
+    //   const allBlocks = un.getBlocks(text);
 
-    let breakLoop: boolean = false;
+    //   const out = un.findBlockById(allBlocks, 'out');
 
-    await uniPlayer.waitLoadingAllInstruments();
+    //   let bpm = un.getOutBpm(out.rows); // 130
+    //   bpm = Math.round((bpm * this.bpmMultiple) / 100);
 
-    for (let i = 0; i < repeat; i++) {
-      if (breakLoop) break;
+    //   const repeat = repeatCount || un.getOutRepeat(out.rows); // 2
+    //   const outBlocks = un.getOutBlocksInfo(allBlocks);
 
-      for (let loops of outLoops) {
-        breakLoop = await uniPlayer.play(loops);
+    //   //console.log('outBlocks', outBlocks);
 
-        if (breakLoop) break;
-      }
-    }
+    //   const outLoops = outBlocks.map((block) => {
+    //     return Object.keys(block.instrs).map((instrKey) => {
+    //       const noteLine = block.instrs[instrKey];
+    //       const isDrum = instrKey.startsWith('@');
+    //       const loopRepeat = un.getRepeatCount(noteLine);
+
+    //       let instrCode: string | number = instrKey.split('-')[0];
+    //       instrCode = isDrum ? undefined : getInstrCodeBy(instrCode);
+
+    //       return uniPlayer.addLoop({
+    //         noteLine,
+    //         bpm,
+    //         isDrum,
+    //         repeat: block.repeat,
+    //         instrCode,
+    //       }).id;
+    //     });
+    //   });
+
+    //   //console.log('allBlocks', allBlocks);
+    //   //console.log('outBlocks', outBlocks);
+    //   //console.log('getOutDrumBlockInstrs.outLoops', outLoops);
+    //   //console.log('LOOPS', uniPlayer.loops);
+
+    //   let breakLoop: boolean = false;
+
+    //   await uniPlayer.waitLoadingAllInstruments();
+
+    //   for (let i = 0; i < repeat; i++) {
+    //     if (breakLoop) break;
+
+    //     for (let loops of outLoops) {
+    //       breakLoop = await uniPlayer.play(loops);
+
+    //       if (breakLoop) break;
+    //     }
+    //   }
   }
 }

@@ -1,283 +1,390 @@
 import WebAudioFontPlayer from 'webaudiofont';
+// import {
+//   freqByNoteHash,
+//   codeByNoteHash,
+//   noteByKeyHash,
+//   getNoteByStepAndOctave,
+//   noteLatByNoteHash,
+// } from './freq';
+// import { fullOctaveBlocks } from './keyboard';
+// import { drumCodes } from './drums';
+// import * as un from './utils-note';
+
 import {
-  freqByNoteHash,
-  codeByNoteHash,
-  noteByKeyHash,
-  getNoteByStepAndOctave,
-  noteLatByNoteHash,
+    freqByNoteHash,
+    codeByNoteHash,
+    noteLatByNoteHash,
 } from './freq';
-import { fullOctaveBlocks } from './keyboard';
-import { drumCodes } from './drums';
 import * as un from './utils-note';
+import { MIDI_INSTR } from './keyboards';
+import { drumCodes } from './drums';
+import {hardcodedInstruments} from './instruments';
 
 const instruments: { [code: number]: any } = {};
 const loadingInstruments: { [code: number]: boolean } = {};
 const drumKeys: { [code: string]: number } = {};
-const fontPlayer = new WebAudioFontPlayer();
 const DRUM_PREFIX = 'drum_';
 
 export type KeyInfo = {
-  oscil?: OscillatorNode;
-  midi?: any;
-  volume: number;
+    oscil?: OscillatorNode;
+    midi?: any;
+    volume: number;
+    id: string | number;
 
-  node: GainNode;
-  code: number;
-  octave: string;
-  instr: number;
-  noteLat: string;
-  noteRus: string;
+    node: GainNode;
+    code: number;
+    octave: string;
+    noteStep: string,
+    instr: number;
+    instrCode?: number;
+    noteLat: string;
+    noteRus: string;
 
-  freq?: number;
+    isDrum?: boolean;
+    freq?: number;
 };
 
 export type PlayingItem = {
-  oscil?: OscillatorNode;
-  midis?: any[];
-  volume: GainNode;
+    oscil?: OscillatorNode;
+    midi?: any;
+    volume: GainNode;
 
-  pauseTimeout: number;
-  durationTimeout: number;
-  dfr: un.Deferred;
-  isSound: boolean;
-  node?: GainNode;
+    pauseTimeout: number;
+    durationTimeout: number;
+    dfr: un.Deferred;
+    isSound: boolean;
+    node?: GainNode;
 };
 
-// playingSounds: {
-//   [key: string]: {
-//     oscil: OscillatorNode;
-//     node: GainNode;
-//     midi?: any;
-//   };
-// } = {};
+const fontPlayer = new WebAudioFontPlayer();
+const fontLoader = fontPlayer.loader;
+const ctx: AudioContext = new AudioContext();
 
 export class Sound {
-  ctx: AudioContext;
-  oscills: { [key: string]: OscillatorNode };
-  playingKey: { [key: string]: KeyInfo } = {};
-  fontPlayer = new WebAudioFontPlayer();
-  // fontInfo: any;
-  // fontInstr: any;
+    oscills: { [key: string]: OscillatorNode };
+    keysAndNotes: { [key: string]: KeyInfo } = {};
+    readonly instrSettings: {[key: string]: { [key: string]: KeyInfo }} = {};
 
-  static get Instruments(): { [code: number]: any } {
-    return instruments;
-  }
+    readonly fontPlayer = fontPlayer;
+    readonly fontLoader = fontLoader;
 
-  get instruments(): { [code: number]: any } {
-    return Sound.Instruments;
-  }
-
-  get loadingInstruments(): { [code: number]: any } {
-    return Sound.LoadingInstruments;
-  }
-
-  static get LoadingInstruments(): { [code: number]: any } {
-    return loadingInstruments;
-  }
-
-  static get DrumKeys(): { [code: string]: number } {
-    return drumKeys;
-  }
-
-  get drumKeys(): { [code: string]: number } {
-    return Sound.DrumKeys;
-  }
-
-  async waitLoadingAllInstruments(): Promise<unknown> {
-    const dfr = new un.Deferred();
-
-    if (!Object.keys(Sound.LoadingInstruments).length) {
-      dfr.resolve(true);
-
-      return dfr.promise;
+    static get ctx(): AudioContext {
+        return ctx;
     }
 
-    let interval = setInterval(() => {
-      if (!Object.keys(Sound.LoadingInstruments).length) {
-        clearInterval(interval);
-
-        dfr.resolve(true);
-      }
-    }, 100);
-
-    return dfr.promise;
-  }
-
-  static AddSound(id: string | number) {
-    if (!id) {
-      return;
+    get ctx(): AudioContext {
+        return ctx;
     }
 
-    if (typeof id === 'number') {
-      Sound.AddToneSound(id);
-
-      return;
+    static get Instruments(): { [code: number]: any } {
+        return instruments;
     }
 
-    let drumId = parseInt(id.replace(DRUM_PREFIX, ''), 10);
-    drumId = isNaN(drumId) ? null : drumId;
-
-    if (!drumId) {
-      return;
+    get instruments(): { [code: number]: any } {
+        return instruments;
     }
 
-    Sound.AddDrumSound(drumId);
-  }
-
-  addMidiSound(id: number) {
-    Sound.AddToneSound(id);
-  }
-
-  addToneSound(id: number) {
-    Sound.AddToneSound(id);
-  }
-
-  static AddToneSound(id: number) {
-    if (!id) {
-      return;
+    static get LoadingInstruments(): { [code: number]: any } {
+        return loadingInstruments;
     }
 
-    if (Sound.Instruments[id] || Sound.LoadingInstruments[id]) {
-      return;
+    get loadingInstruments(): { [code: number]: any } {
+        return loadingInstruments;
     }
 
-    const fontInfo = fontPlayer.loader.instrumentInfo(id);
-
-    Sound.LoadingInstruments[id] = true;
-
-    fontPlayer.loader.startLoad(
-      new AudioContext() /*this.ctx*/,
-      fontInfo.url,
-      fontInfo.variable
-    );
-    fontPlayer.loader.waitLoad(() => {
-      Sound.Instruments[id] = window[fontInfo.variable];
-      delete Sound.LoadingInstruments[id];
-    });
-  }
-
-  addDrumSound(drumId: number) {
-    Sound.AddDrumSound(drumId);
-  }
-
-  static AddDrumSound(drumId: number) {
-    if (!drumId) {
-      return;
+    static get DrumKeys(): { [code: string]: number } {
+        return drumKeys;
     }
 
-    // console.log(this.fontPlayer.loader.drumKeys()); //
-    // console.log(this.fontPlayer.loader.drumTitles()); //
-    const drumIndex = fontPlayer.loader.findDrum(drumId);
-    const drumInfo = fontPlayer.loader.drumInfo(drumIndex);
-    const id = DRUM_PREFIX + drumId;
-    Sound.DrumKeys[id] = drumInfo.pitch;
-
-    if (Sound.Instruments[id] || Sound.LoadingInstruments[id]) {
-      return;
+    get drumKeys(): { [code: string]: number } {
+        return drumKeys;
     }
 
-    Sound.LoadingInstruments[id] = true;
-    fontPlayer.loader.startLoad(
-      new AudioContext() /*this.ctx*/,
-      drumInfo.url,
-      drumInfo.variable
-    );
+    async waitLoadingAllInstruments(): Promise<unknown> {
+        const dfr = new un.Deferred();
 
-    fontPlayer.loader.waitLoad(() => {
-      Sound.Instruments[id] = window[drumInfo.variable];
-      delete Sound.LoadingInstruments[id];
-    });
-  }
+        if (!Object.keys(Sound.LoadingInstruments).length) {
+            dfr.resolve(true);
 
-  getNoteSame(val: string): string {
-    val = (val || '').trim();
+            return dfr.promise;
+        }
 
-    let result = freqByNoteHash[val.toLocaleLowerCase()]
-      ? val.toLocaleLowerCase()
-      : '';
+        let interval = setInterval(() => {
+            if (!Object.keys(Sound.LoadingInstruments).length) {
+                clearInterval(interval);
 
-    result = result || (drumCodes[val] ? val : '');
+                dfr.resolve(true);
+            }
+        }, 100);
 
-    return result;
-  }
+        return dfr.promise;
+    }
 
-  getNoteLat(val: string): string {
-    val = (val || '').trim();
+    static AddToneSound(id: number) {
+        if (!id) {
+            return;
+        }
 
-    let result = noteLatByNoteHash[val.toLocaleLowerCase()];
+        if (Sound.Instruments[id] || Sound.LoadingInstruments[id]) {
+            return;
+        }
 
-    result = freqByNoteHash[result] ? result : '';
+        const fontInfo = fontLoader.instrumentInfo(id);
 
-    result = result || (drumCodes[val] ? val : '');
+        // это захардкоженный инструмент
+        if (hardcodedInstruments[id]) {
+            const variable = hardcodedInstruments[id];
+            const instr = window[variable];
 
-    return result;
-  }
+            fontPlayer.adjustPreset(this.ctx, instr);
+            instruments[id] = instr;
 
-  getSettingsForKeys(settings: any): { [key: string]: KeyInfo } {
-    const playingKey: { [key: string]: KeyInfo } = {};
+            delete Sound.LoadingInstruments[id];
 
-    fullOctaveBlocks.forEach((octaveInfo) => {
-      if (!settings.octaves[octaveInfo.name]) {
-        return;
-      }
+            return;
+        }
 
-      const stepKeys = octaveInfo.value;
-      const octaveVowel = settings.octaves[octaveInfo.name].octave;
+        if (window.location.origin === 'file://') {
+            console.log(`Sound ${id} not found`);
 
-      Object.keys(stepKeys).forEach((key) => {
-        const noteLat = getNoteByStepAndOctave(
-          stepKeys[key],
-          octaveVowel,
-          'lat'
+            return;
+        }
+
+        Sound.LoadingInstruments[id] = true;
+        fontLoader.startLoad(
+            Sound.ctx,
+            fontInfo.url,
+            fontInfo.variable
         );
-        const noteRus = getNoteByStepAndOctave(
-          stepKeys[key],
-          octaveVowel,
-          'rus'
+        fontLoader.waitLoad(() => {
+            Sound.Instruments[id] = window[fontInfo.variable];
+            delete Sound.LoadingInstruments[id];
+        });
+    }
+
+    static AddDrumSound(drumId: number) {
+        if (!drumId) {
+            return;
+        }
+
+        //console.log(this.fontLoader.drumKeys()); //
+        //console.log(this.fontLoader.drumTitles()); //
+        const drumIndex = fontLoader.findDrum(drumId);
+        const drumInfo = fontLoader.drumInfo(drumIndex);
+        const id = DRUM_PREFIX + drumId;
+        Sound.DrumKeys[id] = drumInfo.pitch;
+
+        if (window.location.origin === 'file://') {
+            console.log(`Sound ${id} not found`);
+
+            return;
+        }
+
+        // это захардкоженный инструмент
+        if (hardcodedInstruments[id]) {
+            const variable = hardcodedInstruments[id];
+            const instr = window[variable];
+
+            fontPlayer.adjustPreset(this.ctx, instr);
+            instruments[id] = instr;
+
+            delete Sound.LoadingInstruments[id];
+
+            return;
+        }
+
+        // href: "file:///C:/Users/asdf/AppData/Local/atom/app-1.60.0/resources/app.asar/static/index.html"
+        // origin: "file://"
+        // pathname: "/C:/Users/asdf/AppData/Local/atom/app-1.60.0/resources/app.asar/static/
+
+        if (window.location.origin === 'file://') {
+            return;
+        }
+
+        Sound.LoadingInstruments[id] = true;
+        fontLoader.startLoad(
+            Sound.ctx,
+            drumInfo.url,
+            drumInfo.variable
         );
 
-        // console.log(octaveVowel, noteLat, noteRus);
-
-        playingKey[key] = {
-          ...settings.octaves[octaveInfo.name],
-          noteLat,
-          noteRus,
-          code: codeByNoteHash[noteLat],
-        };
-      });
-    });
-
-    Object.keys(playingKey).forEach((key) => {
-      this.addMidiSound(playingKey[key].instr);
-    });
-
-    if (!settings.drums) {
-      return playingKey;
+        fontLoader.waitLoad(() => {
+            Sound.Instruments[id] = window[drumInfo.variable];
+            delete Sound.LoadingInstruments[id];
+        });
     }
 
-    Object.keys(settings.drums).forEach((key) => {
-      const info = settings.drums[key] as KeyInfo;
+    static AddSound(id: string | number) {
+        let safeId = un.parseInteger(id, -1);
 
-      if (info && !info.instr) {
-        playingKey[key] = {
-          ...info,
-          instr: (DRUM_PREFIX + 'undefined') as any,
-        };
+        if (safeId > -1) {
+            Sound.AddToneSound(safeId);
 
-        return;
-      }
+            return;
+        }
 
-      const drumIndex = this.fontPlayer.loader.findDrum(info.instr);
-      const drumInfo = this.fontPlayer.loader.drumInfo(drumIndex);
-      this.addDrumSound(info.instr);
+        if (!id || typeof id !== 'string') {
+            return;
+        }
 
-      playingKey[key] = {
-        ...info,
-        code: drumInfo.pitch,
-        instr: (DRUM_PREFIX + info.instr) as any,
-      };
-    });
+        let drumId = un.parseInteger(id.replace(DRUM_PREFIX, ''), -1);
 
-    return playingKey;
-  }
+        if (drumId > -1) {
+            Sound.AddDrumSound(drumId);
+        }
+    }
+
+    addToneSound(instumentId: number) {
+        Sound.AddToneSound(instumentId);
+    }
+
+    addDrumSound(drumId: number) {
+        Sound.AddDrumSound(drumId);
+    }
+
+    getNoteSame(val: string): string {
+        val = (val || '').toLocaleLowerCase().trim();
+
+        let result = freqByNoteHash[val] ? val : '';
+
+        result = result || (drumCodes[val] ? val : '');
+
+        return result;
+    }
+
+    getNoteLat(val: string): string {
+        val = (val || '').toLocaleLowerCase().trim();
+        let result = noteLatByNoteHash[val];
+
+        result = freqByNoteHash[result] ? result : '';
+        result = result || (drumCodes[val] ? val : '');
+
+        return result;
+    }
+
+    // from itbanddev
+    // getSettingsForKeys(settings: any): { [key: string]: KeyInfo } {
+    //   const keysAndNotes: { [key: string]: KeyInfo } = {};
+    //
+    //   fullOctaveBlocks.forEach((octaveInfo) => {
+    //     if (!settings.octaves[octaveInfo.name]) {
+    //       return;
+    //     }
+    //
+    //     const stepKeys = octaveInfo.value;
+    //     const octaveVowel = settings.octaves[octaveInfo.name].octave;
+    //
+    //     Object.keys(stepKeys).forEach((key) => {
+    //       const noteLat = getNoteByStepAndOctave(
+    //           stepKeys[key],
+    //           octaveVowel,
+    //           'lat'
+    //       );
+    //       const noteRus = getNoteByStepAndOctave(
+    //           stepKeys[key],
+    //           octaveVowel,
+    //           'rus'
+    //       );
+    //
+    //       //console.log(octaveVowel, noteLat, noteRus);
+    //
+    //       keysAndNotes[key] = {
+    //         ...settings.octaves[octaveInfo.name],
+    //         noteLat,
+    //         noteRus,
+    //         code: codeByNoteHash[noteLat],
+    //       };
+    //     });
+    //   });
+    //
+    //   Object.keys(keysAndNotes).forEach((key) => {
+    //     this.addMidiSound(keysAndNotes[key].instr);
+    //   });
+    //
+    //   if (!settings.drums) {
+    //     return keysAndNotes;
+    //   }
+    //
+    //   Object.keys(settings.drums).forEach((key) => {
+    //     const info = settings.drums[key] as KeyInfo;
+    //
+    //     if (info && !info.instr) {
+    //       keysAndNotes[key] = {
+    //         ...info,
+    //         instr: (DRUM_PREFIX + 'undefined') as any,
+    //       };
+    //
+    //       return;
+    //     }
+    //
+    //     const drumIndex = fontPlayer.loader.findDrum(info.instr);
+    //     const drumInfo = fontPlayer.loader.drumInfo(drumIndex);
+    //     this.addDrumSound(info.instr);
+    //
+    //     keysAndNotes[key] = {
+    //       ...info,
+    //       code: drumInfo.pitch,
+    //       instr: (DRUM_PREFIX + info.instr) as any,
+    //     };
+    //   });
+    //
+    //   return keysAndNotes;
+    // }
+
+    getSettingsForKeysAndNotes(settings: any): { [key: string]: KeyInfo } {
+        const keysAndNotes: { [key: string]: KeyInfo } = {};
+
+        if (settings.keys) {
+            const obj = un.getKeysFromText(settings.keys, MIDI_INSTR);
+
+            Object.keys(obj).forEach((key) => {
+                const item = obj[key];
+                const noteLat = this.getNoteLat(item.note || item.note);
+                const noteRus = item.note;
+
+                keysAndNotes[key] = <KeyInfo>{
+                    noteStep: noteLat[0],
+                    octave: noteLat[1],
+                    volume: item.volume,
+                    noteLat,
+                    noteRus,
+                    code: codeByNoteHash[noteLat],
+                    instr: item.instrCode,
+                    instrCode: item.instrCode,
+                };
+            });
+        }
+
+        //console.log('keysAndNotes', { ...keysAndNotes });
+
+        Object.keys(keysAndNotes).forEach((key) => {
+            this.addToneSound(keysAndNotes[key].instr);
+        });
+
+        if (!settings.drums) {
+            return keysAndNotes;
+        }
+
+        Object.keys(settings.drums).forEach((key) => {
+            const info = settings.drums[key] as KeyInfo;
+            const drumIndex = fontLoader.findDrum(info.instr);
+            const drumInfo = fontLoader.drumInfo(drumIndex);
+            this.addDrumSound(info.instr);
+
+            keysAndNotes[key] = {
+                ...info,
+                code: drumInfo.pitch,
+                instr: ('drum_' + info.instr) as any,
+                isDrum: true,
+            };
+        });
+
+        return keysAndNotes;
+    }
 }
+
+// добавление инструментов
+Object.keys(hardcodedInstruments).forEach(key => {
+    Sound.AddSound(key);
+});
+

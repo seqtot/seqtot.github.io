@@ -45,7 +45,8 @@ export type DrumType =
   | 'muteCuica'
   | 'openCuica'
   | 'muteTriangle'
-  | 'openTriangle';
+  | 'openTriangle'
+  | 'nil';
 
 export const Drums: Record<DrumType, number> = {
   bassDrum2: 35, // bd
@@ -95,16 +96,25 @@ export const Drums: Record<DrumType, number> = {
   openCuica: 79,
   muteTriangle: 80,
   openTriangle: 81,
+  nil: 80,
 } as const;
 
+// hc ho hp
+// bd
+// sn
+// tl tm th
 export const drumCodes = {
   hc: 'drum_42',
   ho: 'drum_46',
   hp: 'drum_44',
+
   bd: 'drum_35',
   bd1: 'drum_36',
+  bd2: 'drum_35',
+
   sn: 'drum_40',
   sn1: 'drum_38',
+  sn2: 'drum_40',
 
   sideRimshot: 'drum_37',
   handClap: 'drum_39',
@@ -113,21 +123,30 @@ export const drumCodes = {
   rideBell: 'drum_53',
   cowbell: 'drum_56',
 
+  tl: 'drum_41',
   lowTom2: 'drum_41',
   tl2: 'drum_41',
   lowTom1: 'drum_43',
   tl1: 'drum_43',
+
+  tm: 'drum_45',
   midTom2: 'drum_45',
   tm2: 'drum_45',
   midTom1: 'drum_47',
   tm1: 'drum_47',
+
+  th: 'drum_50',
   highTom2: 'drum_48',
   th2: 'drum_48',
   highTom1: 'drum_50',
   th1: 'drum_50',
 
   crashCymbal2: 'drum_57',
+  cc2: 'drum_57',
+
   crashCymbal1: 'drum_49',
+  cc1: 'drum_49',
+
   rideCymbal2: 'drum_59',
   rideCymbal1: 'drum_51',
   splashCymbal: 'drum_55',
@@ -164,6 +183,7 @@ export const drumCodes = {
 
   muteTriangle: 'drum_80',
   openTriangle: 'drum_81',
+  nil: 'drum_80',
 };
 
 export const drumInfo: Record<
@@ -225,14 +245,14 @@ export const drumInfo: Record<
   bassDrum2: {
     octave: 'drum',
     volume: 0.5,
-    instr: Drums.bassDrum2, // bd
+    instr: Drums.bassDrum2, // 36
     noteLat: 'bd',
     noteRus: 'бб',
   },
   bassDrum1: {
     octave: 'drum',
     volume: 0.5,
-    instr: Drums.bassDrum1,
+    instr: Drums.bassDrum1, // 35
     noteLat: 'bd1',
     noteRus: 'бб1',
   },
@@ -285,8 +305,8 @@ export const drumInfo: Record<
     octave: 'drum',
     volume: 0.5,
     instr: Drums.crashCymbal2,
-    noteLat: 'crashCymbal2',
-    noteRus: 'crashCymbal2',
+    noteLat: 'cc2',
+    noteRus: 'cc2',
   },
 
   crashCymbal1: {
@@ -294,8 +314,8 @@ export const drumInfo: Record<
     octave: 'drum',
     volume: 0.5,
     instr: Drums.crashCymbal1,
-    noteLat: 'crashCymbal1',
-    noteRus: 'crashCymbal1',
+    noteLat: 'cc1',
+    noteRus: 'cc1',
   },
 
   splashCymbal: {
@@ -524,7 +544,6 @@ export const drumInfo: Record<
     noteLat: 'openCuica',
     noteRus: 'openCuica',
   },
-
   muteTriangle: {
     octave: 'drum',
     volume: 0.5,
@@ -539,23 +558,114 @@ export const drumInfo: Record<
     noteLat: 'openTriangle',
     noteRus: 'openCuica',
   },
+  nil: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: Drums.nil,
+    noteLat: 'nil',
+    noteRus: 'nil',
+  },
 };
 
-export const drumKeys = {
+export const drumKeysLeft = {
   /**/
-  KeyX: drumInfo.bassDrum2,
+  KeyX: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 35, // бочка
+    noteLat: 'bd',
+    noteRus: 'бб',
+  },
   KeyZ: {},
-  ShiftLeft: {},
+  ShiftLeft: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 40, // малый барабан
+    noteLat: 'sn',
+    noteRus: 'мб',
+  },
   /**/
   KeyS: {},
-  KeyA: {},
-  CapsLock: {},
+  KeyA: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 43, // том низкий 41 43 lowTom
+    noteLat: 'tl',
+    noteRus: 'тн',
+  },
+  CapsLock: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 44, // хэт закрытый
+    noteLat: 'hp',
+    noteRus: 'хп',
+  },
   /**/
-  KeyW: drumInfo.snare2,
-  KeyQ: {},
-  Tab: drumInfo.hiHatClosed,
+  KeyW: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 40, // малый барабан
+    noteLat: 'sn',
+    noteRus: 'мб',
+  },
+  KeyQ: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 47, // том средний   midTom1: 45 47
+    noteLat: 'tm',
+    noteRus: 'тс',
+  },
+  Tab: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 42, // хэт закрытый
+    noteLat: 'hc',
+    noteRus: 'хз',
+  },
   /**/
   Digit2: {},
-  Digit1: {},
-  Backquote: drumInfo.hiHatOpened,
+  // 1qaz
+  // lowTom 41 43 midTom1: 45 47 highTom: 50 48
+  Digit1: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 48, // том высокий highTom: 50 48
+    noteLat: 'th',
+    noteRus: 'тв',
+  },
+  Backquote: {
+    octave: 'drum',
+    volume: 0.5,
+    instr: 46, // хэт открытый
+    noteLat: 'ho',
+    noteRus: 'хо',
+  },
+};
+
+export const drumKeysRight = {
+  ShiftRight: { ...drumInfo.bassDrum2 }, // Бочка
+  Semicolon: { ...drumInfo.snare2 }, // Малый барабан
+  Quote: { ...drumInfo.lowTom2 }, // Том низкий
+  BracketLeft: { ...drumInfo.midTom2 }, // Том средний
+  KeyP: { ...drumInfo.highTom2 }, // Том высокий
+  KeyO: { ...drumInfo.hiHatOpened }, // Хэт октрытый
+  KeyL: { ...drumInfo.hiHatClosed }, // Хэт закрытый
+  Period: { ...drumInfo.hiHatPedal }, // Хэт педаль
+  Minus: { ...drumInfo.rideCymbal2 }, // Тарелка малая ???
+  Digit0: { ...drumInfo.crashCymbal2 }, // Тарелка большая ???
+};
+
+export const offsetFotNoteStep = {
+  s: -5,
+  z: -4,
+  l: -3,
+  k: -2,
+  b: -1,
+  d: 0,
+  t: 1,
+  r: 2,
+  n: 3,
+  m: 4,
+  f: 5,
+  v: 6,
 };

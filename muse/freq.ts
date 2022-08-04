@@ -1,14 +1,12 @@
-// https://github.com/surikov/webaudiofont
 // CapsLock
-
+// vowel
 // И - третья i - С6
-
 // Е - вторая e - С5
 // А - первая a - С4
 // O - малая o -  С3
-
 // У - большая y - С2
 // Ы - контроктава u - С1
+// -  субконтроктава - С0
 
 // <!--желтый желто-оранжевый оранжевый красно-оранжевый красный красно-фиолетовый фиолетовый сине-фиолетовый синий сине-зелёный  зелёный жёлто-зелёный жёлтый-->
 
@@ -16,39 +14,10 @@
 // Ы   У   О   А   Е   И
 // U   Y   O   A   E   I
 
-export const octaveListLat = ['u', 'y', 'o', 'a', 'e', 'i'];
-export const octaveListRus = ['ы', 'у', 'о', 'а', 'е', 'и'];
-export const stepListLat = [
-  // notesСonsonantLat
-  'd',
-  't',
-  'r',
-  'n',
-  'm',
-  'f',
-  'v',
-  's',
-  'z',
-  'l',
-  'k',
-  'b',
-];
-export const stepListRus = [
-  // notesСonsonantRu
-  'д',
-  'т',
-  'р',
-  'н',
-  'м',
-  'ф',
-  'в',
-  'с',
-  'з',
-  'л',
-  'к',
-  'б',
-];
-// ['д', 'т', 'р', 'н', 'м', 'ф' ,'в' ,'с', 'з', 'л', 'к', 'б'];
+export const octaveListLat = 'uyoaei'.split('');
+export const octaveListRus = 'ыуоаеи'.split('');
+export const stepListLat = 'dtrnmfvszlkb'.split('');
+export const stepListRus = 'дтрнмфвсзлкб'.split('');
 
 // абвгдеёжзийклмнопрстуфхцчшщъыьэюя: гёжйпцчшцъьэюя
 // abcdefghijklmnopqrstuvwxyz:        cgjpqwx
@@ -249,9 +218,23 @@ export const noteLatByNoteHash: { [key: string]: string } = freqList.reduce(
   {}
 );
 
-console.log('codeByNoteHash', codeByNoteHash);
-console.log('freqByNoteHash', freqByNoteHash);
-console.log('noteLatByNoteHash', noteLatByNoteHash);
+export const noteLatByNote: { [key: string]: string } = stepListLat.reduce(
+  (acc, step, iStep) => {
+    octaveListLat.forEach((octave, iOctave) => {
+      const noteLat = step + octave;
+      const noteRus = stepListRus[iStep] + octaveListRus[iOctave];
+      acc[noteLat] = noteLat;
+      acc[noteRus] = noteLat;
+    });
+
+    return acc;
+  },
+  {}
+);
+
+//console.log('codeByNoteHash', codeByNoteHash);
+//console.log('freqByNoteHash', freqByNoteHash);
+//console.log('noteLatByNoteHash', noteLatByNoteHash);
 
 export const noteByKeyHash = {
   /* 1 ряд нижний з м д */
