@@ -25,19 +25,28 @@ const isDev = /devitband/.test(window.location.href);
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
-const defRoute = isDev ? '/set/set_My/' : '/set/set_blackNight/';
 
-let linkToTest = `
-<a
-  href="/set/set_My/"
-  data-view=".view-main"
-  class="panel-close"
-  >test</a>
-`.trim();
+// const defRoute = isDev ? '/set/set_My/' : '/set/set_All/';
+const defRoute = '/set/set_All/';
 
-if (!isDev) {
-  linkToTest = '';
-}
+const linksToPage = [
+  { href: '/set/set_All/', name: 'Список' },
+  // { href: '/set/set_blackNight/', name: 'Black Night' },
+  // { href: '/set/set_E/', name: 'set E' },
+  // { href: '/set/set_Battle/', name: 'Продолжается бой' },
+  // { href: '/set/set_ItsMyLife/', name: 'Its my life' },
+  { href: '/set/set_My/', name: 'test', isDev: true },
+];
+
+const linksHtml = linksToPage
+  .map((item) => {
+    if (!isDev && item.isDev) {
+      return '';
+    }
+
+    return `<a href="${item.href}" data-view=".view-main" class="panel-close">${item.name}</a>`;
+  })
+  .join('');
 
 const leftPanel = `
 <div
@@ -56,29 +65,7 @@ const leftPanel = `
       <div class="page-content">  
         <div class="list links-list" style="margin-top: 0;">
           <ul>
-            <li>
-              <a
-                href="/set/set_blackNight/"
-                data-view=".view-main"
-                class="panel-close"
-              >Black Night</a>
-              <a
-                href="/set/set_E/"
-                data-view=".view-main"
-                class="panel-close"
-              >set E</a>
-              <a
-                href="/set/set_Battle/"
-                data-view=".view-main"
-                class="panel-close"
-              >Продолжается бой</a>
-              <a
-                href="/set/set_ItsMyLife/"
-                data-view=".view-main"
-                class="panel-close"
-              >Its my life</a>              
-              ${linkToTest}
-            </li>
+            <li>${linksHtml}</li>
           </ul>
         </div>      
       </div><!-- page-content -->

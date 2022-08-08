@@ -15,6 +15,7 @@ import setBattle from './sets/set_battle';
 import setItsMyLife from './sets/set_ItsMyLife';
 import setMy from './sets/set_My';
 import setBlackNight from './sets/set_blackNight';
+import setAll from './sets/set_All';
 
 const multiPlayer = new MultiPlayer();
 
@@ -40,6 +41,7 @@ const sets = {
   set_ItsMyLife: setItsMyLife,
   set_My: setMy,
   set_blackNight: setBlackNight,
+  set_All: setAll,
 };
 
 export const setVc = (props: Props, context: any) => {
