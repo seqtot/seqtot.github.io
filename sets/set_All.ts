@@ -1,139 +1,65 @@
-const enterSandmen = `
-<div style="margin: .5rem;">
+function getLink(name: string, href: string): string {
+  return `<a class="link external" href="${href}" target="_blank">${name}</a>`;
+}
+
+const enterSandmen = `<div style="margin: .5rem;">
   <b>Enter Sandman</b> (Metallica)
-  <a
-    class="link external"
-    href="https://www.youtube.com/watch?v=NIAkEJp8i_Y"
-    target="_blank"
-  >
-    lesson
-  </a> |
-  <a
-    class="link external"
-    href="https://www.songsterr.com/a/wsa/metallica-enter-sandman-tab-s19"
-    target="_blank"
-  >
-    tabs
-  </a>
+  ${getLink('lesson', 'https://www.youtube.com/watch?v=NIAkEJp8i_Y')} |
+  ${getLink(
+    'tabs',
+    'https://www.songsterr.com/a/wsa/metallica-enter-sandman-tab-s19'
+  )}
 </div>
 `;
 
 const peterGunn = `<div style="margin: .5rem;">
   <b>Peter Gunn</b>
-  <a
-    class="link external"
-    href="https://www.youtube.com/watch?v=vhdSodIxZSE"
-    target="_blank"
-  >
-    lesson
-  </a> |
-  <a
-    class="link external"
-    href="https://www.youtube.com/watch?v=296wS9ome4M"
-    target="_blank"
-  >
-    Duane Eddy
-  </a>
+  ${getLink('lesson', 'https://www.youtube.com/watch?v=vhdSodIxZSE')} |
+  ${getLink('Duane Eddy', 'https://www.youtube.com/watch?v=296wS9ome4M')}
 </div>
 `;
 
 const blackNight = `<div style="margin: .5rem;">
   <b>Black Night</b>
-  <a 
-    class="link external"
-    href="https://www.youtube.com/watch?v=QuAKMlfxX7I"
-    target="_blank"
-  >
-    youtube
-  </a> |
-  <a 
-    class="link external"
-    href="https://www.songsterr.com/a/wsa/deep-purple-black-night-tab-s23516t6"
-    target="_blank"
-  >
-      tabs
-    </a>
+  ${getLink('youtube', 'https://www.youtube.com/watch?v=QuAKMlfxX7I')} |
+  ${getLink(
+    'tabs',
+    'https://www.songsterr.com/a/wsa/deep-purple-black-night-tab-s23516t6'
+  )}
 </div>`;
 
 const itsMyLife = `<div style="margin: .5rem;">
   <b>It's My Life </b>
-  
-  <a
-    class="link external"
-    href="https://www.songsterr.com/a/wsa/bon-jovi-its-my-life-4-string-bass-tab-s442387"
-    target="_blank"
-  >
-    tabs
-  </a> |  
-  <a
-    class="link external"
-    href="https://www.youtube.com/watch?v=vx2u5uUu3DE"
-    target="_blank"
-  >
-    youtube
-  </a> |
-  <a
-    class="link external"
-    href="https://www.youtube.com/watch?v=3Npebqu-rl8"
-    target="_blank"
-  >
-    lesson
-  </a> | 
-  <a
-    class="link external"
-    href="https://www.ackordofmine.ru/index/bon_jovi_it_96_s_my_life_tekst_pesni_s_akkordami/0-1974"
-    target="_blank"
-  >
-    chords
-  </a> |
+  ${getLink(
+    'tabs',
+    'https://www.songsterr.com/a/wsa/bon-jovi-its-my-life-4-string-bass-tab-s442387'
+  )} |
+  ${getLink('youtube', 'https://www.youtube.com/watch?v=vx2u5uUu3DE')} |
+  ${getLink('lesson', 'https://www.youtube.com/watch?v=3Npebqu-rl8')} |
+  ${getLink(
+    'chords',
+    'https://www.ackordofmine.ru/index/bon_jovi_it_96_s_my_life_tekst_pesni_s_akkordami/0-1974'
+  )}
 </div>`;
 
 const pacificZodiac = `<div style="margin: .5rem;">
   <b>Pacific (Zodiac, 1980)</b>
-  <a 
-    class="link external"
-    href="https://www.youtube.com/watch?v=W33mp0TYVv8"
-    target="_blank"
-  >
-    youtube
-  </a> |
-  <a 
-    class="link external"
-    href="https://www.youtube.com/watch?v=eNoKyYsbuNA"
-    target="_blank"
-  >
-      lesson
-    </a>
+  ${getLink('youtube', 'https://www.youtube.com/watch?v=W33mp0TYVv8')} |
+  ${getLink('lesson', 'https://www.youtube.com/watch?v=eNoKyYsbuNA')}
 </div>`;
 
 const agressiveSamurai = `<div style="margin: .5rem;">
   <b>Agressive (Samurai)</b>
-  <a 
-    class="link external"
-    href="https://www.youtube.com/watch?v=jVtuIMm52aQ"
-    target="_blank"
-  >
-    youtube
-  </a>
+  ${getLink('youtube', 'https://www.youtube.com/watch?v=jVtuIMm52aQ')}
 </div>`;
 
 const sweetChild = `<div style="margin: .5rem;">
   <b>Sweet Child O' Mine (Guns N' Roses, 1988)</b>
-  <a 
-    class="link external"
-    href="https://www.youtube.com/watch?v=1w7OgIMMRc4"
-    target="_blank"
-  >
-    youtube
-  </a> |
-  <a 
-    class="link external"
-    href="https://www.songsterr.com/a/wsa/guns-n-roses-sweet-child-o-mine-standard-tunning-tab-s412809"
-    target="_blank"
-  >
-      tabs
-  </a>
-
+  ${getLink('youtube', 'https://www.youtube.com/watch?v=1w7OgIMMRc4')} |
+  ${getLink(
+    'tabs',
+    'https://www.songsterr.com/a/wsa/guns-n-roses-sweet-child-o-mine-standard-tunning-tab-s412809'
+  )}
 </div>`;
 
 //
@@ -374,11 +300,3 @@ export default {
     { key: 'test', value: test, name: 'тест' },
   ],
 };
-
-// pg - peterGunn
-// es - enterSandman
-
-// # hc: hiHat closed
-// # ho: hiHat opened
-// # sn: snare
-// # bd: buss drum
