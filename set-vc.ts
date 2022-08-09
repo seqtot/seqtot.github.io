@@ -176,7 +176,7 @@ export class SetVc {
     const content = `
       <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
         <div style="padding: 1rem .5rem 1rem .5rem;">
-          % ускорения
+          bpm
           <div 
             class="range-slider"
             data-name="slider"

@@ -114,7 +114,7 @@ const appTpl = `
           <span class="if-not-md">Back</span>
         </a-->
       </div>
-      <div class="title sliding">ай-ТИ бэнд</div>
+      <div class="title sliding">Band-IT</div>
       <div class="right">
         <a href="#" class="link icon-only panel-open" data-panel="right">
           <i class="icon f7-icons">menu</i>
