@@ -72,6 +72,7 @@ const content = `
   ${pacificZodiac}
   ${agressiveSamurai}
   ${sweetChild}
+  <div style="margin-bottom: 3rem;"></div>
 `.trim();
 
 const parts = `
