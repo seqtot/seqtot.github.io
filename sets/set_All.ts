@@ -3,7 +3,7 @@ function getLink(name: string, href: string): string {
 }
 
 const enterSandmen = `<div style="margin: .5rem;">
-  <b>Enter Sandman</b> (Metallica)
+  <b>Enter Sandman</b> (Metallica)<br/>
   ${getLink('lesson', 'https://www.youtube.com/watch?v=NIAkEJp8i_Y')} |
   ${getLink(
     'tabs',
@@ -13,14 +13,14 @@ const enterSandmen = `<div style="margin: .5rem;">
 `;
 
 const peterGunn = `<div style="margin: .5rem;">
-  <b>Peter Gunn</b>
+  <b>Peter Gunn</b><br/>
   ${getLink('lesson', 'https://www.youtube.com/watch?v=vhdSodIxZSE')} |
   ${getLink('Duane Eddy', 'https://www.youtube.com/watch?v=296wS9ome4M')}
 </div>
 `;
 
 const blackNight = `<div style="margin: .5rem;">
-  <b>Black Night</b>
+  <b>Black Night</b> (Deep Purple)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=QuAKMlfxX7I')} |
   ${getLink(
     'tabs',
@@ -29,7 +29,7 @@ const blackNight = `<div style="margin: .5rem;">
 </div>`;
 
 const itsMyLife = `<div style="margin: .5rem;">
-  <b>It's My Life </b>
+  <b>It's My Life</b> (Bon Jovi)<br/>
   ${getLink(
     'tabs',
     'https://www.songsterr.com/a/wsa/bon-jovi-its-my-life-4-string-bass-tab-s442387'
@@ -43,18 +43,18 @@ const itsMyLife = `<div style="margin: .5rem;">
 </div>`;
 
 const pacificZodiac = `<div style="margin: .5rem;">
-  <b>Pacific (Zodiac, 1980)</b>
+  <b>Pacific</b> (Zodiac, 1980)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=W33mp0TYVv8')} |
   ${getLink('lesson', 'https://www.youtube.com/watch?v=eNoKyYsbuNA')}
 </div>`;
 
 const agressiveSamurai = `<div style="margin: .5rem;">
-  <b>Agressive (Samurai)</b>
+  <b>Agressive</b>  (Samurai, 2022)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=jVtuIMm52aQ')}
 </div>`;
 
 const sweetChild = `<div style="margin: .5rem;">
-  <b>Sweet Child O' Mine (Guns N' Roses, 1988)</b>
+  <b>Sweet Child O' Mine</b> (Guns N' Roses, 1988)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=1w7OgIMMRc4')} |
   ${getLink(
     'tabs',
