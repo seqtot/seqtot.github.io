@@ -219,14 +219,13 @@ ${parts}
 `;
 
 const beat44 = `
-<out b110 r1000>
+<out b100 r1000>
 simple44@
 
 <simple44@>
--  : 1   2   3   4   :
-@hc: x x x x x x x x :
-@sn:     2       4   :
-@bd: 1       3       :
+-             : 1   2   3   4   :
+@cowbell      : 1       3       :
+@nil          :     2       4   :
 `.trim();
 
 const test = `
@@ -294,9 +293,9 @@ ${parts}
 export default {
   content,
   tracks: [
-    { key: '4/4', value: beat44, name: 'бит 4/4 bmp:110' },
-    { key: 'break', value: petGunBreak, name: 'сбивка bmp:110' },
-    { key: 'full', value: full, name: 'полностью bmp:110' },
-    { key: 'test', value: test, name: 'тест' },
+    { key: '4/4', value: beat44, name: 'метроном' },
+    // { key: 'break', value: petGunBreak, name: 'сбивка bmp:110' },
+    // { key: 'full', value: full, name: 'полностью bmp:110' },
+    // { key: 'test', value: test, name: 'тест' },
   ],
 };
