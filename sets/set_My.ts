@@ -62,44 +62,51 @@ function getKeyStep(
     .replace(/ +/g, ' ');
 }
 
-function getKey(note: string, symbol: string, duration: number = 25): string {
-  let step = note[0];
+function getKeyFn(
+  id: string | number
+): (note: string, symbol: string, duration?: number) => string {
+  id = id || '';
 
-  let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
-  let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
-    ? 'border: none;'
-    : '';
-  let fontColor = 'black';
+  return (note: string, symbol: string, duration: number = 25): string => {
+    let step = note[0];
 
-  if (note[1] === 'u') {
-    borderNone = 'border: none;';
-    // fontColor = 'lightgray';
-  }
+    let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
+    let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
+      ? 'border: none;'
+      : '';
+    let fontColor = 'black';
 
-  let border = borderNone || 'border: 1px solid grey;';
+    if (note[1] === 'u') {
+      borderNone = 'border: none;';
+      // fontColor = 'lightgray';
+    }
 
-  return `<div
-    style="
-      box-sizing: border-box;    
-      margin: 0;
-      padding: 0;
-      display: inline-block;
-      font-size: 1.5rem;
-      width: 1.5rem;
-      user-select: none;
-      text-align: center;
-      ${border}
-      color: ${fontColor};
-      font-weight: ${fontW};" 
+    let border = borderNone || 'border: 1px solid grey;';
 
-      data-note-key="b60 ${note}-${duration}"
-      data-name="note-val-${note}"
-      data-note-lat="${note}"
+    return `<div
+      style="
+        box-sizing: border-box;    
+        margin: 0;
+        padding: 0;
+        display: inline-block;
+        font-size: 1.5rem;
+        width: 1.5rem;
+        user-select: none;
+        text-align: center;
+        ${border}
+        color: ${fontColor};
+        font-weight: ${fontW};" 
 
-      >${symbol}</div>`
-    .replace(/\n/g, ' ')
-    .replace(/ +/g, ' ');
-}
+        data-note-key="b60 ${note}-${duration}"
+        data-name="note-val-${note}"
+        data-note-lat="${note}"
+        data-keyboard-id="${id}"
+
+        >${symbol}</div>`
+      .replace(/\n/g, ' ')
+      .replace(/ +/g, ' ');
+  };
+} // getKeyFn
 
 //    margin: 0; display: inline-block; width: .9rem; text-align: center;
 //    border: 1px solid lightgrey; border-right: none;
@@ -203,11 +210,14 @@ ${getKeyStep('24', '24', 'br')}
 function getKeyboard(id?: number | string): string {
   id = id || '';
 
+  const getKey = getKeyFn(id);
+
   const keyboard = `
 <div style="
     font-family: monospace;
     user-select: none;    
     padding: 0.5rem 0 0.5rem 0.5rem;"
+    data-keyboard="${id}"    
 >
 ${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
 ${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
@@ -236,11 +246,13 @@ ${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
 }
 
 const info = `
-<div style="margin: .5rem;">
+<div style="margin: .5rem; user-select: none;">
 
 <br/>
 
-${getKey('bu', 'бы')}
+${getKeyboard(1)}
+
+${getKeyFn(1)('bu', 'бы')}
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
   &nbsp;&nbsp;&nbsp;!clr
 </span>
@@ -248,9 +260,9 @@ ${getKey('bu', 'бы')}
   &nbsp;&nbsp;!rnd
 </span>
 
-${getKeyboard()}
+${getKeyboard(2)}
 
-<div style="font-size: 1.5rem; font-family: monospace;">
+<div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>
   моПаЦу ЩуЦу     <br/>
   буПаЦу оПаХуЦу <br/>
@@ -261,6 +273,7 @@ ${getKeyboard()}
 </div>
 
 <br/><br/>
+
 </div>
 `;
 
