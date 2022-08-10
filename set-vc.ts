@@ -8,7 +8,9 @@ import { Props } from 'framework7/types/modules/component/snabbdom/modules/props
 import { byId, dyName } from './utils';
 import { Sound } from './muse/sound';
 import { MultiPlayer } from './muse/multi-player';
+import { Synthesizer } from './muse/synthesizer';
 import * as un from './muse/utils-note';
+import { defaultSynthSettings } from './muse/keyboards';
 
 import setE from './sets/set_E';
 import setBattle from './sets/set_battle';
@@ -19,6 +21,9 @@ import setAll from './sets/set_All';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
+const synthesizer = new Synthesizer();
+synthesizer.connect({ ctx: Sound.ctx });
+synthesizer.setSettings(defaultSynthSettings);
 
 Sound.AddSound(366); // bass
 Sound.AddSound(697); // sax
@@ -366,9 +371,14 @@ export class SetVc {
       el.addEventListener('pointerdown', (evt: MouseEvent) => {
         el.style.backgroundColor = 'lightgray';
 
-        this.tryPlayTextLine({
-          text: el?.dataset?.noteKey,
+        synthesizer.playSound({
+          keyOrNote: el?.dataset?.noteLat,
+          id: el?.dataset?.keyboardId,
         });
+
+        // this.tryPlayTextLine({
+        //   text: el?.dataset?.noteKey,
+        // });
 
         const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
 
@@ -377,6 +387,17 @@ export class SetVc {
         }
 
         wrapper.dataset.relativeKeyboardBase = el?.dataset?.noteLat;
+      });
+
+      el.addEventListener('pointerup', (evt: MouseEvent) => {
+        synthesizer.playSound(
+          {
+            keyOrNote: el?.dataset?.noteLat,
+            id: el?.dataset?.keyboardId,
+            onlyStop: true,
+          },
+          true
+        );
       });
     });
 
