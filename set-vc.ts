@@ -18,6 +18,7 @@ import setBlackNight from './sets/set_blackNight';
 import setAll from './sets/set_All';
 
 const multiPlayer = new MultiPlayer();
+const metronome = new MultiPlayer();
 
 Sound.AddSound(366); // bass
 Sound.AddSound(697); // sax
@@ -307,7 +308,7 @@ export class SetVc {
     name = name || '';
     this.playingTick = name;
 
-    multiPlayer.clearMidiPlayer();
+    metronome.clearMidiPlayer();
 
     const beat = ticks[this.playingTick];
 
@@ -324,7 +325,7 @@ export class SetVc {
         ${beat}
       `;
 
-    multiPlayer.tryPlayMidiBlock({
+    metronome.tryPlayMidiBlock({
       blocks,
       bpm: this.bpmMultiple,
     });
@@ -369,7 +370,7 @@ export class SetVc {
           text: el?.dataset?.noteKey,
         });
 
-        const wrapper = dyName('relative-keyboard-wrapper');
+        const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
 
         if (!wrapper) {
           return;
@@ -388,18 +389,21 @@ export class SetVc {
     };
 
     // очистка цвета
-    let el = dyName('clear-keys-color');
+    let el = dyName('clear-keys-color', this.pageEl);
     if (el) {
       el.addEventListener('click', () => clearColor());
     }
 
-    el = dyName('select-random-key');
+    el = dyName('select-random-key', this.pageEl);
     if (el) {
       el.addEventListener('click', () => {
         const val =
           un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
 
-        const key = dyName(`note-val-${val}`);
+        const key = dyName(
+          `note-val-${val}`,
+          dyName(`keyboard-2`, this.pageEl)
+        );
 
         if (key) {
           clearColor();
@@ -429,8 +433,9 @@ export class SetVc {
           el.style.backgroundColor = 'white';
         });
 
-        if (dyName(`set-note-${note}`)) {
-          dyName(`set-note-${note}`).style.backgroundColor = 'lightgray';
+        if (dyName(`set-note-${note}`, this.pageEl)) {
+          dyName(`set-note-${note}`, this.pageEl).style.backgroundColor =
+            'lightgray';
         }
 
         this.tryPlayTextLine({ text: `b60 ${note}-25` });
@@ -439,7 +444,7 @@ export class SetVc {
 
     getWithDataAttr('set-note', this.pageEl)?.forEach((el: HTMLElement) => {
       el.addEventListener('pointerdown', () => {
-        const wrapper = dyName('relative-keyboard-wrapper');
+        const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
 
         if (!wrapper) {
           return;
@@ -458,31 +463,11 @@ export class SetVc {
   }
 
   async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
-    // repeat = repeat || 1;
-    // text = (text || '').trim();
-
-    // const noteLine = un.clearNoteLine(text);
-    // const bpm = un.getBpmFromString(noteLine);
-
     return multiPlayer.tryPlayTextLine({ text, repeat });
-
-    // const loopId = uniPlayer.addLoop({
-    //   noteLine,
-    //   bpm,
-    //   isDrum: false, // isDrum,
-    //   repeat,
-    //   instrCode: MIDI_INSTR, // instrAlias[key],
-    // }).id;
-
-    // await uniPlayer.waitLoadingAllInstruments();
-
-    // uniPlayer.play([loopId]);
   }
 
   stop() {
     multiPlayer.clearMidiPlayer();
-    // uniPlayer.clear();
-    // uniPlayer.stop();
   }
 
   async play(text: string, repeatCount?: number) {

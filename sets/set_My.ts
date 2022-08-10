@@ -1,67 +1,3 @@
-function getKeyStep(
-  step: string,
-  symbol: string,
-  borders: string = '',
-  bg: string = 'white'
-): string {
-  // let step = note[0];
-
-  //let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
-  // let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
-  //   ? 'border: none;'
-  //   : '';
-  let fontColor = 'black';
-
-  // if (note[1] === 'u') {
-  //   borderNone = 'border: none;';
-  //   // fontColor = 'lightgray';
-  // }
-
-  //let border = borderNone || 'border: 1px solid grey;';
-  let border = 'border: 1px solid grey;';
-  let borderSide = '';
-
-  if (borders.includes('t')) {
-    borderSide += 'border-top: 3px solid black;';
-  }
-
-  if (borders.includes('r')) {
-    borderSide += 'border-right: 3px solid black;';
-  }
-
-  if (borders.includes('b')) {
-    borderSide += 'border-bottom: 3px solid black;';
-  }
-
-  if (borders.includes('l')) {
-    borderSide += 'border-left: 3px solid black;';
-  }
-
-  let fontWeight = 400;
-
-  return `<div
-    style="
-      box-sizing: border-box;    
-      margin: 0;
-      padding: 0;
-      display: inline-block;
-      font-size: 1.3rem;
-      width: 2.3rem;
-      height: 2.3rem;
-      user-select: none;
-      text-align: center;
-      ${border}
-      ${borderSide}
-      color: ${fontColor};
-      background-color: ${bg};
-      font-weight: ${fontWeight};" 
-      data-name="note-step:${step}"
-      data-relative-key="${step}"
-      >${symbol}</div>`
-    .replace(/\n/g, ' ')
-    .replace(/ +/g, ' ');
-}
-
 function getKeyFn(
   id: string | number
 ): (note: string, symbol: string, duration?: number) => string {
@@ -108,105 +44,6 @@ function getKeyFn(
   };
 } // getKeyFn
 
-//    margin: 0; display: inline-block; width: .9rem; text-align: center;
-//    border: 1px solid lightgrey; border-right: none;
-
-function getKeyboard2(): string {
-  return `
-
-<div data-relative-key="0" style="font-size: 1.5rem; user-select: none;">
-даПуЩаЦаЦу 
-со8аЩуЦуЦаЦу 
-наЩуЦуЦа 
-даЩаЩуПуЩаЦа 
-даЩаХуЦуЦу 
-саЩа7уЧа 
-наХуЦуЦу 
-даЩаХуЦуЦу 
-даЩаХуЦуЦу 
-ко9аЩаЦуХуЦуЦу 
-наХуЦуЦу 
-наХуЦу 
-</div>
-
-<div
-  style="display: flex; flex-direction: column; align-items: center; user-select: none;"
-  data-name="relative-keyboard-wrapper"
-  data-relative-keyboard-base="do"
->
-
-<div style="user-select: none;">
-${getKeyStep('-04', 'чу', 'tl')}
-${getKeyStep('-03', 'щу', 't')}
-${getKeyStep('-02', 'цу', 'trb')}
-${getKeyStep('-01', 'ху', 'tr')}
-${getKeyStep('01', 'ха', 'lt')}
-${getKeyStep('02', 'ца', 'ltb')}
-${getKeyStep('03', 'ща', 't')}
-${getKeyStep('04', 'ча', 'tr')}
-</div>
-
-<div style="user-select: none;">
-${getKeyStep('-08', '8y', 'l')}
-${getKeyStep('-07', '7y', 'rb')}
-${getKeyStep('-06', 'шу', '')}
-${getKeyStep('-05', 'пу', 'r')}
-${getKeyStep('05', 'па', 'l')}
-${getKeyStep('06', 'ша', '')}
-${getKeyStep('07', '7а', 'lb')}
-${getKeyStep('08', '8а', 'r')}
-</div>
-
-<div style="user-select: none;">
-${getKeyStep('-12', 'ю', 'rbl')}
-${getKeyStep('-11', 'гу', 'b')}
-${getKeyStep('-10', 'жу', 'b')}
-${getKeyStep('-09', '9у', 'rb')}
-${getKeyStep('09', '9а', 'lb')}
-${getKeyStep('10', 'жа', 'b')}
-${getKeyStep('11', 'га', 'b')}
-${getKeyStep('12', 'я', 'lbr')}
-</div>
-
-<div style="user-select: none;">
-${getKeyStep('-16', '16', 'tlr')}
-${getKeyStep('-15', '15', 'tb')}
-${getKeyStep('-14', '14', 't')}
-${getKeyStep('-13', '13', 'tr')}
-${getKeyStep('13', '13', 'lt')}
-${getKeyStep('14', '14', 't')}
-${getKeyStep('15', '15', 'tb')}
-${getKeyStep('16', '16', 'trl')}
-</div>
-
-<div style="user-select: none;">
-${getKeyStep('-20', '20', 'l')}
-${getKeyStep('-19', '19', 'r')}
-${getKeyStep('-18', '18', 'b')}
-${getKeyStep('-17', '17', 'r')}
-${getKeyStep('17', '17', 'l')}
-${getKeyStep('18', '18', 'b')}
-${getKeyStep('19', '19', 'l')}
-${getKeyStep('20', '20', 'r')}
-</div>
-
-<div style="user-select: none;">
-${getKeyStep('-24', '24', 'lb')}
-${getKeyStep('-23', '23', 'b')}
-${getKeyStep('-22', '22', 'b')}
-${getKeyStep('-21', '21', 'rbl')}
-${getKeyStep('21', '21', 'lbr')}
-${getKeyStep('22', '22', 'b')}
-${getKeyStep('23', '23', 'b')}
-${getKeyStep('24', '24', 'br')}
-</div>
-
-</div>
-
-
-`.replace(/\n/g, '');
-}
-
 function getKeyboard(id?: number | string): string {
   id = id || '';
 
@@ -217,7 +54,7 @@ function getKeyboard(id?: number | string): string {
     font-family: monospace;
     user-select: none;    
     padding: 0.5rem 0 0.5rem 0.5rem;"
-    data-keyboard="${id}"    
+    data-name="keyboard-${id}"
 >
 ${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
 ${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
@@ -399,3 +236,163 @@ export default {
     // { key: 'harmony', value: melody, name: 'Барабан: bpm:120' },
   ],
 };
+
+function getKeyStep(
+  step: string,
+  symbol: string,
+  borders: string = '',
+  bg: string = 'white'
+): string {
+  // let step = note[0];
+
+  //let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
+  // let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
+  //   ? 'border: none;'
+  //   : '';
+  let fontColor = 'black';
+
+  // if (note[1] === 'u') {
+  //   borderNone = 'border: none;';
+  //   // fontColor = 'lightgray';
+  // }
+
+  //let border = borderNone || 'border: 1px solid grey;';
+  let border = 'border: 1px solid grey;';
+  let borderSide = '';
+
+  if (borders.includes('t')) {
+    borderSide += 'border-top: 3px solid black;';
+  }
+
+  if (borders.includes('r')) {
+    borderSide += 'border-right: 3px solid black;';
+  }
+
+  if (borders.includes('b')) {
+    borderSide += 'border-bottom: 3px solid black;';
+  }
+
+  if (borders.includes('l')) {
+    borderSide += 'border-left: 3px solid black;';
+  }
+
+  let fontWeight = 400;
+
+  return `<div
+    style="
+      box-sizing: border-box;    
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+      font-size: 1.3rem;
+      width: 2.3rem;
+      height: 2.3rem;
+      user-select: none;
+      text-align: center;
+      ${border}
+      ${borderSide}
+      color: ${fontColor};
+      background-color: ${bg};
+      font-weight: ${fontWeight};" 
+      data-name="note-step:${step}"
+      data-relative-key="${step}"
+      >${symbol}</div>`
+    .replace(/\n/g, ' ')
+    .replace(/ +/g, ' ');
+}
+
+function getKeyboard2(): string {
+  return `
+
+<div data-relative-key="0" style="font-size: 1.5rem; user-select: none;">
+даПуЩаЦаЦу 
+со8аЩуЦуЦаЦу 
+наЩуЦуЦа 
+даЩаЩуПуЩаЦа 
+даЩаХуЦуЦу 
+саЩа7уЧа 
+наХуЦуЦу 
+даЩаХуЦуЦу 
+даЩаХуЦуЦу 
+ко9аЩаЦуХуЦуЦу 
+наХуЦуЦу 
+наХуЦу 
+</div>
+
+<div
+  style="display: flex; flex-direction: column; align-items: center; user-select: none;"
+  data-name="relative-keyboard-wrapper"
+  data-relative-keyboard-base="do"
+>
+
+<div style="user-select: none;">
+${getKeyStep('-04', 'чу', 'tl')}
+${getKeyStep('-03', 'щу', 't')}
+${getKeyStep('-02', 'цу', 'trb')}
+${getKeyStep('-01', 'ху', 'tr')}
+${getKeyStep('01', 'ха', 'lt')}
+${getKeyStep('02', 'ца', 'ltb')}
+${getKeyStep('03', 'ща', 't')}
+${getKeyStep('04', 'ча', 'tr')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-08', '8y', 'l')}
+${getKeyStep('-07', '7y', 'rb')}
+${getKeyStep('-06', 'шу', '')}
+${getKeyStep('-05', 'пу', 'r')}
+${getKeyStep('05', 'па', 'l')}
+${getKeyStep('06', 'ша', '')}
+${getKeyStep('07', '7а', 'lb')}
+${getKeyStep('08', '8а', 'r')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-12', 'ю', 'rbl')}
+${getKeyStep('-11', 'гу', 'b')}
+${getKeyStep('-10', 'жу', 'b')}
+${getKeyStep('-09', '9у', 'rb')}
+${getKeyStep('09', '9а', 'lb')}
+${getKeyStep('10', 'жа', 'b')}
+${getKeyStep('11', 'га', 'b')}
+${getKeyStep('12', 'я', 'lbr')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-16', '16', 'tlr')}
+${getKeyStep('-15', '15', 'tb')}
+${getKeyStep('-14', '14', 't')}
+${getKeyStep('-13', '13', 'tr')}
+${getKeyStep('13', '13', 'lt')}
+${getKeyStep('14', '14', 't')}
+${getKeyStep('15', '15', 'tb')}
+${getKeyStep('16', '16', 'trl')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-20', '20', 'l')}
+${getKeyStep('-19', '19', 'r')}
+${getKeyStep('-18', '18', 'b')}
+${getKeyStep('-17', '17', 'r')}
+${getKeyStep('17', '17', 'l')}
+${getKeyStep('18', '18', 'b')}
+${getKeyStep('19', '19', 'l')}
+${getKeyStep('20', '20', 'r')}
+</div>
+
+<div style="user-select: none;">
+${getKeyStep('-24', '24', 'lb')}
+${getKeyStep('-23', '23', 'b')}
+${getKeyStep('-22', '22', 'b')}
+${getKeyStep('-21', '21', 'rbl')}
+${getKeyStep('21', '21', 'lbr')}
+${getKeyStep('22', '22', 'b')}
+${getKeyStep('23', '23', 'b')}
+${getKeyStep('24', '24', 'br')}
+</div>
+
+</div>
+
+
+`.replace(/\n/g, '');
+}

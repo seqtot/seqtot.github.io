@@ -41,8 +41,6 @@ type PlayResult = {
   endTime?: number;
 };
 
-const ee = new EventEmitter();
-
 export class MidiPlayer extends Sound {
   private loopDfr: un.Deferred<PlayResult>;
 
@@ -50,6 +48,7 @@ export class MidiPlayer extends Sound {
   private loopId: number = 0;
   private interval: any;
   private ticker: Ticker;
+  private ee = new EventEmitter();
 
   gains: { [key: string]: GainNode } = {} as any;
   loops: { [key: string]: LoopAndTicksInfo } = {};
@@ -109,7 +108,7 @@ export class MidiPlayer extends Sound {
 
     const startTime = this.ctx.currentTime;
 
-    ee.emit('prepare', loopIdsObj);
+    this.ee.emit('prepare', loopIdsObj);
 
     let currTick = -1;
     const endTick = totalTickCount - 2; // выходим из цикла на тик раньше, это костылёк
@@ -118,7 +117,7 @@ export class MidiPlayer extends Sound {
       currTick++;
 
       if (currTick <= endTick) {
-        ee.emit('getNextSound', {
+        this.ee.emit('getNextSound', {
           tick: currTick,
           whenSec: startTime + (currTick * QUANT) / 1000,
         });
@@ -172,7 +171,7 @@ export class MidiPlayer extends Sound {
 
     startTimeSec = startTimeSec || this.ctx.currentTime;
 
-    ee.emit('prepare', loopIdsObj);
+    this.ee.emit('prepare', loopIdsObj);
 
     let planTick = -1;
     let realTick = -1;
@@ -193,7 +192,7 @@ export class MidiPlayer extends Sound {
       offsetMs = offsetMs + beatsWithOffsetMs[planTick];
 
       if (planTick <= endTick) {
-        ee.emit('getNextSound', {
+        this.ee.emit('getNextSound', {
           tick: planTick,
           whenSec: startTimeSec + offsetMs / 1000,
         });
@@ -610,7 +609,7 @@ export class MidiPlayer extends Sound {
         if (repeated >= repeat) {
           // последний цикл
           repeated = 0;
-          ee.off('getNextSound', onGetNextSound);
+          this.ee.off('getNextSound', onGetNextSound);
         }
       }
     };
@@ -620,25 +619,25 @@ export class MidiPlayer extends Sound {
         return;
       }
 
-      ee.on('getNextSound', null, onGetNextSound);
+      this.ee.on('getNextSound', null, onGetNextSound);
     };
 
     const onStop = () => {
-      ee.off('getNextSound', onGetNextSound);
+      this.ee.off('getNextSound', onGetNextSound);
       repeated = 0;
       beat = -1;
     };
 
     const onClear = () => {
-      ee.off('getNextSound', onGetNextSound);
-      ee.off('prepare', onPrepare);
-      ee.off('stop', onStop);
-      ee.off('clear', onClear);
+      this.ee.off('getNextSound', onGetNextSound);
+      this.ee.off('prepare', onPrepare);
+      this.ee.off('stop', onStop);
+      this.ee.off('clear', onClear);
     };
 
-    ee.on('prepare', null, onPrepare);
-    ee.on('stop', null, onStop);
-    ee.on('clear', null, onClear);
+    this.ee.on('prepare', null, onPrepare);
+    this.ee.on('stop', null, onStop);
+    this.ee.on('clear', null, onClear);
 
     return sked as any;
   }
@@ -710,7 +709,7 @@ export class MidiPlayer extends Sound {
         if (repeated >= repeat) {
           // последний цикл
           repeated = 0;
-          ee.off('getNextSound', onGetNextSound);
+          this.ee.off('getNextSound', onGetNextSound);
         }
       }
     };
@@ -720,25 +719,25 @@ export class MidiPlayer extends Sound {
         return;
       }
 
-      ee.on('getNextSound', null, onGetNextSound);
+      this.ee.on('getNextSound', null, onGetNextSound);
     };
 
     const onStop = () => {
-      ee.off('getNextSound', onGetNextSound);
+      this.ee.off('getNextSound', onGetNextSound);
       repeated = 0;
       tick = -1;
     };
 
     const onClear = () => {
-      ee.off('getNextSound', onGetNextSound);
-      ee.off('prepare', onPrepare);
-      ee.off('stop', onStop);
-      ee.off('clear', onClear);
+      this.ee.off('getNextSound', onGetNextSound);
+      this.ee.off('prepare', onPrepare);
+      this.ee.off('stop', onStop);
+      this.ee.off('clear', onClear);
     };
 
-    ee.on('prepare', null, onPrepare);
-    ee.on('stop', null, onStop);
-    ee.on('clear', null, onClear);
+    this.ee.on('prepare', null, onPrepare);
+    this.ee.on('stop', null, onStop);
+    this.ee.on('clear', null, onClear);
 
     return sked as any;
   }
@@ -747,7 +746,7 @@ export class MidiPlayer extends Sound {
     this.stop({
       break: true,
     });
-    ee.emit('clear');
+    this.ee.emit('clear');
     this.loopId = 0;
     this.loops = {};
   }
@@ -760,7 +759,7 @@ export class MidiPlayer extends Sound {
    */
   stop(params: PlayResult) {
     // this.isStopped = true;
-    ee.emit('stop');
+    this.ee.emit('stop');
     clearInterval(this.interval);
 
     if (this.ticker) {
