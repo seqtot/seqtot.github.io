@@ -1,8 +1,8 @@
 function getKeyStep(
   step: string,
   symbol: string,
-  withBorder: string = '',
-  bgColor: string = 'white'
+  borders: string = '',
+  bg: string = 'white'
 ): string {
   // let step = note[0];
 
@@ -21,19 +21,19 @@ function getKeyStep(
   let border = 'border: 1px solid grey;';
   let borderSide = '';
 
-  if (withBorder.includes('t')) {
+  if (borders.includes('t')) {
     borderSide += 'border-top: 3px solid black;';
   }
 
-  if (withBorder.includes('r')) {
+  if (borders.includes('r')) {
     borderSide += 'border-right: 3px solid black;';
   }
 
-  if (withBorder.includes('b')) {
+  if (borders.includes('b')) {
     borderSide += 'border-bottom: 3px solid black;';
   }
 
-  if (withBorder.includes('l')) {
+  if (borders.includes('l')) {
     borderSide += 'border-left: 3px solid black;';
   }
 
@@ -53,7 +53,7 @@ function getKeyStep(
       ${border}
       ${borderSide}
       color: ${fontColor};
-      background-color: ${bgColor};
+      background-color: ${bg};
       font-weight: ${fontWeight};" 
       data-name="note-step:${step}"
       data-relative-key="${step}"
@@ -198,79 +198,11 @@ ${getKeyStep('24', '24', 'br')}
 
 
 `.replace(/\n/g, '');
-
-  // <div
-  //   style="
-  //     display: flex; flex-direction: column; align-items: center; user-select: none;
-  //     font-family: monospace;
-  //   "
-  //   data-name="relative-keyboard-wrapper"
-  //   data-relative-keyboard-base=""
-  // >
-  // <div style="user-select: none;">
-  // <span data-set-note data-name="set-note-de" style="user-select: none; margin-right: .5rem;">de</span>
-  // <span data-set-note data-name="set-note-te" style="user-select: none; margin-right: .5rem;">te</span>
-  // <span data-set-note data-name="set-note-re" style="user-select: none; margin-right: .5rem;">re</span>
-  // <span data-set-note data-name="set-note-ne" style="user-select: none; margin-right: .5rem;">ne</span>
-  // <span data-set-note data-name="set-note-me" style="user-select: none; margin-right: .5rem;">me</span>
-  // <span data-set-note data-name="set-note-fe" style="user-select: none; margin-right: .5rem;">fe</span>
-  // <span data-set-note data-name="set-note-ve" style="user-select: none; margin-right: .5rem;">ve</span>
-  // <span data-set-note data-name="set-note-se" style="user-select: none; margin-right: .5rem;">se</span>
-  // <span data-set-note data-name="set-note-ze" style="user-select: none; margin-right: .5rem;">ze</span>
-  // <span data-set-note data-name="set-note-le" style="user-select: none; margin-right: .5rem;">le</span>
-  // <span data-set-note data-name="set-note-ke" style="user-select: none; margin-right: .5rem;">ke</span>
-  // <span data-set-note data-name="set-note-be" style="user-select: none; margin-right: .5rem;">be</span>
-  // </div>
-
-  // <div style="user-select: none;">
-  // <span data-set-note data-name="set-note-da" style="user-select: none; margin-right: .5rem;">da</span>
-  // <span data-set-note data-name="set-note-ta" style="user-select: none; margin-right: .5rem;">ta</span>
-  // <span data-set-note data-name="set-note-ra" style="user-select: none; margin-right: .5rem;">ra</span>
-  // <span data-set-note data-name="set-note-na" style="user-select: none; margin-right: .5rem;">na</span>
-  // <span data-set-note data-name="set-note-ma" style="user-select: none; margin-right: .5rem;">ma</span>
-  // <span data-set-note data-name="set-note-fa" style="user-select: none; margin-right: .5rem;">fa</span>
-  // <span data-set-note data-name="set-note-va" style="user-select: none; margin-right: .5rem;">va</span>
-  // <span data-set-note data-name="set-note-sa" style="user-select: none; margin-right: .5rem;">sa</span>
-  // <span data-set-note data-name="set-note-za" style="user-select: none; margin-right: .5rem;">za</span>
-  // <span data-set-note data-name="set-note-la" style="user-select: none; margin-right: .5rem;">la</span>
-  // <span data-set-note data-name="set-note-ka" style="user-select: none; margin-right: .5rem;">ka</span>
-  // <span data-set-note data-name="set-note-ba" style="user-select: none; margin-right: .5rem;">ba</span>
-  // </div>
-
-  // <div style="user-select: none;">
-  // <span data-set-note data-name="set-note-do" style="user-select: none; margin-right: .5rem;">do</span>
-  // <span data-set-note data-name="set-note-to" style="user-select: none; margin-right: .5rem;">to</span>
-  // <span data-set-note data-name="set-note-ro" style="user-select: none; margin-right: .5rem;">ro</span>
-  // <span data-set-note data-name="set-note-no" style="user-select: none; margin-right: .5rem;">no</span>
-  // <span data-set-note data-name="set-note-mo" style="user-select: none; margin-right: .5rem;">mo</span>
-  // <span data-set-note data-name="set-note-fo" style="user-select: none; margin-right: .5rem;">fo</span>
-  // <span data-set-note data-name="set-note-vo" style="user-select: none; margin-right: .5rem;">vo</span>
-  // <span data-set-note data-name="set-note-so" style="user-select: none; margin-right: .5rem;">so</span>
-  // <span data-set-note data-name="set-note-zo" style="user-select: none; margin-right: .5rem;">zo</span>
-  // <span data-set-note data-name="set-note-lo" style="user-select: none; margin-right: .5rem;">lo</span>
-  // <span data-set-note data-name="set-note-ko" style="user-select: none; margin-right: .5rem;">ko</span>
-  // <span data-set-note data-name="set-note-bo" style="user-select: none; margin-right: .5rem;">bo</span>
-  // </div>
-
-  // <div style="user-select: none;">
-  // <span data-set-note data-name="set-note-dy" style="user-select: none; margin-right: .5rem;">dy</span>
-  // <span data-set-note data-name="set-note-ty" style="user-select: none; margin-right: .5rem;">ty</span>
-  // <span data-set-note data-name="set-note-ry" style="user-select: none; margin-right: .5rem;">ry</span>
-  // <span data-set-note data-name="set-note-ny" style="user-select: none; margin-right: .5rem;">ny</span>
-  // <span data-set-note data-name="set-note-my" style="user-select: none; margin-right: .5rem;">my</span>
-  // <span data-set-note data-name="set-note-fy" style="user-select: none; margin-right: .5rem;">fy</span>
-  // <span data-set-note data-name="set-note-vy" style="user-select: none; margin-right: .5rem;">vy</span>
-  // <span data-set-note data-name="set-note-sy" style="user-select: none; margin-right: .5rem;">sy</span>
-  // <span data-set-note data-name="set-note-zy" style="user-select: none; margin-right: .5rem;">zy</span>
-  // <span data-set-note data-name="set-note-ly" style="user-select: none; margin-right: .5rem;">ly</span>
-  // <span data-set-note data-name="set-note-ky" style="user-select: none; margin-right: .5rem;">ky</span>
-  // <span data-set-note data-name="set-note-by" style="user-select: none; margin-right: .5rem;">by</span>
-  // </div>
-
-  // </div>
 }
 
-function getKeyboard(): string {
+function getKeyboard(id?: number | string): string {
+  id = id || '';
+
   const keyboard = `
 <div style="
     font-family: monospace;
@@ -306,10 +238,6 @@ ${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
 const info = `
 <div style="margin: .5rem;">
 
-<!--b>TEST</b-->
-<!--pre style="font-family: monospace; margin: .5rem 0 0;"></pre-->
-
-${getKeyboard2()}
 <br/>
 
 ${getKey('bu', 'бы')}
@@ -323,73 +251,13 @@ ${getKey('bu', 'бы')}
 ${getKeyboard()}
 
 <div style="font-size: 1.5rem; font-family: monospace;">
-
-<!-- li -->
-
-моЦу оПаХуЦу    <br/>
-моПаЦу ЩуЦу     <br/>
-буПаЦу оПаХуЦу <br/>
-моЦуЩуЩа  щуЩа  <br/>
-воЦуЦуЦа цуЩуЦуЦу <br/>
-соЩуЦуЦа <br/>
-моЦуЦаПу паЦуЦаПу  <br/>
-</div>
-
-<!--оЦуЩуЦу                               (ма)<br/>
-пуЩаЩуЦу щуЩаЦа щаЩу паЦуЩу цуЦа щаЩу (мо)<br/>
-о_ЩаЩуЦу щуЩаЦа щаЩу паЦуЩу цуЦа щаЩу (мо)<br/>-->
-
-<div style="font-size: 1.75rem; font-family: monospace;">
-
-
-<!-- Am -->
-
-<a data-note-line="b60 лу-100">wA  1=</a><br/>
-
-<a data-note-line="b60 лу-100 мо-100 ло-100 мо-100">лу7аПаПу</a>
-<a data-note-line="b60 лу-100 мо-100 да-100 мо-100">лу7а8а8у</a>
-
-<br/>
-
-<a data-note-line="b60 мо-100">$E 3=</a><br/>
-<a data-note-line="b60 мо-100 да-100 мо-100 да-100">мо8а8y8а</a>
-<a data-note-line="b60 мо-100 та-100 мо-100 та-100">мо9а9y9а</a>
-
-<!-- Am --> <br/><br/>
-
-<!-- E -->
-<a data-note-line="b60 му-100">
-  !E -1-
-</a>
-<br/>
-<a data-note-line="b60 му-100 бу-100 мо-100 бу-100">му7аПаПу</a>
-<a data-note-line="b60 му-100 бу-100 зо-100 бу-100">му7а9а9у</a>
-<br/>
-
-<a data-note-line="b60 зо-100">%G# 4=  %Ab 5-</a><br/>
-<a data-note-line="b60 зо-100 бу-100 зо-100 бу-100">зо9у9а9у</a>
-
-<!-- E --> <br/><br/>
-
-
-<!-- G -->
-
-<a data-note-line="b60 су-100">zG  1-</a><br/>
-
-<a data-note-line="b60 су-100 ро-100 со-100 ро-100">су7аПаПу</a>
-<a data-note-line="b60 су-100 ро-100 бо-100 ро-100">су7а9а9у</a>
-
-<br/>
-
-<a data-note-line="b60 бо-100">bB 5=</a><br/>
-<a data-note-line="b60 бо-100 ро-100 бо-100 ро-100">бо9у9а9у</a>
-
-<!-- G --><br/><br/>
-
-<a data-note-line="b60 лу-100 до-100 му-100 зу-100">луЩа8уЧа</a><br/>
-<a data-note-line="b60 лу-100 ду-100 му-100 ду-100">Ха9уЧаЧу(9а)</a><br/>
-
-
+  моЦу оПаХуЦу    <br/>
+  моПаЦу ЩуЦу     <br/>
+  буПаЦу оПаХуЦу <br/>
+  моЦуЩуЩа  щуЩа  <br/>
+  воЦуЦуЦа цуЩуЦуЦу <br/>
+  соЩуЦуЦа <br/>
+  моЦуЦаПу паЦуЦаПу  <br/>
 </div>
 
 <br/><br/>
@@ -514,7 +382,7 @@ simple44@
 export default {
   content,
   tracks: [
-    { key: 'beat44', value: beat44, name: 'бит 4/4: bpm120' },
+    //{ key: 'beat44', value: beat44, name: 'бит 4/4: bpm120' },
     // { key: 'harmony', value: melody, name: 'Барабан: bpm:120' },
   ],
 };

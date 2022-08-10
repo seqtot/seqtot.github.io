@@ -294,7 +294,7 @@ ${parts}
 export default {
   content,
   tracks: [
-    { key: '4/4', value: beat44, name: 'метроном' },
+    // { key: '4/4', value: beat44, name: 'метроном' },
     // { key: 'break', value: petGunBreak, name: 'сбивка bmp:110' },
     // { key: 'full', value: full, name: 'полностью bmp:110' },
     // { key: 'test', value: test, name: 'тест' },

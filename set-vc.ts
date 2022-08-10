@@ -71,9 +71,44 @@ export const setVc = (props: Props, context: any) => {
   return () => context.$h`<div class="page"></div>`;
 };
 
+const tick14 = `
+<beat@>
+-             : 1 :
+@cowbell      : 1 :
+`.trim();
+
+const tick24 = `
+<beat@>
+-             : 1   2   :
+@cowbell      : 1       :
+@nil          :     2   :
+`.trim();
+
+const tick34 = `
+<beat@>
+-             : 1   2   3   :
+@cowbell      : 1           :
+@nil          :     2   3   :
+`.trim();
+
+const tick44 = `
+<beat@>
+-             : 1   2   3   4   :
+@cowbell      : 1               :
+@nil          :     2   3   4   :
+`.trim();
+
+const ticks = {
+  '1:4': tick14,
+  '2:4': tick24,
+  '3:4': tick34,
+  '4:4': tick44,
+};
+
 export class SetVc {
   view: 'info' | 'drums' = 'info';
   bpmMultiple = 100;
+  playingTick = '';
 
   constructor(
     public props: Props,
@@ -107,6 +142,10 @@ export class SetVc {
   }
 
   getTracksContent(): string {
+    if (!this.setInfo?.tracks?.length) {
+      return '';
+    }
+
     return this.setInfo.tracks.reduce(
       (acc, item) => {
         acc =
@@ -176,7 +215,12 @@ export class SetVc {
     const content = `
       <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
         <div style="padding: 1rem .5rem 1rem .5rem;">
-          bpm
+          &emsp;
+          <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
+          <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
+          <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
+          <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
+          <a data-tick-trigger="stop"><b>stop</b></a>&emsp;
           <div 
             class="range-slider"
             data-name="slider"
@@ -204,7 +248,12 @@ export class SetVc {
       el: dyName('slider', this.pageEl),
       on: {
         changed: (range: any) => {
+          // console.log('range.onChange', range); // jjkl
           this.bpmMultiple = range.value;
+
+          if (this.playingTick) {
+            this.playTick(this.playingTick);
+          }
         },
       },
     });
@@ -222,7 +271,7 @@ export class SetVc {
 
   subscribViewDrumsEvents() {
     setTimeout(() => {
-      byId(this.getId('action-stop')).addEventListener(
+      byId(this.getId('action-stop'))?.addEventListener(
         'click',
         (evt: MouseEvent) => {
           this.stop();
@@ -254,6 +303,33 @@ export class SetVc {
     this.subscribViewDrumsEvents();
   }
 
+  playTick(name?: string) {
+    name = name || '';
+    this.playingTick = name;
+
+    multiPlayer.clearMidiPlayer();
+
+    const beat = ticks[this.playingTick];
+
+    if (!beat) {
+      this.playingTick = '';
+
+      return;
+    }
+
+    const blocks = `
+        <out r1000000>
+        beat@
+
+        ${beat}
+      `;
+
+    multiPlayer.tryPlayMidiBlock({
+      blocks,
+      bpm: this.bpmMultiple,
+    });
+  }
+
   subscribePageEvents() {
     dyName('action-drums', dyName('panel-right-content')).addEventListener(
       'click',
@@ -270,6 +346,12 @@ export class SetVc {
         this.setViewInfo();
       }
     );
+
+    getWithDataAttr('tick-trigger', this.pageEl)?.forEach((el) => {
+      el.addEventListener('click', (evt: MouseEvent) => {
+        this.playTick(el?.dataset?.tickTrigger);
+      });
+    });
 
     getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
       el.addEventListener('click', (evt: MouseEvent) => {
