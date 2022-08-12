@@ -26,8 +26,8 @@ const isDev = /devitband/.test(window.location.href);
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
 
-// const defRoute = isDev ? '/set/set_My/' : '/set/set_All/';
-const defRoute = '/set/set_All/';
+const defRoute = isDev ? '/set/set_My/' : '/set/set_All/';
+//const defRoute = '/set/set_All/';
 
 const linksToPage = [
   { href: '/set/set_All/', name: 'Список' },

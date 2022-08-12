@@ -1,12 +1,13 @@
 function getKeyFn(
   id: string | number
-): (note: string, symbol: string, duration?: number) => string {
+): (note: string, symbol: string) => string {
   id = id || '';
 
-  return (note: string, symbol: string, duration: number = 25): string => {
+  return (note: string, symbol: string): string => {
     let step = note[0];
 
-    let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
+    //let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
+    let fontW = 400;
     let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
       ? 'border: none;'
       : '';
@@ -17,7 +18,8 @@ function getKeyFn(
       // fontColor = 'lightgray';
     }
 
-    let border = borderNone || 'border: 1px solid grey;';
+    // let border = borderNone || 'border: 1px solid grey;';
+    let border = 'border: 1px solid grey;';
 
     return `<div
       style="
@@ -26,14 +28,13 @@ function getKeyFn(
         padding: 0;
         display: inline-block;
         font-size: 1.5rem;
-        width: 1.5rem;
+        width: 2rem;
         user-select: none;
         text-align: center;
         ${border}
         color: ${fontColor};
         font-weight: ${fontW};" 
-
-        data-note-key="b60 ${note}-${duration}"
+        data-note-key="b60 ${note}-${25}"
         data-name="note-val-${note}"
         data-note-lat="${note}"
         data-keyboard-id="${id}"
@@ -44,10 +45,11 @@ function getKeyFn(
   };
 } // getKeyFn
 
-function getKeyboard(id?: number | string): string {
+function getGuitarKeyboard(id?: number | string): string {
   id = id || '';
 
   const getKey = getKeyFn(id);
+  const _ = '&nbsp;';
 
   const keyboard = `
 <div style="
@@ -56,25 +58,32 @@ function getKeyboard(id?: number | string): string {
     padding: 0.5rem 0 0.5rem 0.5rem;"
     data-name="keyboard-${id}"
 >
-${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
-${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
-${getKey('da', '^')}${getKey('ma', '&')}${getKey('za', '*')}
-${getKey('de', '(')}${getKey('me', ')')}${getKey('ze', '_')}
+${getKey('my', 'м')}${getKey('ly', 'л')}${getKey('ro', 'р')}
+${getKey('so', 'с')}${getKey('bo', 'б')}${getKey('ma', 'м')}
 <br/>
-${getKey('ty', '?')}${getKey('fy', 'q')}${getKey('ly', 'w')}
-${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
-${getKey('ta', 'y')}${getKey('fa', 'u')}${getKey('la', 'i')}
-${getKey('te', 'o')}${getKey('fe', 'p')}${getKey('le', '[')}
+${getKey('fy', 'ф')}${getKey('ky', _)}${getKey('no', _)}
+${getKey('zo', _)}${getKey('da', 'д')}${getKey('fa', 'ф')}
 <br/>
-${getKey('ry', '?')}${getKey('vy', 'a')}${getKey('ky', 's')}
-${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
-${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
-${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
+${getKey('vy', _)}${getKey('by', 'б')}${getKey('mo', 'м')}
+${getKey('lo', 'л')}${getKey('ta', _)}${getKey('va', _)}
 <br/>
-${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
-${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
-${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
-${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
+${getKey('sy', 'с')}${getKey('do', 'д')}${getKey('fo', 'ф')}
+${getKey('ko', _)}${getKey('ra', 'р')}${getKey('sa', 'c')}
+<br/>
+${getKey('zy', _)}${getKey('to', _)}${getKey('vo', _)}
+${getKey('bo', 'б')}${getKey('na', _)}${getKey('za', _)}
+<br/>
+${getKey('ly', 'л')}${getKey('ro', 'р')}${getKey('so', 'c')}
+${getKey('da', 'д')}${getKey('ma', 'м')}${getKey('la', 'л')}
+<br/>
+${getKey('ky', _)}${getKey('no', _)}${getKey('zo', _)}
+${getKey('ta', _)}${getKey('fa', 'ф')}${getKey('ka', _)}
+<br/>
+${getKey('by', 'б')}${getKey('mo', 'м')}${getKey('lo', 'л')}
+${getKey('ra', 'р')}${getKey('va', _)}${getKey('ba', 'б')}
+<br/>
+${getKey('do', 'д')}${getKey('fo', 'ф')}${getKey('ko', _)}
+${getKey('na', _)}${getKey('sa', 'с')}${getKey('de', 'д')}
 </div>
 
 `.replace(/\n/g, '');
@@ -85,9 +94,7 @@ ${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
 const info = `
 <div style="margin: .5rem; user-select: none;">
 
-<br/>
-
-${getKeyboard(1)}
+${getGuitarKeyboard(1)}
 
 ${getKeyFn(1)('bu', 'бы')}
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
@@ -97,7 +104,7 @@ ${getKeyFn(1)('bu', 'бы')}
   &nbsp;&nbsp;!rnd
 </span>
 
-${getKeyboard(2)}
+<!--${getKeyboard(2)}-->
 
 <div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>
@@ -395,4 +402,42 @@ ${getKeyStep('24', '24', 'br')}
 
 
 `.replace(/\n/g, '');
+}
+
+function getKeyboard(id?: number | string): string {
+  id = id || '';
+
+  const getKey = getKeyFn(id);
+
+  const keyboard = `
+<div style="
+    font-family: monospace;
+    user-select: none;    
+    padding: 0.5rem 0 0.5rem 0.5rem;"
+    data-name="keyboard-${id}"
+>
+${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
+${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
+${getKey('da', '^')}${getKey('ma', '&')}${getKey('za', '*')}
+${getKey('de', '(')}${getKey('me', ')')}${getKey('ze', '_')}
+<br/>
+${getKey('ty', '?')}${getKey('fy', 'q')}${getKey('ly', 'w')}
+${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
+${getKey('ta', 'y')}${getKey('fa', 'u')}${getKey('la', 'i')}
+${getKey('te', 'o')}${getKey('fe', 'p')}${getKey('le', '[')}
+<br/>
+${getKey('ry', '?')}${getKey('vy', 'a')}${getKey('ky', 's')}
+${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
+${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
+${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
+<br/>
+${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
+${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
+${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
+${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
+</div>
+
+`.replace(/\n/g, '');
+
+  return keyboard;
 }
