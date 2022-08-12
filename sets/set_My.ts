@@ -27,8 +27,8 @@ function getKeyFn(
         margin: 0;
         padding: 0;
         display: inline-block;
-        font-size: 1.5rem;
-        width: 2rem;
+        font-size: 1.3rem;
+        width: 1.6rem;
         user-select: none;
         text-align: center;
         ${border}
@@ -58,8 +58,8 @@ function getGuitarKeyboard(id?: number | string): string {
     padding: 0.5rem 0 0.5rem 0.5rem;"
     data-name="keyboard-${id}"
 >
-${getKey('my', 'м')}${getKey('ly', 'л')}${getKey('ro', 'р')}
-${getKey('so', 'с')}${getKey('bo', 'б')}${getKey('ma', 'м')}
+${getKey('my', 'М')}${getKey('ly', 'Л')}${getKey('ro', 'Р')}
+${getKey('so', 'С')}${getKey('bo', 'Б')}${getKey('ma', 'М')}
 <br/>
 ${getKey('fy', 'ф')}${getKey('ky', _)}${getKey('no', _)}
 ${getKey('zo', _)}${getKey('da', 'д')}${getKey('fa', 'ф')}
@@ -84,6 +84,18 @@ ${getKey('ra', 'р')}${getKey('va', _)}${getKey('ba', 'б')}
 <br/>
 ${getKey('do', 'д')}${getKey('fo', 'ф')}${getKey('ko', _)}
 ${getKey('na', _)}${getKey('sa', 'с')}${getKey('de', 'д')}
+<br/>
+${getKey('to', _)}${getKey('vo', _)}${getKey('bo', 'б')}
+${getKey('ma', 'м')}${getKey('za', _)}${getKey('te', _)}
+<br/>
+${getKey('ro', 'р')}${getKey('so', `с`)}${getKey('da', 'д')}
+${getKey('fa', 'ф')}${getKey('la', 'л')}${getKey('re', 'р')}
+<br/>
+${getKey('no', _)}${getKey('zo', _)}${getKey('ta', _)}
+${getKey('va', _)}${getKey('ka', _)}${getKey('ne', _)}
+<br/>
+${getKey('mo', 'м')}${getKey('lo', 'л')}${getKey('ra', 'р')}
+${getKey('sa', 'с')}${getKey('ba', 'б')}${getKey('me', 'м')}
 </div>
 
 `.replace(/\n/g, '');
@@ -94,19 +106,18 @@ ${getKey('na', _)}${getKey('sa', 'с')}${getKey('de', 'д')}
 const info = `
 <div style="margin: .5rem; user-select: none;">
 
-${getGuitarKeyboard(1)}
-
-${getKeyFn(1)('bu', 'бы')}
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
-  &nbsp;&nbsp;&nbsp;!clr
+  clr&nbsp;&nbsp;
 </span>
 <span style="user-select: none; font-size: 1.5rem" data-name="select-random-key">
-  &nbsp;&nbsp;!rnd
+  rnd&nbsp;&nbsp;
 </span>
+
+${getGuitarKeyboard(1)}
 
 <!--${getKeyboard(2)}-->
 
-<div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
+<!--div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>
   моПаЦу ЩуЦу     <br/>
   буПаЦу оПаХуЦу <br/>
@@ -114,9 +125,7 @@ ${getKeyFn(1)('bu', 'бы')}
   воЦуЦуЦа цуЩуЦуЦу <br/>
   соЩуЦуЦа <br/>
   моЦуЦаПу паЦуЦаПу  <br/>
-</div>
-
-<br/><br/>
+</div-->
 
 </div>
 `;
@@ -242,6 +251,7 @@ export default {
     //{ key: 'beat44', value: beat44, name: 'бит 4/4: bpm120' },
     // { key: 'harmony', value: melody, name: 'Барабан: bpm:120' },
   ],
+  hideMetronome: true,
 };
 
 function getKeyStep(

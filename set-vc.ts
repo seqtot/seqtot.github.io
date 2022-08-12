@@ -143,6 +143,7 @@ export class SetVc {
     break: string;
     drums: string;
     tracks: { key: string; value: string; name: string }[];
+    hideMetronome?: boolean;
   } {
     return sets[this.setId];
   }
@@ -218,8 +219,7 @@ export class SetVc {
   setViewInfo() {
     this.view = 'info';
 
-    const content = `
-      <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
+    let metronomeView = `
         <div style="padding: 1rem .5rem 1rem .5rem;">
           &emsp;
           <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
@@ -242,6 +242,15 @@ export class SetVc {
           </div>
         </div>
         ${this.getTracksContent()}
+    `;
+
+    if (this.setInfo.hideMetronome) {
+      metronomeView = '';
+    }
+
+    const content = `
+      <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
+      ${metronomeView}
       <div data-name="setContent">
         ${this.setInfo.content}
       </div>
