@@ -6,8 +6,7 @@ function getKeyFn(
   return (note: string, symbol: string): string => {
     let step = note[0];
 
-    //let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
-    let fontW = 400;
+    let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
     let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
       ? 'border: none;'
       : '';
@@ -18,8 +17,7 @@ function getKeyFn(
       // fontColor = 'lightgray';
     }
 
-    // let border = borderNone || 'border: 1px solid grey;';
-    let border = 'border: 1px solid grey;';
+    let border = borderNone || 'border: 1px solid grey;';
 
     return `<div
       style="
@@ -28,7 +26,7 @@ function getKeyFn(
         padding: 0;
         display: inline-block;
         font-size: 1.3rem;
-        width: 1.6rem;
+        width: 1.5rem;
         user-select: none;
         text-align: center;
         ${border}
@@ -106,16 +104,16 @@ ${getKey('sa', 'с')}${getKey('ba', 'б')}${getKey('me', 'м')}
 const info = `
 <div style="margin: .5rem; user-select: none;">
 
+
+
+${getKeyboard(1)}
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
   clr&nbsp;&nbsp;
 </span>
 <span style="user-select: none; font-size: 1.5rem" data-name="select-random-key">
   rnd&nbsp;&nbsp;
 </span>
-
-${getGuitarKeyboard(1)}
-
-<!--${getKeyboard(2)}-->
+${getKeyboard(2)}
 
 <!--div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>
