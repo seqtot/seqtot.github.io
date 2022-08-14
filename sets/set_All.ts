@@ -2,8 +2,17 @@ function getLink(name: string, href: string): string {
   return `<a class="link external" href="${href}" target="_blank">${name}</a>`;
 }
 
+function getBpmLink(bpm: number): string {
+  return `<a
+    class="link external"
+    target="_blank"
+    data-set-bmp-action
+    data-bpm="${bpm}"
+  >${bpm}</a>`;
+}
+
 const enterSandmen = `<div style="margin: .5rem;">
-  <b>Enter Sandman: 124</b> (Metallica)<br/>
+  <b>Enter Sandman: ${getBpmLink(124)}</b> (Metallica)<br/>
   ${getLink('lesson', 'https://www.youtube.com/watch?v=NIAkEJp8i_Y')} |
   ${getLink(
     'tabs',
@@ -13,14 +22,14 @@ const enterSandmen = `<div style="margin: .5rem;">
 `;
 
 const peterGunn = `<div style="margin: .5rem;">
-  <b>Peter Gunn: 124</b><br/>
+  <b>Peter Gunn: ${getBpmLink(124)}</b><br/>
   ${getLink('lesson', 'https://www.youtube.com/watch?v=vhdSodIxZSE')} |
   ${getLink('Duane Eddy', 'https://www.youtube.com/watch?v=296wS9ome4M')}
 </div>
 `;
 
 const blackNight = `<div style="margin: .5rem;">
-  <b>Black Night: 134</b> (Deep Purple)<br/>
+  <b>Black Night: ${getBpmLink(134)}</b> (Deep Purple)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=QuAKMlfxX7I')} |
   ${getLink(
     'tabs',
@@ -29,7 +38,7 @@ const blackNight = `<div style="margin: .5rem;">
 </div>`;
 
 const itsMyLife = `<div style="margin: .5rem;">
-  <b>It's My Life: 120</b> (Bon Jovi)<br/>
+  <b>It's My Life: ${getBpmLink(120)}</b> (Bon Jovi)<br/>
   ${getLink(
     'tabs',
     'https://www.songsterr.com/a/wsa/bon-jovi-its-my-life-4-string-bass-tab-s442387'
@@ -43,18 +52,18 @@ const itsMyLife = `<div style="margin: .5rem;">
 </div>`;
 
 const pacificZodiac = `<div style="margin: .5rem;">
-  <b>Pacific: 118</b> (Zodiac, 1980)<br/>
+  <b>Pacific: ${getBpmLink(118)}</b> (Zodiac, 1980)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=W33mp0TYVv8')} |
   ${getLink('lesson', 'https://www.youtube.com/watch?v=eNoKyYsbuNA')}
 </div>`;
 
 const agressiveSamurai = `<div style="margin: .5rem;">
-  <b>Agressive: 75</b>  (Samurai, 2022)<br/>
+  <b>Agressive: ${getBpmLink(75)}</b>  (Samurai, 2022)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=jVtuIMm52aQ')}
 </div>`;
 
 const sweetChild = `<div style="margin: .5rem;">
-  <b>Sweet Child O' Mine: 128</b> (Guns N' Roses, 1988)<br/>
+  <b>Sweet Child O' Mine: ${getBpmLink(128)}</b> (Guns N' Roses, 1988)<br/>
   ${getLink('youtube', 'https://www.youtube.com/watch?v=1w7OgIMMRc4')} |
   ${getLink(
     'tabs',

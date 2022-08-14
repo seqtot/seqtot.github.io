@@ -3,6 +3,7 @@
 
 // import { Page } from 'framework7/types/components/page/page';
 import { Page } from 'framework7/types/components/page/page';
+import { Range } from 'framework7/types/components/range/range';
 import { ComponentContext } from 'framework7/types/modules/component/component';
 import { Props } from 'framework7/types/modules/component/snabbdom/modules/props';
 import { byId, dyName } from './utils';
@@ -48,6 +49,11 @@ const sets = {
   set_My: setMy,
   set_blackNight: setBlackNight,
   set_All: setAll,
+};
+
+const ns = {
+  setBmpAction: 'set-bmp-action',
+  setNote: 'set-note',
 };
 
 export const setVc = (props: Props, context: any) => {
@@ -115,6 +121,7 @@ export class SetVc {
   view: 'info' | 'drums' = 'info';
   bpmMultiple = 100;
   playingTick = '';
+  bpmRange: Range.Range;
 
   constructor(
     public props: Props,
@@ -204,7 +211,7 @@ export class SetVc {
 
     this.page.$el.html(content);
 
-    let bpmRange = this.context.$f7.range.create({
+    this.bpmRange = this.context.$f7.range.create({
       el: dyName('slider', this.pageEl),
       on: {
         changed: (range: any) => {
@@ -259,7 +266,7 @@ export class SetVc {
 
     this.page.$el.html(content);
 
-    let bpmRange = this.context.$f7.range.create({
+    this.bpmRange = this.context.$f7.range.create({
       el: dyName('slider', this.pageEl),
       on: {
         changed: (range: any) => {
@@ -431,7 +438,7 @@ export class SetVc {
           un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
 
         const key = dyName(
-          `note-val-${val}`,
+          `note-key-${val}`,
           dyName(`keyboard-2`, this.pageEl)
         );
 
@@ -459,7 +466,7 @@ export class SetVc {
 
         wrapper.dataset.relativeKeyboardBase = note;
 
-        getWithDataAttr('set-note', this.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
           el.style.backgroundColor = 'white';
         });
 
@@ -472,7 +479,7 @@ export class SetVc {
       });
     });
 
-    getWithDataAttr('set-note', this.pageEl)?.forEach((el: HTMLElement) => {
+    getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
       el.addEventListener('pointerdown', () => {
         const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
 
@@ -480,7 +487,7 @@ export class SetVc {
           return;
         }
 
-        getWithDataAttr('set-note', this.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
           el.style.backgroundColor = 'white';
         });
 
@@ -490,6 +497,15 @@ export class SetVc {
         this.tryPlayTextLine({ text: `b60 ${note}-25` });
       });
     });
+
+    getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
+      (el: HTMLElement) => {
+        el.addEventListener('pointerdown', () => {
+          this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);
+          this.playTick(this.playingTick);
+        });
+      }
+    );
   }
 
   async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
@@ -560,3 +576,6 @@ export class SetVc {
     //   }
   }
 }
+
+// data-set-bmp-action
+// data-bmp="${bpm}"

@@ -32,8 +32,8 @@ function getKeyFn(
         ${border}
         color: ${fontColor};
         font-weight: ${fontW};" 
-        data-note-key="b60 ${note}-${25}"
-        data-name="note-val-${note}"
+        data-note-key="${note}"
+        data-name="note-key-${note}"
         data-note-lat="${note}"
         data-keyboard-id="${id}"
 
