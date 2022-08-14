@@ -71,7 +71,10 @@ const sweetChild = `<div style="margin: .5rem;">
   )}
 </div>`;
 
-//
+const itsGoingGood = `<div style="margin: .5rem;">
+  <b>It's Going Good!: ${getBpmLink(95)}</b> (Sueco)<br/>
+  ${getLink('youtube', 'https://www.youtube.com/watch?v=1w7OgIMMRc4')} |
+</div>`;
 
 const content = `
   ${peterGunn}
@@ -81,6 +84,7 @@ const content = `
   ${pacificZodiac}
   ${agressiveSamurai}
   ${sweetChild}
+  ${itsGoingGood}  
   <div style="margin-bottom: 3rem;"></div>
 `.trim();
 
