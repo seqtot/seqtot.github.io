@@ -12,12 +12,42 @@ function getKeyFn(
       : '';
     let fontColor = 'black';
 
-    if (note[1] === 'u') {
-      borderNone = 'border: none;';
-      // fontColor = 'lightgray';
+    // if (note[1] === 'u') {
+    //   borderNone = 'border: none;';
+    //   // fontColor = 'lightgray';
+    // }
+
+    let border = borderNone || 'border: 1px solid black;';
+
+    if (note[0] === 'm') {
+      border =
+        'border-top: 2px solid black; border-left: 2px solid black; border-right: 2px solid black;';
     }
 
-    let border = borderNone || 'border: 1px solid grey;';
+    if (note[0] === 's') {
+      border =
+        'border-bottom: 2px solid black; border-left: 2px solid black; border-right: 2px solid black;';
+    }
+
+    if (note[0] === 'l') {
+      border = 'border-right: 2px solid black; border-top: 2px solid black;';
+    }
+
+    if (note[0] === 'k') {
+      border = 'border-right: 2px solid black; border-bottom: 2px solid black;';
+    }
+
+    if (note[0] === 'f' || note[0] === 'v') {
+      border = 'border: none;';
+    }
+
+    if (note[0] === 't') {
+      border = 'border-left: 2px solid black; border-top: 2px solid black;';
+    }
+
+    if (note[0] === 'r') {
+      border = 'border-left: 2px solid black; border-bottom: 2px solid black;';
+    }
 
     return `<div
       style="
