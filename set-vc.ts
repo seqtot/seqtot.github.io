@@ -385,16 +385,15 @@ export class SetVc {
 
     getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
       el.addEventListener('pointerdown', (evt: MouseEvent) => {
+        let keyOrNote = el?.dataset?.noteLat || '';
+
         el.style.backgroundColor = 'lightgray';
 
         synthesizer.playSound({
-          keyOrNote: el?.dataset?.noteLat,
+          keyOrNote,
           id: el?.dataset?.keyboardId,
+          // instrCode: 366,
         });
-
-        // this.tryPlayTextLine({
-        //   text: el?.dataset?.noteKey,
-        // });
 
         const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
 
@@ -406,9 +405,11 @@ export class SetVc {
       });
 
       el.addEventListener('pointerup', (evt: MouseEvent) => {
+        let keyOrNote = el?.dataset?.noteLat || '';
+
         synthesizer.playSound(
           {
-            keyOrNote: el?.dataset?.noteLat,
+            keyOrNote,
             id: el?.dataset?.keyboardId,
             onlyStop: true,
           },
@@ -439,7 +440,7 @@ export class SetVc {
 
         const key = dyName(
           `note-key-${val}`,
-          dyName(`keyboard-2`, this.pageEl)
+          dyName(`keyboard-solo`, this.pageEl)
         );
 
         if (key) {

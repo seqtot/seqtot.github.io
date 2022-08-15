@@ -1,53 +1,58 @@
-function getKeyFn(
-  id: string | number
-): (note: string, symbol: string) => string {
-  id = id || '';
+function getBorder(note: string): string {
+  note = note || '';
+  let border = 'border: none;';
+
+  if (note[0] === 'm') {
+    border =
+      'border-top: 2px solid black; border-left: 2px solid black; border-right: 2px solid black;';
+  }
+
+  if (note[0] === 's') {
+    border =
+      'border-bottom: 2px solid black; border-left: 2px solid black; border-right: 2px solid black;';
+  }
+
+  if (note[0] === 'l') {
+    border = 'border-right: 2px solid black; border-top: 2px solid black;';
+  }
+
+  if (note[0] === 'k') {
+    border = 'border-right: 2px solid black; border-bottom: 2px solid black;';
+  }
+
+  if (note[0] === 'f' || note[0] === 'v') {
+    border = 'border: none;';
+  }
+
+  if (note[0] === 't') {
+    border = 'border-left: 2px solid black; border-top: 2px solid black;';
+  }
+
+  if (note[0] === 'r') {
+    border = 'border-left: 2px solid black; border-bottom: 2px solid black;';
+  }
+
+  return border;
+}
+
+function getKeyFn(params: {
+  id: string | number;
+  width?: string;
+  fontSize?: string;
+}): (note: string, symbol: string) => string {
+  const id = params.id || '';
+  const fontSize = params.fontSize || '1.3rem';
+  const width = params.width || '1.5rem';
 
   return (note: string, symbol: string): string => {
     let step = note[0];
 
-    let fontW = ['m', 'f', 'v', 's'].find((item) => item === step) ? 800 : 400;
-    let borderNone = ['d', 'z', 'n', 'b'].find((item) => item === step)
-      ? 'border: none;'
-      : '';
+    let fontWeight = ['m', 'f', 'v', 's'].find((item) => item === step)
+      ? 800
+      : 400;
     let fontColor = 'black';
 
-    // if (note[1] === 'u') {
-    //   borderNone = 'border: none;';
-    //   // fontColor = 'lightgray';
-    // }
-
-    let border = borderNone || 'border: 1px solid black;';
-
-    if (note[0] === 'm') {
-      border =
-        'border-top: 2px solid black; border-left: 2px solid black; border-right: 2px solid black;';
-    }
-
-    if (note[0] === 's') {
-      border =
-        'border-bottom: 2px solid black; border-left: 2px solid black; border-right: 2px solid black;';
-    }
-
-    if (note[0] === 'l') {
-      border = 'border-right: 2px solid black; border-top: 2px solid black;';
-    }
-
-    if (note[0] === 'k') {
-      border = 'border-right: 2px solid black; border-bottom: 2px solid black;';
-    }
-
-    if (note[0] === 'f' || note[0] === 'v') {
-      border = 'border: none;';
-    }
-
-    if (note[0] === 't') {
-      border = 'border-left: 2px solid black; border-top: 2px solid black;';
-    }
-
-    if (note[0] === 'r') {
-      border = 'border-left: 2px solid black; border-bottom: 2px solid black;';
-    }
+    let border = getBorder(note);
 
     return `<div
       style="
@@ -55,13 +60,13 @@ function getKeyFn(
         margin: 0;
         padding: 0;
         display: inline-block;
-        font-size: 1.3rem;
-        width: 1.5rem;
+        font-size: ${fontSize};
+        width: ${width};
         user-select: none;
         text-align: center;
         ${border}
         color: ${fontColor};
-        font-weight: ${fontW};" 
+        font-weight: ${fontWeight};" 
         data-note-key="${note}"
         data-name="note-key-${note}"
         data-note-lat="${note}"
@@ -76,7 +81,7 @@ function getKeyFn(
 function getGuitarKeyboard(id?: number | string): string {
   id = id || '';
 
-  const getKey = getKeyFn(id);
+  const getKey = getKeyFn({ id });
   const _ = '&nbsp;';
 
   const keyboard = `
@@ -136,14 +141,14 @@ const info = `
 
 
 
-${getKeyboard(1)}
+${getKeyboardBass('bass')}
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
   clr&nbsp;&nbsp;
 </span>
 <span style="user-select: none; font-size: 1.5rem" data-name="select-random-key">
   rnd&nbsp;&nbsp;
 </span>
-${getKeyboard(2)}
+${getKeyboardSolo('solo')}
 
 <!--div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>
@@ -442,10 +447,10 @@ ${getKeyStep('24', '24', 'br')}
 `.replace(/\n/g, '');
 }
 
-function getKeyboard(id?: number | string): string {
+function getKeyboardSolo(id?: number | string): string {
   id = id || '';
 
-  const getKey = getKeyFn(id);
+  const getKey = getKeyFn({ id });
 
   const keyboard = `
 <div style="
@@ -473,6 +478,40 @@ ${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
 ${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
 ${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
 ${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
+</div>
+
+`.replace(/\n/g, '');
+
+  return keyboard;
+}
+
+function getKeyboardBass(id?: number | string): string {
+  id = id || '';
+
+  const getKey = getKeyFn({ id, width: '2rem', fontSize: '1.5rem' });
+
+  const keyboard = `
+<div style="
+    font-family: monospace;
+    user-select: none;    
+    padding: 0.5rem 0 0.5rem 0.5rem;"
+    data-name="keyboard-${id}"
+>
+${getKey('du', 'д')}${getKey('mu', 'м')}${getKey('zu', 'з')}
+${getKey('dy', 'д')}${getKey('my', 'м')}${getKey('zy', 'з')}
+${getKey('do', 'д')}${getKey('mo', 'м')}${getKey('zo', 'з')}
+<br/>
+${getKey('tu', 'т')}${getKey('fu', 'ф')}${getKey('lu', 'л')}
+${getKey('ty', 'т')}${getKey('fy', 'ф')}${getKey('ly', 'л')}
+${getKey('to', 'т')}${getKey('fo', 'ф')}${getKey('lo', 'л')}
+<br/>
+${getKey('ru', 'р')}${getKey('vu', 'в')}${getKey('ku', 'к')}
+${getKey('ry', 'р')}${getKey('vy', 'в')}${getKey('ky', 'к')}
+${getKey('ro', 'р')}${getKey('vo', 'в')}${getKey('ko', 'к')}
+<br/>
+${getKey('nu', 'н')}${getKey('su', 'с')}${getKey('bu', 'б')}
+${getKey('ny', 'н')}${getKey('sy', 'с')}${getKey('by', 'б')}
+${getKey('no', 'н')}${getKey('so', 'с')}${getKey('bo', 'б')}
 </div>
 
 `.replace(/\n/g, '');
