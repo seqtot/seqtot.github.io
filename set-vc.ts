@@ -19,6 +19,7 @@ import setItsMyLife from './sets/set_ItsMyLife';
 import setMy from './sets/set_My';
 import setBlackNight from './sets/set_blackNight';
 import setAll from './sets/set_All';
+import setHardToHandle from './sets/set_HardToHandle';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -49,6 +50,7 @@ const sets = {
   set_My: setMy,
   set_blackNight: setBlackNight,
   set_All: setAll,
+  set_HardToHandle: setHardToHandle,
 };
 
 const ns = {

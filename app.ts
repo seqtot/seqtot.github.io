@@ -34,7 +34,8 @@ const linksToPage = [
   // { href: '/set/set_blackNight/', name: 'Black Night' },
   // { href: '/set/set_E/', name: 'set E' },
   // { href: '/set/set_Battle/', name: 'Продолжается бой' },
-  // { href: '/set/set_ItsMyLife/', name: 'Its my life' },
+  { href: '/set/set_HardToHandle/', name: 'HardToHandle', isDev: true },
+  //{ href: '/set/set_ItsMyLife/', name: 'Its my life', isDev: true },
   { href: '/set/set_My/', name: 'test', isDev: true },
 ];
 
