@@ -34,6 +34,6 @@
       "@cm/*": ["src_cm/*"]
     }
   },
-  "include": ["sets", "muse"],
-  "files": ["app.ts", "index.ts", "set-vc.ts"]
+  "include": ["sets", "muse", "src"],
+  "files": ["index.ts"]
 }
