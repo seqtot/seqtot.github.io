@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev_old": "webpack-dev-server --config webpack.dev.js --open",
-    "dev": "webpack serve --config webpack.dev.js --open",
-    "build": "webpack --config webpack.config.prod.js --mode production --devtool hidden-source-map",
+    "dev": "webpack serve --config build/webpack.dev.js --open",
+    "build": "webpack --config build/webpack.config.prod.js --mode production --devtool hidden-source-map",
     "test": "jest"
   },
   "dependencies": {
