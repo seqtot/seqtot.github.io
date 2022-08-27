@@ -20,7 +20,9 @@ import { setVc } from './set-vc';
 
 const appEl = document.getElementById('app');
 
-const isDev = /devitband/.test(window.location.href);
+const isDev =
+  /devitband/.test(window.location.href) ||
+  '/local/.test(window.location.href)';
 
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';

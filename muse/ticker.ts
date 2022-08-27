@@ -142,7 +142,7 @@ export class Ticker {
         nextTime = nextTime + quant;
         cb();
       }
-    });
+    }) as any;
   }
 
   stop() {

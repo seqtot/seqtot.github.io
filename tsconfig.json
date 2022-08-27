@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "noEmit": false,
+    "noImplicitAny": false,
+    "baseUrl": ".",
+    "typeRoots": ["node_modules/@types"],
+    "paths": {
+      "@components/*": ["src_au/components/*"],
+      "@components": ["src_au/components"],
+      "@style/*": ["src_au/common/style/*"],
+      "@util": ["src_au/common/util"],
+      "@types": ["src_au/common/types"],
+      "@store": ["src_au/store"],
+      "@model/*": ["src_au/model/*"],
+      "@model": ["src_au/model"],
+      "@controllers": ["src_au/controllers"],
+      "@command": ["src_au/common/command"],
+      "@audio": ["src_au/common/audio"],
+      "@ss/*": ["src_ss/*"],
+      "@gl/*": ["src_gl/*"],
+      "@cm/*": ["src_cm/*"]
+    }
+  },
+  "include": ["sets", "muse"],
+  "files": ["app.ts", "index.ts", "set-vc.ts"]
+}
