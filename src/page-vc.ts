@@ -12,7 +12,8 @@ import { MultiPlayer } from '../muse/multi-player';
 import { Synthesizer } from '../muse/synthesizer';
 import * as un from '../muse/utils-note';
 import { defaultSynthSettings } from '../muse/keyboards';
-import sets from '../sets';
+
+import page_roll from '../pages/page_roll';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -36,12 +37,16 @@ function getWithDataAttr<T extends HTMLElement = HTMLElement>(
   return ((el || document).querySelectorAll(`[data-${name}]`) as any) || [];
 }
 
+const sets = {
+  page_roll,
+};
+
 const ns = {
   setBmpAction: 'set-bmp-action',
   setNote: 'set-note',
 };
 
-export const setVc = (props: Props, context: any) => {
+export const pageVc = (props: Props, context: any) => {
   let vc: SetVc;
 
   // context object contains a lot of useful helpers:

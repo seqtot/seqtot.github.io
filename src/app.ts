@@ -9,6 +9,7 @@
 // Import framework with all components
 import Framework7 from 'framework7/bundle';
 import { setVc } from './set-vc';
+import { pageVc } from './page-vc';
 
 // Import additional components
 // import Searchbar from 'framework7/components/searchbar/';
@@ -28,17 +29,18 @@ const isDev =
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
 
-const defRoute = isDev ? '/set/set_My/' : '/set/set_All/';
+const defRoute = isDev ? '/set/set_my/' : '/set/set_all/';
 //const defRoute = '/set/set_All/';
 
 const linksToPage = [
-  { href: '/set/set_All/', name: 'Список' },
+  { href: '/set/set_all/', name: 'Список' },
   // { href: '/set/set_blackNight/', name: 'Black Night' },
   // { href: '/set/set_E/', name: 'set E' },
   // { href: '/set/set_Battle/', name: 'Продолжается бой' },
-  { href: '/set/set_HardToHandle/', name: 'HardToHandle', isDev: true },
+  { href: '/set/set_hardToHandle/', name: 'hardToHandle', isDev: true },
   //{ href: '/set/set_ItsMyLife/', name: 'Its my life', isDev: true },
-  { href: '/set/set_My/', name: 'test', isDev: true },
+  { href: '/set/set_my/', name: 'test', isDev: true },
+  { href: '/page/page_roll/', name: 'roll', isDev: true },
 ];
 
 const linksHtml = linksToPage
@@ -146,6 +148,10 @@ const app = new Framework7({
     {
       path: '/set/:id',
       component: setVc,
+    },
+    {
+      path: '/page/:id',
+      component: pageVc,
     },
   ],
   on: {
