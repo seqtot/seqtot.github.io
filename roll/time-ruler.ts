@@ -100,7 +100,7 @@ export class TimeRuler extends Component {
       return;
     }
 
-    const minLabelSpacing = 50;
+    const minLabelSpacing = 50; // jjkl 50
     const minGraduationSpacing = 5;
 
     let ratio = 1;

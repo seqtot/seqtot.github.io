@@ -12,6 +12,8 @@ export interface SequencerDisplayModel {
   verticalRange: Range;
   visibleTimeRange: Range;
   maxTimeRange: Range;
+  quarterCount?: number;
+
   signature: TimeSignature;
   adaptiveMode: boolean;
   colors: Colors;
@@ -55,16 +57,26 @@ export class NoteSequencer extends CustomElement {
 
   constructor() {
     super();
+
+    const signature: TimeSignature = {
+      upper: 3,
+      lower: 4,
+    };
+    const quarterInBar = signature.upper * signature.lower;
+
     this._model = {
       velocityTrackHeight: -0.3, // -0.3
       verticalRange: { start: 36, end: 72 }, // { start: 60, end: 72 }
-      visibleTimeRange: { start: 0, end: 64 }, // { start: 0, end: 16 }
-      maxTimeRange: { start: 0, end: 64 }, // { start: 0, end: 16 }
-      signature: { upper: 4, lower: 4 }, // { upper: 4, lower: 4 }
+
+      visibleTimeRange: { start: 0, end: quarterInBar }, // { start: 0, end: 16 }
+      maxTimeRange: { start: 0, end: quarterInBar * 2 }, // { start: 0, end: 16 }
+
+      // signature: { upper: 3, lower: 4 }, // { upper: 4, lower: 4 } размер
+      signature,
       zoomSensitivity: 30, // 30
       adaptiveMode: true, // true
       colors: defaultColors,
-      theme: new LookAndFeel_Default(),
+      theme: new LookAndFeel_Live(),
     };
 
     this._shadowRoot = this.attachShadow({ mode: 'closed' });
