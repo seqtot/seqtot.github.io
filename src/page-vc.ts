@@ -46,6 +46,26 @@ const ns = {
   setNote: 'set-note',
 };
 
+// class MyElement extends HTMLElement {
+//   constructor() {
+//     super();
+//     this.style.background = '#00ff00';
+//     console.log('Created custom element!');
+//   }
+// }
+// function addCustomElement() {
+//   customElements.define('my-element', MyElement);
+//   console.log('Added MyElement to custom element registry!');
+// }
+// // add call here, because onload did not work for me
+// addCustomElement();
+
+import { NoteSequencer } from '../roll/roll';
+
+if (customElements.get(NoteSequencer.tag) == null) {
+  customElements.define(NoteSequencer.tag, NoteSequencer);
+}
+
 export const pageVc = (props: Props, context: any) => {
   let vc: SetVc;
 
