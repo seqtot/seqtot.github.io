@@ -1,4 +1,4 @@
-import { SequencerDisplayModel } from './roll';
+import { SequencerDisplayModel } from './a_roll';
 import { MAX_PITCH, MAX_SEMI_H, MIN_PITCH } from './const';
 import { Component, ComponentMouseEvent } from './base-component';
 import { NoteGridComponent } from './note-grid-component';

@@ -1,4 +1,4 @@
-import { SequencerDisplayModel } from './roll';
+import { SequencerDisplayModel } from './a_roll';
 import { MAX_PITCH } from './const';
 import {
   Component,
@@ -6,8 +6,9 @@ import {
   ComponentPosition,
 } from './base-component';
 import { LassoSelector } from './lasso-selector';
-import { Note, NoteGridComponent } from './note-grid-component';
+import { NoteGridComponent } from './note-grid-component';
 import { squaredDistance } from './render-helpers';
+import { Note } from './types';
 
 export class VelocityTrack extends Component {
   private readonly handleRadius: number = 3;
@@ -162,10 +163,10 @@ export class VelocityTrack extends Component {
 
     for (const note of this.grid.notes) {
       const x = this.grid.getPositionForTime(note.time);
-      console.log(note.duration);
+      //console.log(note.duration);
       const w = Math.max(0, hScale * (note.tempDuration || note.duration));
 
-      console.log(x, w);
+      //console.log(x, w);
 
       if (x + w < -5 || x > this.width + 5) continue;
 

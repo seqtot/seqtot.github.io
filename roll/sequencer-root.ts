@@ -1,4 +1,4 @@
-import { SequencerDisplayModel } from './roll';
+import { SequencerDisplayModel } from './a_roll';
 import { Component } from './base-component';
 import { DraggableBorder, DraggableBorderOwner } from './draggable-border';
 import { NoteGridComponent } from './note-grid-component';
@@ -107,6 +107,8 @@ export class SequencerRoot extends Component implements DraggableBorderOwner {
   }
 
   public setTimeStart(numberValue: number): number {
+    //console.log('setTimerStart', numberValue);
+
     const newValue = Math.max(0, numberValue);
 
     const offset = newValue - this.model.maxTimeRange.start;
@@ -142,6 +144,8 @@ export class SequencerRoot extends Component implements DraggableBorderOwner {
   }
 
   public setDuration(numberValue: number): number {
+    //console.log('setDuration', numberValue);
+
     numberValue = Math.max(0, numberValue);
 
     this.model.maxTimeRange.end = this.model.maxTimeRange.start + numberValue;

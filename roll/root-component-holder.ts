@@ -79,6 +79,8 @@ export class RootComponentHolder<T extends Component> {
 
     this.canvasMouseDownListener = (mouseEvent) =>
       hit(mouseEvent, (component) => {
+        mouseEvent.preventDefault(); // jjkl
+
         pressedComponent = component;
         mouseDownPos = mousePositionRelativeToCanvas(mouseEvent);
         mouseDownTime = performance.now();

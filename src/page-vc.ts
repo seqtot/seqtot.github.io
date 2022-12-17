@@ -60,7 +60,7 @@ const ns = {
 // // add call here, because onload did not work for me
 // addCustomElement();
 
-import { NoteSequencer } from '../roll/roll';
+import { NoteSequencer } from '../roll/a_roll';
 
 if (customElements.get(NoteSequencer.tag) == null) {
   customElements.define(NoteSequencer.tag, NoteSequencer);

@@ -1,5 +1,5 @@
 import { Range } from './types';
-import { SequencerDisplayModel } from './roll';
+import { SequencerDisplayModel } from './a_roll';
 
 import { clamp } from './utils';
 import { Component, ComponentMouseEvent } from './base-component';

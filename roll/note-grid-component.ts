@@ -1,4 +1,4 @@
-import { SequencerDisplayModel } from './roll';
+import { SequencerDisplayModel } from './a_roll';
 
 import { MAX_PITCH, MAX_VELOCITY, MIN_SEMI_H } from './const';
 import {
