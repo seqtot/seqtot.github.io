@@ -1,4 +1,4 @@
-import { SequencerDisplayModel } from './a_roll';
+import { SequencerDisplayModel } from './types';
 import { Component } from './base-component';
 import { DraggableBorder, DraggableBorderOwner } from './draggable-border';
 import { NoteGridComponent } from './note-grid-component';

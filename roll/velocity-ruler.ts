@@ -1,4 +1,4 @@
-import { SequencerDisplayModel } from './a_roll';
+import { SequencerDisplayModel } from './types';
 import { Component } from './base-component';
 
 export class VelocityRuler extends Component {

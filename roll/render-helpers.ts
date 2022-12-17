@@ -1,4 +1,4 @@
-import { TimeSignature } from './types';
+import { MeasureInfo } from './types';
 
 export function squaredDistance(
   x1: number,
@@ -10,24 +10,25 @@ export function squaredDistance(
 }
 
 export function getBackgroundAlternateWidth(
-  sixteenth: number,
-  signature: TimeSignature
+  atomWidth: number,
+  measure: MeasureInfo
 ): number {
-  const minAlternate = 100;
-  const maxAlternate = 200;
+  // const minAlternate = 100;
+  // const maxAlternate = 200;
 
-  let alternate = (16 * signature.upper) / signature.lower;
+  // let alternate = (measure.atomInQuarter * measure.upper) / measure.lower;
+  let atomInBar = measure.atomInQuarter * measure.upper;
 
   // If a measure is too big, try alternating with each beat
-  if (alternate * sixteenth > maxAlternate) {
-    alternate /= signature.upper;
+  // if (atomInBar * atomWidth > maxAlternate) {
+  //   atomInBar /= measure.upper;
+  //
+  //   // If it's still to big, subdivide beat
+  //   while (atomInBar * atomWidth > maxAlternate) atomInBar /= 2;
+  // } else {
+  //   // If it's too small, multiply measure by 2
+  //   while (atomInBar * atomWidth < minAlternate) atomInBar *= 2;
+  // }
 
-    // If it's still to big, subdivide beat
-    while (alternate * sixteenth > maxAlternate) alternate /= 2;
-  } else {
-    // If it's too small, multiply measure by 2
-    while (alternate * sixteenth < minAlternate) alternate *= 2;
-  }
-
-  return alternate;
+  return atomInBar;
 }

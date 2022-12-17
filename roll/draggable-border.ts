@@ -1,4 +1,4 @@
-import { SequencerDisplayModel } from './a_roll';
+import { SequencerDisplayModel } from './types';
 import { Component, ComponentMouseEvent } from './base-component';
 
 export interface DraggableBorderOwner {

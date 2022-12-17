@@ -1,9 +1,9 @@
-import { Range } from './types';
-import { SequencerDisplayModel } from './a_roll';
-
-import { clamp } from './utils';
+import { Range, SequencerDisplayModel } from './types';
 import { Component, ComponentMouseEvent } from './base-component';
 import { NoteGridComponent } from './note-grid-component';
+import { clamp } from './utils';
+
+let tempWidth = 0;
 
 export class TimeRulerMy extends Component {
   private timeAtMouseDown: number;
@@ -26,21 +26,27 @@ export class TimeRulerMy extends Component {
   }
 
   public doubleClicked(event: ComponentMouseEvent): void {
-    this.model.visibleTimeRange.start = 0;
-    this.model.visibleTimeRange.end = this.model.maxTimeRange.end;
-    this.getParentComponent().repaint();
+    console.log(this.grid.notes);
+
+    // this.model.visibleTimeRange.start = 0;
+    // this.model.visibleTimeRange.end = this.model.maxTimeRange.end;
+    // this.getParentComponent().repaint();
   }
 
   public mouseDragged(event: ComponentMouseEvent): void {
     const dragSensitivity = -0.0015;
     const minimalRange = 1;
-
-    const dragOffset = event.positionAtMouseDown.y - event.position.y;
+    const dragOffsetY = event.positionAtMouseDown.y - event.position.y;
     const toAdd =
       (this.model.maxTimeRange.end - this.model.maxTimeRange.start) *
-      dragOffset *
+      dragOffsetY *
       dragSensitivity;
-    const amountToAdd = toAdd / 2;
+
+    let amountToAdd = toAdd / 2;
+
+    if (!event.modifiers.option) {
+      amountToAdd = 0;
+    }
 
     let newStart = this.rangeAtMouseDown.start + amountToAdd;
     let newEnd = this.rangeAtMouseDown.end - amountToAdd;
@@ -93,9 +99,14 @@ export class TimeRulerMy extends Component {
 
     const start = this.model.visibleTimeRange.start;
     const end = this.model.visibleTimeRange.end;
-    const sixteenth = this.grid.getSixteenthWidth();
+    const atomWidth = this.grid.getAtomWidth();
 
-    if (sixteenth < 0.0001 || sixteenth === Infinity) {
+    if (Math.ceil(atomWidth) !== tempWidth) {
+      //console.log('tempWidth, quarterWidth: ', tempWidth, atomWidth);
+      tempWidth = Math.ceil(atomWidth);
+    }
+
+    if (atomWidth < 0.0001 || atomWidth === Infinity) {
       // escape overly intensive calculation or even potential infinite loop
       return;
     }
@@ -105,18 +116,18 @@ export class TimeRulerMy extends Component {
 
     let ratio = 1;
 
-    while (sixteenth * ratio < minLabelSpacing) ratio *= 2;
+    while (atomWidth * ratio < minLabelSpacing) ratio *= 2;
 
     let incr = 1;
 
-    if (sixteenth * incr < minGraduationSpacing) {
-      while (sixteenth * incr < minGraduationSpacing) incr *= 2;
+    if (atomWidth * incr < minGraduationSpacing) {
+      while (atomWidth * incr < minGraduationSpacing) incr *= 2;
     } else {
-      while (sixteenth * incr * 0.5 > minGraduationSpacing) incr *= 0.5;
+      while (atomWidth * incr * 0.5 > minGraduationSpacing) incr *= 0.5;
     }
 
     for (let i = 0; i < Math.ceil(end); i += incr) {
-      const x = (i - start) * sixteenth;
+      const x = (i - start) * atomWidth;
 
       if (x < 0) continue;
 
@@ -137,5 +148,6 @@ export class TimeRulerMy extends Component {
     // Bottom border
     g.fillStyle = this.model.colors.strokeDark;
     g.fillRect(0, bounds.height - 1, bounds.width, 1);
+    // g.fillRect(0, 5, bounds.width, 1); // my
   }
 }

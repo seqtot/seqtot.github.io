@@ -1,4 +1,3 @@
-import { SequencerDisplayModel } from './a_roll';
 import { MAX_PITCH } from './const';
 import {
   Component,
@@ -8,7 +7,7 @@ import {
 import { LassoSelector } from './lasso-selector';
 import { NoteGridComponent } from './note-grid-component';
 import { squaredDistance } from './render-helpers';
-import { Note } from './types';
+import { Note, SequencerDisplayModel } from './types';
 
 export class VelocityTrack extends Component {
   private readonly handleRadius: number = 3;
@@ -36,7 +35,7 @@ export class VelocityTrack extends Component {
 
       return this.grid.notes.filter((note) => {
         const noteBounds = {
-          x: this.grid.getPositionForTime(note.time) - this.handleRadius,
+          x: this.grid.getPositionForTime(note.atomInd) - this.handleRadius,
           y: this.height - note.velocity * vScale - this.handleRadius,
           width: this.handleRadius * 2,
           height: this.handleRadius * 2,
@@ -122,7 +121,7 @@ export class VelocityTrack extends Component {
     // Horizontal
     const start = this.model.visibleTimeRange.start;
     const end = this.model.visibleTimeRange.end;
-    const sixteenth = this.grid.getSixteenthWidth();
+    const sixteenth = this.grid.getAtomWidth();
 
     this.drawHorizontalBackground(g, sixteenth, start, end);
 
@@ -152,17 +151,17 @@ export class VelocityTrack extends Component {
       incr,
       start,
       end,
-      this.model.signature,
+      this.model.measure,
       this.model.colors
     );
   }
 
   private drawVelocityHandles(g: CanvasRenderingContext2D): void {
     const vScale = this.height / MAX_PITCH;
-    const hScale = this.grid.getSixteenthWidth();
+    const hScale = this.grid.getAtomWidth();
 
     for (const note of this.grid.notes) {
-      const x = this.grid.getPositionForTime(note.time);
+      const x = this.grid.getPositionForTime(note.atomInd);
       //console.log(note.duration);
       const w = Math.max(0, hScale * (note.tempDuration || note.duration));
 
@@ -202,7 +201,7 @@ export class VelocityTrack extends Component {
 
     // We need to iterate from end to start to have front most notes first
     for (const note of this.grid.notes) {
-      const x = this.grid.getPositionForTime(note.time);
+      const x = this.grid.getPositionForTime(note.atomInd);
       const y = this.height - note.velocity * vScale;
 
       if (squaredDistance(pos.x, pos.y, x, y) < squaredHitDistance) return note;

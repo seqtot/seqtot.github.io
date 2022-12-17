@@ -1,60 +1,41 @@
+import {MeasureInfo, Colors, SequencerDisplayModel, NoteData} from './types';
 import { RootComponentHolder } from './root-component-holder';
 import { SequencerRoot } from './sequencer-root';
 import { CustomElement } from './custom-element';
-import { LookAndFeel } from './look-and-feel.types';
 import { LookAndFeel_Default, LookAndFeel_Live } from './look-and-feel';
-import { TimeSignature, Range, Colors } from './types';
-import { CSS_STYLE } from './const';
+import { CSS_STYLE, defaultColors } from './const';
 
-export interface SequencerDisplayModel {
-  velocityTrackHeight: number;
-  zoomSensitivity: number;
-  verticalRange: Range;
+function getModel(): SequencerDisplayModel {
+  const measure: MeasureInfo = {
+    upper: 4,
+    lower: 4,
+    atomInQuarter: 12,
+  };
+  const atomInBar = measure.upper * measure.atomInQuarter;
+  const data = <NoteData>{
+    notes: [],
+    layers: [],
+    quarters: []
+  };
 
-  /**
-   * Видимый на текущий момент диапазон, изменяется в процессе масштабирования
-   */
-  visibleTimeRange: Range;
+  return {
+    velocityTrackHeight: -0.1, // -0.3
+    verticalRange: { start: 36, end: 72 }, // { start: 60, end: 72 }
 
-  /**
-   * Задаётся один раз при инициализации
-   */
-  maxTimeRange: Range;
+    visibleTimeRange: { start: 0, end: atomInBar * 3 }, // { start: 0, end: 16 }
+    maxTimeRange: { start: 0, end: atomInBar * 6 }, // { start: 0, end: 16 }
 
-  quarterCount?: number;
+    // measure: { upper: 3, lower: 4 }, // { upper: 4, lower: 4 } размер
+    measure,
+    zoomSensitivity: 30, // 30
+    adaptiveMode: true, // true
+    colors: defaultColors,
+    theme: new LookAndFeel_Live(),
+    data,
+  };
 
-  signature: TimeSignature;
-  adaptiveMode: boolean;
-  colors: Colors;
-  theme: LookAndFeel;
 }
 
-const defaultColors: Colors = {
-  background: '#ffffff',
-  backgroundAlternate: '#0000000f',
-  backgroundBlackKey: '#00000017', // #00000017
-  strokeLight: '#00000020',
-  strokeDark: '#00000050', // #00000050
-  text: '#000000',
-  velocityHandle: '#ff1906',
-  velocityHandleSelected: '#00a8ff',
-  whiteKey: '#ffffff',
-  blackKey: '#5e5e5e', // #5e5e5e
-  noteHigh: '#ff1906',
-  noteLowBlend: '#d2c263',
-  noteOutline: '#60606090',
-  noteOutlineSelected: '#00a8ff',
-  draggableBorder: '#8f8f8f',
-  draggableBorderHover: '#676767',
-  lassoBackground: '#00a8ff20',
-  lassoOutline: '#00a8ff80',
-};
-
-// /**
-//  * A canvas-based note sequencer.
-//  *
-//  * @noInheritDoc
-//  */
 export class NoteSequencer extends CustomElement {
   public static readonly TIME_START: string = 'time-start';
   public static readonly DURATION: string = 'duration';
@@ -67,27 +48,7 @@ export class NoteSequencer extends CustomElement {
   constructor() {
     super();
 
-    const signature: TimeSignature = {
-      upper: 4,
-      lower: 4,
-    };
-    const quarterInBar = signature.upper * signature.lower;
-
-    this._model = {
-      velocityTrackHeight: -0.3, // -0.3
-      verticalRange: { start: 36, end: 72 }, // { start: 60, end: 72 }
-
-      visibleTimeRange: { start: 0, end: quarterInBar * 8 }, // { start: 0, end: 16 }
-      maxTimeRange: { start: 0, end: quarterInBar * 16 }, // { start: 0, end: 16 }
-
-      // signature: { upper: 3, lower: 4 }, // { upper: 4, lower: 4 } размер
-      signature,
-      zoomSensitivity: 30, // 30
-      adaptiveMode: true, // true
-      colors: defaultColors,
-      theme: new LookAndFeel_Live(),
-    };
-
+    this._model = getModel();
     this._shadowRoot = this.attachShadow({ mode: 'closed' });
     this._sequencerRoot = new SequencerRoot(this._model);
     this._rootHolder = new RootComponentHolder<SequencerRoot>(
@@ -110,21 +71,25 @@ export class NoteSequencer extends CustomElement {
       this.registerCustomColor(key, this._model.colors[key]);
     });
   }
+
   /**
    * HTML tag name used for this element.
    */
   public static get tag(): string {
     return 'note-sequencer';
   }
+
   /**
    * Observed HTML attributes (custom element implementation).
    */
   public static get observedAttributes(): string[] {
     return [NoteSequencer.TIME_START, 'duration', 'pitch-start', 'pitch-end'];
   }
+
   public get colors(): Colors {
     return this._model.colors;
   }
+
   // Attributes/properties reflection
   /**
    * First time value to show.
@@ -132,6 +97,7 @@ export class NoteSequencer extends CustomElement {
   public get timeStart(): number {
     return this._model.maxTimeRange.start;
   }
+
   public set timeStart(value: number) {
     let numberValue: number = Number(value);
     if (isNaN(numberValue)) {
@@ -140,6 +106,7 @@ export class NoteSequencer extends CustomElement {
     numberValue = this._sequencerRoot.setTimeStart(numberValue);
     this.setAttribute(NoteSequencer.TIME_START, numberValue.toString());
   }
+
   /**
    * Maximum visible time range from timeStart.
    */
@@ -154,12 +121,14 @@ export class NoteSequencer extends CustomElement {
     numberValue = this._sequencerRoot.setDuration(numberValue);
     this.setAttribute(NoteSequencer.DURATION, numberValue.toString());
   }
+
   /**
    * Set the current theme. Defaults to 'default'.
    */
   public get theme(): string {
     return this._model.theme.name;
   }
+
   /**
    * Set the current theme. Defaults to 'default'.
    */
@@ -177,6 +146,7 @@ export class NoteSequencer extends CustomElement {
     this.setAttribute(NoteSequencer.THEME, value);
     this.draw();
   }
+
   // CustomElement implementation
   /**
    * Called when the HTML node is first connected to the DOM (custom element implementation).
@@ -187,18 +157,22 @@ export class NoteSequencer extends CustomElement {
     this.duration = this.duration || 16;
     this.resizeAndDraw();
   }
+
   public disconnectedCallback(): void {
     this._rootHolder.removeMouseEventListeners();
   }
+
   /**
    * Called whenever an observed HTML attribute changes (custom element implementation). Redraws the component.
    */
   public attributeChangedCallback(/* name, oldValue, newValue */): void {
     this.draw();
   }
+
   public draw(): void {
     this._rootHolder.repaint();
   }
+
   protected styleChanged(): void {
     super.styleChanged();
     this.customColors.forEach((color) => {
@@ -206,6 +180,7 @@ export class NoteSequencer extends CustomElement {
     });
     this.draw();
   }
+
   private resizeAndDraw(): void {
     const boundingClientRect = this.getBoundingClientRect();
     this._rootHolder.resize(

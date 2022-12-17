@@ -1,4 +1,4 @@
-import { Colors, Note, TimeSignature } from './types';
+import { Colors, Note, MeasureInfo } from './types';
 
 export interface LookAndFeel {
   name: string;
@@ -10,9 +10,9 @@ export interface LookAndFeel {
     height: number,
     sixteenth: number,
     incr: number,
-    start: number,
-    end: number,
-    signature: TimeSignature,
+    startInd: number,
+    endInd: number,
+    measure: MeasureInfo,
     colors: Colors
   ): void;
 

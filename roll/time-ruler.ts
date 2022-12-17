@@ -1,9 +1,7 @@
-import { Range } from './types';
-import { SequencerDisplayModel } from './a_roll';
-
-import { clamp } from './utils';
+import { Range, SequencerDisplayModel } from './types';
 import { Component, ComponentMouseEvent } from './base-component';
 import { NoteGridComponent } from './note-grid-component';
+import { clamp } from './utils';
 
 export class TimeRuler extends Component {
   private timeAtMouseDown: number;
@@ -93,7 +91,7 @@ export class TimeRuler extends Component {
 
     const start = this.model.visibleTimeRange.start;
     const end = this.model.visibleTimeRange.end;
-    const sixteenth = this.grid.getSixteenthWidth();
+    const sixteenth = this.grid.getAtomWidth();
 
     if (sixteenth < 0.0001 || sixteenth === Infinity) {
       // escape overly intensive calculation or even potential infinite loop

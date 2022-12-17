@@ -1,12 +1,15 @@
+import {LookAndFeel} from './look-and-feel.types';
+
 declare class ResizeObserver {
   constructor(...args: any[]);
 
   public observe(element: HTMLElement, options?: any): any;
 }
 
-export interface TimeSignature {
+export interface MeasureInfo {
   upper: number;
   lower: number;
+  atomInQuarter?: number;
 }
 
 export interface Range {
@@ -36,7 +39,7 @@ export interface Colors {
 }
 
 export interface Note {
-  time: number;
+  atomInd: number;
   pitch: number;
   duration: number;
   velocity: number;
@@ -47,4 +50,36 @@ export interface Note {
 
   initialStart: number;
   initialVelocity: number;
+}
+
+export type NoteData = {
+  notes: Note[],
+  quarters: any[],
+  layers: any[],
+  topLayer: any,
+  backLayer: any,
+}
+
+export interface SequencerDisplayModel {
+  velocityTrackHeight: number;
+  zoomSensitivity: number;
+  verticalRange: Range;
+
+  /**
+   * Видимый на текущий момент диапазон, изменяется в процессе масштабирования
+   */
+  visibleTimeRange: Range;
+
+  /**
+   * Задаётся один раз при инициализации
+   */
+  maxTimeRange: Range;
+
+  quarterCount?: number;
+
+  measure: MeasureInfo;
+  adaptiveMode: boolean;
+  colors: Colors;
+  theme: LookAndFeel;
+  data: NoteData;
 }

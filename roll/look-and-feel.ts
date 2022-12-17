@@ -1,5 +1,5 @@
 import { getBackgroundAlternateWidth } from './render-helpers';
-import { Colors, Note, TimeSignature } from './types';
+import { Colors, Note, MeasureInfo } from './types';
 import { MAX_PITCH, PITCH_PATTERN } from './const';
 import { LookAndFeel } from './look-and-feel.types';
 
@@ -11,32 +11,32 @@ export class LookAndFeel_Default implements LookAndFeel {
   public drawTimeBackground(
     g: CanvasRenderingContext2D,
     height: number,
-    sixteenth: number,
+    atomWidth: number,
     incr: number,
-    start: number,
-    end: number,
-    signature: TimeSignature,
+    startInd: number,
+    endInd: number,
+    measure: MeasureInfo,
     colors: Colors
   ): void {
     const alternateBackgroundWidth = getBackgroundAlternateWidth(
-      sixteenth,
-      signature
+      atomWidth,
+      measure
     );
 
-    for (let i = 0; i < Math.ceil(end); i += incr) {
-      const x = (i - start) * sixteenth;
+    for (let i = 0; i < Math.ceil(endInd); i += incr) {
+      const x = (i - startInd) * atomWidth;
 
       g.fillStyle = colors.backgroundAlternate;
 
       if (i % (alternateBackgroundWidth * 2) == 0) {
-        g.fillRect(x, 0, alternateBackgroundWidth * sixteenth, height);
+        g.fillRect(x, 0, alternateBackgroundWidth * atomWidth, height);
       }
 
       if (x < 0) {
         continue;
       }
 
-      if (i % ((16 * signature.upper) / signature.lower) == 0) {
+      if (i % (( measure.atomInQuarter * measure.upper) / measure.lower) == 0) {
         // Larger lines for measures
         g.fillStyle = colors.strokeDark;
         g.fillRect(x, 0, 1, height);
@@ -194,18 +194,19 @@ export class LookAndFeel_Default implements LookAndFeel {
       const y = height - (i - Math.floor(start)) * semiHeight;
       const pitchClass = i % 12;
 
+      //console.log(i, pitchClass);
+
       const viewportY = yOffset + y - semiHeight;
 
       // Black key
-      g.fillStyle = colors.backgroundBlackKey;
-
-      if (PITCH_PATTERN[pitchClass]) {
-        g.fillRect(0, viewportY, width, semiHeight);
-      }
+      // g.fillStyle = colors.backgroundBlackKey;
+      // if (PITCH_PATTERN[pitchClass]) {
+      //   g.fillRect(0, viewportY, width, semiHeight);
+      // }
 
       // Line separation
       g.fillStyle = colors.strokeLight;
-      g.fillRect(0, viewportY, width, 1);
+      g.fillRect(0, viewportY, width, pitchClass === 11 ? 2: 1);
     }
   }
 
@@ -363,12 +364,12 @@ export class LookAndFeel_Live extends LookAndFeel_Default {
     selected: boolean,
     colors: Colors
   ): void {
-    g.fillStyle = colors.noteHigh;
-    g.fillRect(x, y, width, height);
+    //g.fillStyle = colors.noteHigh;
+    //g.fillRect(x, y, width, height);
 
-    g.globalAlpha = 1 - velocity / 127;
-    g.fillStyle = colors.noteLowBlend;
-    g.fillRect(x, y, width, height);
+    //g.globalAlpha = 1 - velocity / 127;
+    //g.fillStyle = colors.noteLowBlend;
+    // g.fillRect(x, y, width, height);
 
     g.globalAlpha = 1;
     g.lineWidth = selected ? 2 : 1;
