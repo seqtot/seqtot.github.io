@@ -52,9 +52,19 @@ export interface Note {
   initialVelocity: number;
 }
 
+type Quarter = {
+  /**
+   * 1    1/2   1/4   1/8   1/16   1/32
+   * 480  240   120   60    30     15
+   */
+  duration: number;
+  index: number;
+  divider: number;
+}
+
 export type NoteData = {
   notes: Note[],
-  quarters: any[],
+  quarters: Quarter[],
   layers: any[],
   topLayer: any,
   backLayer: any,

@@ -1,15 +1,11 @@
 import { SequencerDisplayModel } from './types';
 
 import { MAX_PITCH, MAX_VELOCITY, MIN_SEMI_H } from './const';
-import {
-  Component,
-  ComponentBounds,
-  ComponentMouseEvent,
-  ComponentPosition,
-} from './base-component';
+import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
 import { LassoSelector } from './lasso-selector';
 import { SelectedItemSet } from './selected-item-set';
 import { Note } from './types';
+import { Rector, IPoint } from '../common/canvas/types';
 
 interface NotePosition {
   atomInd: number;
@@ -18,8 +14,12 @@ interface NotePosition {
 
 type DragAction = 'V_RIGHT' | 'MOVE_NOTE' | 'RIGHT' | 'LEFT' | 'NONE';
 
-export class NoteGridComponent extends Component {
+export class NoteGridComponent extends CanvasComponent {
   // TODO: move into model or utility
+  private get model(): SequencerDisplayModel {
+    return this.context.model();
+  }
+
   public readonly adaptiveLabels: string[] = ['XL', 'X', 'M', 'S', 'XS'];
   public readonly adaptiveRatios: number[] = [1, 0.5, 0.25, 0.1, 0.05];
   public adaptiveIndex: number = 3;
@@ -43,18 +43,17 @@ export class NoteGridComponent extends Component {
   private _minDragOffset: NotePosition = null;
   private _maxDragOffset: NotePosition = null;
 
-  constructor(private readonly model: SequencerDisplayModel) {
+  constructor(private readonly context: {model: ()=> SequencerDisplayModel}) {
     super();
 
     this._selectedSet = new SelectedItemSet<Note>();
+    this._lasso = new LassoSelector<Note>({
+        owner: this,
+        selectedSet: () => this._selectedSet,
+        colors: () => context.model().colors,
+    });
 
-    this._lasso = new LassoSelector<Note>(
-      this,
-      this._selectedSet,
-      this.model.colors
-    );
-
-    this._lasso.findAllElementsInLasso = (lassoBounds: ComponentBounds) => {
+    this._lasso.findAllElementsInLasso = (lassoBounds: Rector) => {
       return this.notes.filter((note) => {
         const noteBounds = {
           x: this.getPositionForTime(note.atomInd),
@@ -63,7 +62,7 @@ export class NoteGridComponent extends Component {
           height: this.getSemitoneHeight(),
         };
 
-        return Component.boundsIntersect(noteBounds, lassoBounds);
+        return CanvasComponent.boundsIntersect(noteBounds, lassoBounds);
       });
     };
   }
@@ -796,7 +795,7 @@ export class NoteGridComponent extends Component {
     this.getParentComponent().repaint();
   }
 
-  private getDragActionForNoteAt(pos: ComponentPosition, n: Note): DragAction {
+  private getDragActionForNoteAt(pos: IPoint, n: Note): DragAction {
     const margin = 3;
     const noteX = this.getPositionForTime(n.atomInd);
     const noteW = Math.max(2, n.duration * this.getAtomWidth());
@@ -809,7 +808,7 @@ export class NoteGridComponent extends Component {
     return 'NONE';
   }
 
-  private findNoteAt(pos: ComponentPosition): Note {
+  private findNoteAt(pos: IPoint): Note {
     // We need to iterate from end to start to have front most notes first
     for (const note of this.notes) {
       const x = this.getPositionForTime(note.atomInd);

@@ -1,16 +1,14 @@
 import { SequencerDisplayModel } from './types';
-import { Component, ComponentMouseEvent } from './base-component';
+import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
 
-export interface DraggableBorderOwner {
-  borderDragged(position: number): void;
-}
-
-export class DraggableBorder extends Component {
+export class DraggableBorder extends CanvasComponent {
   private initialPosition: number;
 
   constructor(
-    private readonly model: SequencerDisplayModel,
-    private readonly owner: DraggableBorderOwner
+    private readonly context: {
+      model: ()=> SequencerDisplayModel,
+      borderDragged(position: number)
+    }
   ) {
     super();
     this.mouseCursor = 'ns-resize';
@@ -23,7 +21,7 @@ export class DraggableBorder extends Component {
   public mouseDragged(event: ComponentMouseEvent): void {
     const newPosition =
       this.initialPosition + (event.position.y - event.positionAtMouseDown.y);
-    this.owner.borderDragged(newPosition);
+    this.context.borderDragged(newPosition);
   }
 
   public mouseEnter(event: ComponentMouseEvent): void {
@@ -37,9 +35,11 @@ export class DraggableBorder extends Component {
   }
 
   protected render(g: CanvasRenderingContext2D): void {
+    const m = this.context.model();
+
     g.fillStyle = this.hovered
-      ? this.model.colors.draggableBorderHover
-      : this.model.colors.draggableBorder;
+      ? m.colors.draggableBorderHover
+      : m.colors.draggableBorder;
     g.fillRect(0, 0, this.width, this.height);
   }
 

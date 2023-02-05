@@ -1,9 +1,9 @@
 import { SequencerDisplayModel } from './types';
 import { MAX_PITCH, MAX_SEMI_H, MIN_PITCH } from './const';
-import { Component, ComponentMouseEvent } from './base-component';
+import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
 import { NoteGridComponent } from './note-grid-component';
 
-export class PitchRuler extends Component {
+export class PitchRuler extends CanvasComponent {
   private lastMouseX: number;
   private lastMouseY: number;
 
@@ -18,18 +18,20 @@ export class PitchRuler extends Component {
   private hoveredPitch: number = null;
 
   constructor(
-    private readonly model: SequencerDisplayModel,
-    private grid: NoteGridComponent
+      private readonly context: {
+        model: ()=> SequencerDisplayModel,
+        grid: ()=> NoteGridComponent,
+      }
   ) {
     super();
   }
 
   public mousePressed(event: ComponentMouseEvent): void {
-    const semitoneHeight = this.grid.getSemitoneHeight();
+    const semitoneHeight = this.context.grid().getSemitoneHeight();
     const pos = this.getPosition();
 
     if (
-      this.model.theme.isOnPianoRoll(
+      this.context.model().theme.isOnPianoRoll(
         event.position.x - pos.x,
         event.position.y - pos.y,
         this.width,
@@ -48,7 +50,7 @@ export class PitchRuler extends Component {
 
   public mouseDragged(event: ComponentMouseEvent): void {
     const pos = this.getPosition();
-    const semitoneHeight = this.grid.getSemitoneHeight();
+    const semitoneHeight = this.context.grid().getSemitoneHeight();
 
     if (this.dragStarted) {
       const yOffset = event.position.y - this.lastMouseY;
@@ -67,7 +69,7 @@ export class PitchRuler extends Component {
         }
       }
     } else if (
-      this.model.theme.isOnPianoRoll(
+      this.context.model().theme.isOnPianoRoll(
         event.position.x - pos.x,
         event.position.y - pos.y,
         this.width,
@@ -95,18 +97,19 @@ export class PitchRuler extends Component {
 
   public doubleClicked(event: ComponentMouseEvent): void {
     const pos = this.getPosition();
+    const model = this.context.model();
 
     if (
-      !this.model.theme.isOnPianoRoll(
+      !model.theme.isOnPianoRoll(
         event.position.x - pos.x,
         event.position.y - pos.y,
         this.width,
         this.height,
-        this.grid.getSemitoneHeight()
+        this.context.grid().getSemitoneHeight()
       )
     ) {
-      this.model.verticalRange.start = MIN_PITCH;
-      this.model.verticalRange.end = MAX_PITCH;
+      model.verticalRange.start = MIN_PITCH;
+      model.verticalRange.end = MAX_PITCH;
       this.getParentComponent().repaint();
     }
   }
@@ -115,15 +118,16 @@ export class PitchRuler extends Component {
 
   protected render(g: CanvasRenderingContext2D): void {
     const bounds = this.getLocalBounds();
+    const model = this.context.model();
 
-    g.fillStyle = this.model.colors.background;
+    g.fillStyle = model.colors.background;
     g.fillRect(0, 0, this.width, this.height);
 
-    const start = this.model.verticalRange.start;
-    const end = this.model.verticalRange.end;
-    const semiHeight = this.grid.getSemitoneHeight();
+    const start = model.verticalRange.start;
+    const end = model.verticalRange.end;
+    const semiHeight = this.context.grid().getSemitoneHeight();
 
-    this.model.theme.drawPitchRuler(
+    model.theme.drawPitchRuler(
       g,
       this.width,
       this.height,
@@ -131,16 +135,16 @@ export class PitchRuler extends Component {
       end,
       semiHeight,
       this.hoveredPitch,
-      this.model.colors
+      model.colors
     );
 
     // right border
-    g.fillStyle = this.model.colors.strokeDark;
+    g.fillStyle = model.colors.strokeDark;
     g.fillRect(bounds.width - 1, 0, 1, bounds.height);
   }
 
   private previewNoteAt(y: number): void {
-    const p = this.grid.getPitchAt(y);
+    const p = this.context.grid().getPitchAt(y);
 
     if (p == this.lastPreviewedPitch) return;
 
@@ -152,34 +156,36 @@ export class PitchRuler extends Component {
   }
 
   private zoomIn(): void {
-    const range = this.model.verticalRange.end - this.model.verticalRange.start;
-    const semiHeight = this.grid.getSemitoneHeight();
+    const model = this.context.model();
+    const range = model.verticalRange.end - model.verticalRange.start;
+    const semiHeight = this.context.grid().getSemitoneHeight();
 
     if (semiHeight < MAX_SEMI_H) {
-      const zoomAmount = range / this.model.zoomSensitivity;
+      const zoomAmount = range / model.zoomSensitivity;
 
-      this.model.verticalRange.start += zoomAmount;
-      this.model.verticalRange.end -= zoomAmount;
+      model.verticalRange.start += zoomAmount;
+      model.verticalRange.end -= zoomAmount;
 
       this.getParentComponent().repaint();
     }
   }
 
   private zoomOut(): void {
-    const start = this.model.verticalRange.start;
-    const end = this.model.verticalRange.end;
+    const model = this.context.model();
+    const start = model.verticalRange.start;
+    const end = model.verticalRange.end;
     const range = end - start;
-    const zoomAmount = range / this.model.zoomSensitivity;
+    const zoomAmount = range / model.zoomSensitivity;
 
-    this.model.verticalRange.start -= zoomAmount;
-    this.model.verticalRange.end += zoomAmount;
+    model.verticalRange.start -= zoomAmount;
+    model.verticalRange.end += zoomAmount;
 
-    this.model.verticalRange.end = Math.min(
-      this.model.verticalRange.end,
+    model.verticalRange.end = Math.min(
+      model.verticalRange.end,
       MAX_PITCH
     );
-    this.model.verticalRange.start = Math.max(
-      this.model.verticalRange.start,
+    model.verticalRange.start = Math.max(
+      model.verticalRange.start,
       MIN_PITCH
     );
 
@@ -187,17 +193,19 @@ export class PitchRuler extends Component {
   }
 
   private translate(amount: number): void {
-    const start = this.model.verticalRange.start;
-    const end = this.model.verticalRange.end;
-    const semiHeight = this.grid.getSemitoneHeight();
+    const model = this.context.model();
+
+    const start = model.verticalRange.start;
+    const end = model.verticalRange.end;
+    const semiHeight = this.context.grid().getSemitoneHeight();
 
     if (amount < 0) {
       const desiredMin = start + amount / semiHeight;
       const clipped = Math.max(desiredMin, MIN_PITCH);
       const correctAmount = clipped - desiredMin + amount / semiHeight;
 
-      this.model.verticalRange.start = clipped;
-      this.model.verticalRange.end += correctAmount;
+      model.verticalRange.start = clipped;
+      model.verticalRange.end += correctAmount;
 
       this.getParentComponent().repaint();
     } else if (amount > 0) {
@@ -205,8 +213,8 @@ export class PitchRuler extends Component {
       const clipped = Math.min(desiredMax, MAX_PITCH);
       const correctAmount = clipped - desiredMax + amount / semiHeight;
 
-      this.model.verticalRange.end = clipped;
-      this.model.verticalRange.start += correctAmount;
+      model.verticalRange.end = clipped;
+      model.verticalRange.start += correctAmount;
 
       this.getParentComponent().repaint();
     }

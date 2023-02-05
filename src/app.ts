@@ -8,8 +8,8 @@
 // import Framework7 from 'framework7';
 // Import framework with all components
 import Framework7 from 'framework7/bundle';
-import { setVc } from './set-vc';
-import { pageVc } from './page-vc';
+import { mboxRc } from './mbox-rc';
+import { pageRc } from './page-rc';
 
 // Import additional components
 // import Searchbar from 'framework7/components/searchbar/';
@@ -29,8 +29,8 @@ const isDev =
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
 
-const defRoute = isDev ? '/page/page_roll/' : '/set/set_all/';
-//const defRoute = '/set/set_All/';
+const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
+//const defRoute = isDev ? '/page/page_roll/' : '/set/set_all/';
 
 const linksToPage = [
   { href: '/set/set_all/', name: 'Список' },
@@ -41,6 +41,7 @@ const linksToPage = [
   //{ href: '/set/set_ItsMyLife/', name: 'Its my life', isDev: true },
   { href: '/set/set_my/', name: 'test', isDev: true },
   { href: '/page/page_roll/', name: 'roll', isDev: true },
+  { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
 ];
 
 const linksHtml = linksToPage
@@ -53,10 +54,11 @@ const linksHtml = linksToPage
   })
   .join('');
 
+
 const leftPanel = `
 <div
   class="panel panel-left panel-cover panel-init theme-dark"
-  data-visible-breakpoint="960"
+  data-visible-breakpoint="2000"  
 >
   <div class="view view-init" data-view="left">
     <div class="page">
@@ -147,17 +149,17 @@ const app = new Framework7({
   routes: [
     {
       path: '/set/:id',
-      component: setVc,
+      component: mboxRc,
     },
     {
       path: '/page/:id',
-      component: pageVc,
+      component: pageRc,
     },
   ],
   on: {
-    init: function () {
-      //console.log('App initialized', arguments.length, this);
-    },
+    // init: function () {
+    //  console.log('App initialized', arguments.length, this);
+    // },
     // pageInit: function () {
     //console.log('Page initialized', arguments.length, arguments[0]);
     // },

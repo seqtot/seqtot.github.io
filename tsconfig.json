@@ -23,6 +23,7 @@
       "@data/*": ["sets/*"]
     }
   },
-  "include": ["sets", "muse", "src"],
+  "include": [
+    "mboxes", "muse", "src"],
   "files": ["index.ts"]
 }

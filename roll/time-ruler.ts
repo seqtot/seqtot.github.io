@@ -1,41 +1,48 @@
 import { Range, SequencerDisplayModel } from './types';
-import { Component, ComponentMouseEvent } from './base-component';
+import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
 import { NoteGridComponent } from './note-grid-component';
 import { clamp } from './utils';
 
-export class TimeRuler extends Component {
+export class TimeRuler extends CanvasComponent {
   private timeAtMouseDown: number;
   private rangeAtMouseDown: Range;
   private zoomAtMouseDown: number;
 
   constructor(
-    private readonly model: SequencerDisplayModel,
-    private readonly grid: NoteGridComponent
+    private readonly context: {
+      model: ()=> SequencerDisplayModel,
+      grid: ()=> NoteGridComponent,
+    }
   ) {
     super();
   }
 
   public mousePressed(event: ComponentMouseEvent): void {
-    this.timeAtMouseDown = this.grid.getTimeAt(event.position.x);
-    this.rangeAtMouseDown = { ...this.model.visibleTimeRange };
+    const model = this.context.model();
+
+    this.timeAtMouseDown = this.context.grid().getTimeAt(event.position.x);
+    this.rangeAtMouseDown = { ...model.visibleTimeRange };
     this.zoomAtMouseDown =
-      (this.model.maxTimeRange.end - this.model.maxTimeRange.start) /
-      (this.model.visibleTimeRange.end - this.model.visibleTimeRange.start);
+      (model.maxTimeRange.end - model.maxTimeRange.start) /
+      (model.visibleTimeRange.end - model.visibleTimeRange.start);
   }
 
   public doubleClicked(event: ComponentMouseEvent): void {
-    this.model.visibleTimeRange.start = 0;
-    this.model.visibleTimeRange.end = this.model.maxTimeRange.end;
+    const model = this.context.model();
+
+    model.visibleTimeRange.start = 0;
+    model.visibleTimeRange.end = model.maxTimeRange.end;
     this.getParentComponent().repaint();
   }
 
   public mouseDragged(event: ComponentMouseEvent): void {
     const dragSensitivity = -0.0015;
     const minimalRange = 1;
+    const model = this.context.model();
 
     const dragOffset = event.positionAtMouseDown.y - event.position.y;
     const toAdd =
-      (this.model.maxTimeRange.end - this.model.maxTimeRange.start) *
+      (model.maxTimeRange.end - model.maxTimeRange.start) *
       dragOffset *
       dragSensitivity;
     const amountToAdd = toAdd / 2;
@@ -49,34 +56,29 @@ export class TimeRuler extends Component {
     newEnd += excess * 0.5;
 
     // Pre-apply the new range
-    this.model.visibleTimeRange.start = Math.max(
-      this.model.maxTimeRange.start,
+    model.visibleTimeRange.start = Math.max(
+      model.maxTimeRange.start,
       newStart
     );
-    this.model.visibleTimeRange.end = Math.min(
-      this.model.maxTimeRange.end,
+    model.visibleTimeRange.end = Math.min(
+      model.maxTimeRange.end,
       newEnd
     );
 
     // Compute the offset to the anchor under the mouse
-    let offset = this.timeAtMouseDown - this.grid.getTimeAt(event.position.x);
+    let offset = this.timeAtMouseDown - this.context.grid().getTimeAt(event.position.x);
 
     // Constraint this offset to stay in the maximal range
-    const distanceToLeft =
-      this.model.maxTimeRange.start - this.model.visibleTimeRange.start;
-    const distanceToRight =
-      this.model.visibleTimeRange.end - this.model.maxTimeRange.end;
+    const distanceToLeft = model.maxTimeRange.start - model.visibleTimeRange.start;
+    const distanceToRight = model.visibleTimeRange.end - model.maxTimeRange.end;
     offset = clamp(offset, distanceToLeft, -distanceToRight);
 
     // Apply the constrained offset
-    this.model.visibleTimeRange.start = Math.max(
-      this.model.maxTimeRange.start,
+    model.visibleTimeRange.start = Math.max(
+      model.maxTimeRange.start,
       newStart + offset
     );
-    this.model.visibleTimeRange.end = Math.min(
-      this.model.maxTimeRange.end,
-      newEnd + offset
-    );
+    model.visibleTimeRange.end = Math.min(model.maxTimeRange.end, newEnd + offset);
 
     this.getParentComponent().repaint();
   }
@@ -85,13 +87,14 @@ export class TimeRuler extends Component {
 
   protected render(g: CanvasRenderingContext2D): void {
     const bounds = this.getLocalBounds();
+    const model = this.context.model();
 
-    g.fillStyle = this.model.colors.background;
+    g.fillStyle = model.colors.background;
     g.fillRect(0, 0, this.width, this.height);
 
-    const start = this.model.visibleTimeRange.start;
-    const end = this.model.visibleTimeRange.end;
-    const sixteenth = this.grid.getAtomWidth();
+    const start = model.visibleTimeRange.start;
+    const end = model.visibleTimeRange.end;
+    const sixteenth = this.context.grid().getAtomWidth();
 
     if (sixteenth < 0.0001 || sixteenth === Infinity) {
       // escape overly intensive calculation or even potential infinite loop
@@ -120,20 +123,20 @@ export class TimeRuler extends Component {
 
       const gradH = i % (incr * 4) == 0 ? 0.4 : 0.12;
 
-      g.fillStyle = this.model.colors.strokeLight;
+      g.fillStyle = model.colors.strokeLight;
       g.fillRect(x, bounds.height * (1 - gradH), 1, bounds.height * gradH);
 
       if (i % ratio == 0) {
         g.rect(x + 1, bounds.height * (1 - gradH), 1, 1);
 
-        g.fillStyle = this.model.colors.text;
-        const text = this.grid.getStringForTime(i, true);
+        g.fillStyle = model.colors.text;
+        const text = this.context.grid().getStringForTime(i, true);
         g.fillText(text, x + 4, bounds.height - 5, minLabelSpacing);
       }
     }
 
     // Bottom border
-    g.fillStyle = this.model.colors.strokeDark;
+    g.fillStyle = model.colors.strokeDark;
     g.fillRect(0, bounds.height - 1, bounds.width, 1);
   }
 }

@@ -1,7 +1,8 @@
+import { RootComponentHolder } from '../common/canvas';
+import { SequencerRoot } from './a-sequencer-root-cc';
+
 import {MeasureInfo, Colors, SequencerDisplayModel, NoteData} from './types';
-import { RootComponentHolder } from './root-component-holder';
-import { SequencerRoot } from './sequencer-root';
-import { CustomElement } from './custom-element';
+import { CustomElement } from '../common/custom-element';
 import { LookAndFeel_Default, LookAndFeel_Live } from './look-and-feel';
 import { CSS_STYLE, defaultColors } from './const';
 
@@ -39,6 +40,8 @@ function getModel(): SequencerDisplayModel {
 export class NoteSequencer extends CustomElement {
   public static readonly TIME_START: string = 'time-start';
   public static readonly DURATION: string = 'duration';
+  public static readonly ATOM_IN_QUARTER: string = 'atom-in-quarter';
+
   public static readonly THEME: string = 'theme';
   private _shadowRoot: ShadowRoot;
   private _rootHolder: RootComponentHolder<SequencerRoot>;
@@ -90,6 +93,19 @@ export class NoteSequencer extends CustomElement {
     return this._model.colors;
   }
 
+  public get atomInQuarter(): number {
+    return this._model.measure.atomInQuarter || 12;
+  }
+
+  public set atomInQuarter(val: number) {
+    val = Number(val);
+    if (isNaN(val)) {
+      val = 12;
+    }
+    val = this._sequencerRoot.setAtomInQuarter(val);
+    this.setAttribute(NoteSequencer.ATOM_IN_QUARTER, val.toString());
+  }
+
   // Attributes/properties reflection
   /**
    * First time value to show.
@@ -113,6 +129,7 @@ export class NoteSequencer extends CustomElement {
   public get duration(): number {
     return this._model.maxTimeRange.start + this._model.maxTimeRange.end;
   }
+
   public set duration(newValue: number) {
     let numberValue: number = Number(newValue);
     if (isNaN(numberValue)) {
@@ -155,6 +172,8 @@ export class NoteSequencer extends CustomElement {
     this._rootHolder.attachMouseEventListeners();
     this.timeStart = this.timeStart || 0;
     this.duration = this.duration || 16;
+    this.atomInQuarter = this.atomInQuarter || 12;
+
     this.resizeAndDraw();
   }
 

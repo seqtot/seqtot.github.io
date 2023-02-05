@@ -1,6 +1,7 @@
-import { Component, ComponentMouseEvent, IBounds } from './base-component';
+import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
 import { Colors } from './types';
 import { SelectableItem, SelectedItemSet } from './selected-item-set';
+import {IPoint, IRect, Rector} from '../common/canvas/types';
 
 interface Lasso<T extends SelectableItem> {
   startX: number;
@@ -12,18 +13,28 @@ interface Lasso<T extends SelectableItem> {
 }
 
 export class LassoSelector<T extends SelectableItem> {
-  public findAllElementsInLasso: (lassoBounds: IBounds) => T[];
+  public findAllElementsInLasso: (lassoBounds: IRect) => T[];
+
+  public get selectedItemSet(): SelectedItemSet<T> {
+    return this.context.selectedSet();
+  }
+
+  public get colors(): Colors {
+    return this.context.colors();
+  }
 
   private lasso: Lasso<T>;
 
   constructor(
-    public readonly ownerComp: Component,
-    public readonly selectedItemSet: SelectedItemSet<T>,
-    public readonly colors: Colors
+    public readonly context: {
+      owner: CanvasComponent,
+      selectedSet: () => SelectedItemSet<T>,
+      colors: () => Colors,
+    }
   ) {}
 
   public beginLasso(event: ComponentMouseEvent): void {
-    const ownerPos = this.ownerComp.getPosition();
+    const ownerPos = this.context.owner.getPosition();
 
     this.lasso = {
       startX: event.position.x - ownerPos.x,
@@ -48,12 +59,12 @@ export class LassoSelector<T extends SelectableItem> {
       return;
     }
 
-    const ownerPos = this.ownerComp.getPosition();
+    const ownerPos = this.context.owner.getPosition();
 
     this.lasso.endX = event.position.x - ownerPos.x;
     this.lasso.endY = event.position.y - ownerPos.y;
 
-    const lassoBounds: IBounds = {
+    const lassoBounds: IRect = {
       x: Math.min(this.lasso.startX, this.lasso.endX),
       y: Math.min(this.lasso.startY, this.lasso.endY),
       width: Math.abs(this.lasso.startX - this.lasso.endX),

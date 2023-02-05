@@ -1,6 +1,7 @@
 'use babel';
 
-import WebAudioFontPlayer from 'webaudiofont';
+import {WebAudioFontPlayer} from '../waf-player/player';
+//import {WebAudioFontLoader} from '../waf-player/loader';
 // import {
 //   freqByNoteHash,
 //   codeByNoteHash,
@@ -134,7 +135,7 @@ export class Sound {
       const variable = hardcodedInstruments[id];
       const instr = window[variable];
 
-      fontPlayer.adjustPreset(this.ctx, instr);
+      fontPlayer.adjustPreset(this.ctx, <any>instr);
       instruments[id] = instr;
 
       delete Sound.LoadingInstruments[id];
@@ -179,7 +180,7 @@ export class Sound {
       const variable = hardcodedInstruments[id];
       const instr = window[variable];
 
-      fontPlayer.adjustPreset(this.ctx, instr);
+      fontPlayer.adjustPreset(this.ctx, <any>instr);
       instruments[id] = instr;
 
       delete Sound.LoadingInstruments[id];

@@ -1,20 +1,22 @@
 import { SequencerDisplayModel } from './types';
-import { Component } from './base-component';
+import { CanvasComponent } from '../common/canvas/canvas-component';
 
-export class VelocityRuler extends Component {
-  constructor(private readonly model: SequencerDisplayModel) {
+export class VelocityRuler extends CanvasComponent {
+  constructor(private readonly context: {model: ()=> SequencerDisplayModel}) {
     super();
   }
 
   protected render(g: CanvasRenderingContext2D): void {
-    g.fillStyle = this.model.colors.background;
+    const model = this.context.model();
+
+    g.fillStyle = model.colors.background;
     g.fillRect(0, 0, this.width, this.height);
 
-    this.model.theme.drawVelocityRuler(
+    model.theme.drawVelocityRuler(
       g,
       this.width,
       this.height,
-      this.model.colors
+      model.colors
     );
   }
 
