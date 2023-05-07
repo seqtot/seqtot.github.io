@@ -1,23 +1,14 @@
 'use babel';
 
 import {WebAudioFontPlayer} from '../waf-player/player';
-//import {WebAudioFontLoader} from '../waf-player/loader';
-// import {
-//   freqByNoteHash,
-//   codeByNoteHash,
-//   noteByKeyHash,
-//   getNoteByStepAndOctave,
-//   noteLatByNoteHash,
-// } from './freq';
-// import { fullOctaveBlocks } from './keyboard';
-// import { drumCodes } from './drums';
-// import * as un from './utils-note';
-
+import {WaveBox} from '../waf-player/otypes';
 import { freqByNoteHash, codeByNoteHash, noteLatByNoteHash } from './freq';
 import * as un from './utils-note';
 import { MIDI_INSTR } from './keyboards';
 import { drumCodes } from './drums';
 import { hardcodedInstruments } from './instruments';
+
+
 
 const instruments: { [code: number]: any } = {};
 const loadingInstruments: { [code: number]: boolean } = {};
@@ -26,16 +17,17 @@ const DRUM_PREFIX = 'drum_';
 
 export type KeyInfo = {
   oscil?: OscillatorNode;
-  midi?: any;
+  waveBox?: WaveBox;
+
   volume: number;
   id: string | number;
-
   node: GainNode;
   code: number;
   octave: string;
   noteStep: string;
   instr: number;
   instrCode?: number;
+  instrObj?: object;
   noteLat: string;
   noteRus: string;
 
@@ -45,7 +37,7 @@ export type KeyInfo = {
 
 export type PlayingItem = {
   oscil?: OscillatorNode;
-  midi?: any;
+  waveBox?: WaveBox;
   volume: GainNode;
 
   pauseTimeout: number;

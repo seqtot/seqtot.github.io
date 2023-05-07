@@ -70,7 +70,7 @@ export const freqList: { value: number; code: number }[] = [
   { code: 54, value: 185.0 },
   { code: 55, value: 196.0 },
   { code: 56, value: 207.65 },
-  { code: 57, value: 220.0 },
+  { code: 57, value: 220.0 }, // л
   { code: 58, value: 233.08 },
   { code: 59, value: 246.94 },
   /* ПЕРВАЯ */

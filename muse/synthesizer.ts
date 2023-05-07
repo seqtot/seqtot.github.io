@@ -102,6 +102,54 @@ export class Synthesizer extends Sound {
     this.addToOut(note);
   }; // playSoundSynth
 
+  playSound2 = (
+      val: {
+        keyOrNote: string;
+        id?: string | number;
+        instrCode?: string | number;
+        print?: boolean;
+        onlyStop?: boolean;
+        instrObj?: object;
+        volume?: number;
+      },
+      onlyStop?: boolean
+  ) => {
+    //console.log('this.keysAndNotes', this.keysAndNotes);
+
+    let keyOrNote = val.keyOrNote;
+    let id = val.id  || 0;
+    let print = !!val.print;
+    let soundInfo = this.keysAndNotes[keyOrNote];
+    let note = this.getNoteSame(keyOrNote);
+    const noteLat = this.getNoteLat(note);
+
+    //console.log('soundInfo', noteLat, {...soundInfo});
+
+    if (!soundInfo && !note) {
+      return;
+    }
+
+    if (!soundInfo && noteLat) {
+      soundInfo = this.keysAndNotes[noteLat];
+    }
+
+    const instrObj = val.instrObj || this.instruments[soundInfo.instrCode];
+
+    //console.log('playSound', keyInfo, this.instruments);
+
+
+    if (soundInfo && instrObj) {
+      const volume = isPresent(val.volume) ? val.volume : soundInfo.volume;
+
+      this.playSoundMidi({
+        ...soundInfo,
+        id,
+        instrObj,
+        volume
+      }, print, onlyStop);
+    }
+  }; // playSound2
+
   playSound = (
     keyOrObj:
       | string
@@ -119,6 +167,8 @@ export class Synthesizer extends Sound {
     let id = typeof keyOrObj === 'string' ? 0 : keyOrObj.id || 0;
     let print = typeof keyOrObj === 'string' ? true : !!keyOrObj.print;
     let soundInfo = this.keysAndNotes[keyOrNote];
+
+    console.log('soundInfo', {...soundInfo});
 
     let note = this.getNoteSame(keyOrNote);
     const noteLat = this.getNoteLat(note);
@@ -181,9 +231,9 @@ export class Synthesizer extends Sound {
     let fadeIn = 0; // ms
 
     // stop midi
-    if (playing.midi && playing.midi.cancel) {
-      playing.midi.cancel();
-      playing.midi = null;
+    if (playing.waveBox && playing.waveBox.cancel) {
+      playing.waveBox.cancel();
+      playing.waveBox = null;
 
       delete this.playingSounds[id];
     }
@@ -230,7 +280,7 @@ export class Synthesizer extends Sound {
       return this.setPlayingTones();
     }
 
-    const fontInstr = this.instruments[info.instr];
+    const fontInstr = info.instrObj || this.instruments[info.instr];
 
     if (!fontInstr) {
       return this.setPlayingTones();
@@ -244,10 +294,10 @@ export class Synthesizer extends Sound {
       toneOffset = offsetFotNoteStep[this.playingTones[0].noteStep] || 0;
       //console.log('playSoundMidi.toneOffset', toneOffset);
     }
-    //console.log('playSoundMidi.info', info);
+    console.log('playSoundMidi.info', info);
 
     // fontPlayer.queueWaveTable(ctx, ctx.destination, instr, 0, 12 * 3 + 3, 10);
-    info.midi = this.fontPlayer.queueWaveTable(
+    info.waveBox = this.fontPlayer.queueWaveTable2(
       ctx,
       ctx.destination,
       fontInstr,

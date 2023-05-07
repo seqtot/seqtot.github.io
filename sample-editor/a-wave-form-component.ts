@@ -13,7 +13,77 @@ interface NotePosition {
 }
 
 type DragAction = 'V_RIGHT' | 'MOVE_NOTE' | 'RIGHT' | 'LEFT' | 'NONE';
+type Nil = null | undefined;
 
+function getAnchors(): Anchors {
+    return {
+        startInd: 0,
+        startSec: 0,
+        endInd: 0,
+        endSec: 0,
+
+        startOffsetInd: 0,
+        startOffsetSec: 0,
+        headInd: 0,
+        headSec: 0,
+        loopStartInd: 0,
+        loopStartSec: 0,
+        loopEndInd: 0,
+        loopEndSec: 0,
+        tailInd: 0,
+        tailSec: 0,
+
+        // current
+        tempSec: 0,
+        tempInd: 0,
+        tempClickedSec: 0,
+        tempClickedInd: 0,
+        tempMaxInd: 0,
+        tempMaxSec: 0,
+        tempMinInd: 0,
+        tempMinSec: 0,
+    }
+}
+
+export type Anchors = {
+    startInd?: number | Nil,
+    startSec?: number | Nil,
+    endInd?: number | Nil,
+    endSec?: number | Nil,
+
+    startOffsetInd?: number | Nil,
+    startOffsetSec?: number | Nil,
+    headInd?: number | Nil,
+    headSec?: number | Nil,
+    loopStartInd?: number | Nil,
+    loopStartSec?: number | Nil,
+    loopEndInd?: number | Nil,
+    loopEndSec?: number | Nil,
+    tailInd?: number | Nil,
+    tailSec?: number | Nil,
+
+    // current
+    tempSec?: number | Nil,
+    tempInd?: number | Nil,
+    tempClickedSec?: number | Nil,
+    tempClickedInd?: number | Nil,
+    tempMaxInd?: number | Nil,
+    tempMaxSec?: number | Nil,
+    tempMinInd?: number | Nil,
+    tempMinSec?: number | Nil,
+}
+
+type TopData = {
+    sumPos: number,
+    posCount: number,
+    sumNeg: number,
+    negCount: number,
+    maxNeg: number,
+    maxPos: number,
+    avg: number,
+}
+
+// https://css-tricks.com/making-an-audio-waveform-visualizer-with-vanilla-javascript/
 export class WaveFormComponent extends CanvasComponent {
     // TODO: move into model or utility
     private get model(): SequencerDisplayModel {
@@ -31,6 +101,15 @@ export class WaveFormComponent extends CanvasComponent {
     private rawData: number[] = [];
     private maxRawDataValue: number = 0;
     private minRawDataValue: number = 0;
+    private anchors: Anchors = {};
+
+    public get notes(): Note[] {
+        return this.model.data.notes;
+    }
+
+    public get selectedSet(): SelectedItemSet<Note> {
+        return this._selectedSet;
+    }
 
     constructor(private readonly context: {
         model: ()=> SequencerDisplayModel,
@@ -62,26 +141,62 @@ export class WaveFormComponent extends CanvasComponent {
             const rawData = [];
             this.audioBuffer = data.audioBuffer
             const channelData = this.audioBuffer.getChannelData(0);
+            let min = 0;
+            let max = 0;
+            let val = 0;
 
             for (let i = 0; i<channelData.length; i++) {
-                rawData[i] = channelData[i];
+                val = channelData[i];
+                min = val < min ? val : min;
+                max = val > max ? val : max;
+                rawData[i] = val;
             }
             this.rawData = rawData;
-            this.maxRawDataValue = Math.max(...rawData);
-            this.minRawDataValue = Math.min(...rawData);
+            this.maxRawDataValue = max;
+            this.minRawDataValue = min;
 
             //console.log('rawDAta', rawData);
             //this.rawData = this.audioBuffer.getChannelData(0).map(item => item);
             //console.log('fff', this.rawData.length, this.rawData.filter(item => (item < 0)));
-        })
+        });
+
+        const onChangeAnchors = () => {
+            this.context.ee.emit('changeAnchorsInfo', {...this.anchors});
+            this.context.ee.emit('repaint');
+        }
+
+        context.ee.on('fixAnchor', null, (data: {from: string, to: string}) => {
+            if (!data.from || !data.to) {
+                return;
+            }
+
+            const ind = this.anchors[`${data.from}Ind`] || 0;
+            this.anchors[`${data.to}Ind`] = ind;
+            this.anchors[`${data.to}Sec`] = this.indToSec(ind);
+
+            onChangeAnchors();
+        });
+
+        context.ee.on('clearAllAnchors', null, () => {
+            this.anchors = getAnchors();
+            onChangeAnchors();
+        });
     }
 
-    public get notes(): Note[] {
-        return this.model.data.notes;
+    secToInd(sec: number): number {
+        return Math.round(this.audioBuffer.sampleRate*sec);
     }
 
-    public get selectedSet(): SelectedItemSet<Note> {
-        return this._selectedSet;
+    indToSec(ind: number): number {
+        const sec = Math.round(ind/this.audioBuffer.sampleRate*1000000)/1000000;
+        const ind2 = Math.round(this.audioBuffer.sampleRate*sec);
+
+        // jjkl
+        if (ind !== ind2) {
+            console.warn('bad convert indToSec', ind, sec, ind2);
+        }
+
+        return sec;
     }
 
     public filterAudioDataPos(rawData: number[], blockSize = 48): number[] {
@@ -119,6 +234,65 @@ export class WaveFormComponent extends CanvasComponent {
                 sum += rawData[blockStart + j];
             }
             filteredData.push(sum / blockSize);
+        }
+
+        return filteredData;
+    }
+
+    public groupAudioData(
+        rawData: number[],
+        maxVal: number,
+        minVal: number,
+        blockSize = 48
+    ): {
+        sumPos: number,
+        posCount: number,
+        sumNeg: number,
+        negCount: number,
+        maxNeg: number,
+        maxPos: number,
+        avg: number,
+    }[] {
+        const samples = Math.floor(rawData.length / blockSize);
+        const filteredData = [];
+        const rate = 1 / Math.max(Math.abs(maxVal), Math.abs(minVal));
+
+        for (let i = 0; i < samples; i++) {
+            let blockStart = blockSize * i;
+            let sumPos = 0;
+            let posCount = 0;
+            let sumNeg = 0;
+            let negCount = 0;
+            let maxNeg = 0;
+            let maxPos = 0;
+            let avg = 0;
+
+            for (let j = 0; j < blockSize; j++) {
+                let val = rawData[blockStart + j] * rate;
+
+                 if (val > 0) {
+                     posCount++;
+                     sumPos += val;
+                     maxPos = val > maxPos ? val : maxPos;
+                 } else if (val < 0) {
+                     val = Math.abs(val);
+                     negCount++;
+                     sumNeg += val;
+                     maxNeg = val > maxNeg ? val : maxNeg;
+                 }
+            }
+
+            avg = (sumPos + sumNeg) / blockSize;
+
+            filteredData.push({
+                sumPos,
+                posCount,
+                sumNeg,
+                negCount,
+                maxNeg,
+                maxPos,
+                avg,
+            });
         }
 
         return filteredData;
@@ -214,8 +388,33 @@ export class WaveFormComponent extends CanvasComponent {
             g.stroke();
         }
 
+        // блок
         g.fillStyle = 'rgba(0, 0, 0, 0.1)';
         g.fillRect(highlightStart, pOffsetY + this.sidePadding, this.topBlockSize, height );
+
+        // временный
+        let temp = this.anchors.tempClickedInd;
+        if (temp && temp > leftDataInd && temp < (leftDataInd + areaWidth)){
+            g.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            temp = temp - leftDataInd + this.sidePadding;
+            g.fillRect(temp, pOffsetY + this.sidePadding, 1, height );
+        }
+
+        // старт цикла
+        temp = this.anchors.loopStartInd;
+        if (temp && temp > leftDataInd && temp < (leftDataInd + areaWidth)){
+            g.fillStyle = 'rgba(150, 0, 0, 1)';
+            temp = temp - leftDataInd + this.sidePadding;
+            g.fillRect(temp, pOffsetY + this.sidePadding, 1, height );
+        }
+
+        // окончание цикла
+        temp = this.anchors.loopEndInd;
+        if (temp && temp > leftDataInd && temp < (leftDataInd + areaWidth)){
+            g.fillStyle = 'rgba(0, 150, 0, 1)';
+            temp = temp - leftDataInd + this.sidePadding;
+            g.fillRect(temp, pOffsetY + this.sidePadding, 1, height );
+        }
 
         this.midData = {
             areaWidth,
@@ -234,17 +433,23 @@ export class WaveFormComponent extends CanvasComponent {
         return arr.map(item => item * rate);
     }
 
+    // public normalizeAudioData2(arr: number[], max: number, min: number): {maxPos: number, maxNeg: number}[] {
+    //     const rate = 1 / Math.max(Math.abs(max), Math.abs(min));;
+    //     return arr.map(item => item * rate);
+    // }
+
     topBlockSize = 48;
     sidePadding = 10;
-    topData: number[] = [];
+    topData: TopData[] = [];
 
     public renderTop(g: CanvasRenderingContext2D, pHeight = 150, pOffsetY = 0 ) {
         const sidePadding = this.sidePadding;
 
         this.topBlockSize = Math.ceil(this.audioBuffer.length / (this.width - (sidePadding * 2)));
-        const data = this.normalizeAudioData(
-            this.filterAudioDataNeg(this.rawData, this.topBlockSize), this.maxRawDataValue, this.minRawDataValue
-        );
+        // const data = this.normalizeAudioData(
+        //     this.filterAudioDataNeg(this.rawData, this.topBlockSize), this.maxRawDataValue, this.minRawDataValue
+        // );
+        const data = this.groupAudioData(this.rawData, this.maxRawDataValue, this.minRawDataValue, this.topBlockSize);
         this.topData = data;
 
         const height = pHeight - (sidePadding * 2);
@@ -254,28 +459,34 @@ export class WaveFormComponent extends CanvasComponent {
 
         g.lineWidth = 1;
 
-        const positiveStyle = 'rgba(0, 255, 0, 1)';
-        const negativeStyle = 'rgba(255, 0, 0, 1)';
+        const positiveStyle = 'rgba(0, 255, 0, .5)';
+        const negativeStyle = 'rgba(255, 0, 0, .5)';
+        const avgStyle = 'rgba(0, 0, 0, .6)';
+
+        let maxVal = 0;
+        let maxStyle = '';
+        let minVal = 0;
+        let minStyle = '';
 
         for (let i = 0; i<data.length; i++) {
             let val = data[i];
-            let style = positiveStyle;
 
-            if (val < 0) {
-                style = negativeStyle;
-                val = val * -1;
-            }
+            maxVal = val.maxPos >= val.maxNeg ? val.maxPos : val.maxNeg;
+            maxStyle = val.maxPos >= val.maxNeg ? positiveStyle : negativeStyle;
+            minVal = val.maxPos >= val.maxNeg ?  val.maxNeg : val.maxPos;
+            minStyle = val.maxPos >= val.maxNeg ? negativeStyle : positiveStyle;
 
-            g.strokeStyle = style;
-            g.beginPath();
-            g.moveTo(zeroX+i, zeroY);
-            y = zeroY - (val * height);
-            g.lineTo(zeroX+i, y);
-            g.stroke();
+            y = zeroY - (maxVal * height);
+            g.fillStyle = maxStyle;
+            g.fillRect(zeroX+i, y, 1, zeroY - y);
 
-            // y = zeroY - (val * height);
-            // g.fillStyle = style;
-            // g.fillRect(zeroX+i, y, 1, zeroY - y);
+            y = zeroY - (minVal * height);
+            g.fillStyle = minStyle;
+            g.fillRect(zeroX+i, y, 1, zeroY - y);
+
+            y = zeroY - (val.avg * height);
+            g.fillStyle = avgStyle;
+            g.fillRect(zeroX+i, y, 1, zeroY - y);
 
             // if (val < 0.02) {
             //     g.beginPath();
@@ -299,28 +510,33 @@ export class WaveFormComponent extends CanvasComponent {
         g.lineTo(zeroX-1, pOffsetY + pHeight);
         g.stroke();
 
-        g.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-        g.beginPath();
-        g.moveTo(zeroX + this.xInTopArea, zeroY);
-        g.lineTo(zeroX + this.xInTopArea, zeroY - height);
-        g.stroke();
+        let x = 0;
 
-        // //console.log('BOUNDS', this.getLocalBounds());
-        // // https://css-tricks.com/making-an-audio-waveform-visualizer-with-vanilla-javascript/
-        //
-        // console.log('chaneldata', Math.max(...audioBuffer.getChannelData(0)));
-        // console.log('chaneldata', Math.min(...audioBuffer.getChannelData(0)));
-        //
-        // //getChannelData(0);
-        //var source = ctx.createBufferSource();
-        // // устанавливает буфер в AudioBufferSourceNode
-        //source.buffer = audioBuffer;
-        // // присоединяет AudioBufferSourceNode к
-        // // destination, чтобы мы могли слышать звук
-        //source.connect(ctx.destination);
-        // // Начать воспроизведение с источника
-        //source.start();
+        // current selection
+        if (this.xInTopArea) {
+            x = zeroX + this.xInTopArea;
+            g.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            g.fillRect(x, zeroY - height, 1, height);
+            g.fillRect(x - 2 , zeroY - height - 4, 5, 4);
+        }
+
+        // loopStart
+        if (this.anchors.loopStartInd) {
+            x = (this.anchors.loopStartInd / this.topBlockSize) + zeroX; // ???
+            g.fillStyle = 'rgba(255, 0, 0, .5)';
+            g.fillRect(x, zeroY - height, 1, height);
+            g.fillRect(x - 2 , zeroY - height - 4, 5, 4);
+        }
+
+        // loopEnd
+        if (this.anchors.loopEndInd) {
+            x = (this.anchors.loopEndInd / this.topBlockSize) + zeroX; // ???
+            g.fillStyle = 'rgba(0, 255, 0, .5)';
+            g.fillRect(x, zeroY - height, 1, height);
+            g.fillRect(x - 2 , zeroY - height - 4, 5, 4);
+        }
     }
+
 
     private topHeight = 150;
     private midHeight = 150;
@@ -470,10 +686,12 @@ export class WaveFormComponent extends CanvasComponent {
         }
 
         this.xInTopArea = x - 1;
-        console.log(this.xInTopArea);
+        console.log('set xInTopArea', this.xInTopArea);
     }
 
     public midDblClicked(local: IPoint, event: ComponentMouseEvent) {
+        console.log('midDblClicked');
+
         const x = local.x - this.sidePadding;
 
         if (x <= 0) {
@@ -482,10 +700,15 @@ export class WaveFormComponent extends CanvasComponent {
 
         let dataInd = this.midData.leftDataInd + x - 1;
 
-        const getNearMin = (): number => {
+
+        const getNearArray = (): number[] => {
             let startInd = dataInd - 5;
             startInd = startInd > 0 ? startInd: 0;
-            const arr = this.rawData.slice(startInd, startInd+10)
+            return this.rawData.slice(startInd, startInd+10)
+        }
+
+        const getNearMinInd = (arr: number[]): number => {
+            let startInd = dataInd - 5 > 0 ? dataInd - 5: 0;
             let min = Math.abs(arr[0]);
             let tempIndex = 0;
             for (let i = 0; i<arr.length; i++) {
@@ -499,10 +722,8 @@ export class WaveFormComponent extends CanvasComponent {
             return startInd + tempIndex;
         }
 
-        const getNearMax = (): number => {
-            let startInd = dataInd - 5;
-            startInd = startInd > 0 ? startInd: 0;
-            const arr = this.rawData.slice(startInd, startInd+10)
+        const getNearMaxInd = (arr: number[]): number => {
+            let startInd = dataInd - 5 > 0 ? dataInd - 5: 0;
             let max = Math.abs(arr[0]);
             let tempIndex = 0;
             for (let i = 0; i<arr.length; i++) {
@@ -515,18 +736,35 @@ export class WaveFormComponent extends CanvasComponent {
             return startInd + tempIndex;
         }
 
-        // щелчок под осью
+
         if (local.y > (this.midHeight - this.sidePadding)) {
+            // щелчок под осью
             this.xInTopArea = Math.floor((dataInd/this.topBlockSize));
             console.log('topMdlClick', this.xInTopArea);
         } else {
-            let clickMs = Math.round(dataInd/this.audioBuffer.sampleRate*1000000)/1000000;
-            let minMs = Math.round((getNearMin()/this.audioBuffer.sampleRate*1000000))/1000000;
-            let maxMs = Math.round((getNearMax()/this.audioBuffer.sampleRate*1000000))/1000000;
+            // щелчок над осью
+            const clickedCurrInd = dataInd;
+            const arr = getNearArray();
+            const maxCurrInd = getNearMaxInd(arr);
+            const minCurrInd = getNearMinInd(arr);
 
-            console.log(`click: ${clickMs}  min: ${minMs}  max: ${maxMs}`);
+            console.log('near array', arr);
 
-            this.context.ee.emit('clickMinMax', {clickMs, minMs, maxMs});
+            let clickedCurrSec = this.indToSec(clickedCurrInd); // Math.round(dataInd/this.audioBuffer.sampleRate*1000000)/1000000;
+            let minCurrSec = this.indToSec(minCurrInd); // Math.round((getNearMinInd()/this.audioBuffer.sampleRate*1000000))/1000000;
+            let maxCurrSec = this.indToSec(maxCurrInd); // Math.round((getNearMaxInd()/this.audioBuffer.sampleRate*1000000))/1000000;
+
+            this.anchors = {
+                ...this.anchors,
+                tempClickedSec: clickedCurrSec,
+                tempMaxSec: maxCurrSec,
+                tempMinSec: minCurrSec,
+                tempClickedInd: clickedCurrInd,
+                tempMaxInd: maxCurrInd,
+                tempMinInd: minCurrInd,
+            }
+
+            this.context.ee.emit('changeAnchorsInfo', {...this.anchors});
         }
     }
 

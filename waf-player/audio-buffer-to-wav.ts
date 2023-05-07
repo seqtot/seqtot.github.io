@@ -1,3 +1,5 @@
+'use babel';
+
 // https://github.com/Jam3/audiobuffer-to-wav
 export class Deferred<T = any> {
     promise: Promise<T>;
@@ -151,6 +153,47 @@ export async function getAudioBufferFromBlobString(blobStr: string): Promise<Aud
 
     return getAudioBufferFromBlob(blob);
 }
+
+export async function getAudioBufferFromString(audioFile: string, ctx?: AudioContext): Promise<AudioBuffer> {
+    const dfr = new Deferred();
+    let arrayBuffer = new ArrayBuffer(audioFile.length);
+    let view = new Uint8Array(arrayBuffer);
+    let decoded = atob(audioFile);
+    let b;
+    for (let i = 0; i < decoded.length; i++) {
+        b = decoded.charCodeAt(i);
+        view[i] = b;
+    }
+
+    ctx = ctx || new AudioContext();
+    ctx.decodeAudioData(arrayBuffer, async (val) => dfr.resolve(val));
+
+    return dfr.promise;
+}
+
+// {
+//     let arrayBuffer: ArrayBuffer;
+//     arrayBuffer = new ArrayBuffer(audioFile.length);
+//     let view = new Uint8Array(arrayBuffer);
+//     let decoded = atob(audioFile);
+//     let b;
+//
+//     for (let i = 0; i < decoded.length; i++) {
+//         b = decoded.charCodeAt(i);
+//         view[i] = b;
+//     }
+//
+//     ctx.decodeAudioData(arrayBuffer, async (val) => {
+//         audioBuffer = val;
+//         console.log('audioBuffer', audioBuffer);
+//
+//         //const blob = await getBlobFromAudioBuffer(audioBuffer);
+//         //console.log('BLOB', blob);
+//         //const blobString = await getBlobString(blob);
+//         //console.log('BLOB STRING', blobString);
+//     });
+// }
+
 
 
 /**

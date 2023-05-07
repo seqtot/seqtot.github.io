@@ -29,8 +29,8 @@ const isDev =
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
 
-const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
-//const defRoute = isDev ? '/page/page_roll/' : '/set/set_all/';
+//const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
+const defRoute = isDev ? '/set/set_my/' : '/set/set_all/';
 
 const linksToPage = [
   { href: '/set/set_all/', name: 'Список' },

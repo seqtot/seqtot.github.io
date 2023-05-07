@@ -138,17 +138,23 @@ ${getKey('sa', 'с')}${getKey('ba', 'б')}${getKey('me', 'м')}
 
 const info = `
 <div style="margin: .5rem; user-select: none;">
-
-
+<br/>
 
 ${getKeyboardBass('bass')}
+
+<br/>
+
 <span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
   clr&nbsp;&nbsp;
 </span>
 <span style="user-select: none; font-size: 1.5rem" data-name="select-random-key">
   rnd&nbsp;&nbsp;
 </span>
-${getKeyboardSolo('solo')}
+
+<br/>
+<br/>
+
+${getKeyboardSolo3('solo')}
 
 <!--div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>
@@ -447,7 +453,7 @@ ${getKeyStep('24', '24', 'br')}
 `.replace(/\n/g, '');
 }
 
-function getKeyboardSolo(id?: number | string): string {
+function getKeyboardSolo4(id?: number | string): string {
   id = id || '';
 
   const getKey = getKeyFn({ id });
@@ -475,6 +481,40 @@ ${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
 ${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
 <br/>
 ${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
+${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
+${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
+${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
+</div>
+
+`.replace(/\n/g, '');
+
+  return keyboard;
+}
+
+function getKeyboardSolo3(id?: number | string): string {
+  id = id || '';
+
+  const getKey = getKeyFn({ id, width: '2rem', fontSize: '1.5rem' });
+
+  const keyboard = `
+<div style="
+    font-family: monospace;
+    user-select: none;    
+    padding: 0.5rem 0 0.5rem 0.5rem;"
+    data-name="keyboard-${id}"
+>
+${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
+${getKey('da', '^')}${getKey('ma', '&')}${getKey('za', '*')}
+${getKey('de', '(')}${getKey('me', ')')}${getKey('ze', '_')}
+<br/>
+${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
+${getKey('ta', 'y')}${getKey('fa', 'u')}${getKey('la', 'i')}
+${getKey('te', 'o')}${getKey('fe', 'p')}${getKey('le', '[')}
+<br/>
+${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
+${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
+${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
+<br/>
 ${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
 ${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
 ${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}

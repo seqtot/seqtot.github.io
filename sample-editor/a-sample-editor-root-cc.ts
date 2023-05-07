@@ -14,7 +14,7 @@ function getLayout() {
     return {
         type: 'col',
         items: [
-            { type: 'row', name: '_timeRuler',   h: 'timeRulerHeight', component: TimeRuler },
+            //{ type: 'row', name: '_timeRuler',   h: 'timeRulerHeight', component: TimeRuler },
             { type: 'row', name: '_timeRulerMy', h: 'timeRulerHeight', component: TimeRulerMy },
             { type: 'row', name: null,           h: 'gridNoteHeight',  component: null,
                 items: [
@@ -115,9 +115,9 @@ export class SampleEditorRootCc extends CanvasComponent {
 
         this._draggableBorder.setBounds(bounds.removeFromBottom(borderHeight));
 
-        let hRulerBounds = bounds.removeFromTop(rulerHeight);
-        hRulerBounds.removeFromLeft(rulerWidth);
-        this._timeRuler.setBounds(hRulerBounds);
+        //let hRulerBounds = bounds.removeFromTop(rulerHeight);
+        //hRulerBounds.removeFromLeft(rulerWidth);
+        //this._timeRuler.setBounds(hRulerBounds);
 
         // jjkl
         let hRulerBoundsMy = bounds.removeFromTop(rulerHeight);
