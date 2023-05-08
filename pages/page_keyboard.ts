@@ -77,6 +77,7 @@ export class KeyboardPage {
     bpmMultiple = 100;
     playingTick = '';
     bpmRange: Range.Range;
+    playingNote: {[key: string]: string} = {};
 
     get pageId(): string {
         return this.props.id;
@@ -277,31 +278,44 @@ export class KeyboardPage {
             const keyOrNote = el?.dataset?.noteLat || '';
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                synthesizer.playSound(
+                    {
+                        keyOrNote: this.playingNote[keyboardId],
+                        id: keyboardId,
+                        onlyStop: true,
+                    },
+                    true
+                );
+                this.playingNote[keyboardId] = keyOrNote;
+
                 el.style.backgroundColor = 'lightgray';
+
                 synthesizer.playSound({
                     keyOrNote,
                     id: keyboardId,
                     // instrCode: 366,
                 });
 
-                const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
-
-                if (!wrapper) {
-                    return;
-                }
-
-                wrapper.dataset.relativeKeyboardBase = el?.dataset?.noteLat;
+                // const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
+                //
+                // if (!wrapper) {
+                //     return;
+                // }
+                //
+                // wrapper.dataset.relativeKeyboardBase = el?.dataset?.noteLat;
             });
 
             el.addEventListener('pointerup', (evt: MouseEvent) => {
                 synthesizer.playSound(
                     {
-                        keyOrNote,
+                        keyOrNote: this.playingNote[keyboardId],
                         id: keyboardId,
                         onlyStop: true,
                     },
                     true
                 );
+
+                this.playingNote[keyboardId] = undefined;
             });
         });
 
