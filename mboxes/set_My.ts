@@ -503,21 +503,21 @@ function getKeyboardSolo3(id?: number | string): string {
     padding: 0.5rem 0 0.5rem 0.5rem;"
     data-name="keyboard-${id}"
 >
+${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
 ${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
 ${getKey('da', '^')}${getKey('ma', '&')}${getKey('za', '*')}
-${getKey('de', '(')}${getKey('me', ')')}${getKey('ze', '_')}
 <br/>
+${getKey('ty', '?')}${getKey('fy', 'q')}${getKey('ly', 'w')}
 ${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
 ${getKey('ta', 'y')}${getKey('fa', 'u')}${getKey('la', 'i')}
-${getKey('te', 'o')}${getKey('fe', 'p')}${getKey('le', '[')}
 <br/>
+${getKey('ry', '?')}${getKey('vy', 'a')}${getKey('ky', 's')}
 ${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
 ${getKey('ra', 'h')}${getKey('va', 'j')}${getKey('ka', 'k')}
-${getKey('re', 'l')}${getKey('ve', ';')}${getKey('ke', "'")}
 <br/>
+${getKey('ny', '?')}${getKey('sy', 'z')}${getKey('by', 'x')}
 ${getKey('no', 'c')}${getKey('so', 'v')}${getKey('bo', 'b')}
 ${getKey('na', 'n')}${getKey('sa', 'm')}${getKey('ba', ',')}
-${getKey('ne', '.')}${getKey('se', '/')}${getKey('be', '?')}
 </div>
 
 `.replace(/\n/g, '');
@@ -538,19 +538,19 @@ function getKeyboardBass(id?: number | string): string {
     data-name="keyboard-${id}"
 >
 ${getKey('du', 'д')}${getKey('mu', 'м')}${getKey('zu', 'з')}
-${getKey('dy', 'д')}${getKey('my', 'м')}${getKey('zy', 'з')}
-${getKey('do', 'д')}${getKey('mo', 'м')}${getKey('zo', 'з')}
+${getKey('dy', '~')}${getKey('my', '!')}${getKey('zy', '@')}
+${getKey('do', '#')}${getKey('mo', '$')}${getKey('zo', '%')}
 <br/>
 ${getKey('tu', 'т')}${getKey('fu', 'ф')}${getKey('lu', 'л')}
-${getKey('ty', 'т')}${getKey('fy', 'ф')}${getKey('ly', 'л')}
-${getKey('to', 'т')}${getKey('fo', 'ф')}${getKey('lo', 'л')}
+${getKey('ty', '?')}${getKey('fy', 'q')}${getKey('ly', 'w')}
+${getKey('to', 'e')}${getKey('fo', 'r')}${getKey('lo', 't')}
 <br/>
 ${getKey('ru', 'р')}${getKey('vu', 'в')}${getKey('ku', 'к')}
-${getKey('ry', 'р')}${getKey('vy', 'в')}${getKey('ky', 'к')}
-${getKey('ro', 'р')}${getKey('vo', 'в')}${getKey('ko', 'к')}
+${getKey('ry', '?')}${getKey('vy', 'a')}${getKey('ky', 's')}
+${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
 <br/>
 ${getKey('nu', 'н')}${getKey('su', 'с')}${getKey('bu', 'б')}
-${getKey('ny', 'н')}${getKey('sy', 'с')}${getKey('by', 'б')}
+${getKey('ny', '?')}${getKey('sy', 'с')}${getKey('by', 'б')}
 ${getKey('no', 'н')}${getKey('so', 'с')}${getKey('bo', 'б')}
 </div>
 
