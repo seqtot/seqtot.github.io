@@ -9,7 +9,7 @@ import { MultiPlayer } from '../muse/multi-player';
 import { Synthesizer } from '../muse/synthesizer';
 import * as un from '../muse/utils-note';
 import { defaultSynthSettings } from '../muse/keyboards';
-import mboxes from '../mboxes';
+import keyboardSet from './page_keyboard-utils';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -17,25 +17,25 @@ const synthesizer = new Synthesizer();
 synthesizer.connect({ ctx: Sound.ctx });
 synthesizer.setSettings(defaultSynthSettings);
 
-Sound.AddSound(366); // bass
-Sound.AddSound(697); // sax
-Sound.AddSound(776); // flute
-Sound.AddSound(762); // piccolo
-Sound.AddSound(790); // Pan Flute
-Sound.AddSound(781); // Recorder
-Sound.AddSound(320); // gdm guidar drive mute
-Sound.AddSound(137); // xlph xylophone
+// Sound.AddSound(366); // bass
+// Sound.AddSound(697); // sax
+// Sound.AddSound(776); // flute
+// Sound.AddSound(762); // piccolo
+// Sound.AddSound(790); // Pan Flute
+// Sound.AddSound(781); // Recorder
+// Sound.AddSound(320); // gdm guidar drive mute
+// Sound.AddSound(137); // xlph xylophone
 
 function getWithDataAttr<T extends HTMLElement = HTMLElement>(
     name: string,
     el?: HTMLElement
 ): T[] {
-  return ((el || document).querySelectorAll(`[data-${name}]`) as any) || [];
+    return ((el || document).querySelectorAll(`[data-${name}]`) as any) || [];
 }
 
 const ns = {
-  setBmpAction: 'set-bmp-action',
-  setNote: 'set-note',
+    setBmpAction: 'set-bmp-action',
+    setNote: 'set-note',
 };
 
 const tick14 = `
@@ -66,63 +66,63 @@ const tick44 = `
 `.trim();
 
 const ticks = {
-  '1:4': tick14,
-  '2:4': tick24,
-  '3:4': tick34,
-  '4:4': tick44,
+    '1:4': tick14,
+    '2:4': tick24,
+    '3:4': tick34,
+    '4:4': tick44,
 };
 
 export class KeyboardPage {
-  view: 'info' | 'drums' = 'info';
-  bpmMultiple = 100;
-  playingTick = '';
-  bpmRange: Range.Range;
+    view: 'info' | 'drums' = 'info';
+    bpmMultiple = 100;
+    playingTick = '';
+    bpmRange: Range.Range;
 
-  get pageId(): string {
-    return this.props.id;
-  }
+    get pageId(): string {
+        return this.props.id;
+    }
 
-  get pageEl(): HTMLElement {
-    return this.context.$el.value[0] as HTMLElement;
-  }
+    get pageEl(): HTMLElement {
+        return this.context.$el.value[0] as HTMLElement;
+    }
 
-  get el$(): Dom7Array {
-    return this.context.$el.value;
-  }
+    get el$(): Dom7Array {
+        return this.context.$el.value;
+    }
 
-  get setInfo(): {
-    content: string;
-    break: string;
-    drums: string;
-    tracks: { key: string; value: string; name: string }[];
-    hideMetronome?: boolean;
-  } {
-    return mboxes[this.pageId];
-  }
+    get setInfo(): {
+        content: string;
+        break: string;
+        drums: string;
+        tracks: { key: string; value: string; name: string }[];
+        hideMetronome?: boolean;
+    } {
+        return keyboardSet as any;
+    }
 
-  getId(id: string): string {
-    return this.pageId + '-' + id;
-  }
+    getId(id: string): string {
+        return this.pageId + '-' + id;
+    }
 
-  constructor(
-      public props: Props,
-      public context: ComponentContext,
-  ) {}
+    constructor(
+        public props: Props,
+        public context: ComponentContext,
+    ) {}
 
-  onMounted() {
-    this.setViewInfo();
-    dyName('panel-right-content').innerHTML = `
+    onMounted() {
+        this.setViewInfo();
+        dyName('panel-right-content').innerHTML = `
       <p data-name="action-info">табы</p>
       <p data-name="action-drums">барабан</p>
     `;
 
-    this.subscribePageEvents();
-  }
+        this.subscribePageEvents();
+    }
 
-  setViewInfo() {
-    this.view = 'info';
+    setViewInfo() {
+        this.view = 'info';
 
-    let metronomeView = `
+        let metronomeView = `
         <div style="padding: 1rem .5rem 1rem .5rem;">
           &emsp;
           <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
@@ -147,11 +147,11 @@ export class KeyboardPage {
         ${this.getTracksContent()}
     `;
 
-    if (this.setInfo.hideMetronome) {
-      metronomeView = '';
-    }
+        if (this.setInfo.hideMetronome) {
+            metronomeView = '';
+        }
 
-    const content = `
+        const content = `
       <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
       ${metronomeView}
       <div data-name="setContent">
@@ -160,276 +160,276 @@ export class KeyboardPage {
       </div>
     `;
 
-    this.el$.html(content);
+        this.el$.html(content);
 
-    this.bpmRange = (this.context.$f7 as any).range.create({ // jjkl
-      el: dyName('slider', this.pageEl),
-      on: {
-        changed: (range: any) => {
-          // console.log('range.onChange', range); // jjkl
-          this.bpmMultiple = range.value;
+        this.bpmRange = (this.context.$f7 as any).range.create({ // jjkl
+            el: dyName('slider', this.pageEl),
+            on: {
+                changed: (range: any) => {
+                    // console.log('range.onChange', range); // jjkl
+                    this.bpmMultiple = range.value;
 
-          if (this.playingTick) {
-            this.playTick(this.playingTick);
-          }
-        },
-      },
-    });
-
-    this.subscribViewInfoEvents();
-  }
-
-  subscribePageEvents() {
-    dyName('action-drums', dyName('panel-right-content')).addEventListener(
-        'click',
-        () => {
-          //console.log('action-info');
-          this.setViewDrums();
-        }
-    );
-
-    dyName('action-info', dyName('panel-right-content')).addEventListener(
-        'click',
-        () => {
-          //console.log('action-info');
-          this.setViewInfo();
-        }
-    );
-
-    getWithDataAttr('tick-trigger', this.pageEl)?.forEach((el) => {
-      el.addEventListener('click', (evt: MouseEvent) => {
-        this.playTick(el?.dataset?.tickTrigger);
-      });
-    });
-
-    getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
-      el.addEventListener('click', (evt: MouseEvent) => {
-        this.tryPlayTextLine({
-          text: el?.dataset?.noteLine,
-        });
-      });
-    });
-
-    getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-      el.addEventListener('pointerdown', (evt: MouseEvent) => {
-        let keyOrNote = el?.dataset?.noteLat || '';
-
-        el.style.backgroundColor = 'lightgray';
-
-        synthesizer.playSound({
-          keyOrNote,
-          id: el?.dataset?.keyboardId,
-          // instrCode: 366,
-        });
-
-        const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
-
-        if (!wrapper) {
-          return;
-        }
-
-        wrapper.dataset.relativeKeyboardBase = el?.dataset?.noteLat;
-      });
-
-      el.addEventListener('pointerup', (evt: MouseEvent) => {
-        let keyOrNote = el?.dataset?.noteLat || '';
-
-        synthesizer.playSound(
-            {
-              keyOrNote,
-              id: el?.dataset?.keyboardId,
-              onlyStop: true,
+                    if (this.playingTick) {
+                        this.playTick(this.playingTick);
+                    }
+                },
             },
-            true
-        );
-      });
-    });
-
-    const clearColor = () => {
-      // console.log(window.location.href);
-
-      getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-        el.style.backgroundColor = 'white';
-      });
-    };
-
-    // очистка цвета
-    let el = dyName('clear-keys-color', this.pageEl);
-    if (el) {
-      el.addEventListener('click', () => clearColor());
-    }
-
-    el = dyName('select-random-key', this.pageEl);
-    if (el) {
-      el.addEventListener('click', () => {
-        const val =
-            un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
-
-        const key = dyName(
-            `note-key-${val}`,
-            dyName(`keyboard-solo`, this.pageEl)
-        );
-
-        if (key) {
-          clearColor();
-          key.style.backgroundColor = 'lightgray';
-        }
-      });
-    }
-
-    getWithDataAttr('relative-key', this.pageEl)?.forEach((el: HTMLElement) => {
-      el.addEventListener('pointerdown', () => {
-        const wrapper = dyName('relative-keyboard-wrapper');
-
-        if (!wrapper) {
-          return;
-        }
-
-        let baseNote = wrapper.dataset.relativeKeyboardBase || 'do';
-        let note = un.getNoteByOffset(baseNote, el.dataset.relativeKey);
-
-        if (!note) {
-          return;
-        }
-
-        wrapper.dataset.relativeKeyboardBase = note;
-
-        getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
-          el.style.backgroundColor = 'white';
         });
 
-        if (dyName(`set-note-${note}`, this.pageEl)) {
-          dyName(`set-note-${note}`, this.pageEl).style.backgroundColor =
-              'lightgray';
-        }
-
-        this.tryPlayTextLine({ text: `b60 ${note}-25` });
-      });
-    });
-
-    getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
-      el.addEventListener('pointerdown', () => {
-        const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
-
-        if (!wrapper) {
-          return;
-        }
-
-        getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
-          el.style.backgroundColor = 'white';
-        });
-
-        el.style.backgroundColor = 'lightgray';
-        const note = el.innerText.trim();
-        wrapper.dataset.relativeKeyboardBase = note;
-        this.tryPlayTextLine({ text: `b60 ${note}-25` });
-      });
-    });
-
-    getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
-        (el: HTMLElement) => {
-          el.addEventListener('pointerdown', () => {
-            this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);
-            this.playTick(this.playingTick);
-          });
-        }
-    );
-  }
-
-  getTracksContent(): string {
-    if (!this.setInfo?.tracks?.length) {
-      return '';
+        this.subscribViewInfoEvents();
     }
 
-    return this.setInfo.tracks.reduce(
-        (acc, item) => {
-          acc =
-              acc +
-              `
+    subscribePageEvents() {
+        dyName('action-drums', dyName('panel-right-content')).addEventListener(
+            'click',
+            () => {
+                //console.log('action-info');
+                this.setViewDrums();
+            }
+        );
+
+        dyName('action-info', dyName('panel-right-content')).addEventListener(
+            'click',
+            () => {
+                //console.log('action-info');
+                this.setViewInfo();
+            }
+        );
+
+        getWithDataAttr('tick-trigger', this.pageEl)?.forEach((el) => {
+            el.addEventListener('click', (evt: MouseEvent) => {
+                this.playTick(el?.dataset?.tickTrigger);
+            });
+        });
+
+        getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
+            el.addEventListener('click', (evt: MouseEvent) => {
+                this.tryPlayTextLine({
+                    text: el?.dataset?.noteLine,
+                });
+            });
+        });
+
+        getWithDataAttr('relative-key', this.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                const wrapper = dyName('relative-keyboard-wrapper');
+
+                if (!wrapper) {
+                    return;
+                }
+
+                let baseNote = wrapper.dataset.relativeKeyboardBase || 'do';
+                let note = un.getNoteByOffset(baseNote, el.dataset.relativeKey);
+
+                if (!note) {
+                    return;
+                }
+
+                wrapper.dataset.relativeKeyboardBase = note;
+
+                getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
+                    el.style.backgroundColor = 'white';
+                });
+
+                if (dyName(`set-note-${note}`, this.pageEl)) {
+                    dyName(`set-note-${note}`, this.pageEl).style.backgroundColor =
+                        'lightgray';
+                }
+
+                this.tryPlayTextLine({ text: `b60 ${note}-25` });
+            });
+        });
+
+        getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
+
+                if (!wrapper) {
+                    return;
+                }
+
+                getWithDataAttr(ns.setNote, this.pageEl)?.forEach((el: HTMLElement) => {
+                    el.style.backgroundColor = 'white';
+                });
+
+                el.style.backgroundColor = 'lightgray';
+                const note = el.innerText.trim();
+                wrapper.dataset.relativeKeyboardBase = note;
+                this.tryPlayTextLine({ text: `b60 ${note}-25` });
+            });
+        });
+
+        getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
+            (el: HTMLElement) => {
+                el.addEventListener('pointerdown', () => {
+                    this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);
+                    this.playTick(this.playingTick);
+                });
+            }
+        );
+
+        this.subscribeKeyboardEvents();
+    }
+
+    subscribeKeyboardEvents() {
+        getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
+            const keyboardId = el?.dataset?.keyboardId;
+            const keyOrNote = el?.dataset?.noteLat || '';
+
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                el.style.backgroundColor = 'lightgray';
+                synthesizer.playSound({
+                    keyOrNote,
+                    id: keyboardId,
+                    // instrCode: 366,
+                });
+
+                const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
+
+                if (!wrapper) {
+                    return;
+                }
+
+                wrapper.dataset.relativeKeyboardBase = el?.dataset?.noteLat;
+            });
+
+            el.addEventListener('pointerup', (evt: MouseEvent) => {
+                synthesizer.playSound(
+                    {
+                        keyOrNote,
+                        id: keyboardId,
+                        onlyStop: true,
+                    },
+                    true
+                );
+            });
+        });
+
+        const clearColor = () => {
+            getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
+                el.style.backgroundColor = 'white';
+            });
+        };
+
+        // очистка цвета
+        let el = dyName('clear-keys-color', this.pageEl);
+        if (el) {
+            el.addEventListener('click', () => clearColor());
+        }
+
+        el = dyName('select-random-key', this.pageEl);
+        if (el) {
+            el.addEventListener('click', () => {
+                const val =
+                    un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
+
+                const key = dyName(
+                    `note-key-${val}`,
+                    dyName(`keyboard-solo`, this.pageEl)
+                );
+
+                if (key) {
+                    clearColor();
+                    key.style.backgroundColor = 'lightgray';
+                }
+            });
+        }
+    }
+
+    getTracksContent(): string {
+        if (!this.setInfo?.tracks?.length) {
+            return '';
+        }
+
+        return this.setInfo.tracks.reduce(
+            (acc, item) => {
+                acc =
+                    acc +
+                    `
         <div class="row">
           <button id="${this.getId(
-                  'action-play-' + item.key
-              )}" class="button col">${item.name || item.key}</button>
+                        'action-play-' + item.key
+                    )}" class="button col">${item.name || item.key}</button>
           </div>
         `;
 
-          return acc.trim();
-        },
-        `
+                return acc.trim();
+            },
+            `
         <div class="row">
           <button id="${this.getId(
-            'action-stop'
-        )}" class="button col">stop</button>
+                'action-stop'
+            )}" class="button col">stop</button>
         </div>                  
     `
-    );
-  }
-
-  playTick(name?: string) {
-    name = name || '';
-    this.playingTick = name;
-
-    metronome.clearMidiPlayer();
-
-    const beat = ticks[this.playingTick];
-
-    if (!beat) {
-      this.playingTick = '';
-
-      return;
+        );
     }
 
-    const blocks = `
+    playTick(name?: string) {
+        name = name || '';
+        this.playingTick = name;
+
+        metronome.clearMidiPlayer();
+
+        const beat = ticks[this.playingTick];
+
+        if (!beat) {
+            this.playingTick = '';
+
+            return;
+        }
+
+        const blocks = `
         <out r1000000>
         beat@
 
         ${beat}
       `;
 
-    metronome.tryPlayMidiBlock({
-      blocks,
-      bpm: this.bpmMultiple,
-    });
-  }
+        metronome.tryPlayMidiBlock({
+            blocks,
+            bpm: this.bpmMultiple,
+        });
+    }
 
-  subscribViewInfoEvents() {
-    this.subscribViewDrumsEvents();
-  }
+    subscribViewInfoEvents() {
+        this.subscribViewDrumsEvents();
+    }
 
-  subscribViewDrumsEvents() {
-    setTimeout(() => {
-      byId(this.getId('action-stop'))?.addEventListener(
-          'click',
-          (evt: MouseEvent) => {
-            this.stop();
-          }
-      );
+    subscribViewDrumsEvents() {
+        setTimeout(() => {
+            byId(this.getId('action-stop'))?.addEventListener(
+                'click',
+                (evt: MouseEvent) => {
+                    this.stop();
+                }
+            );
 
-      this.setInfo.tracks.forEach((item) => {
-        byId(`${this.getId('action-play-' + item.key)}`).addEventListener(
-            'click',
-            (evt: MouseEvent) => {
-              //console.log('subscribViewDrumsEvents', item.key);
+            this.setInfo.tracks.forEach((item) => {
+                byId(`${this.getId('action-play-' + item.key)}`).addEventListener(
+                    'click',
+                    (evt: MouseEvent) => {
+                        //console.log('subscribViewDrumsEvents', item.key);
 
-              const track = this.setInfo.tracks.find(
-                  (track) => track.key === item.key
-              );
+                        const track = this.setInfo.tracks.find(
+                            (track) => track.key === item.key
+                        );
 
-              //console.log(track);
+                        //console.log(track);
 
-              if (!track) return;
+                        if (!track) return;
 
-              this.play(track.value);
-            }
-        );
-      });
-    }, 550);
-  }
+                        this.play(track.value);
+                    }
+                );
+            });
+        }, 550);
+    }
 
-  setViewDrums() {
-    this.view = 'drums';
+    setViewDrums() {
+        this.view = 'drums';
 
-    const content = `
+        const content = `
       <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
         <div style="padding: 1rem .5rem 1rem .5rem;">
           % ускорения
@@ -451,85 +451,33 @@ export class KeyboardPage {
       </div>
     `;
 
-    this.el$.html(content);
+        this.el$.html(content);
 
-    this.bpmRange = (this.context.$f7 as any).range.create({
-      el: dyName('slider', this.pageEl),
-      on: {
-        changed: (range: any) => {
-          this.bpmMultiple = range.value;
-        },
-      },
-    });
+        this.bpmRange = (this.context.$f7 as any).range.create({
+            el: dyName('slider', this.pageEl),
+            on: {
+                changed: (range: any) => {
+                    this.bpmMultiple = range.value;
+                },
+            },
+        });
 
-    this.subscribViewDrumsEvents();
-  }
+        this.subscribViewDrumsEvents();
+    }
 
-  async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
-    return multiPlayer.tryPlayTextLine({ text, repeat });
-  }
+    async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
+        return multiPlayer.tryPlayTextLine({ text, repeat });
+    }
 
-  stop() {
-    multiPlayer.clearMidiPlayer();
-  }
+    stop() {
+        multiPlayer.clearMidiPlayer();
+    }
 
-  async play(text: string, repeatCount?: number) {
-    multiPlayer.tryPlayMidiBlock({
-      blocks: text,
-      repeatCount,
-      bpmMultiple: this.bpmMultiple,
-    });
-
-    //   uniPlayer.clear();
-
-    //   const allBlocks = un.getBlocks(text);
-
-    //   const out = un.findBlockById(allBlocks, 'out');
-
-    //   let bpm = un.getOutBpm(out.rows); // 130
-    //   bpm = Math.round((bpm * this.bpmMultiple) / 100);
-
-    //   const repeat = repeatCount || un.getOutRepeat(out.rows); // 2
-    //   const outBlocks = un.getOutBlocksInfo(allBlocks);
-
-    //   //console.log('outBlocks', outBlocks);
-
-    //   const outLoops = outBlocks.map((block) => {
-    //     return Object.keys(block.instrs).map((instrKey) => {
-    //       const noteLine = block.instrs[instrKey];
-    //       const isDrum = instrKey.startsWith('@');
-    //       const loopRepeat = un.getRepeatCount(noteLine);
-
-    //       let instrCode: string | number = instrKey.split('-')[0];
-    //       instrCode = isDrum ? undefined : getInstrCodeBy(instrCode);
-
-    //       return uniPlayer.addLoop({
-    //         noteLine,
-    //         bpm,
-    //         isDrum,
-    //         repeat: block.repeat,
-    //         instrCode,
-    //       }).id;
-    //     });
-    //   });
-
-    //   //console.log('allBlocks', allBlocks);
-    //   //console.log('outBlocks', outBlocks);
-    //   //console.log('getOutDrumBlockInstrs.outLoops', outLoops);
-    //   //console.log('LOOPS', uniPlayer.loops);
-
-    //   let breakLoop: boolean = false;
-
-    //   await uniPlayer.waitLoadingAllInstruments();
-
-    //   for (let i = 0; i < repeat; i++) {
-    //     if (breakLoop) break;
-
-    //     for (let loops of outLoops) {
-    //       breakLoop = await uniPlayer.play(loops);
-
-    //       if (breakLoop) break;
-    //     }
-    //   }
-  }
+    async play(text: string, repeatCount?: number) {
+        multiPlayer.tryPlayMidiBlock({
+            blocks: text,
+            repeatCount,
+            bpmMultiple: this.bpmMultiple,
+        });
+    }
 }

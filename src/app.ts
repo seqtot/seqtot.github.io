@@ -30,7 +30,7 @@ const isDev =
 // const defRoute = '/set/set_ItsMyLife/';
 
 //const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
-const defRoute = isDev ? '/set/set_my/' : '/set/set_all/';
+const defRoute = isDev ? '/page/page_keyboard/' : '/set/set_all/';
 
 const linksToPage = [
   { href: '/set/set_all/', name: 'Список' },
@@ -39,8 +39,8 @@ const linksToPage = [
   // { href: '/set/set_Battle/', name: 'Продолжается бой' },
   { href: '/set/set_hardToHandle/', name: 'hardToHandle', isDev: true },
   //{ href: '/set/set_ItsMyLife/', name: 'Its my life', isDev: true },
-  { href: '/set/set_my/', name: 'test', isDev: true },
   { href: '/page/page_roll/', name: 'roll', isDev: true },
+  { href: '/page/page_keyboard/', name: 'keyboard', isDev: true },
   { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
 ];
 

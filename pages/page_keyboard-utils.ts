@@ -45,6 +45,8 @@ function getKeyFn(params: {
   const width = params.width || '1.5rem';
 
   return (note: string, symbol: string): string => {
+    symbol = '&nbsp;';
+
     let step = note[0];
 
     let fontWeight = ['m', 'f', 'v', 's'].find((item) => item === step)
