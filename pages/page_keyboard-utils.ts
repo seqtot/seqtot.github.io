@@ -66,6 +66,7 @@ function getKeyFn(params: {
         width: ${width};
         user-select: none;
         text-align: center;
+        touch-action: none;
         ${border}
         color: ${fontColor};
         font-weight: ${fontWeight};" 
