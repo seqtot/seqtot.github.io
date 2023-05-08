@@ -157,7 +157,7 @@ ${getKeyboardBass('bass')}
 <br/>
 <br/>
 
-${getKeyboardSolo3('solo')}
+${getKeyboardSolo4('solo')}
 
 <!--div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>

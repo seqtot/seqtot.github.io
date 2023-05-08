@@ -270,24 +270,26 @@ export class KeyboardPage {
     this.subscribeKeyboardEvents();
   }
 
-
   setKeysColor() {
-      const bassChar = (this.playingNote.bass || '')[0];
-      const soloChar = (this.playingNote.solo || '')[0];
+    const bassChar = (this.playingNote.bass || '')[0];
+    const soloChar = (this.playingNote.solo || '')[0];
 
-      getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-          el.style.backgroundColor = 'white';
-          const data = (el?.dataset || {}) as {keyboardId: string, noteLat: string};
-          const firstChar = data.noteLat[0];
+    getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
+      el.style.backgroundColor = 'white';
+      const data = (el?.dataset || {}) as {
+        keyboardId: string;
+        noteLat: string;
+      };
+      const firstChar = data.noteLat[0];
 
-          if (data.keyboardId === 'solo' && firstChar === bassChar) {
-              el.style.backgroundColor = 'lightgray';
-          }
+      if (data.keyboardId === 'solo' && firstChar === bassChar) {
+        el.style.backgroundColor = '#eee';
+      }
 
-          if (data.keyboardId === 'bass' && firstChar === soloChar) {
-              el.style.backgroundColor = 'lightgray';
-          }
-      });
+      // if (data.keyboardId === 'bass' && firstChar === soloChar) {
+      //   el.style.backgroundColor = 'lightgray';
+      // }
+    });
   }
 
   subscribeKeyboardEvents() {
