@@ -111,14 +111,6 @@ export class KeyboardPage {
     ) {}
 
     onMounted() {
-        let metaTag=document.createElement('meta');
-        metaTag.name = "viewport"
-        //<meta name="viewport" content="width=device-width, user-scalable=no">
-        //metaTag.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
-        metaTag.content = "width=device-width, initial-scale=1.0, user-scalable=no"
-
-        document.getElementsByTagName('head')[0].appendChild(metaTag);
-
         this.setViewInfo();
         dyName('panel-right-content').innerHTML = `
       <p data-name="action-info">табы</p>
