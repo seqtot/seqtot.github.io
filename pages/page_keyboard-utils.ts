@@ -140,23 +140,23 @@ ${getKey('sa', 'с')}${getKey('ba', 'б')}${getKey('me', 'м')}
 }
 
 const info = `
-<div style="margin: .5rem; user-select: none;">
+<div style="margin: .5rem; user-select: none; touch-action: none;">
 <br/>
 
 ${getKeyboardBass('bass')}
 
-<br/>
+<!-- br/ -->
 
-<span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
+<!-- span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
   clr&nbsp;&nbsp;
 </span>
 <span style="user-select: none; font-size: 1.5rem" data-name="select-random-key">
   rnd&nbsp;&nbsp;
-</span>
+</span -->
 
-<br/>
-<br/>
+<!-- br/ -->
 
+<!-- br/ -->
 <!--${getKeyboardSolo4('solo')}-->
 <!-- <br/> -->
 
@@ -568,7 +568,6 @@ ${getKey('no', 'н')}${getKey('so', 'с')}${getKey('bo', 'б')}
   return keyboard;
 }
 
-
 function getRelativeKeyFn(params: {
   keyboardId: string | number;
   width?: string;
@@ -591,7 +590,7 @@ function getRelativeKeyFn(params: {
     let fontColor = 'black';
 
     //let border = getBorder(note);
-    let border = pitchOffset ? 'border: 1px solid black;': 'border: none;';
+    let border = pitchOffset ? 'border: 1px solid black;' : 'border: none;';
 
     return `<div
       style="
@@ -612,11 +611,10 @@ function getRelativeKeyFn(params: {
         data-keyboard-id="${keyboardId}"
 
         >${symbol}</div>`
-        .replace(/\n/g, ' ')
-        .replace(/ +/g, ' ');
+      .replace(/\n/g, ' ')
+      .replace(/ +/g, ' ');
   };
 } // getKeyFn
-
 
 function getRelativeKeyboard(keyboardId?: number | string): string {
   keyboardId = keyboardId || '';
