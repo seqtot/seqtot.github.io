@@ -168,7 +168,7 @@ export class Synthesizer extends Sound {
     let print = typeof keyOrObj === 'string' ? true : !!keyOrObj.print;
     let soundInfo = this.keysAndNotes[keyOrNote];
 
-    console.log('soundInfo', {...soundInfo});
+    //console.log('soundInfo', {...soundInfo});
 
     let note = this.getNoteSame(keyOrNote);
     const noteLat = this.getNoteLat(note);
@@ -294,7 +294,8 @@ export class Synthesizer extends Sound {
       toneOffset = offsetFotNoteStep[this.playingTones[0].noteStep] || 0;
       //console.log('playSoundMidi.toneOffset', toneOffset);
     }
-    console.log('playSoundMidi.info', info);
+
+    //console.log('playSoundMidi.info', info);
 
     // fontPlayer.queueWaveTable(ctx, ctx.destination, instr, 0, 12 * 3 + 3, 10);
     info.waveBox = this.fontPlayer.queueWaveTable2(

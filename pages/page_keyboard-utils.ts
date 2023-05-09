@@ -157,7 +157,10 @@ ${getKeyboardBass('bass')}
 <br/>
 <br/>
 
-${getKeyboardSolo4('solo')}
+<!--${getKeyboardSolo4('solo')}-->
+<!-- <br/> -->
+
+${getRelativeKeyboard('relative')}
 
 <!--div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
   моЦу оПаХуЦу    <br/>
@@ -464,7 +467,8 @@ function getKeyboardSolo4(id?: number | string): string {
   const keyboard = `
 <div style="
     font-family: monospace;
-    user-select: none;    
+    user-select: none;
+    touch-action: none;    
     padding: 0.5rem 0 0.5rem 0.5rem;"
     data-name="keyboard-${id}"
 >
@@ -502,7 +506,8 @@ function getKeyboardSolo3(id?: number | string): string {
   const keyboard = `
 <div style="
     font-family: monospace;
-    user-select: none;    
+    user-select: none;  
+    touch-action: none;      
     padding: 0.5rem 0 0.5rem 0.5rem;"
     data-name="keyboard-${id}"
 >
@@ -536,7 +541,8 @@ function getKeyboardBass(id?: number | string): string {
   const keyboard = `
 <div style="
     font-family: monospace;
-    user-select: none;    
+    user-select: none;
+    touch-action: none;    
     padding: 0.5rem 0 0.5rem 0.5rem;"
     data-name="keyboard-${id}"
 >
@@ -555,6 +561,123 @@ ${getKey('ro', 'd')}${getKey('vo', 'f')}${getKey('ko', 'g')}
 ${getKey('nu', 'н')}${getKey('su', 'с')}${getKey('bu', 'б')}
 ${getKey('ny', '?')}${getKey('sy', 'с')}${getKey('by', 'б')}
 ${getKey('no', 'н')}${getKey('so', 'с')}${getKey('bo', 'б')}
+</div>
+
+`.replace(/\n/g, '');
+
+  return keyboard;
+}
+
+
+function getRelativeKeyFn(params: {
+  keyboardId: string | number;
+  width?: string;
+  fontSize?: string;
+}): (pitchOffset: string | number, symbol: string) => string {
+  const keyboardId = params.keyboardId || '';
+  const fontSize = params.fontSize || '1.3rem';
+  const width = params.width || '1.5rem';
+
+  return (pitchOffset: string | number, symbol: string): string => {
+    //symbol = '&nbsp;';
+    pitchOffset = ('' + pitchOffset).trim();
+
+    // let step = note[0];
+    //
+    // let fontWeight = ['m', 'f', 'v', 's'].find((item) => item === step)
+    //     ? 800
+    //     : 400;
+    let fontWeight = 400;
+    let fontColor = 'black';
+
+    //let border = getBorder(note);
+    let border = pitchOffset ? 'border: 1px solid black;': 'border: none;';
+
+    return `<div
+      style="
+        box-sizing: border-box;    
+        margin: 0;
+        padding: 0;
+        display: inline-block;
+        font-size: ${fontSize};
+        width: ${width};
+        user-select: none;
+        text-align: center;
+        touch-action: none;
+        ${border}
+        color: ${fontColor};
+        font-weight: ${fontWeight};" 
+        data-is-relative-note="true"
+        data-pitch-offset="${pitchOffset}"        
+        data-keyboard-id="${keyboardId}"
+
+        >${symbol}</div>`
+        .replace(/\n/g, ' ')
+        .replace(/ +/g, ' ');
+  };
+} // getKeyFn
+
+
+function getRelativeKeyboard(keyboardId?: number | string): string {
+  keyboardId = keyboardId || '';
+
+  const getKey = getRelativeKeyFn({ keyboardId, fontSize: '1rem' });
+
+  const keyboard = `
+<div style="
+    font-family: monospace;
+    user-select: none;
+    touch-action: none;        
+    padding: 0.5rem 0 0.5rem 0.5rem;"    
+    data-name="keyboard-${keyboardId}"
+>
+
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(-16, '-4')}${getKey(-15, '-3')}${getKey(-14, '-2')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+<br/>
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(-4, '-4')}${getKey(-3, '-3')}${getKey(-2, '-2')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+<br/>
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(8, '8')}${getKey(9, '9')}${getKey(10, '10')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+<br/>
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(20, '8')}${getKey(21, '9')}${getKey(22, '10')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+
+<br/>
+${getKey(-17, '-5')}${getKey(-5, '-5')}${getKey(7, '7')}${getKey(19, '7')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(23, '11')}${getKey(11, '11')}${getKey(-1, '-1')}${getKey(-13, '-1')}
+<br/>
+${getKey(-18, '-6')}${getKey(-6, '-6')}${getKey(6, '6')}${getKey(18, '6')}
+${getKey('', '')}${getKey(0, 'x')}${getKey('', '')}
+${getKey(12, '12')}${getKey(0, 'ц')}${getKey(-12, 'ю')}${getKey(-24, 'йу')}
+<br/>
+${getKey(-19, '-7')}${getKey(-7, '-7')}${getKey(5, '5')}${getKey(17, '5')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(13, '1')}${getKey(1, '1')}${getKey(-11, '-c')}${getKey(-23, '-с')}
+
+<br/>
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(16, '4')}${getKey(15, '3')}${getKey(14, '2')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+<br/>
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(4, '4')}${getKey(3, '3')}${getKey(2, '2')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+<br/>
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(-8, '-8')}${getKey(-9, '-9')}${getKey(-10, '-ж')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+<br/>
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey(-20, '-8')}${getKey(-21, '-9')}${getKey(-22, '-ж')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+
 </div>
 
 `.replace(/\n/g, '');

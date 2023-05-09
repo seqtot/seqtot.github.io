@@ -10,6 +10,7 @@ import { Synthesizer } from '../muse/synthesizer';
 import * as un from '../muse/utils-note';
 import { defaultSynthSettings } from '../muse/keyboards';
 import keyboardSet from './page_keyboard-utils';
+import {getNoteByOffset, parseInteger} from '../muse/utils-note';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -78,6 +79,7 @@ export class KeyboardPage {
   playingTick = '';
   bpmRange: Range.Range;
   playingNote: { [key: string]: string } = {};
+  relativeNote = 'do';
 
   get pageId(): string {
     return this.props.id;
@@ -268,6 +270,7 @@ export class KeyboardPage {
     );
 
     this.subscribeKeyboardEvents();
+    this.subscribeRelativeKeyboardEvents();
   }
 
   setKeysColor() {
@@ -371,6 +374,91 @@ export class KeyboardPage {
         }
       });
     }
+  }
+
+  subscribeRelativeKeyboardEvents() {
+    getWithDataAttr('is-relative-note', this.pageEl)?.forEach((el: HTMLElement) => {
+      if (!el?.dataset?.pitchOffset) {
+        return;
+      }
+
+      const keyboardId = el?.dataset?.keyboardId;
+      const offset = parseInteger(el?.dataset?.pitchOffset, null);
+
+      if (offset === null) {
+        return;
+      }
+
+      //console.log(offset, keyboardId);
+
+      el.addEventListener('pointerdown', (evt: MouseEvent) => {
+        const note = getNoteByOffset(this.relativeNote, offset);
+
+        synthesizer.playSound(
+            {
+              keyOrNote: this.playingNote[keyboardId],
+              id: keyboardId,
+              onlyStop: true,
+            },
+            true
+        );
+        this.playingNote[keyboardId] = note;
+
+        //el.style.backgroundColor = 'lightgray';
+
+        synthesizer.playSound({
+          keyOrNote: note,
+          id: keyboardId,
+        });
+
+        //this.setKeysColor();
+      });
+
+      el.addEventListener('pointerup', (evt: MouseEvent) => {
+        const note = getNoteByOffset(this.relativeNote, offset);
+
+        synthesizer.playSound(
+            {
+              keyOrNote: note,
+              id: keyboardId,
+              onlyStop: true,
+            },
+            true
+        );
+
+        this.playingNote[keyboardId] = undefined;
+      });
+    });
+
+    // const clearColor = () => {
+    //   getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
+    //     el.style.backgroundColor = 'white';
+    //   });
+    // };
+    //
+    // // очистка цвета
+    // let el = dyName('clear-keys-color', this.pageEl);
+    // if (el) {
+    //   el.addEventListener('click', () => clearColor());
+    // }
+    //
+    // el = dyName('select-random-key', this.pageEl);
+    // if (el) {
+    //   el.addEventListener('click', () => {
+    //     const val =
+    //         un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
+    //
+    //     const key = dyName(
+    //         `note-key-${val}`,
+    //         dyName(`keyboard-solo`, this.pageEl)
+    //     );
+    //
+    //     if (key) {
+    //       clearColor();
+    //       key.style.backgroundColor = 'lightgray';
+    //     }
+    //   });
+    // }
   }
 
   getTracksContent(): string {
