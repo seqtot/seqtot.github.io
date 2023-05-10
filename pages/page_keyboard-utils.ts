@@ -683,7 +683,7 @@ function getRelativeKeyboard(keyboardId?: number | string): string {
 
 ${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
 ${getKey(-16, '-4')}${getKey(-15, '-3')}${getKey(-14, '-2')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getCmd('setDo', 'до')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getCmd('setDa', 'da')}
 <br/>
 ${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
 ${getKey(-4, '-4')}${getKey(-3, '-3')}${getKey(-2, '-2')}

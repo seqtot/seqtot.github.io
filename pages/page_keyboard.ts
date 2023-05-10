@@ -79,8 +79,8 @@ export class KeyboardPage {
   playingTick = '';
   bpmRange: Range.Range;
   playingNote: { [key: string]: string } = {};
-  fixedRelativeNote = 'do';
-  lastRelativeNote = 'do';
+  fixedRelativeNote = 'da';
+  lastRelativeNote = 'da';
 
   get pageId(): string {
     return this.props.id;
@@ -380,10 +380,10 @@ export class KeyboardPage {
   subscribeRelativeKeyboardEvents() {
     const fixEl = dyName('relative-command-fix');
 
-    dyName('relative-command-setDo')?.addEventListener('pointerdown', (evt: MouseEvent) => {
-      this.fixedRelativeNote = 'do';
-      this.lastRelativeNote = 'do'
-      fixEl.innerText = 'do';
+    dyName('relative-command-setDa')?.addEventListener('pointerdown', (evt: MouseEvent) => {
+      this.fixedRelativeNote = 'da';
+      this.lastRelativeNote = 'da'
+      fixEl.innerText = 'da';
     });
 
     fixEl.addEventListener('pointerdown', (evt: MouseEvent) => {
