@@ -79,7 +79,8 @@ export class KeyboardPage {
   playingTick = '';
   bpmRange: Range.Range;
   playingNote: { [key: string]: string } = {};
-  relativeNote = 'do';
+  fixedRelativeNote = 'do';
+  lastRelativeNote = 'do';
 
   get pageId(): string {
     return this.props.id;
@@ -377,6 +378,55 @@ export class KeyboardPage {
   }
 
   subscribeRelativeKeyboardEvents() {
+    const fixEl = dyName('relative-command-fix');
+
+    dyName('relative-command-setDo')?.addEventListener('pointerdown', (evt: MouseEvent) => {
+      this.fixedRelativeNote = 'do';
+      this.lastRelativeNote = 'do'
+      fixEl.innerText = 'do';
+    });
+
+    fixEl.addEventListener('pointerdown', (evt: MouseEvent) => {
+      const keyboardId = fixEl?.dataset?.keyboardId;
+
+      synthesizer.playSound(
+          {
+            keyOrNote: this.playingNote[keyboardId],
+            id: keyboardId,
+            onlyStop: true,
+          },
+          true
+      );
+
+      if (!this.lastRelativeNote) {
+        return;
+      }
+
+      this.fixedRelativeNote = this.lastRelativeNote;
+      this.playingNote[keyboardId] = this.lastRelativeNote;
+
+      synthesizer.playSound({
+        keyOrNote: this.lastRelativeNote,
+        id: keyboardId,
+      });
+
+    });
+
+    fixEl.addEventListener('pointerup', (evt: MouseEvent) => {
+      const keyboardId = fixEl?.dataset?.keyboardId;
+
+      synthesizer.playSound(
+          {
+            keyOrNote: this.lastRelativeNote,
+            id: keyboardId,
+            onlyStop: true,
+          },
+          true
+      );
+
+      this.playingNote[keyboardId] = undefined;
+    });
+
     getWithDataAttr('is-relative-note', this.pageEl)?.forEach((el: HTMLElement) => {
       if (!el?.dataset?.pitchOffset) {
         return;
@@ -392,7 +442,7 @@ export class KeyboardPage {
       //console.log(offset, keyboardId);
 
       el.addEventListener('pointerdown', (evt: MouseEvent) => {
-        const note = getNoteByOffset(this.relativeNote, offset);
+        const note = getNoteByOffset(this.fixedRelativeNote, offset);
 
         synthesizer.playSound(
             {
@@ -403,8 +453,15 @@ export class KeyboardPage {
             true
         );
         this.playingNote[keyboardId] = note;
+        this.lastRelativeNote = note;
 
-        //el.style.backgroundColor = 'lightgray';
+        if (!note) {
+          return;
+        }
+
+        if (fixEl) {
+          fixEl.innerText = note;
+        }
 
         synthesizer.playSound({
           keyOrNote: note,
@@ -415,7 +472,7 @@ export class KeyboardPage {
       });
 
       el.addEventListener('pointerup', (evt: MouseEvent) => {
-        const note = getNoteByOffset(this.relativeNote, offset);
+        const note = getNoteByOffset(this.fixedRelativeNote, offset);
 
         synthesizer.playSound(
             {

@@ -568,6 +568,55 @@ ${getKey('no', 'н')}${getKey('so', 'с')}${getKey('bo', 'б')}
   return keyboard;
 }
 
+
+function getRelativeCommandFn(params: {
+  keyboardId: string | number;
+  width?: string;
+  fontSize?: string;
+}): (pitchOffset: string | number, symbol: string) => string {
+  const keyboardId = params.keyboardId || '';
+  const fontSize = params.fontSize || '1.3rem';
+  const width = params.width || '1.5rem';
+
+  return (command: string, symbol: string): string => {
+    symbol = symbol || '&nbsp;'
+    command = (command || '').trim();
+
+    // let step = note[0];
+    //
+    // let fontWeight = ['m', 'f', 'v', 's'].find((item) => item === step)
+    //     ? 800
+    //     : 400;
+    let fontWeight = 400;
+    let fontColor = 'black';
+
+    //let border = getBorder(note);
+    let border = command ? 'border: 1px solid black;' : 'border: none;';
+
+    return `<div
+      style="
+        box-sizing: border-box;    
+        margin: 0;
+        padding: 0;
+        display: inline-block;
+        font-size: ${fontSize};
+        width: ${width};
+        user-select: none;
+        text-align: center;
+        touch-action: none;
+        ${border}
+        color: ${fontColor};
+        font-weight: ${fontWeight};"
+        data-name="relative-command-${command}" 
+        data-is-relative-command="true"
+        data-command="${command}"        
+        data-keyboard-id="${keyboardId}"
+        >${symbol}</div>`
+        .replace(/\n/g, ' ')
+        .replace(/ +/g, ' ');
+  };
+} // getKeyFn
+
 function getRelativeKeyFn(params: {
   keyboardId: string | number;
   width?: string;
@@ -577,9 +626,10 @@ function getRelativeKeyFn(params: {
   const fontSize = params.fontSize || '1.3rem';
   const width = params.width || '1.5rem';
 
-  return (pitchOffset: string | number, symbol: string): string => {
+  return (pitchOffset: string | number, symbol?: string): string => {
     //symbol = '&nbsp;';
     pitchOffset = ('' + pitchOffset).trim();
+    symbol = symbol || '&nbsp;'
 
     // let step = note[0];
     //
@@ -620,6 +670,7 @@ function getRelativeKeyboard(keyboardId?: number | string): string {
   keyboardId = keyboardId || '';
 
   const getKey = getRelativeKeyFn({ keyboardId, fontSize: '1rem' });
+  const getCmd = getRelativeCommandFn({ keyboardId, fontSize: '1rem' });
 
   const keyboard = `
 <div style="
@@ -632,7 +683,7 @@ function getRelativeKeyboard(keyboardId?: number | string): string {
 
 ${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
 ${getKey(-16, '-4')}${getKey(-15, '-3')}${getKey(-14, '-2')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getCmd('setDo', 'до')}
 <br/>
 ${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
 ${getKey(-4, '-4')}${getKey(-3, '-3')}${getKey(-2, '-2')}
@@ -652,7 +703,7 @@ ${getKey('', '')}${getKey('', '')}${getKey('', '')}
 ${getKey(23, '11')}${getKey(11, '11')}${getKey(-1, '-1')}${getKey(-13, '-1')}
 <br/>
 ${getKey(-18, '-6')}${getKey(-6, '-6')}${getKey(6, '6')}${getKey(18, '6')}
-${getKey('', '')}${getKey(0, 'x')}${getKey('', '')}
+${getKey('', '')}${getCmd('fix', '')}${getKey('', '')}
 ${getKey(12, '12')}${getKey(0, 'ц')}${getKey(-12, 'ю')}${getKey(-24, 'йу')}
 <br/>
 ${getKey(-19, '-7')}${getKey(-7, '-7')}${getKey(5, '5')}${getKey(17, '5')}
