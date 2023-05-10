@@ -383,6 +383,7 @@ export class KeyboardPage {
 
   subscribeRelativeKeyboardEvents() {
     const fixEl = dyName('relative-command-fix');
+    const zeroEl = dyName('relative-note-0');
 
     dyName('relative-command-fixQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
       this.fixedRelativeNote = this.lastRelativeNote;
@@ -390,18 +391,21 @@ export class KeyboardPage {
       fixEl.innerText = this.fixedQuickNote;
       const el = dyName('relative-command-setQuickNote');
       el.innerText = this.fixedQuickNote;
+      zeroEl.innerText = this.fixedQuickNote;
     });
 
     dyName('relative-command-setQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
       this.fixedRelativeNote = this.fixedQuickNote;
       this.lastRelativeNote = this.fixedQuickNote;
       fixEl.innerText = this.fixedQuickNote;
+      zeroEl.innerText = this.fixedQuickNote;
     });
 
     dyName('relative-command-setDa')?.addEventListener('pointerdown', (evt: MouseEvent) => {
       this.fixedRelativeNote = defaultNote;
       this.lastRelativeNote = defaultNote;
       fixEl.innerText = defaultNote;
+      zeroEl.innerText = defaultNote;
     });
 
     fixEl.addEventListener('pointerdown', (evt: MouseEvent) => {
@@ -422,6 +426,7 @@ export class KeyboardPage {
 
       this.fixedRelativeNote = this.lastRelativeNote;
       this.playingNote[keyboardId] = this.lastRelativeNote;
+      zeroEl.innerText = this.lastRelativeNote;
 
       synthesizer.playSound({
         keyOrNote: this.lastRelativeNote,

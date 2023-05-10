@@ -1,3 +1,24 @@
+const relativeBoardTop: any[][]  = [
+  ['setDa', null, null, null,  -13, -24,  -23,  null, null, null, 'setQuickNote'],
+  [null,    null, null, null,   -1, -12,  -11,  null, null, null, null],
+  [null,    null, null, null,   11,   0,    1,  null, null, null, null],
+  [null,    null, null, null,   23,  12,   13,  null,  null, null, null],
+];
+
+const relativeBoardMiddle: any[][]  = [
+  [-14, -2, 10, 22,    null,  null,  null,    14, 2, -10, -22],
+  [-15, -3,  9, 21,    null,  'fix', null,    15, 3,  -9, -21],
+  [-16, -4,  8, 20,    null,  null,  null,    16, 4,  -8, -20],
+];
+
+const relativeBoardBottom: any[][]  = [
+  [null, null, null, null,   19,   18, 17,     null, null, null, null],
+  [null, null, null, null,   7,     6,  5,     null, null, null, null],
+  [null, null, null, null,   -5,   -6, -7,     null, null, null, null],
+  [null, null, null, null,   -17, -18, -19,    null,  null, null, 'fixQuickNote'],
+];
+
+
 function getBorder(note: string): string {
   note = note || '';
   let border = 'border: none;';
@@ -655,7 +676,8 @@ function getRelativeKeyFn(params: {
         touch-action: none;
         ${border}
         color: ${fontColor};
-        font-weight: ${fontWeight};" 
+        font-weight: ${fontWeight};"
+        data-name="relative-note-${pitchOffset}" 
         data-is-relative-note="true"
         data-pitch-offset="${pitchOffset}"        
         data-keyboard-id="${keyboardId}"
@@ -666,11 +688,39 @@ function getRelativeKeyFn(params: {
   };
 } // getKeyFn
 
+
+
+
+
 function getRelativeKeyboard(keyboardId?: number | string): string {
   keyboardId = keyboardId || '';
 
   const getKey = getRelativeKeyFn({ keyboardId, fontSize: '1rem' });
   const getCmd = getRelativeCommandFn({ keyboardId, fontSize: '1rem' });
+
+  let board = '';
+
+  let commands = {
+    fix: 'da',
+    setDa: 'da',
+    setQuickNote: 'da',
+    fixQuickNote: 'x',
+  };
+
+  [...relativeBoardTop, ...relativeBoardMiddle, ...relativeBoardBottom].forEach(row => {
+    row.forEach(item => {
+      item = item === null ? '' : item;
+
+      if (typeof item === 'number' || !item) {
+        board = board + getKey(item, item === 0 ? 'da' : '');
+      } else {
+        board = board + getCmd(item, commands[item] || '?');
+      }
+    });
+
+    board = board + '<br/>';
+  });
+
 
   const keyboard = `
 <div style="
@@ -679,56 +729,7 @@ function getRelativeKeyboard(keyboardId?: number | string): string {
     touch-action: none;        
     padding: 0.5rem 0 0.5rem 0.5rem;"    
     data-name="keyboard-${keyboardId}"
->
-
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(-16, '-4')}${getKey(-15, '-3')}${getKey(-14, '-2')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getCmd('setDa', 'da')}
-<br/>
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(-4, '-4')}${getKey(-3, '-3')}${getKey(-2, '-2')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-<br/>
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(8, '8')}${getKey(9, '9')}${getKey(10, '10')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-<br/>
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(20, '8')}${getKey(21, '9')}${getKey(22, '10')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-
-<br/>
-${getKey(-17, '-5')}${getKey(-5, '-5')}${getKey(7, '7')}${getKey(19, '7')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(23, '11')}${getKey(11, '11')}${getKey(-1, '-1')}${getKey(-13, '-1')}
-<br/>
-${getKey(-18, '-6')}${getKey(-6, '-6')}${getKey(6, '6')}${getKey(18, '6')}
-${getKey('', '')}${getCmd('fix', '')}${getKey('', '')}
-${getKey(12, '12')}${getKey(0, 'ц')}${getKey(-12, 'ю')}${getKey(-24, 'йу')}
-<br/>
-${getKey(-19, '-7')}${getKey(-7, '-7')}${getKey(5, '5')}${getKey(17, '5')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(13, '1')}${getKey(1, '1')}${getKey(-11, '-c')}${getKey(-23, '-с')}
-
-<br/>
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(16, '4')}${getKey(15, '3')}${getKey(14, '2')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-<br/>
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(4, '4')}${getKey(3, '3')}${getKey(2, '2')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-<br/>
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(-8, '-8')}${getKey(-9, '-9')}${getKey(-10, '-ж')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-<br/>
-${getCmd('fixQuickNote', 'x')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
-${getKey(-20, '-8')}${getKey(-21, '-9')}${getKey(-22, '-ж')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getCmd('setQuickNote', 'da')}
-
-</div>
-
+>${board}</div>
 `.replace(/\n/g, '');
 
   return keyboard;
