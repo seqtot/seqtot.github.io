@@ -723,9 +723,9 @@ ${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
 ${getKey(-8, '-8')}${getKey(-9, '-9')}${getKey(-10, '-ж')}
 ${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
 <br/>
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getCmd('fixQuickNote', 'x')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
 ${getKey(-20, '-8')}${getKey(-21, '-9')}${getKey(-22, '-ж')}
-${getKey('', '')}${getKey('', '')}${getKey('', '')}${getKey('', '')}
+${getKey('', '')}${getKey('', '')}${getKey('', '')}${getCmd('setQuickNote', 'da')}
 
 </div>
 

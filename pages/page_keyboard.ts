@@ -73,14 +73,18 @@ const ticks = {
   '4:4': tick44,
 };
 
+const defaultNote = 'da';
+
 export class KeyboardPage {
   view: 'info' | 'drums' = 'info';
   bpmMultiple = 100;
   playingTick = '';
   bpmRange: Range.Range;
   playingNote: { [key: string]: string } = {};
-  fixedRelativeNote = 'da';
-  lastRelativeNote = 'da';
+
+  fixedRelativeNote = defaultNote;
+  lastRelativeNote = defaultNote;
+  fixedQuickNote = defaultNote;
 
   get pageId(): string {
     return this.props.id;
@@ -380,10 +384,24 @@ export class KeyboardPage {
   subscribeRelativeKeyboardEvents() {
     const fixEl = dyName('relative-command-fix');
 
+    dyName('relative-command-fixQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
+      this.fixedRelativeNote = this.lastRelativeNote;
+      this.fixedQuickNote = this.lastRelativeNote;
+      fixEl.innerText = this.fixedQuickNote;
+      const el = dyName('relative-command-setQuickNote');
+      el.innerText = this.fixedQuickNote;
+    });
+
+    dyName('relative-command-setQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
+      this.fixedRelativeNote = this.fixedQuickNote;
+      this.lastRelativeNote = this.fixedQuickNote;
+      fixEl.innerText = this.fixedQuickNote;
+    });
+
     dyName('relative-command-setDa')?.addEventListener('pointerdown', (evt: MouseEvent) => {
-      this.fixedRelativeNote = 'da';
-      this.lastRelativeNote = 'da'
-      fixEl.innerText = 'da';
+      this.fixedRelativeNote = defaultNote;
+      this.lastRelativeNote = defaultNote;
+      fixEl.innerText = defaultNote;
     });
 
     fixEl.addEventListener('pointerdown', (evt: MouseEvent) => {
