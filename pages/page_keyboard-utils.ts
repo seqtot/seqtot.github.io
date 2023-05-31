@@ -183,7 +183,7 @@ ${getKeyboardSolo4('solo')}
 <!--${getRelativeKeyboard('relative')}-->
 
 <div style="font-size: 1.5rem; font-family: monospace; user-select: none; touch-action: none;">
-  о яЛуСуЛуЛуЛу лаНаЗуЛуЛаМа <br/>
+  о яЛуСуЛуЛуЛу cаНаЗуЛуЛаМа <br/>
   оНаНу хаЛаНуЛу луЛуХаНа    <br/>
 </div>
 
