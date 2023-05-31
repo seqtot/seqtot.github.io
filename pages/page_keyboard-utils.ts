@@ -161,37 +161,31 @@ ${getKey('sa', 'с')}${getKey('ba', 'б')}${getKey('me', 'м')}
 }
 
 const info = `
-<div style="margin: 0 .5rem .5rem .5rem; user-select: none; touch-action: none;">
+<div style="margin: .5rem; user-select: none; touch-action: none;">
 <!--br/-->
 
 ${getKeyboardBass('bass')}
 
 <!-- br/ -->
 
-<!-- span style="user-select: none; font-size: 1.5rem" data-name="clear-keys-color">
+<span style="font-size: 1.5rem; user-select: none; touch-action: none;" data-name="clear-keys-color">
   clr&nbsp;&nbsp;
 </span>
-<span style="user-select: none; font-size: 1.5rem" data-name="select-random-key">
+<span style="font-size: 1.5rem; user-select: none; touch-action: none;" data-name="select-random-key">
   rnd&nbsp;&nbsp;
-</span -->
+</span>
 
-<!-- br/ -->
+<br/>
+<br/>
+${getKeyboardSolo4('solo')}
+<br/>
 
-<!-- br/ -->
-<!--${getKeyboardSolo4('solo')}-->
-<!-- <br/> -->
+<!--${getRelativeKeyboard('relative')}-->
 
-${getRelativeKeyboard('relative')}
-
-<!--div style="font-size: 1.5rem; font-family: monospace; user-select: none;">
-  моЦу оПаХуЦу    <br/>
-  моПаЦу ЩуЦу     <br/>
-  буПаЦу оПаХуЦу <br/>
-  моЦуЩуЩа  щуЩа  <br/>
-  воЦуЦуЦа цуЩуЦуЦу <br/>
-  соЩуЦуЦа <br/>
-  моЦуЦаПу паЦуЦаПу  <br/>
-</div-->
+<div style="font-size: 1.5rem; font-family: monospace; user-select: none; touch-action: none;">
+  о яЛуСуЛуЛуЛу лаНаЗуЛуЛаМа <br/>
+  оНаНу хаЛаНуЛу луЛуХаНа    <br/>
+</div>
 
 </div>
 `;
