@@ -105,35 +105,39 @@ const rightPanel = `
 </div>
 `;
 
+// старая навигационная панель
+// <div class="navbar">
+// <div class="navbar-bg"></div>
+// <div class="navbar-inner">
+//   <div class="left">
+//     <a href="#" class="link icon-only panel-open" data-panel=".panel-left">
+//       <i class="icon f7-icons">menu</i>
+//     </a>
+//     <!--a href="#" class="link back">
+//       <i class="icon icon-back"></i>
+//       <span class="if-not-md">Back</span>
+//     </a-->
+//   </div>
+//   <div class="title sliding">Band-IT</div>
+//   <div class="right">
+//     <a href="#" class="link icon-only panel-open" data-panel="right">
+//       <i class="icon f7-icons">menu</i>
+//     </a>
+//   </div>
+// </div>
+// </div>
+
 const appTpl = `
   ${leftPanel}
   ${rightPanel}
 
-  <div class="navbar">
-    <div class="navbar-bg"></div>
-    <div class="navbar-inner">
-      <div class="left">
-        <a href="#" class="link icon-only panel-open" data-panel=".panel-left">
-          <i class="icon f7-icons">menu</i>
-        </a>
-        <!--a href="#" class="link back">
-          <i class="icon icon-back"></i>
-          <span class="if-not-md">Back</span>
-        </a-->
-      </div>
-      <div class="title sliding">Band-IT</div>
-      <div class="right">
-        <a href="#" class="link icon-only panel-open" data-panel="right">
-          <i class="icon f7-icons">menu</i>
-        </a>
-      </div>
-    </div>
+  <div style="text-align: center;">
+    <a class="panel-open" data-panel=".panel-left">LFT</a>&nbsp;
+    <a class="panel-open" data-panel=".panel-right">RHT</a>
   </div>
   
-<!-- Your main view, should have "view-main" class -->
-<div class="view view-main view-init safe-areas" data-url="${defRoute}">
-
-</div>
+  <!-- Your main view, should have "view-main" class -->
+  <div class="view view-main view-init safe-areas" data-url="${defRoute}"></div>
 `;
 
 appEl.innerHTML = appTpl;
