@@ -161,8 +161,8 @@ ${getKey('sa', 'с')}${getKey('ba', 'б')}${getKey('me', 'м')}
 }
 
 const info = `
-<div style="margin: .5rem; user-select: none; touch-action: none;">
-<br/>
+<div style="margin: 0 .5rem .5rem .5rem; user-select: none; touch-action: none;">
+<!--br/-->
 
 ${getKeyboardBass('bass')}
 
