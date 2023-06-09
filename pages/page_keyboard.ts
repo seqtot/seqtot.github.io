@@ -191,23 +191,27 @@ export class KeyboardPage {
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
+                <div style="margin: .5rem; user-select: none; touch-action: none;">
+                    <pre style="font-family: monospace; font-size: 2rem; margin: .5rem;">
+Q_q_Aoq_X_q_A_xv
+Q_q_AoxoX_qoA_xv</pre>
+                </div>                
+
                 <div
                     style="
-                    display: flex;
-                        margin: .5rem;
-                        width: 17rem;
+                        display: flex;
                         user-select: none; touch-action: none;
                     "                
                 >
                     <div
                         style="
-                            width: 10rem;
+                            width: 60%;
                         "
                     >
                         <div
                             style="
-                                height: 8rem;
-                                width: 10rem;
+                                width: 100%;
+                                height: 10rem;
                                 border: 1px solid black;
                                 user-select: none; touch-action: none;
                             "
@@ -217,8 +221,8 @@ export class KeyboardPage {
                         </div>
                         <div
                             style="
-                                height: 8rem;
-                                width: 10rem;
+                                width: 100%;                            
+                                height: 10rem;
                                 border: 1px solid black;
                                 user-select: none; touch-action: none;
                             "
@@ -230,8 +234,8 @@ export class KeyboardPage {
                     
                     <div
                         style="                           
-                            height: 16rem;
-                            width: 6rem;
+                            height: 20rem;
+                            width: 40%;
                             border: 1px solid black;
                             user-select: none; touch-action: none;
                         "
@@ -394,8 +398,8 @@ export class KeyboardPage {
                 synthesizer.playSound(
                     {
                         keyOrNote: info.note,
-                        id: 'sn',
-                        instrCode: info.instr,
+                        id: 'drum',
+                        //instrCode: info.instr,
                         //onlyStop: true,
                     },
                     false
@@ -406,8 +410,8 @@ export class KeyboardPage {
                 synthesizer.playSound(
                     {
                         keyOrNote: info.note,
-                        id: 'sn',
-                        instrCode: info.instr,
+                        id: 'drum',
+                        //instrCode: info.instr,
                         //onlyStop: true,
                     },
                     true
