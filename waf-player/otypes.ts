@@ -34,11 +34,15 @@ export type WaveZone = {
 	tailed?: boolean,
 };
 export type WavePreset = {
+	pitchShift?: number,
 	zones: WaveZone[];
 };
 export type WaveSlide = {
-	when: number,
-	delta: number
+    endWhen: number,
+    delta: number,
+    volume?: number | null,
+    isPlato?: boolean,
+	hasVolumeSlide?: boolean,
 };
 export type WaveAHDSR = {
 	duration: number,

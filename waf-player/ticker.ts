@@ -1,4 +1,6 @@
-'use strict'
+'use babel';
+//'use strict'
+
 import {WebAudioFontPlayer} from './player'
 import {ChordQueue} from './otypes'
 
@@ -15,7 +17,16 @@ export class WebAudioFontTicker {
 				var note = queue[i];
 				if (note.when >= from && note.when < to) {
 					var start = when + note.when - from;
-					player.queueWaveTable(audioContext, note.destination, note.preset, start, note.pitch, note.duration, note.volume, note.slides);
+					player.queueWaveTableSrc({
+						audioContext: audioContext,
+						targetNode: note.destination,
+						preset: note.preset,
+						when: start,
+						pitch: note.pitch,
+						duration: note.duration,
+						volume: note.volume,
+						slides: note.slides
+					});
 				}
 			}
 		}, loopStart, loopPosition, loopEnd, function (at) {

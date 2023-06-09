@@ -1,4 +1,5 @@
-'use strict'
+'use babel';
+//'use strict';
 
 export class WebAudioFontChannel {
 	audioContext: AudioContext;

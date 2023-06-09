@@ -8,6 +8,7 @@
 // import Framework7 from 'framework7';
 // Import framework with all components
 import Framework7 from 'framework7/bundle';
+import { mboxOldRc } from './mbox-old-rc';
 import { mboxRc } from './mbox-rc';
 import { pageRc } from './page-rc';
 
@@ -31,6 +32,7 @@ const isDev =
 
 //const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
 const defRoute = isDev ? '/page/page_keyboard/' : '/set/set_all/';
+//const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
 const linksToPage = [
   { href: '/set/set_all/', name: 'Список' },
@@ -38,6 +40,7 @@ const linksToPage = [
   // { href: '/set/set_E/', name: 'set E' },
   // { href: '/set/set_Battle/', name: 'Продолжается бой' },
   { href: '/set/set_hardToHandle/', name: 'hardToHandle', isDev: true },
+  { href: '/mbox/tiriTiri/', name: 'tiriTiri', isDev: true },
   //{ href: '/set/set_ItsMyLife/', name: 'Its my life', isDev: true },
   { href: '/page/page_roll/', name: 'roll', isDev: true },
   { href: '/page/page_keyboard/', name: 'keyboard', isDev: true },
@@ -157,6 +160,10 @@ const app = new Framework7({
   routes: [
     {
       path: '/set/:id',
+      component: mboxOldRc,
+    },
+    {
+      path: '/mbox/:id',
       component: mboxRc,
     },
     {

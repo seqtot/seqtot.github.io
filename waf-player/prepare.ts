@@ -1,6 +1,7 @@
+'use babel';
+
 import {WavePreset, WaveZone} from './otypes'
 import {Deferred} from './utils';
-
 
 function isNeg (number): boolean {
 	return number === 0 && (1 / number) === -Infinity;
@@ -95,7 +96,7 @@ function shallow (ctx: AudioContext, buffer: AudioBuffer): AudioBuffer {
 	//workaround for faster browser creation
 	//avoid extra checks & copying inside of AudioBuffer class
 	//if (isBrowser) {
-		return ctx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+	return ctx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
 	//}
 
 	//return create(buffer.length, buffer.numberOfChannels, buffer.sampleRate);
@@ -139,7 +140,6 @@ function transformWithZero(val: number, i: number, channel: any, data: number[])
 
 	return val;
 }
-
 
 // https://github.com/audiojs/audio-buffer-utils
 async function getBufferFromFile(ctx: AudioContext, file: string): Promise<AudioBuffer> {
@@ -260,12 +260,20 @@ export async function prepareZone (ctx: AudioContext, zone: WaveZone): Promise<W
 		dfr.resolve(zone);
 	}
 
-	 return dfr.promise;
+	return dfr.promise;
 }
 
-export async function preparePreset (audioContext: AudioContext, preset: WavePreset): Promise<WavePreset> {
+export async function preparePreset (audioContext: AudioContext, preset: WavePreset, info?: any): Promise<WavePreset | null> {
+	if (!preset) {
+		console.log('preparePreset: preset is null', info);
+
+		return Promise.resolve(null);
+	}
+
+	preset.pitchShift = numValue(preset.pitchShift, 0);
+
 	for (let i = 0; i < preset.zones.length; i++) {
-		await prepareZone(audioContext, preset.zones[i]);
+		prepareZone(audioContext, preset.zones[i]);
 	}
 
 	return Promise.resolve(preset);

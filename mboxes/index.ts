@@ -4,6 +4,7 @@ import set_itsMyLife from './/set_ItsMyLife';
 import set_blackNight from './/set_blackNight';
 import set_all from './/set_All';
 import set_hardToHandle from './/set_HardToHandle';
+import tiriTiri from './tiriTiri';
 
 export default {
   set_e,
@@ -12,4 +13,5 @@ export default {
   set_blackNight,
   set_all,
   set_hardToHandle,
+  tiriTiri,
 };

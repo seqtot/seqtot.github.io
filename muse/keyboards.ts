@@ -1,8 +1,8 @@
 'use babel';
 
-import { drumKeysRight, drumInfo, drumCodes } from './drums';
+import {drumKeysRight, drumInfo, drumCodes} from './drums';
 
-export const MIDI_INSTR = 168;
+export const MIDI_INSTR = 162;
 
 // # bass 370
 // # Acoustic Bass: 366 - 374
@@ -21,20 +21,21 @@ export const MIDI_INSTR = 168;
 
 // 630 - trombone
 
+
 export const keysLeftToRightBrassSection = `
 # 0-key 1-note 2-volume 3-instrCode
-noteDu      ~ды~0.8~638,
-noteTu      ~ты~0.8~638,
-noteRu      ~ры~0.8~638,
-noteNu      ~ны~0.8~638,
-noteMu      ~мы~0.8~638,
-noteFu      ~фы~0.8~638,
-noteVu      ~вы~0.8~638,
-noteSu      ~сы~0.8~638,
-noteZu      ~зы~0.8~638,
-noteLu      ~лы~0.8~638,
-noteKu      ~кы~0.8~638,
-noteBu      ~бы~0.8~638,
+noteDy      ~ды~0.8~638,
+noteTy      ~ты~0.8~638,
+noteRy      ~ры~0.8~638,
+noteNy      ~ны~0.8~638,
+noteMy      ~мы~0.8~638,
+noteFy      ~фы~0.8~638,
+noteVy      ~вы~0.8~638,
+noteSy      ~сы~0.8~638,
+noteZy      ~зы~0.8~638,
+noteLy      ~лы~0.8~638,
+noteKy      ~кы~0.8~638,
+noteBy      ~бы~0.8~638,
 
 Backquote   ~ду~0.8~638,
 Tab         ~ту~0.8~638,
@@ -92,32 +93,30 @@ ShiftRight  ~бе~0.2~618,
 
 export const keysLeftToRight = `
 # 0-key 1-note 2-volume 3-instrCode
-noteDu      ~ды~1.0,
-noteTu      ~ты~1.0,
-noteRu      ~ры~1.0,
-noteNu      ~ны~1.0,
-noteMu      ~мы~1.0,
-noteFu      ~фы~1.0,
-noteVu      ~вы~1.0,
-noteSu      ~сы~1.0,
-noteZu      ~зы~1.0,
-noteLu      ~лы~1.0,
-noteKu      ~кы~1.0,
-noteBu      ~бы~1.0,
-
-Backquote   ~ду~1.0,
-Tab         ~ту~1.0,
-CapsLock    ~ру~1.0,
-ShiftLeft   ~ну~1.0,
-Digit1      ~му~1.0,
-KeyQ        ~фу~1.0,
-KeyA        ~ву~1.0,
-KeyZ        ~су~1.0,
-Digit2      ~зу~1.0,
-KeyW        ~лу~1.0,
-KeyS        ~ку~1.0,
-KeyX        ~бу~1.0,
-
+noteDy      ~ды~0.5,
+noteTy      ~ты~0.5,
+noteRy      ~ры~0.5,
+noteNy      ~ны~0.5,
+noteMy      ~мы~0.5,
+noteFy      ~фы~0.5,
+noteVy      ~вы~0.5,
+noteSy      ~сы~0.5,
+noteZy      ~зы~0.5,
+noteLy      ~лы~0.5,
+noteKy      ~кы~0.5,
+noteBy      ~бы~0.5,
+Backquote   ~ду~0.5,
+Tab         ~ту~0.5,
+CapsLock    ~ру~0.5,
+ShiftLeft   ~ну~0.5,
+Digit1      ~му~0.5,
+KeyQ        ~фу~0.5,
+KeyA        ~ву~0.5,
+KeyZ        ~су~0.5,
+Digit2      ~зу~0.5,
+KeyW        ~лу~0.5,
+KeyS        ~ку~0.5,
+KeyX        ~бу~0.5,
 Digit3      ~до~0.5,
 KeyE        ~то~0.5,
 KeyD        ~ро~0.5,
@@ -130,45 +129,31 @@ Digit5      ~зо~0.5,
 KeyT        ~ло~0.5,
 KeyG        ~ко~0.5,
 KeyB        ~бо~0.5,
+Digit6      ~да~0.5,
+KeyY        ~та~0.5,
+KeyH        ~ра~0.5,
+KeyN        ~на~0.5,
+Digit7      ~ма~0.5,
+KeyU        ~фа~0.5,
+KeyJ        ~ва~0.5,
+KeyM        ~са~0.5,
+Digit8      ~за~0.5,
+KeyI        ~ла~0.5,
+KeyK        ~ка~0.5,
+Comma       ~ба~0.5,
+Digit9      ~де~0.5,
+KeyO        ~те~0.5,
+KeyL        ~ре~0.5,
+Period      ~не~0.5,
+Digit0      ~ме~0.5,
+KeyP        ~фе~0.5,
+Semicolon   ~ве~0.5,
+Slash       ~се~0.5,
+Minus       ~зе~0.5,
+BracketLeft ~ле~0.5,
+Quote       ~ке~0.5,
+ShiftRight  ~бе~0.5,
 
-Digit6      ~да~0.4,
-KeyY        ~та~0.4,
-KeyH        ~ра~0.4,
-KeyN        ~на~0.4,
-Digit7      ~ма~0.4,
-KeyU        ~фа~0.4,
-KeyJ        ~ва~0.4,
-KeyM        ~са~0.4,
-Digit8      ~за~0.4,
-KeyI        ~ла~0.4,
-KeyK        ~ка~0.4,
-Comma       ~ба~0.4,
-
-Digit9      ~де~0.3,
-KeyO        ~те~0.3,
-KeyL        ~ре~0.3,
-Period      ~не~0.3,
-Digit0      ~ме~0.3,
-KeyP        ~фе~0.3,
-Semicolon   ~ве~0.3,
-Slash       ~се~0.3,
-Minus       ~зе~0.3,
-BracketLeft ~ле~0.3,
-Quote       ~ке~0.3,
-ShiftRight  ~бе~0.3,
-
-noteDi      ~ди~0.3,
-noteTi      ~ти~0.3,
-noteRi      ~ри~0.3,
-noteNi      ~ни~0.3,
-noteMi      ~ми~0.3,
-noteFi      ~фи~0.3,
-noteVi      ~ви~0.3,
-noteSi      ~си~0.3,
-noteZi      ~зи~0.3,
-noteLi      ~ли~0.3,
-noteKi      ~ки~0.3,
-noteBi      ~би~0.3,
 `;
 
 export const keysSigns = `
@@ -288,38 +273,38 @@ noteBy      ~бы~0.5,
 `;
 
 export function setInstrument(data: string, instrCode?: number): string {
-  const arr: string[] = data
-    .trim()
-    .split('\n')
-    .filter((item) => item && !item.startsWith('#'))
-    .map((item) => item.trim())
-    .map((item) => item.trim().replace(/,$/, ''))
-    .map((item) => item + `~${instrCode || MIDI_INSTR}` + ',')
-    .join('')
-    .split(',')
-    .map((item) => item.trim())
-    .filter((item) => item && !item.startsWith('#'));
+    const arr: string[] = data
+        .trim()
+        .split('\n')
+        .filter((item) => item && !item.startsWith('#'))
+        .map((item) => item.trim())
+        .map((item) => item.trim().replace(/,$/, ''))
+        .map((item) => item + `~${instrCode || MIDI_INSTR}` + ',')
+        .join('')
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item && !item.startsWith('#'));
 
-  return arr.join(',');
+    return arr.join(',');
 }
 
 export const drumSettings = {
-  keys: keysLeftToRight,
-  drums: drumKeysRight,
+    keys: keysLeftToRight,
+    drums: drumKeysRight,
 };
 
 export const defaultSynthSettings = {
-  keys: setInstrument(keysLeftToRight, MIDI_INSTR),
-  // drums: {
-  //     Space: {...drumInfo.bassDrum2}
-  // },
+    keys: setInstrument(keysLeftToRight, MIDI_INSTR),
+    // drums: {
+    //     Space: {...drumInfo.bassDrum2}
+    // },
 };
 
 export const toneAndDrumPlayerSettings = {
-  keys: setInstrument(keysLeftToRight, MIDI_INSTR),
-  drums: { ...drumInfo },
+    keys: setInstrument(keysLeftToRight, MIDI_INSTR),
+    drums: {...drumInfo},
 };
 
 export const leftToRightBrassSection = {
-  keys: keysLeftToRightBrassSection,
-};
+    keys: keysLeftToRightBrassSection
+}

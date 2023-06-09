@@ -241,3 +241,18 @@ export function getRandomElement(arr: any[] | string): any {
 
   return arr[i];
 }
+
+export function getWithDataAttr<T extends HTMLElement = HTMLElement>(
+    name: string,
+    el?: HTMLElement
+): T[] {
+  return ((el || document).querySelectorAll(`[data-${name}]`) as any) || [];
+}
+
+export function getWithDataAttrValue<T extends HTMLElement = HTMLElement>(
+    name: string,
+    val: string,
+    el?: HTMLElement
+): T[] {
+  return ((el || document).querySelectorAll(`[data-${name}="${val}"]`) as any) || [];
+}

@@ -70,7 +70,7 @@ export const freqList: { value: number; code: number }[] = [
   { code: 54, value: 185.0 },
   { code: 55, value: 196.0 },
   { code: 56, value: 207.65 },
-  { code: 57, value: 220.0 }, // л
+  { code: 57, value: 220.0 },
   { code: 58, value: 233.08 },
   { code: 59, value: 246.94 },
   /* ПЕРВАЯ */
@@ -175,6 +175,11 @@ export const rightKeys = {
   Equal: 'Equal',
 };
 
+export const leftAndRightKeys = {
+  ...leftKeys,
+  ...rightKeys
+};
+
 export const freqByNoteHash: { [key: string]: number } = freqList.reduce(
   (acc, item) => {
     const offset = -2;
@@ -220,19 +225,16 @@ export const noteLatByNoteHash: { [key: string]: string } = freqList.reduce(
   {}
 );
 
-export const noteLatByNote: { [key: string]: string } = stepListLat.reduce(
-  (acc, step, iStep) => {
-    octaveListLat.forEach((octave, iOctave) => {
-      const noteLat = step + octave;
-      const noteRus = stepListRus[iStep] + octaveListRus[iOctave];
-      acc[noteLat] = noteLat;
-      acc[noteRus] = noteLat;
-    });
+export const noteLatByNote: { [key: string]: string } = stepListLat.reduce((acc, step, iStep) => {
+  octaveListLat.forEach((octave, iOctave) => {
+    const noteLat = step + octave;
+    const noteRus = stepListRus[iStep] + octaveListRus[iOctave];
+    acc[noteLat] = noteLat;
+    acc[noteRus] = noteLat;
+  });
 
-    return acc;
-  },
-  {}
-);
+  return acc;
+}, {} );
 
 //console.log('codeByNoteHash', codeByNoteHash);
 //console.log('freqByNoteHash', freqByNoteHash);
