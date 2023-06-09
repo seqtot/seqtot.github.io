@@ -192,8 +192,8 @@ export class KeyboardPage {
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
 
-                <div style="margin: .5rem; user-select: none; touch-action: none;">
-                    <pre style="font-family: monospace; font-size: 1.5rem; margin: .5rem;">
+                <div style="margin: .5rem; user-select: none;">
+                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
 QoxoAoq_X_qoA_xv
 Q_x_AoxoX_x_A_xv</pre>                                                        
                 </div>
@@ -247,8 +247,8 @@ Q_x_AoxoX_x_A_xv</pre>
                     
                 </div>
                     
-                <div style="margin: .5rem; user-select: none; touch-action: none;">
-                    <pre style="font-family: monospace; font-size: 1.5rem; margin: .5rem;">
+                <div style="margin: .5rem; user-select: none;">
+                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
 Q_q_Aoq_X_q_A_xv
 Q_q_AoxoX_qoA_xv</pre>
                 </div>
