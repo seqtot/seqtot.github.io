@@ -206,13 +206,13 @@ Q_x_AoxoX_x_A_xv</pre>
                 >
                     <div
                         style="
-                            width: 60%;
+                            width: 65%;
                         "
                     >
                         <div
                             style="
                                 width: 100%;
-                                height: 10rem;
+                                height: 11rem;
                                 border: 1px solid black;
                                 user-select: none; touch-action: none;
                             "
@@ -223,7 +223,7 @@ Q_x_AoxoX_x_A_xv</pre>
                         <div
                             style="
                                 width: 100%;                            
-                                height: 10rem;
+                                height: 9rem;
                                 border: 1px solid black;
                                 user-select: none; touch-action: none;
                             "
@@ -236,7 +236,7 @@ Q_x_AoxoX_x_A_xv</pre>
                     <div
                         style="                           
                             height: 20rem;
-                            width: 40%;
+                            width: 35%;
                             border: 1px solid black;
                             user-select: none; touch-action: none;
                         "
