@@ -191,11 +191,12 @@ export class KeyboardPage {
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
+
                 <div style="margin: .5rem; user-select: none; touch-action: none;">
-                    <pre style="font-family: monospace; font-size: 2rem; margin: .5rem;">
-Q_q_Aoq_X_q_A_xv
-Q_q_AoxoX_qoA_xv</pre>
-                </div>                
+                    <pre style="font-family: monospace; font-size: 1.5rem; margin: .5rem;">
+QoxoAoq_X_qoA_xv
+Q_x_AoxoX_x_A_xv</pre>                                                        
+                </div>
 
                 <div
                     style="
@@ -242,7 +243,14 @@ Q_q_AoxoX_qoA_xv</pre>
                         data-action-drum="V"
                     >
                         V-v<br/>(A-a)
-                    </div>                                    
+                    </div>
+                    
+                </div>
+                    
+                <div style="margin: .5rem; user-select: none; touch-action: none;">
+                    <pre style="font-family: monospace; font-size: 1.5rem; margin: .5rem;">
+Q_q_Aoq_X_q_A_xv
+Q_q_AoxoX_qoA_xv</pre>
                 </div>
             </div>`.trim();
 
