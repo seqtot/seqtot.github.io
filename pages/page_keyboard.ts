@@ -32,21 +32,21 @@ export class BassSoloCtrl {
 
 }
 
-const drumsMap = {
-    O: {
-        instr: 'drum_35',
-        note: 'bd',
-
-    },
-    V: {
-        note: 'sn',
-        instr: 'drum_40',
-    },
-    X: {
-        note: 'hc',
-        instr: 'drum_42',
-    },
-}
+// const drumsMap = {
+//     O: {
+//         instr: 'drum_35',
+//         note: 'bd',
+//
+//     },
+//     V: {
+//         note: 'sn',
+//         instr: 'drum_40',
+//     },
+//     X: {
+//         note: 'hc',
+//         instr: 'drum_42',
+//     },
+// }
 
 
 export class KeyboardPage {
@@ -182,6 +182,9 @@ export class KeyboardPage {
 
     setDrumsContent() {
         this.view = 'drums';
+        const topRowHeight = 7;
+        const midRowHeight = 10;
+        const totHeight = topRowHeight + midRowHeight + topRowHeight;
 
         let metronome = `
             <div style="padding: 1rem .5rem 1rem .5rem;">
@@ -201,17 +204,23 @@ export class KeyboardPage {
                 <div style="display: flex; user-select: none; touch-action: none;">
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
-                            <div style="width: 50%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;">
+                            <div 
+                                style="width: 50%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                                data-action-drum="cowbell"
+                            >
                                 bpm
                             </div>
-                            <div style="width: 50%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;">
+                            <div 
+                                style="width: 50%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                                data-action-drum="cowbell"                                
+                            >
                                 2
                             </div>
                         </div>                        
                         
                         <div 
-                            style="width: 100%; height: 10rem; border: 1px solid black; user-select: none; touch-action: none;"
-                            data-action-drum="X"
+                            style="width: 100%; height: ${midRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                            data-action-drum="hc"
                         >
                     <pre style="font-family: monospace; font-size: 1.6rem; margin: .5rem;">
 QoxoAoq_
@@ -220,8 +229,8 @@ Q_q_Aoxo
 X_x_A_xv</pre>
                         </div>
                         <div
-                            style="width: 100%; height: 6rem; border: 1px solid black; user-select: none; touch-action: none;"
-                            data-action-drum="O"                
+                            style="width: 100%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                            data-action-drum="bd"                
                         >
                             O-o<br/>(Q-q)
                         </div>                    
@@ -229,12 +238,12 @@ X_x_A_xv</pre>
 
                     <div style="width: 33%; user-select: none; touch-action: none;">
                         <div
-                            style="height: 15rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;"
-                            data-action-drum="V"
+                            style="height: ${topRowHeight + midRowHeight}rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;"
+                            data-action-drum="sn"
                         >
                             V-v<br/>(A-a)
                         </div>
-                        <div style="height: 6rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;">
+                        <div style="width: 100%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;">
                             stop
                         </div>
                     </div>                    
@@ -400,12 +409,12 @@ Q_q_AoxoX_qoA_xv</pre>
 
     subscribeDrumsEvents() {
         getWithDataAttr('action-drum', this.pageEl)?.forEach((el: HTMLElement) => {
-            const info = drumsMap[el.dataset['actionDrum']];
+            //const info = drumsMap[el.dataset['actionDrum']];
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 synthesizer.playSound(
                     {
-                        keyOrNote: info.note,
+                        keyOrNote: el.dataset['actionDrum'],
                         id: 'drum',
                         //instrCode: info.instr,
                         //onlyStop: true,
@@ -417,7 +426,7 @@ Q_q_AoxoX_qoA_xv</pre>
             el.addEventListener('pointerup', (evt: MouseEvent) => {
                 synthesizer.playSound(
                     {
-                        keyOrNote: info.note,
+                        keyOrNote: el.dataset['actionDrum'],
                         id: 'drum',
                         //instrCode: info.instr,
                         //onlyStop: true,
