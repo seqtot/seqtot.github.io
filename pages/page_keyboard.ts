@@ -199,10 +199,10 @@ export class KeyboardPage {
                 </div>
 
                 <div style="display: flex; user-select: none; touch-action: none;">
-                    <div style="width: 66%; height: 20rem;">
+                    <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
                             <div style="width: 50%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;">
-                                1
+                                bpm
                             </div>
                             <div style="width: 50%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;">
                                 2
@@ -213,24 +213,28 @@ export class KeyboardPage {
                             style="width: 100%; height: 10rem; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="X"
                         >
-                            X-x
+                    <pre style="font-family: monospace; font-size: 1.6rem; margin: .5rem;">
+QoxoAoq_
+X_qoA_xv
+Q_q_Aoxo
+X_x_A_xv</pre>
                         </div>
                         <div
-                            style="width: 100%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;"
+                            style="width: 100%; height: 6rem; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="O"                
                         >
                             O-o<br/>(Q-q)
                         </div>                    
                     </div>
 
-                    <div style="width: 33%; height: 20rem; user-select: none; touch-action: none;">
+                    <div style="width: 33%; user-select: none; touch-action: none;">
                         <div
                             style="height: 15rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="V"
                         >
                             V-v<br/>(A-a)
                         </div>
-                        <div style="height: 5rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;">
+                        <div style="height: 6rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;">
                             stop
                         </div>
                     </div>                    
