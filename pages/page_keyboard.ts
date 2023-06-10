@@ -192,66 +192,56 @@ export class KeyboardPage {
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
 
-                <div style="margin: .5rem; user-select: none;">
-                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
-QoxoAoq_X_qoA_xv
-Q_x_AoxoX_x_A_xv</pre>                                                        
-                </div>
-
-                <div
-                    style="
-                        display: flex;
-                        user-select: none; touch-action: none;
-                    "                
-                >
-                    <div
-                        style="
-                            width: 65%;
-                        "
-                    >
-                        <div
-                            style="
-                                width: 100%;
-                                height: 11rem;
-                                border: 1px solid black;
-                                user-select: none; touch-action: none;
-                            "
+                <div style="display: flex; user-select: none; touch-action: none;">
+                    <div style="width: 65%;">
+                        <div style="display: flex; width: 100%;">
+                            <div style="width: 50%; height: 6rem; border: 1px solid black; user-select: none; touch-action: none;">
+                                1
+                            </div>
+                            <div style="width: 50%; height: 6rem; border: 1px solid black; user-select: none; touch-action: none;">
+                                2
+                            </div>
+                        </div>                        
+                        
+                        <div 
+                            style="width: 100%; height: 11rem; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="X"
                         >
                             X-x
                         </div>
                         <div
-                            style="
-                                width: 100%;                            
-                                height: 9rem;
-                                border: 1px solid black;
-                                user-select: none; touch-action: none;
-                            "
+                            style="width: 100%; height: 9rem; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="O"                
                         >
                             O-o<br/>(Q-q)
                         </div>                    
                     </div>
-                    
-                    <div
-                        style="                           
-                            height: 20rem;
-                            width: 35%;
-                            border: 1px solid black;
-                            user-select: none; touch-action: none;
-                        "
-                        data-action-drum="V"
-                    >
-                        V-v<br/>(A-a)
-                    </div>
-                    
+
+                    <div style="height: 23rem; width: 35%; user-select: none; touch-action: none;">
+                        <div
+                            style="height: 17rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;"
+                            data-action-drum="V"
+                        >
+                            V-v<br/>(A-a)
+                        </div>
+                        <div style="height: 9rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;">
+                            stop
+                        </div>
+                    </div>                    
                 </div>
-                    
+
+                <div style="margin: .5rem; user-select: none;">
+                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
+QoxoAoq_X_qoA_xv
+Q_q_AoxoX_x_A_xv</pre>                                                        
+                </div>
+                                    
                 <div style="margin: .5rem; user-select: none;">
                     <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
 Q_q_Aoq_X_q_A_xv
 Q_q_AoxoX_qoA_xv</pre>
                 </div>
+                
             </div>`.trim();
 
         this.el$.html(content);
