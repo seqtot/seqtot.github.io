@@ -195,23 +195,17 @@ export class KeyboardPage {
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
                 
-                <div style="margin: .5rem; user-select: none; touch-action: none;">
-                    <span style="font-size: 1.5rem; user-select: none; touch-action: none;" data-action="clear">
-                        clr&nbsp;&nbsp;
-                    </span>                
-                </div>
-
                 <div style="display: flex; user-select: none; touch-action: none;">
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
                             <div 
-                                style="width: 50%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${topRowHeight}rem; background-color: lightcyan; user-select: none; touch-action: none;"
                                 data-action-drum="cowbell"
                             >
                                 bpm
                             </div>
                             <div 
-                                style="width: 50%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${topRowHeight}rem; background-color: lightyellow; user-select: none; touch-action: none;"
                                 data-action-drum="cowbell"                                
                             >
                                 2
@@ -219,17 +213,17 @@ export class KeyboardPage {
                         </div>                        
                         
                         <div 
-                            style="width: 100%; height: ${midRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                            style="width: 100%; height: ${midRowHeight}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
                             data-action-drum="hc"
                         >
-                    <pre style="font-family: monospace; font-size: 1.6rem; margin: .5rem;">
+                    <pre style="font-family: monospace; font-size: 1.6rem; margin: 0; padding: 0; padding-left: 0;">
 QoxoAoq_
 X_qoA_xv
 Q_q_Aoxo
 X_x_A_xv</pre>
                         </div>
                         <div
-                            style="width: 100%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;"
+                            style="width: 100%; height: ${topRowHeight}rem; background-color: tan; user-select: none; touch-action: none;"
                             data-action-drum="bd"                
                         >
                             O-o<br/>(Q-q)
@@ -238,7 +232,7 @@ X_x_A_xv</pre>
 
                     <div style="width: 33%; user-select: none; touch-action: none;">
                         <div
-                            style="height: ${topRowHeight + midRowHeight}rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;"
+                            style="height: ${topRowHeight + midRowHeight}rem; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
                             data-action-drum="sn"
                         >
                             V-v<br/>(A-a)
@@ -249,6 +243,12 @@ X_x_A_xv</pre>
                     </div>                    
                 </div>
 
+                <div style="margin: .5rem; user-select: none; touch-action: none;">
+                    <span style="font-size: 1.5rem; user-select: none; touch-action: none;" data-action="clear">
+                        clr&nbsp;&nbsp;
+                    </span>                
+                </div>
+                
                 <div style="margin: .5rem; user-select: none;">
                     <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
 QoxoAoq_X_qoA_xv
@@ -410,6 +410,7 @@ Q_q_AoxoX_qoA_xv</pre>
     subscribeDrumsEvents() {
         getWithDataAttr('action-drum', this.pageEl)?.forEach((el: HTMLElement) => {
             //const info = drumsMap[el.dataset['actionDrum']];
+            const volume = el.dataset['actionDrum'] === 'cowbell' ? 0.35 : undefined
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 synthesizer.playSound(
@@ -418,6 +419,7 @@ Q_q_AoxoX_qoA_xv</pre>
                         id: 'drum',
                         //instrCode: info.instr,
                         //onlyStop: true,
+                        volume
                     },
                     false
                 );
