@@ -12,7 +12,7 @@ import { toneAndDrumPlayerSettings } from '../muse/keyboards';
 import keyboardSet from './page_keyboard-utils';
 import { getNoteByOffset, parseInteger } from '../muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
-import {drumInfo, Drums} from '../muse/drums';
+import {DrumCtrl} from './drum-ctrl';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -33,22 +33,10 @@ export class BassSoloCtrl {
 
 }
 
-// const drumsMap = {
-//     O: {
-//         instr: 'drum_35',
-//         note: 'bd',
-//
-//     },
-//     V: {
-//         note: 'sn',
-//         instr: 'drum_40',
-//     },
-//     X: {
-//         note: 'hc',
-//         instr: 'drum_42',
-//     },
-// }
 
+interface Page {
+    getMetronomeContent(): string;
+}
 
 export class KeyboardPage {
     view: ViewType = 'bassSolo';
@@ -182,118 +170,10 @@ export class KeyboardPage {
     }
 
     setDrumsContent() {
+        const ctrl = new DrumCtrl(this);
+
         this.view = 'drums';
-
-        const topRowHeight = 7;
-        const midRowHeight = 10;
-
-        let metronome = `
-            <div style="padding: 1rem .5rem 1rem .5rem;">
-                &emsp;${this.getMetronomeContent()}
-            </div>`.trim();
-
-        let drums = Object.keys(drumInfo).reduce((acc, key) => {
-            const info = drumInfo[key];
-            const label = key === info.noteLat ? key: `${key}:${info.noteLat}`;
-
-            acc = acc + `
-                <a data-action-drum="${info.noteLat}" style="user-select: none;">${label}</a>&emsp;            
-            `.trim();
-
-            return acc;
-        }, '');
-
-        const content = `
-            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-                ${metronome}
-                
-                <div style="display: flex; user-select: none; touch-action: none;">
-                    <div style="width: 66%;">
-                        <div style="display: flex; width: 100%;">
-                            <div 
-                                style="width: 50%; height: ${topRowHeight}rem; background-color: lightcyan; user-select: none; touch-action: none;"
-                                data-action-drum="cowbell"
-                            >
-                                bpm
-                            </div>
-                            <div 
-                                style="width: 50%; height: ${topRowHeight}rem; background-color: lightyellow; user-select: none; touch-action: none;"
-                                data-action-drum="cowbell"                                
-                            >
-                                2
-                            </div>
-                        </div>                        
-                        
-                        <div 
-                            style="width: 100%; height: ${midRowHeight}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
-                            data-action-drum="hc"
-                        >
-                    <pre style="font-family: monospace; font-size: 1.6rem; margin: 0; padding: 0; padding-left: 0;">
-QoxoAoq_
-X_qoA_xv
-Q_q_Aoxo
-X_x_A_xv</pre>
-                        </div>
-                        <div
-                            style="width: 100%; height: ${topRowHeight}rem; background-color: tan; user-select: none; touch-action: none;"
-                            data-action-drum="bd"                
-                        >
-                            O-o<br/>(Q-q)
-                        </div>                    
-                    </div>
-
-                    <div style="width: 33%; user-select: none; touch-action: none;">
-                        <div
-                            style="height: ${topRowHeight + midRowHeight}rem; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
-                            data-action-drum="sn"
-                        >
-                            V-v<br/>(A-a)
-                        </div>
-                        <div style="width: 100%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;">
-                            stop
-                        </div>
-                    </div>                    
-                </div>
-
-                <div style="margin: .5rem; user-select: none; touch-action: none;">
-                    <span style="font-size: 1.5rem; user-select: none; touch-action: none;" data-action="clear">
-                        clr&nbsp;&nbsp;
-                    </span>                
-                </div>
-                
-                
-                <div style="margin: .5rem; user-select: none;">
-                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
-O-k-T-k-O---O-kt
-O-k-T-k-O---B---
-O-ktK-v-O---O---
-O-k-|-k-O-k-V---
-O---|-k-O---B---
-O---T-k-O---A---
-O---T-k-O---O---</pre>                                                        
-                </div>
-
-                
-                <div style="margin: .5rem; user-select: none;">
-                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
-QoxoAoq_X_qoA_xv
-Q_q_AoxoX_x_A_xv</pre>                                                        
-                </div>
-                                    
-                <div style="margin: .5rem; user-select: none;">
-                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
-Q_q_Aoq_X_q_A_xv
-Q_q_AoxoX_qoA_xv</pre>
-                </div>
-                
-            <div style="font-size: 1.5rem;">
-                ${drums}            
-            </div>
-                
-            </div>`.trim();
-
-        this.el$.html(content);
-
+        this.el$.html(ctrl.getContent('drums'));
         this.bpmRange = (this.context.$f7 as any).range.create({
             el: dyName('slider', this.pageEl),
             on: {
@@ -438,25 +318,23 @@ Q_q_AoxoX_qoA_xv</pre>
 
     subscribeDrumsEvents() {
         getWithDataAttr('action-drum', this.pageEl)?.forEach((el: HTMLElement) => {
-            //const info = drumsMap[el.dataset['actionDrum']];
             const keyOrNote = el.dataset['actionDrum'];
             const volume = keyOrNote === 'cowbell' ? 0.30 : undefined
+            const keyboardId = el.dataset['keyboardId'];
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 synthesizer.playSound({
                     keyOrNote,
-                    id: 'drum',
-                    //instrCode: info.instr,
+                    volume,
+                    id: keyboardId,
                     onlyStop: false,
-                    volume
                 });
             });
             //
             el.addEventListener('pointerup', (evt: MouseEvent) => {
                 synthesizer.playSound({
                     keyOrNote,
-                    id: 'drum',
-                    //instrCode: info.instr,
+                    id: keyboardId,
                     onlyStop: true,
                 });
             });
