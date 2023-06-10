@@ -191,40 +191,46 @@ export class KeyboardPage {
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
+                
+                <div style="margin: .5rem; user-select: none; touch-action: none;">
+                    <span style="font-size: 1.5rem; user-select: none; touch-action: none;" data-action="clear">
+                        clr&nbsp;&nbsp;
+                    </span>                
+                </div>
 
                 <div style="display: flex; user-select: none; touch-action: none;">
-                    <div style="width: 65%;">
+                    <div style="width: 66%; height: 20rem;">
                         <div style="display: flex; width: 100%;">
-                            <div style="width: 50%; height: 6rem; border: 1px solid black; user-select: none; touch-action: none;">
+                            <div style="width: 50%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;">
                                 1
                             </div>
-                            <div style="width: 50%; height: 6rem; border: 1px solid black; user-select: none; touch-action: none;">
+                            <div style="width: 50%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;">
                                 2
                             </div>
                         </div>                        
                         
                         <div 
-                            style="width: 100%; height: 11rem; border: 1px solid black; user-select: none; touch-action: none;"
+                            style="width: 100%; height: 10rem; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="X"
                         >
                             X-x
                         </div>
                         <div
-                            style="width: 100%; height: 9rem; border: 1px solid black; user-select: none; touch-action: none;"
+                            style="width: 100%; height: 5rem; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="O"                
                         >
                             O-o<br/>(Q-q)
                         </div>                    
                     </div>
 
-                    <div style="height: 23rem; width: 35%; user-select: none; touch-action: none;">
+                    <div style="width: 33%; height: 20rem; user-select: none; touch-action: none;">
                         <div
-                            style="height: 17rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;"
+                            style="height: 15rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;"
                             data-action-drum="V"
                         >
                             V-v<br/>(A-a)
                         </div>
-                        <div style="height: 9rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;">
+                        <div style="height: 5rem; width: 100%; border: 1px solid black; user-select: none; touch-action: none;">
                             stop
                         </div>
                     </div>                    
