@@ -238,9 +238,8 @@ export class MBoxOldPage {
             {
               keyOrNote,
               id: el?.dataset?.keyboardId,
-              //onlyStop: true,
-            },
-            true
+              onlyStop: true,
+            }
         );
       });
     });

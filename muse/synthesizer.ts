@@ -110,30 +110,23 @@ export class Synthesizer extends Sound {
         this.addToOut(note);
     }; // playSoundSynth
 
-    playSound = (keyOrObj: string | {
+    playSound = (x: {
         keyOrNote: string,
         id?: string | number,
         instrCode?: string | number,
         print?: boolean,
-        //onlyStop?: boolean,
+        onlyStop?: boolean,
         volume?: number,
         pitchShift?: number,
-    }, onlyStop?: boolean) => {
-        // if (typeof keyOrObj === 'string') {
-        //     keyOrObj = {
-        //         keyOrNote: keyOrObj as string
-        //     }
-        // }
-        const isString = typeof keyOrObj === 'string';
-        let keyOrNote = isString ? keyOrObj : keyOrObj.keyOrNote;
-        let id = isString ? 0 : keyOrObj.id || 0;
-        let print = isString ? true : !!keyOrObj.print;
-        let soundInfo = this.keysAndNotes[keyOrNote];
-        let instrCode = getInstrCodeBy(isString ? '' : keyOrObj.instrCode) as number;
-        let volume = isString ? undefined : keyOrObj.volume;
-        let pitchShift = isString ? 0 : keyOrObj.pitchShift || 0;
+    }) => {
+        let id = x.id || 0;
+        let print = !!x.print;
+        let soundInfo = this.keysAndNotes[x.keyOrNote];
+        let instrCode = getInstrCodeBy(x.instrCode) as number;
+        let volume = x.volume;
+        let pitchShift = x.pitchShift || 0;
 
-        let note = this.getNoteSame(keyOrNote);
+        let note = this.getNoteSame(x.keyOrNote);
         const noteLat = this.getNoteLat(note);
 
         if (!soundInfo && !note) {
@@ -154,9 +147,9 @@ export class Synthesizer extends Sound {
             instrCode = instrCode || soundInfo.instrCode;
             volume = volume == null ? soundInfo.volume : volume;
 
-            this.playSoundMidi({id, ...soundInfo, instrCode, volume}, print, pitchShift, onlyStop);
+            this.playSoundMidi({id, ...soundInfo, instrCode, volume}, print, pitchShift, x.onlyStop);
         } else if (note) {
-          this.playSoundSynth(note, onlyStop);
+          this.playSoundSynth(note, x.onlyStop);
         }
     }; // playSound
 

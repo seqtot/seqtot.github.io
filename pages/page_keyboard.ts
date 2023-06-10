@@ -12,6 +12,7 @@ import { toneAndDrumPlayerSettings } from '../muse/keyboards';
 import keyboardSet from './page_keyboard-utils';
 import { getNoteByOffset, parseInteger } from '../muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
+import {drumInfo, Drums} from '../muse/drums';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -182,14 +183,25 @@ export class KeyboardPage {
 
     setDrumsContent() {
         this.view = 'drums';
+
         const topRowHeight = 7;
         const midRowHeight = 10;
-        const totHeight = topRowHeight + midRowHeight + topRowHeight;
 
         let metronome = `
             <div style="padding: 1rem .5rem 1rem .5rem;">
                 &emsp;${this.getMetronomeContent()}
             </div>`.trim();
+
+        let drums = Object.keys(drumInfo).reduce((acc, key) => {
+            const info = drumInfo[key];
+            const label = key === info.noteLat ? key: `${key}:${info.noteLat}`;
+
+            acc = acc + `
+                <a data-action-drum="${info.noteLat}">${label}</a>&emsp;            
+            `.trim();
+
+            return acc;
+        }, '');
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
@@ -249,6 +261,19 @@ X_x_A_xv</pre>
                     </span>                
                 </div>
                 
+                
+                <div style="margin: .5rem; user-select: none;">
+                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
+O-k-T-k-O---O-kt
+O-k-T-k-O---B---
+O-ktK-v-O---O---
+O-k-|-k-O-k-V---
+O---|-k-O---B---
+O---T-k-O---A---
+O---T-k-O---O---</pre>                                                        
+                </div>
+
+                
                 <div style="margin: .5rem; user-select: none;">
                     <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
 QoxoAoq_X_qoA_xv
@@ -260,6 +285,10 @@ Q_q_AoxoX_x_A_xv</pre>
 Q_q_Aoq_X_q_A_xv
 Q_q_AoxoX_qoA_xv</pre>
                 </div>
+                
+            <div style="font-size: 1.5rem;">
+                ${drums}            
+            </div>
                 
             </div>`.trim();
 
@@ -410,31 +439,26 @@ Q_q_AoxoX_qoA_xv</pre>
     subscribeDrumsEvents() {
         getWithDataAttr('action-drum', this.pageEl)?.forEach((el: HTMLElement) => {
             //const info = drumsMap[el.dataset['actionDrum']];
-            const volume = el.dataset['actionDrum'] === 'cowbell' ? 0.35 : undefined
+            const keyOrNote = el.dataset['actionDrum'];
+            const volume = keyOrNote === 'cowbell' ? 0.30 : undefined
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                synthesizer.playSound(
-                    {
-                        keyOrNote: el.dataset['actionDrum'],
-                        id: 'drum',
-                        //instrCode: info.instr,
-                        //onlyStop: true,
-                        volume
-                    },
-                    false
-                );
+                synthesizer.playSound({
+                    keyOrNote,
+                    id: 'drum',
+                    //instrCode: info.instr,
+                    onlyStop: false,
+                    volume
+                });
             });
             //
             el.addEventListener('pointerup', (evt: MouseEvent) => {
-                synthesizer.playSound(
-                    {
-                        keyOrNote: el.dataset['actionDrum'],
-                        id: 'drum',
-                        //instrCode: info.instr,
-                        //onlyStop: true,
-                    },
-                    true
-                );
+                synthesizer.playSound({
+                    keyOrNote,
+                    id: 'drum',
+                    //instrCode: info.instr,
+                    onlyStop: true,
+                });
             });
         });
 
@@ -446,17 +470,13 @@ Q_q_AoxoX_qoA_xv</pre>
             const keyOrNote = el?.dataset?.noteLat || '';
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                synthesizer.playSound(
-                    {
-                        keyOrNote: this.playingNote[keyboardId],
-                        id: keyboardId,
-                        //onlyStop: true,
-                    },
-                    true
-                );
-                this.playingNote[keyboardId] = keyOrNote;
+                synthesizer.playSound({
+                    keyOrNote: this.playingNote[keyboardId],
+                    id: keyboardId,
+                    onlyStop: true,
+                });
 
-                //el.style.backgroundColor = 'lightgray';
+                this.playingNote[keyboardId] = keyOrNote;
 
                 synthesizer.playSound({
                     keyOrNote,
@@ -465,26 +485,14 @@ Q_q_AoxoX_qoA_xv</pre>
                 });
 
                 this.setKeysColor();
-
-                // const wrapper = dyName('relative-keyboard-wrapper', this.pageEl);
-                //
-                // if (!wrapper) {
-                //     return;
-                // }
-                //
-                // wrapper.dataset.relativeKeyboardBase = el?.dataset?.noteLat;
             });
 
             el.addEventListener('pointerup', (evt: MouseEvent) => {
-                synthesizer.playSound(
-                    {
-                        //keyOrNote: this.playingNote[keyboardId],
-                        keyOrNote,
-                        id: keyboardId,
-                        //onlyStop: true,
-                    },
-                    true
-                );
+                synthesizer.playSound({
+                    keyOrNote,
+                    id: keyboardId,
+                    onlyStop: true,
+                });
 
                 this.playingNote[keyboardId] = undefined;
             });
@@ -551,14 +559,11 @@ Q_q_AoxoX_qoA_xv</pre>
         fixEl?.addEventListener('pointerdown', (evt: MouseEvent) => {
             const keyboardId = fixEl?.dataset?.keyboardId;
 
-            synthesizer.playSound(
-                {
-                    keyOrNote: this.playingNote[keyboardId],
-                    id: keyboardId,
-                    //onlyStop: true,
-                },
-                true
-            );
+            synthesizer.playSound({
+                keyOrNote: this.playingNote[keyboardId],
+                id: keyboardId,
+                onlyStop: true,
+            });
 
             if (!this.lastRelativeNote) {
                 return;
@@ -578,14 +583,11 @@ Q_q_AoxoX_qoA_xv</pre>
         fixEl?.addEventListener('pointerup', (evt: MouseEvent) => {
             const keyboardId = fixEl?.dataset?.keyboardId;
 
-            synthesizer.playSound(
-                {
-                    keyOrNote: this.lastRelativeNote,
-                    id: keyboardId,
-                    //onlyStop: true,
-                },
-                true
-            );
+            synthesizer.playSound({
+                keyOrNote: this.lastRelativeNote,
+                id: keyboardId,
+                onlyStop: true,
+            });
 
             this.playingNote[keyboardId] = undefined;
         });
@@ -607,14 +609,11 @@ Q_q_AoxoX_qoA_xv</pre>
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 const note = getNoteByOffset(this.fixedRelativeNote, offset);
 
-                synthesizer.playSound(
-                    {
-                        keyOrNote: this.playingNote[keyboardId],
-                        id: keyboardId,
-                        //onlyStop: true,
-                    },
-                    true
-                );
+                synthesizer.playSound({
+                    keyOrNote: this.playingNote[keyboardId],
+                    id: keyboardId,
+                    onlyStop: true,
+                });
                 this.playingNote[keyboardId] = note;
                 this.lastRelativeNote = note;
 
@@ -637,14 +636,11 @@ Q_q_AoxoX_qoA_xv</pre>
             el.addEventListener('pointerup', (evt: MouseEvent) => {
                 const note = getNoteByOffset(this.fixedRelativeNote, offset);
 
-                synthesizer.playSound(
-                    {
-                        keyOrNote: note,
-                        id: keyboardId,
-                        //onlyStop: true,
-                    },
-                    true
-                );
+                synthesizer.playSound({
+                    keyOrNote: note,
+                    id: keyboardId,
+                    onlyStop: true,
+                });
 
                 this.playingNote[keyboardId] = undefined;
             });

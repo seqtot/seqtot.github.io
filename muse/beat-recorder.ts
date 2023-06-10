@@ -56,7 +56,7 @@ export class BeatRecorder {
     beatInput: Editor;
     textInput: Editor | string;
     multiBuffer: Editor;
-    playSound: (sound: string, onlyStop?: boolean) => void;
+    playSound: (x: {keyOrNote: string, onlyStop?: boolean}) => void;
     isNote: (str: string) => boolean;
     mode: string = 'Digit1';
     downedKeys: { [key: string]: boolean } = {};
@@ -158,7 +158,7 @@ export class BeatRecorder {
                 next: 0,
             };
 
-            return this.playSound(this.keyData.note);
+            return this.playSound({keyOrNote: this.keyData.note});
         }
 
         if (
@@ -167,7 +167,7 @@ export class BeatRecorder {
         ) {
             if (!this.keyData.up) {
                 this.keyData.up = time;
-                this.playSound(this.keyData.note, true);
+                this.playSound({keyOrNote: this.keyData.note, onlyStop: true});
             }
 
             if (type === DOWN) {
@@ -182,7 +182,7 @@ export class BeatRecorder {
                     next: 0,
                 };
 
-                this.playSound(this.keyData.note);
+                this.playSound({keyOrNote: this.keyData.note});
             }
         }
     }
