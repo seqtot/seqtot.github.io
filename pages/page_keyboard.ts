@@ -197,7 +197,7 @@ export class KeyboardPage {
             const label = key === info.noteLat ? key: `${key}:${info.noteLat}`;
 
             acc = acc + `
-                <a data-action-drum="${info.noteLat}">${label}</a>&emsp;            
+                <a data-action-drum="${info.noteLat}" style="user-select: none;">${label}</a>&emsp;            
             `.trim();
 
             return acc;
