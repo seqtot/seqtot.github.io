@@ -60,18 +60,18 @@ export class DrumCtrl {
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
                             <div 
-                                style="width: 50%; height: ${topRowHeight}rem; background-color: lightcyan; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightcyan; user-select: none; touch-action: none;"
                                 data-action-drum="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >
-                                &nbsp;?
+                                <br/>&nbsp;K-k
                             </div>
                             <div 
-                                style="width: 50%; height: ${topRowHeight}rem; background-color: lightyellow; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightyellow; user-select: none; touch-action: none;"
                                 data-action-drum="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >
-                                &nbsp;?
+                                <br/>&nbsp;T-t
                             </div>
                         </div>                        
                         
@@ -79,20 +79,20 @@ export class DrumCtrl {
                             style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
                         >
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum="sn+hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                             >         
-                                &nbsp;A-a
+                                <br/>&nbsp;A-a
                             </div>
                             
                         
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                             >  
-                                &nbsp;X-x
+                                <br/>&nbsp;X-x
                             </div>   
                         </div>
                                                  
@@ -100,20 +100,20 @@ export class DrumCtrl {
                             style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
                         >
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                             >       
-                                &nbsp;X-x
+                                <br/>&nbsp;X-x
                             </div>
                             
                         
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum="bd+hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                             >     
-                                &nbsp;Q-q                                           
+                                <br/>&nbsp;Q-q
                             </div>   
                         </div>                        
                         
