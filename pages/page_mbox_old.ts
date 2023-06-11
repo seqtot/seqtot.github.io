@@ -166,7 +166,7 @@ export class MBoxOldPage {
       el: dyName('slider', this.pageEl),
       on: {
         changed: (range: any) => {
-          // console.log('range.onChange', range); // jjkl
+          //console.log('range.onChange', range); // jjkl
           this.bpmMultiple = range.value;
 
           if (this.playingTick) {
@@ -245,7 +245,7 @@ export class MBoxOldPage {
     });
 
     const clearColor = () => {
-      // console.log(window.location.href);
+      //console.log(window.location.href);
 
       getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
         el.style.backgroundColor = 'white';

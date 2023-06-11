@@ -200,7 +200,7 @@ export class KeyboardPage {
             el: dyName('slider', this.pageEl),
             on: {
                 changed: (range: any) => {
-                    // console.log('range.onChange', range); // jjkl
+                    //console.log('range.onChange', range); // jjkl
                     this.bpmValue = range.value;
 
                     if (this.playingTick) {
@@ -318,24 +318,31 @@ export class KeyboardPage {
 
     subscribeDrumsEvents() {
         getWithDataAttr('action-drum', this.pageEl)?.forEach((el: HTMLElement) => {
-            const keyOrNote = el.dataset['actionDrum'];
-            const volume = keyOrNote === 'cowbell' ? 0.30 : undefined
+            const note1 = el.dataset['actionDrum'].split('+')[0];
+            const note2 = el.dataset['actionDrum'].split('+')[1];
+            const notes = [note1, note2].filter(item => !!item);
+
+            const volume = note1 === 'cowbell' ? 0.30 : undefined
             const keyboardId = el.dataset['keyboardId'];
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                synthesizer.playSound({
-                    keyOrNote,
-                    volume,
-                    id: keyboardId,
-                    onlyStop: false,
+                notes.forEach(keyOrNote => {
+                    synthesizer.playSound({
+                        keyOrNote,
+                        volume,
+                        id: keyboardId,
+                        onlyStop: false,
+                    });
                 });
             });
-            //
+
             el.addEventListener('pointerup', (evt: MouseEvent) => {
-                synthesizer.playSound({
-                    keyOrNote,
-                    id: keyboardId,
-                    onlyStop: true,
+                notes.forEach(keyOrNote => {
+                    synthesizer.playSound({
+                        keyOrNote,
+                        id: keyboardId,
+                        onlyStop: true,
+                    });
                 });
             });
         });

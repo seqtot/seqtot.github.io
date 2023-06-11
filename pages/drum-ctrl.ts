@@ -24,8 +24,9 @@ export class DrumCtrl {
     constructor(public page: Page) {}
 
     getContent(keyboardId: string): string {
-        const topRowHeight = 7;
+        const topRowHeight = 5;
         const midRowHeight = 10;
+        const botRowHeight = 5;
         let ind = 0;
 
         let metronome = `
@@ -44,8 +45,15 @@ export class DrumCtrl {
             return acc;
         }, '');
 
+
+        // <pre style="font-family: monospace; font-size: 1.6rem; margin: 0; padding: 0; padding-left: 0;">
+        //     QoxoAoq_
+        // X_qoA_xv
+        // Q_q_Aoxo
+        // X_x_A_xv</pre>
+
         const content = `
-            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
+            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem; position: relative;">
                 ${metronome}
                 
                 <div style="display: flex; user-select: none; touch-action: none;">
@@ -56,34 +64,65 @@ export class DrumCtrl {
                                 data-action-drum="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >
-                                bpm
+                                &nbsp;?
                             </div>
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; background-color: lightyellow; user-select: none; touch-action: none;"
                                 data-action-drum="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >
-                                2
+                                &nbsp;?
                             </div>
                         </div>                        
                         
-                        <div 
-                            style="width: 100%; height: ${midRowHeight}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
-                            data-action-drum="hc"
-                            data-keyboard-id="${keyboardId}-${ind++}"
-                        >
-                    <pre style="font-family: monospace; font-size: 1.6rem; margin: 0; padding: 0; padding-left: 0;">
-QoxoAoq_
-X_qoA_xv
-Q_q_Aoxo
-X_x_A_xv</pre>
-                        </div>
                         <div
-                            style="width: 100%; height: ${topRowHeight}rem; background-color: tan; user-select: none; touch-action: none;"
+                            style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
+                        >
+                            <div 
+                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                data-action-drum="sn+hc"
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                            >         
+                                &nbsp;A-a
+                            </div>
+                            
+                        
+                            <div 
+                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                data-action-drum="hc"
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                            >  
+                                &nbsp;X-x
+                            </div>   
+                        </div>
+                                                 
+                        <div
+                            style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
+                        >
+                            <div 
+                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                data-action-drum="hc"
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                            >       
+                                &nbsp;X-x
+                            </div>
+                            
+                        
+                            <div 
+                                style="width: 50%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                data-action-drum="bd+hc"
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                            >     
+                                &nbsp;Q-q                                           
+                            </div>   
+                        </div>                        
+                        
+                        <div
+                            style="width: 100%; height: ${botRowHeight}rem; background-color: tan; user-select: none; touch-action: none;"
                             data-action-drum="bd"  
                             data-keyboard-id="${keyboardId}-${ind++}"              
                         >
-                            O-o<br/>(Q-q)
+                            &nbsp;O-o
                         </div>                    
                     </div>
 
@@ -93,10 +132,10 @@ X_x_A_xv</pre>
                             data-action-drum="sn"
                             data-keyboard-id="${keyboardId}-${ind++}"                            
                         >
-                            V-v<br/>(A-a)
+                            &nbsp;V-v
                         </div>
-                        <div style="width: 100%; height: ${topRowHeight}rem; border: 1px solid black; user-select: none; touch-action: none;">
-                            stop
+                        <div style="width: 100%; height: ${botRowHeight}rem; user-select: none; touch-action: none;">
+                            beat
                         </div>
                     </div>                    
                 </div>

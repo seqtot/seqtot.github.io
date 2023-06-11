@@ -146,7 +146,7 @@ export class MBoxPage {
             el: dyName('slider', this.pageEl),
             on: {
                 changed: (range: any) => {
-                    // console.log('range.onChange', range); // jjkl
+                    //console.log('range.onChange', range); // jjkl
                     this.bpmValue = range.value;
 
                     if (this.playingTick) {

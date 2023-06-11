@@ -151,7 +151,7 @@ export class SamplePage {
         public context: ComponentContext,
     ) {
         this.mouseDownListener = (event: MouseEvent) => {
-            // console.log('MousePressed', this.context);
+            //console.log('MousePressed', this.context);
             // this.ee.emit('setInFocus', this.pageEl.contains(event.target as HTMLElement));
         }
 
@@ -352,7 +352,8 @@ export class SamplePage {
             ].join(`\n`);
         }
 
-        await this.synthesizer.fontPlayer.adjustPreset(this.synthesizer.ctx, font);
+        //await this.synthesizer.fontPlayer.adjustPreset(this.synthesizer.ctx, font); // jjkl
+
         //const audioBuffer = await getAudioBufferFromString(font.zones[iZone].file);
         const audioBuffer = font.zones[iZone].buffer;
         this.font = font;
@@ -502,14 +503,14 @@ export class SamplePage {
 
             //const info = {}
 
-            this.synthesizer.playSound2({keyOrNote, instrObj, volume: .5}, false);
+            //this.synthesizer.playSound({keyOrNote, instrObj, volume: .5, onlyStop: false}); // jjkl
 
             return;
         }
 
         if (soundInfo.noteLat && type === UP) {
             this.downedKeys[keyOrNote] = false;
-            this.synthesizer.playSound2({keyOrNote, instrObj}, true);
+            // this.synthesizer.playSound({keyOrNote, instrObj}, true); // jjkl
 
             return;
         }
