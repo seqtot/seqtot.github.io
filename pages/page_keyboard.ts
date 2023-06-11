@@ -319,6 +319,11 @@ export class KeyboardPage {
     subscribeDrumsEvents() {
         getWithDataAttr('action-drum', this.pageEl)?.forEach((el: HTMLElement) => {
             const note1 = el.dataset['actionDrum'].split('+')[0];
+
+            if (!note1) {
+                return;
+            }
+
             const note2 = el.dataset['actionDrum'].split('+')[1];
             const notes = [note1, note2].filter(item => !!item);
 
@@ -334,6 +339,12 @@ export class KeyboardPage {
                         onlyStop: false,
                     });
                 });
+
+                if (note2) {
+                    getWithDataAttrValue('highlight-drum', el.dataset['actionDrum']).forEach(el => {
+                        el.style.border = '1px solid black';
+                    });
+                }
             });
 
             el.addEventListener('pointerup', (evt: MouseEvent) => {
@@ -344,6 +355,12 @@ export class KeyboardPage {
                         onlyStop: true,
                     });
                 });
+
+                if (note2) {
+                    getWithDataAttrValue('highlight-drum', el.dataset['actionDrum']).forEach(el => {
+                        el.style.border = null;
+                    });
+                }
             });
         });
 

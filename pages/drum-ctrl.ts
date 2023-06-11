@@ -79,18 +79,15 @@ export class DrumCtrl {
                             style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
                         >
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum="sn+hc"
-                                data-keyboard-id="${keyboardId}-${ind++}"
+                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                             >         
-                                <br/>&nbsp;A-a
+                                <br/>&nbsp;?
                             </div>
-                            
-                        
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
+                                data-highlight-drum="bd+hc"                                                                
                             >  
                                 <br/>&nbsp;X-x
                             </div>   
@@ -100,27 +97,27 @@ export class DrumCtrl {
                             style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
                         >
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
+                                data-highlight-drum="sn+hc"                                
                             >       
                                 <br/>&nbsp;X-x
                             </div>
                             
                         
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum="bd+hc"
-                                data-keyboard-id="${keyboardId}-${ind++}"
+                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                             >     
-                                <br/>&nbsp;Q-q
+                                <br/>&nbsp;?
                             </div>   
                         </div>                        
                         
                         <div
                             style="width: 100%; height: ${botRowHeight}rem; background-color: tan; user-select: none; touch-action: none;"
                             data-action-drum="bd"  
-                            data-keyboard-id="${keyboardId}-${ind++}"              
+                            data-keyboard-id="${keyboardId}-${ind++}"
+                            data-highlight-drum="bd+hc"                                          
                         >
                             &nbsp;O-o
                         </div>                    
@@ -128,14 +125,28 @@ export class DrumCtrl {
 
                     <div style="width: 33%; user-select: none; touch-action: none;">
                         <div
-                            style="height: ${topRowHeight + midRowHeight}rem; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
+                            style="height: ${midRowHeight}rem; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
                             data-action-drum="sn"
-                            data-keyboard-id="${keyboardId}-${ind++}"                            
+                            data-keyboard-id="${keyboardId}-${ind++}"
+                            data-highlight-drum="sn+hc"                                                        
                         >
                             &nbsp;V-v
                         </div>
-                        <div style="width: 100%; height: ${botRowHeight}rem; user-select: none; touch-action: none;">
-                            beat
+                        
+                        <div 
+                            style="width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"
+                                data-action-drum="sn+hc"
+                                data-keyboard-id="${keyboardId}-${ind++}"                            
+                        >
+                            <br/>&nbsp;A-a
+                        </div>                        
+                        
+                        <div 
+                            style="width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"
+                                data-action-drum="bd+hc"
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                        >
+                            <br/>&nbsp;Q-q
                         </div>
                     </div>                    
                 </div>
