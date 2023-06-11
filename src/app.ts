@@ -24,7 +24,7 @@ const appEl = document.getElementById('app');
 
 const isDev =
   /devitband/.test(window.location.href) ||
-  '/local/.test(window.location.href)';
+  /local/.test(window.location.href);
 
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
@@ -40,10 +40,10 @@ const linksToPage = [
   // { href: '/set/set_E/', name: 'set E' },
   // { href: '/set/set_Battle/', name: 'Продолжается бой' },
   { href: '/set/set_hardToHandle/', name: 'hardToHandle', isDev: true },
-  { href: '/mbox/tiriTiri/', name: 'tiriTiri', isDev: true },
+  { href: '/mbox/tiriTiri/', name: 'tiriTiri', isDev: false },
   //{ href: '/set/set_ItsMyLife/', name: 'Its my life', isDev: true },
   { href: '/page/page_roll/', name: 'roll', isDev: true },
-  { href: '/page/page_keyboard/', name: 'keyboard', isDev: true },
+  { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
   { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
 ];
 
