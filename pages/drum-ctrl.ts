@@ -53,10 +53,10 @@ export class DrumCtrl {
         // X_x_A_xv</pre>
 
         const content = `
-            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem; position: relative;">
+            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
                 
-                <div style="display: flex; user-select: none; touch-action: none;">
+                <div style="display: flex; user-select: none; touch-action: none; position: relative;">
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
                             <div 
@@ -64,14 +64,14 @@ export class DrumCtrl {
                                 data-action-drum="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >
-                                <br/>&nbsp;K-k
+                                <!--<br/>&nbsp;K-k-->
                             </div>
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightyellow; user-select: none; touch-action: none;"
                                 data-action-drum="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >
-                                <br/>&nbsp;T-t
+                                <!--<br/>&nbsp;T-t-->
                             </div>
                         </div>                        
                         
@@ -81,7 +81,7 @@ export class DrumCtrl {
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                             >         
-                                <br/>&nbsp;?
+                                <!--<br/>&nbsp;?-->
                             </div>
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
@@ -89,7 +89,7 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-highlight-drum="bd+hc"                                                                
                             >  
-                                <br/>&nbsp;X-x
+                                <!--<br/>&nbsp;X-x-->
                             </div>   
                         </div>
                                                  
@@ -102,14 +102,14 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-highlight-drum="sn+hc"                                
                             >       
-                                <br/>&nbsp;X-x
+                                <!--<br/>&nbsp;X-x-->
                             </div>
                             
                         
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                             >     
-                                <br/>&nbsp;?
+                                <!--<br/>&nbsp;?-->
                             </div>   
                         </div>                        
                         
@@ -119,7 +119,7 @@ export class DrumCtrl {
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-highlight-drum="bd+hc"                                          
                         >
-                            &nbsp;O-o
+                            <!--&nbsp;O-o-->
                         </div>                    
                     </div>
 
@@ -130,7 +130,7 @@ export class DrumCtrl {
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-highlight-drum="sn+hc"                                                        
                         >
-                            &nbsp;V-v
+                            <!--&nbsp;V-v-->
                         </div>
                         
                         <div 
@@ -138,7 +138,7 @@ export class DrumCtrl {
                                 data-action-drum="sn+hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"                            
                         >
-                            <br/>&nbsp;A-a
+                            <!--<br/>&nbsp;A-a-->
                         </div>                        
                         
                         <div 
@@ -146,40 +146,54 @@ export class DrumCtrl {
                                 data-action-drum="bd+hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                         >
-                            <br/>&nbsp;Q-q
+                            <!--<br/>&nbsp;Q-q-->
                         </div>
-                    </div>                    
+                    </div>
+                        
+                    <div 
+                        style="font-size: 1.7rem; font-family: monospace; height: 20rem; width: 100%; position: absolute; top: 0; pointer-events: none; user-select: none; touch-action: none; padding-left: .5rem;"
+                        data-type="text-under-keyboard"
+                    >
+                        O-k-T-k-O---V---<br/>                    
+                        O-k-T-k-O---O-kt<br/>
+                        O-ktK-v-O---O---<br/>
+                        O-k-|-k-O-k-V---<br/>
+                        O---|-k-O---V---<br/>
+                        O---T-k-O---V---<br/>
+                        O---T-k-O---O---<br/>
+                    </div>
                 </div>
+                
+                
 
                 <div style="margin: .5rem; user-select: none; touch-action: none;">
                     <span style="font-size: 1.5rem; user-select: none; touch-action: none;" data-action="clear">
                         clr&nbsp;&nbsp;
                     </span>                
                 </div>
-                
-                
-                <div style="margin: .5rem; user-select: none;">
-                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
-O-k-T-k-O---O-kt
-O-k-T-k-O---B---
-O-ktK-v-O---O---
-O-k-|-k-O-k-V---
-O---|-k-O---B---
-O---T-k-O---A---
-O---T-k-O---O---</pre>                                                        
+                                
+                <div style="margin: .5rem; user-select: none; font-family: monospace; font-size: 2rem;">
+                    O-k-T-k-O---V---<br/>                    
+                    O-k-T-k-O---O-kt<br/>
+                    O-ktK-v-O---O---<br/>
+                    O-k-|-k-O-k-V---<br/>
+                    O---|-k-O---V---<br/>
+                    O---T-k-O---V---<br/>
+                    O---T-k-O---O---<br/>                                                        
                 </div>
 
-                
-                <div style="margin: .5rem; user-select: none;">
-                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
-QoxoAoq_X_qoA_xv
-Q_q_AoxoX_x_A_xv</pre>                                                        
+                <div style="margin: .5rem; user-select: none; font-family: monospace; font-size: 2rem;">
+                    QoxoAoq_<br/>
+                    X_qoA_xv<br/>
+                    Q_q_Aoxo<br/>
+                    X_x_A_xv
                 </div>
-                                    
-                <div style="margin: .5rem; user-select: none;">
-                    <pre style="font-family: monospace; font-size: 1.7rem; margin: .5rem;">
-Q_q_Aoq_X_q_A_xv
-Q_q_AoxoX_qoA_xv</pre>
+
+                <div style="margin: .5rem; user-select: none; font-family: monospace; font-size: 2rem;">
+                    Q_q_Aoq_<br/>
+                    X_q_A_xv<br/>
+                    Q_q_Aoxo<br/>
+                    X_qoA_xv
                 </div>
                 
             <div style="font-size: 1.5rem;">
