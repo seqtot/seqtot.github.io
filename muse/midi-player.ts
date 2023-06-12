@@ -99,7 +99,7 @@ export class MidiPlayer extends Sound {
             }
 
             //console.log('planTick', planTick, realTick);
-            //cb('tick', { isVirtTick, planTick, endTick });
+            cb('tick', { isVirtTick, planTick, endTick });
 
             offsetMs = offsetMs + beatsWithOffsetMs[planTick];
             const whenSec = startTimeSec + (offsetMs / 1000);

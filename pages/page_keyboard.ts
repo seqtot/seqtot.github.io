@@ -54,6 +54,7 @@ export class KeyboardPage {
     fixedRelativeNote = defaultNote;
     lastRelativeNote = defaultNote;
     fixedQuickNote = defaultNote;
+    tickTime = 0;
 
     get pageId(): string {
         return this.props.id;
@@ -341,6 +342,7 @@ export class KeyboardPage {
                 note: code,
                 up: 0,
                 next: 0,
+                quarterTime: this.tickTime,
             };
 
             return;
@@ -365,6 +367,7 @@ export class KeyboardPage {
                     note: code,
                     up: 0,
                     next: 0,
+                    quarterTime: this.tickTime,
                 };
 
                 //this.playSound(this.keyData.note);
@@ -373,31 +376,49 @@ export class KeyboardPage {
     }
 
     getOut(bpmInfo: DrumCtrl['bpmInfo'], seq: DrumCtrl['keySequence'] ) {
-        let bpm = 0;
-        let qms = 0; // ms в четверти
+        let bpm = this.bpmValue;
+        let qms = Math.round(60000/ bpm); // ms в четверти
 
-        if (bpmInfo.totalMs) {
-            qms = bpmInfo.totalMs / (bpmInfo.pressCount - 1);
-            bpm = Math.round(60000 / qms);
-        }
+        // if (bpmInfo.totalMs) {
+        //     //qms = bpmInfo.totalMs / (bpmInfo.pressCount - 1);
+        //     //bpm = Math.round(60000 / qms);
+        //     qms = Math.round(60000/ bpm);
+        // }
 
-        //console.log(bpm, qms, this.drumCtrl.keySequence, this.drumCtrl.bpmInfo);
+        console.log('seq', seq);
 
-        let quarterTime = bpmInfo.lastDownTime + qms;
-
-        let out = '';
+        //let quarterTime = bpmInfo.lastDownTime + qms;
+        let quarterTime = 0;
+        let quarterOut = '';
+        let totalOut = '';
+        let restDuration = 0;
+        let restDurationForNext = 0;
+        let quarterRest = 12;
+        let offsetInt = 0;
+        let symbols: string[];
 
         seq.forEach((item, i) => {
-            let durationQ = Math.round(((item.next - item.down) / qms) * un.NUM_120);
-            let otklMs = item.down - (quarterTime + (qms * i));
-            let otklQ = Math.round((otklMs / qms) * un.NUM_120);
-            out = out + `${i} - ${otklMs} - ${otklQ} - ${durationQ}<br/>`
-            //console.log(i, item.down - (quarterTime + (qms * i)));
+            if (quarterTime !== item.quarterTime) {
+                symbols = ['-', '-', '-', '-', '-', '-','|', '-', '-', '-', '-', '-'];
+                quarterTime = item.quarterTime;
+            }
+
+            const offset = Math.round((((item.down - item.quarterTime) / qms) * un.NUM_120)/12);
+            symbols[offset] = 'x';
+            console.log(item.down - item.quarterTime, offset);
+            totalOut = totalOut + symbols.join('') + '<br/>';
+
+            // let durationQ = Math.round((((item.up - item.down) / qms) * un.NUM_120)/12);
+            // let durationForNextQ = Math.round(((item.next - item.down) / qms) * un.NUM_120);
+            // let otklMs = item.down - (quarterTime + (qms * i));
+            // let otklQ = Math.round((otklMs / qms) * un.NUM_120);
+            // out = out + `${item.quarterNumber} - ${i} - ${otklMs} - ${otklQ} - ${durationQ}<br/>`
+            // //console.log(i, item.down - (quarterTime + (qms * i)));
         });
 
         const el = dyName('drum-record-out', this.pageEl);
         if (el) {
-            el.innerHTML = out;
+            el.innerHTML = totalOut;
         }
 
 //  getOut2(multi: boolean = false): string {
@@ -467,6 +488,8 @@ export class KeyboardPage {
                 }
 
                 el.innerText = '' + (bpmInfo.bpm || '');
+                //this.bpmRange.setValue(bpmInfo.bpm);
+                //this.bpmValue = bpmInfo.bpm;
             });
         });
 
@@ -821,9 +844,17 @@ export class KeyboardPage {
         ${tick}
         `;
 
+        this.tickTime = Date.now();
         metronome.tryPlayMidiBlock({
             blocks,
             bpm: this.bpmValue,
+            cb: (type, data) => {
+                if (type === 'tick' && !data.isVirtTick) {
+                    this.tickTime = Date.now();
+                }
+
+                //console.log(type, this.tickCount, data);
+            }
         });
     }
 
@@ -833,6 +864,7 @@ export class KeyboardPage {
 
     stop() {
         multiPlayer.stopAndClearMidiPlayer();
+        metronome.stopAndClearMidiPlayer();
     }
 
     async play(text: string, repeatCount?: number) {

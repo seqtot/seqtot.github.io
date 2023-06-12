@@ -21,6 +21,7 @@ interface Page {
 // }
 
 type KeyData = {
+    quarterTime: number;
     code: string;
     note: string;
     down: number;
@@ -229,9 +230,12 @@ export class DrumCtrl {
                     </span>                    
                 </div>
                 
-                <div data-name="drum-record-out"></div>                
+                <div
+                    data-name="drum-record-out"
+                    style="font-size: 2rem; line-height: 1.5rem; font-family: monospace;"
+                ></div>                
                                 
-                <div style="font-size: 2rem; margin: .5rem; user-select: none; font-family: monospace; ">
+                <div style="font-size: 2rem; margin: .5rem; user-select: none; font-family: monospace;">
                     O-k-T-k-O---V---<br/>                    
                     O-k-T-k-O---O-kt<br/>
                     O-ktK-v-O---O---<br/>
