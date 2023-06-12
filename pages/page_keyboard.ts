@@ -321,6 +321,8 @@ export class KeyboardPage {
     }
 
     handleKeyRecord(code: string, time: number, type: 0 | 1) {
+        //console.log(code, time, type);
+
         if (this.drumCtrl.mode !== 'record') {
             return;
         }
@@ -329,7 +331,7 @@ export class KeyboardPage {
 
         // ПЕРВОЕ НАЖАТИЕ
         if (!ctrl.startUpTime) {
-            ctrl.startUpTime = ctrl.lastTickTime || time;
+            ctrl.startUpTime = ctrl.lastTickTime; //  || time;
         }
 
         if (!ctrl.keyData && type === DOWN) {
@@ -379,7 +381,7 @@ export class KeyboardPage {
             bpm = Math.round(60000 / qms);
         }
 
-        console.log(bpm, qms, this.drumCtrl.keySequence, this.drumCtrl.bpmInfo);
+        //console.log(bpm, qms, this.drumCtrl.keySequence, this.drumCtrl.bpmInfo);
 
         let quarterTime = bpmInfo.lastDownTime + qms;
 
@@ -490,7 +492,8 @@ export class KeyboardPage {
         });
 
         getWithDataAttr('action-drum-key', this.pageEl)?.forEach((el: HTMLElement) => {
-            console.log(el, el.dataset['actionDrum']);
+            //console.log(el, el.dataset['actionDrum']);
+
             const note1 = (el.dataset['actionDrumKey'] || '').split('+')[0];
 
             if (!note1) {
@@ -498,13 +501,17 @@ export class KeyboardPage {
             }
 
             const note2 = (el.dataset['actionDrum'] || '').split('+')[1];
-            const notes = [note1, note2].filter(item => !!item);
-
+            const notes = [note1, note2].filter(item => !!item && item !== '0');
+            const isBeatKey = note1 === '0';
             const volume = note1 === 'cowbell' ? 0.30 : undefined
             const keyboardId = el.dataset['keyboardId'];
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 const time = Date.now();
+
+                if (isBeatKey) {
+                    return this.handleKeyRecord('0', time, DOWN);
+                }
 
                 notes.forEach(keyOrNote => {
                     synthesizer.playSound({
@@ -514,7 +521,7 @@ export class KeyboardPage {
                         onlyStop: false,
                     });
 
-                    this.handleKeyRecord(keyOrNote, time, DOWN);
+                    //this.handleKeyRecord(keyOrNote, time, DOWN);
                 });
 
                 if (note2) {
@@ -527,6 +534,10 @@ export class KeyboardPage {
             el.addEventListener('pointerup', (evt: MouseEvent) => {
                 const time = Date.now();
 
+                if (isBeatKey) {
+                    return this.handleKeyRecord('0', time, UP);
+                }
+
                 notes.forEach(keyOrNote => {
                     synthesizer.playSound({
                         keyOrNote,
@@ -534,7 +545,7 @@ export class KeyboardPage {
                         onlyStop: true,
                     });
 
-                    this.handleKeyRecord(keyOrNote, time, UP);
+                    //this.handleKeyRecord(keyOrNote, time, UP);
                 });
 
                 if (note2) {

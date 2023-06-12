@@ -123,6 +123,8 @@ export class DrumCtrl {
                         >
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                data-action-drum-key="0"
+                                data-keyboard-id="${keyboardId}-${ind++}"                                
                             >         
                                 <!--<br/>&nbsp;?-->
                             </div>
@@ -151,6 +153,8 @@ export class DrumCtrl {
                         
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                data-action-drum-key="0"
+                                data-keyboard-id="${keyboardId}-${ind++}"                                
                             >     
                                 <!--<br/>&nbsp;?-->
                             </div>   
