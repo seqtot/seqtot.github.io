@@ -438,8 +438,13 @@ export class KeyboardPage {
             // //console.log(i, item.down - (quarterTime + (qms * i)));
         });
 
-        outArr.forEach(row => {
-            totalOut = totalOut + row.join('') + '<br/>';
+        outArr.forEach((row, iRow) => {
+            row.forEach((item, iCell) => {
+                totalOut = totalOut +
+                    `<span data-cell="${iRow}-${iCell}" style="user-select: none;">${item}</span>`;
+            });
+
+            totalOut = totalOut + '<br/>';
         });
 
         const el = dyName('drum-record-out', this.pageEl);

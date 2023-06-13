@@ -237,7 +237,7 @@ export class DrumCtrl {
                 
                 <div
                     data-name="drum-record-out"
-                    style="font-size: 2rem; line-height: 1.5rem; font-family: monospace;"
+                    style="padding-left: .5rem; font-size: 2rem; line-height: 1.5rem; font-family: monospace;"
                 ></div>                
                                 
                 <div style="font-size: 2rem; margin: .5rem; user-select: none; font-family: monospace;">
