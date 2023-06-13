@@ -432,8 +432,11 @@ export class KeyboardPage {
             const offset = Math.floor((
                     (Math.floor(item.down - item.quarterTime) / qms) * un.NUM_120)/12
             );
-            const durItems = Math.floor((
+            const durItem = Math.floor((
                 (Math.floor(item.up - item.down) / qms) * un.NUM_120)/12
+            ) || 1;
+            const durNextItem = Math.floor((
+                (Math.floor(item.next - item.down) / qms) * un.NUM_120)/12
             ) || 1;
 
             // for (i=offset; i<offset+durItems; i++) {
@@ -441,8 +444,11 @@ export class KeyboardPage {
             //         currRow[i].color = bgColor;
             //     }
             // }
-            currRow[offset].color = bgColor;
-            currRow[offset].text = 'x';
+
+            if (currRow[offset]) {
+                currRow[offset].color = bgColor;
+                currRow[offset].text = 'x';
+            }
         });
 
         outArr.forEach((row, iRow) => {
