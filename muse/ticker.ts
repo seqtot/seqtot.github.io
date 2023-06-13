@@ -173,7 +173,10 @@ export class Ticker {
     createTickSource(x: {
         qms: number,
         preset: WavePreset,
-        cb: (ab: AudioBufferSourceNode)=> void,
+        cb: (x: {
+            ab: AudioBufferSourceNode,
+            startTimeMs: number
+         })=> void,
         repeat: number,
     }) {
         let repeat = x.repeat || 100;
@@ -206,7 +209,11 @@ export class Ticker {
                     audioBufferSourceNode.disconnect(Sound.ctx.destination);
                 }
 
-                x.cb(audioBufferSourceNode);
+                x.cb({
+                    ab: audioBufferSourceNode,
+                    startTimeMs: Date.now()
+                });
+
             })
             .catch(function(err) {
                 console.log('Rendering failed: ' + err);
