@@ -238,7 +238,7 @@ export class DrumCtrl {
                     style="padding-left: .5rem; font-size: 2rem; line-height: 1.5rem; font-family: monospace;"
                 ></div>                
                                 
-                <div style="font-size: 2rem; margin: .5rem; user-select: none; font-family: monospace;">
+                <div style="font-size: 1.8rem; margin: .5rem; user-select: none; font-family: monospace;">
                     O-k-T-k-O---V---<br/>                    
                     O-k-T-k-O---O-kt<br/>
                     O-ktK-v-O---O---<br/>
