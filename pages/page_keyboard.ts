@@ -13,10 +13,12 @@ import keyboardSet from './page_keyboard-utils';
 import { getNoteByOffset, parseInteger } from '../muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
 import {DrumCtrl} from './drum-ctrl';
+import {Ticker} from '../muse/ticker';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
 const synthesizer = new Synthesizer();
+const ticker = new Ticker(Sound.ctx);
 synthesizer.connect({ ctx: Sound.ctx });
 synthesizer.setSettings(toneAndDrumPlayerSettings);
 
@@ -54,7 +56,10 @@ export class KeyboardPage {
     fixedRelativeNote = defaultNote;
     lastRelativeNote = defaultNote;
     fixedQuickNote = defaultNote;
-    tickTime = 0;
+    tickInfo = {
+        quarterTime: 0,
+        quarterNio: 0,
+    }
 
     get pageId(): string {
         return this.props.id;
@@ -141,6 +146,7 @@ export class KeyboardPage {
             <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
             <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
             <a data-action-type="stop"><b>stop</b></a>&emsp;
+            <a data-action-type="tick"><b>tick</b></a>&emsp;
             <div 
                 class="range-slider"
                 data-name="slider"
@@ -162,6 +168,10 @@ export class KeyboardPage {
             el.addEventListener('click', (evt: MouseEvent) => {
                 this.playTick(el?.dataset?.tickTrigger);
             });
+        });
+
+        getWithDataAttrValue('action-type', 'tick', this.pageEl)?.forEach((el) => {
+            el.addEventListener('click', (evt: MouseEvent) => this.playTick2());
         });
 
         getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
@@ -342,17 +352,18 @@ export class KeyboardPage {
                 note: code,
                 up: 0,
                 next: 0,
-                quarterTime: this.tickTime,
+                quarterTime: this.tickInfo.quarterTime,
+                quarterNio: this.tickInfo.quarterNio,
             };
 
             return;
         }
 
         if (
-            ctrl.keyData &&
-            ((type === UP && code === ctrl.keyData.code) || type === DOWN)
+            ctrl.keyData
+            //&& ((type === UP && code === ctrl.keyData.code) || type === DOWN)
         ) {
-            if (!ctrl.keyData.up) {
+            if (type === UP) {
                 ctrl.keyData.up = time;
                 //this.playSound(this.keyData.note, true);
             }
@@ -367,7 +378,8 @@ export class KeyboardPage {
                     note: code,
                     up: 0,
                     next: 0,
-                    quarterTime: this.tickTime,
+                    quarterTime: this.tickInfo.quarterTime,
+                    quarterNio: this.tickInfo.quarterNio,
                 };
 
                 //this.playSound(this.keyData.note);
@@ -388,25 +400,39 @@ export class KeyboardPage {
         console.log('seq', seq);
 
         //let quarterTime = bpmInfo.lastDownTime + qms;
-        let quarterTime = 0;
+        let quarterNio = seq[0].quarterNio;
+        let quarterTime = seq[0].quarterTime;
         let quarterOut = '';
         let totalOut = '';
         let restDuration = 0;
         let restDurationForNext = 0;
         let quarterRest = 12;
         let offsetInt = 0;
-        let symbols: string[];
+        const mask = ['-', '-', '-', '-', '-', '-','|', '-', '-', '-', '-', '-'];
+        let currRow: string[] = [...mask];
+        let outArr: string[][] = [currRow];
 
         seq.forEach((item, i) => {
-            if (quarterTime !== item.quarterTime) {
-                symbols = ['-', '-', '-', '-', '-', '-','|', '-', '-', '-', '-', '-'];
+            if (quarterNio !== item.quarterNio) {
+                const diff = item.quarterNio - quarterNio;
+                if (diff > 1) {
+                    for (i=1; i<diff; i++) {
+                        //totalOut = totalOut + mask.join('') + '<br/>';
+                        outArr.push([...mask]);
+                    }
+                }
+
+                //console.log(item.quarterTime - quarterTime);
+                currRow = [...mask];
+                outArr.push(currRow);
                 quarterTime = item.quarterTime;
+                quarterNio = item.quarterNio;
             }
 
             const offset = Math.round((((item.down - item.quarterTime) / qms) * un.NUM_120)/12);
-            symbols[offset] = 'x';
-            console.log(item.down - item.quarterTime, offset);
-            totalOut = totalOut + symbols.join('') + '<br/>';
+            currRow[offset] = 'x';
+            //console.log('offset', offset);
+            //totalOut = totalOut + symbols.join('') + '<br/>';
 
             // let durationQ = Math.round((((item.up - item.down) / qms) * un.NUM_120)/12);
             // let durationForNextQ = Math.round(((item.next - item.down) / qms) * un.NUM_120);
@@ -414,6 +440,10 @@ export class KeyboardPage {
             // let otklQ = Math.round((otklMs / qms) * un.NUM_120);
             // out = out + `${item.quarterNumber} - ${i} - ${otklMs} - ${otklQ} - ${durationQ}<br/>`
             // //console.log(i, item.down - (quarterTime + (qms * i)));
+        });
+
+        outArr.forEach(row => {
+            totalOut = totalOut + row.join('') + '<br/>';
         });
 
         const el = dyName('drum-record-out', this.pageEl);
@@ -468,6 +498,7 @@ export class KeyboardPage {
                     this.drumCtrl.keySequence.push(this.drumCtrl.keyData);
                     this.getOut(this.drumCtrl.bpmInfo, this.drumCtrl.keySequence)
                     this.drumCtrl.clearRecordData();
+                    this.stopTicker();
 
                     return;
                 }
@@ -823,6 +854,43 @@ export class KeyboardPage {
         );
     }
 
+    stopTicker() {
+        ticker.stop();
+        synthesizer.playSound({
+            keyOrNote: 'cowbell',
+            id: 'ticker',
+            onlyStop: true,
+        });
+    }
+
+    playTick2(name?: string) {
+        this.tickInfo = {
+            quarterTime: Date.now(),
+            quarterNio: -1,
+        }
+
+        ticker.tickByBpm({
+            bpm: this.bpmValue,
+
+        }, () => {
+            this.tickInfo = {
+                quarterTime: Date.now(),
+                quarterNio: this.tickInfo.quarterNio + 1,
+            }
+
+            synthesizer.playSound({
+                keyOrNote: 'cowbell',
+                id: 'ticker',
+                onlyStop: true,
+            });
+            synthesizer.playSound({
+                keyOrNote: 'cowbell',
+                id: 'ticker',
+                onlyStop: false,
+            });
+        });
+    }
+
     playTick(name?: string) {
         name = name || '';
         this.playingTick = name;
@@ -844,17 +912,16 @@ export class KeyboardPage {
         ${tick}
         `;
 
-        this.tickTime = Date.now();
         metronome.tryPlayMidiBlock({
             blocks,
             bpm: this.bpmValue,
-            cb: (type, data) => {
-                if (type === 'tick' && !data.isVirtTick) {
-                    this.tickTime = Date.now();
-                }
-
-                //console.log(type, this.tickCount, data);
-            }
+            // cb: (type, data) => {
+            //     if (type === 'tick' && !data.isVirtTick) {
+            //         this.tickTime = Date.now();
+            //     }
+            //
+            //     //console.log(type, this.tickCount, data);
+            // }
         });
     }
 
@@ -865,6 +932,7 @@ export class KeyboardPage {
     stop() {
         multiPlayer.stopAndClearMidiPlayer();
         metronome.stopAndClearMidiPlayer();
+        this.stopTicker();
     }
 
     async play(text: string, repeatCount?: number) {

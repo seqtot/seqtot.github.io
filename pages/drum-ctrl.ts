@@ -22,6 +22,7 @@ interface Page {
 
 type KeyData = {
     quarterTime: number;
+    quarterNio: number;
     code: string;
     note: string;
     down: number;
