@@ -340,10 +340,6 @@ export class KeyboardPage {
         const ctrl = this.drumCtrl;
 
         // ПЕРВОЕ НАЖАТИЕ
-        if (!ctrl.startUpTime) {
-            ctrl.startUpTime = ctrl.lastTickTime; //  || time;
-        }
-
         if (!ctrl.keyData && type === DOWN) {
             ctrl.keyData = {
                 code,
@@ -387,37 +383,47 @@ export class KeyboardPage {
     }
 
     getOut(bpmInfo: DrumCtrl['bpmInfo'], seq: DrumCtrl['keySequence'] ) {
+        const getMask = (): {color: string, text: string, note: string}[] => {
+            const arr = Array(12).fill(null);
+            return arr.map(() => ({
+                color: 'whitesmoke',
+                text: '',
+                note: '',
+            }));
+        }
+
         let bpm = this.bpmValue;
         let qms = Math.round(60000/ bpm); // ms в четверти
-
-        // if (bpmInfo.totalMs) {
-        //     //qms = bpmInfo.totalMs / (bpmInfo.pressCount - 1);
-        //     //bpm = Math.round(60000 / qms);
-        //     qms = Math.round(60000/ bpm);
-        // }
 
         console.log('seq', seq);
 
         //let quarterTime = bpmInfo.lastDownTime + qms;
         let quarterNio = seq[0].quarterNio;
         let quarterTime = seq[0].quarterTime;
-        let quarterOut = '';
         let totalOut = '';
-        const mask = ['.', '.', '.', '.', '.', '.','.', '.', '.', '.', '.', '.'];
-        let currRow: string[] = [...mask];
-        let outArr: string[][] = [currRow];
+        let currRow: {color: string, text: string, note: string}[] = getMask();
+        let outArr: {color: string, text: string, note: string}[][] = [currRow];
+        let note = seq[0].note;
+        const color1 = 'blue';
+        const color2 = 'green';
+        let bgColor = color1;
 
         seq.forEach((item, i) => {
+            if (note !== item.note) {
+                bgColor = bgColor === color1 ? color2 : color1;
+                note = item.note;
+            }
+
             if (quarterNio !== item.quarterNio) {
                 const diff = item.quarterNio - quarterNio;
                 if (diff > 1) {
                     for (i=1; i<diff; i++) {
-                        outArr.push([...mask]);
+                        outArr.push(getMask());
                     }
                 }
 
                 //console.log(item.quarterTime - quarterTime);
-                currRow = [...mask];
+                currRow = getMask();
                 outArr.push(currRow);
                 quarterTime = item.quarterTime;
                 quarterNio = item.quarterNio;
@@ -426,22 +432,26 @@ export class KeyboardPage {
             const offset = Math.floor((
                     (Math.floor(item.down - item.quarterTime) / qms) * un.NUM_120)/12
             );
-            currRow[offset] = 'x';
-            //console.log('offset', offset);
-            //totalOut = totalOut + symbols.join('') + '<br/>';
+            const durItems = Math.floor((
+                (Math.floor(item.up - item.down) / qms) * un.NUM_120)/12
+            ) || 1;
 
-            // let durationQ = Math.round((((item.up - item.down) / qms) * un.NUM_120)/12);
-            // let durationForNextQ = Math.round(((item.next - item.down) / qms) * un.NUM_120);
-            // let otklMs = item.down - (quarterTime + (qms * i));
-            // let otklQ = Math.round((otklMs / qms) * un.NUM_120);
-            // out = out + `${item.quarterNumber} - ${i} - ${otklMs} - ${otklQ} - ${durationQ}<br/>`
-            // //console.log(i, item.down - (quarterTime + (qms * i)));
+            // for (i=offset; i<offset+durItems; i++) {
+            //     if (i<11) {
+            //         currRow[i].color = bgColor;
+            //     }
+            // }
+            currRow[offset].color = bgColor;
+            currRow[offset].text = 'x';
         });
 
         outArr.forEach((row, iRow) => {
             row.forEach((item, iCell) => {
                 totalOut = totalOut +
-                    `<span data-cell="${iRow}-${iCell}" style="user-select: none;">${item}</span>`;
+                    `<div 
+                        data-cell="${iRow}-${iCell}"
+                        style="box-sizing: border-box; border: 1px solid white; display: inline-block; width: 1.5rem; height: 1.5rem; background-color: ${item.color}; user-select: none;"
+                    ></div>`;
             });
 
             totalOut = totalOut + '<br/>';
@@ -556,16 +566,15 @@ export class KeyboardPage {
             }
 
             const note2 = (el.dataset['actionDrum'] || '').split('+')[1];
-            const notes = [note1, note2].filter(item => !!item && item !== '0');
-            const isBeatKey = note1 === '0';
+            const notes = [note1, note2].filter(item => !!item && !item.startsWith('empty'));
             const volume = note1 === 'cowbell' ? 0.30 : undefined
             const keyboardId = el.dataset['keyboardId'];
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 const time = Date.now();
 
-                if (isBeatKey) {
-                    return this.handleKeyRecord('0', time, DOWN);
+                if (this.drumCtrl.mode === 'record') {
+                    return this.handleKeyRecord(note1, time, DOWN);
                 }
 
                 notes.forEach(keyOrNote => {
@@ -589,8 +598,8 @@ export class KeyboardPage {
             el.addEventListener('pointerup', (evt: MouseEvent) => {
                 const time = Date.now();
 
-                if (isBeatKey) {
-                    return this.handleKeyRecord('0', time, UP);
+                if (this.drumCtrl.mode === 'record') {
+                    return this.handleKeyRecord(note1, time, UP);
                 }
 
                 notes.forEach(keyOrNote => {

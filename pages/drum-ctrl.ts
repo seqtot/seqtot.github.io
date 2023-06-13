@@ -52,7 +52,6 @@ export class DrumCtrl {
     mode: 'record' | null = null;
     keyData: KeyData | null = null;
     keySequence: KeyData[] = [];
-    startUpTime = 0;
     lastTickTime: number = 0;
 
     constructor(public page: Page) {}
@@ -60,7 +59,6 @@ export class DrumCtrl {
     clearRecordData() {
         this.keyData = null;
         this.keySequence = [];
-        this.startUpTime = 0;
         this.lastTickTime = 0;
     }
 
@@ -125,7 +123,7 @@ export class DrumCtrl {
                         >
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum-key="0"
+                                data-action-drum-key="empty0"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >         
                                 <!--<br/>&nbsp;?-->
@@ -155,7 +153,7 @@ export class DrumCtrl {
                         
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum-key="0"
+                                data-action-drum-key="empty1"
                                 data-keyboard-id="${keyboardId}-${ind++}"                                
                             >     
                                 <!--<br/>&nbsp;?-->
