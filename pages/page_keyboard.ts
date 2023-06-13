@@ -887,13 +887,7 @@ export class KeyboardPage {
 
         ticker.tickByBpm({
             bpm: this.bpmValue,
-
         }, () => {
-            this.tickInfo = {
-                quarterTime: Date.now(),
-                quarterNio: this.tickInfo.quarterNio + 1,
-            }
-
             synthesizer.playSound({
                 keyOrNote: 'cowbell',
                 id: 'ticker',
@@ -904,6 +898,11 @@ export class KeyboardPage {
                 id: 'ticker',
                 onlyStop: false,
             });
+
+            this.tickInfo = {
+                quarterTime: Date.now(),
+                quarterNio: this.tickInfo.quarterNio + 1,
+            }
         });
     }
 
