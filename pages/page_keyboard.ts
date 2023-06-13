@@ -173,6 +173,10 @@ export class KeyboardPage {
             el.addEventListener('click', (evt: MouseEvent) => this.playTick2());
         });
 
+        getWithDataAttrValue('action-type', 'test', this.pageEl)?.forEach((el) => {
+            el.addEventListener('click', (evt: MouseEvent) => this.playTick3());
+        });
+
         getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
             (el: HTMLElement) => {
                 el.addEventListener('pointerdown', () => {
@@ -879,6 +883,22 @@ export class KeyboardPage {
         });
     }
 
+    playTick3() {
+        const cb = (ab: AudioBufferSourceNode) => {
+            console.log('start');
+            setTimeout(() => {
+                ab.stop(0);
+            }, 10000);
+        }
+
+        ticker.createTickSource({
+            qms: Math.round(60000/ this.bpmValue),
+            preset:synthesizer.instruments['drum_56'],
+            repeat: 20,
+            cb,
+        });
+    }
+
     playTick2(name?: string) {
         this.tickInfo = {
             quarterTime: Date.now(),
@@ -898,7 +918,6 @@ export class KeyboardPage {
                 id: 'ticker',
                 onlyStop: false,
             });
-
             this.tickInfo = {
                 quarterTime: Date.now(),
                 quarterNio: this.tickInfo.quarterNio + 1,

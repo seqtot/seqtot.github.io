@@ -1,5 +1,8 @@
 'use babel';
 
+import {Sound} from '../muse/sound';
+import {WavePreset} from '../waf-player/otypes';
+
 export function tickOnTime(endTime: number, ctx: AudioContext, cb: () => void): OscillatorNode | undefined {
     if (ctx.currentTime >= endTime) {
         cb();
@@ -165,5 +168,49 @@ export class Ticker {
             clearInterval(this.interval);
             this.interval = null;
         }
+    }
+
+    createTickSource(x: {
+        qms: number,
+        preset: WavePreset,
+        cb: (ab: AudioBufferSourceNode)=> void,
+        repeat: number,
+    }) {
+        let repeat = x.repeat || 100;
+        let qms = x.qms || 400;
+        let qmsSec = qms / 1000;
+        let totalDurationSec = qmsSec * repeat;
+        let offlineCtx = new OfflineAudioContext(1, 44100 * totalDurationSec, 44100);
+        let currentTime = offlineCtx.currentTime;
+        let offset = 0;
+
+        for (let i=0; i<repeat; i++) {
+            const soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+            soundSource.buffer = x.preset.zones[0].buffer;
+            soundSource.connect(offlineCtx.destination);
+            soundSource.start(currentTime + offset);
+            offset = offset + qmsSec;
+        }
+
+        offlineCtx
+            .startRendering()
+            .then(audioBuffer => {
+                const audioBufferSourceNode = Sound.ctx.createBufferSource();
+
+                audioBufferSourceNode.buffer = audioBuffer;
+                audioBufferSourceNode.connect(Sound.ctx.destination);
+                audioBufferSourceNode.start();
+                audioBufferSourceNode.stop(Sound.ctx.currentTime + totalDurationSec);
+                audioBufferSourceNode.onended = () => {
+                    console.log('onended');
+                    audioBufferSourceNode.disconnect(Sound.ctx.destination);
+                }
+
+                x.cb(audioBufferSourceNode);
+            })
+            .catch(function(err) {
+                console.log('Rendering failed: ' + err);
+                // Note: The promise should reject when startRendering is called a second time on an OfflineAudioContext
+            });
     }
 }
