@@ -146,7 +146,6 @@ export class KeyboardPage {
             <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
             <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
             <a data-action-type="stop"><b>stop</b></a>&emsp;
-            <a data-action-type="tick"><b>tick</b></a>&emsp;
             <div 
                 class="range-slider"
                 data-name="slider"
@@ -404,11 +403,7 @@ export class KeyboardPage {
         let quarterTime = seq[0].quarterTime;
         let quarterOut = '';
         let totalOut = '';
-        let restDuration = 0;
-        let restDurationForNext = 0;
-        let quarterRest = 12;
-        let offsetInt = 0;
-        const mask = ['-', '-', '-', '-', '-', '-','|', '-', '-', '-', '-', '-'];
+        const mask = ['.', '.', '.', '.', '.', '.','.', '.', '.', '.', '.', '.'];
         let currRow: string[] = [...mask];
         let outArr: string[][] = [currRow];
 
@@ -417,7 +412,6 @@ export class KeyboardPage {
                 const diff = item.quarterNio - quarterNio;
                 if (diff > 1) {
                     for (i=1; i<diff; i++) {
-                        //totalOut = totalOut + mask.join('') + '<br/>';
                         outArr.push([...mask]);
                     }
                 }
@@ -429,7 +423,9 @@ export class KeyboardPage {
                 quarterNio = item.quarterNio;
             }
 
-            const offset = Math.round((((item.down - item.quarterTime) / qms) * un.NUM_120)/12);
+            const offset = Math.floor((
+                    (Math.floor(item.down - item.quarterTime) / qms) * un.NUM_120)/12
+            );
             currRow[offset] = 'x';
             //console.log('offset', offset);
             //totalOut = totalOut + symbols.join('') + '<br/>';

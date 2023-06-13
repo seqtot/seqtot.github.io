@@ -220,15 +220,19 @@ export class DrumCtrl {
                     <span 
                         style="font-size: 1.5rem; user-select: none; touch-action: none;"
                         data-action-drum="clear"
-                    >
-                        clr&nbsp;&nbsp;
-                    </span>                
-                    <span 
+                    >clr&nbsp;&nbsp;</span>                
+                    <span
                         style="font-size: 1.5rem; user-select: none; touch-action: none;"
                         data-action-drum="record"
-                    >
-                        rec&nbsp;&nbsp;
-                    </span>                    
+                    >rec&nbsp;&nbsp;</span>
+                    <span
+                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        data-action-type="stop"
+                    >stop&nbsp;&nbsp;</span>                                        
+                    <span
+                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        data-action-type="tick"
+                    >tick&nbsp;&nbsp;</span>                    
                 </div>
                 
                 <div
