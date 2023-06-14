@@ -1,11 +1,11 @@
 import { SequencerDisplayModel } from './types';
 
 import { MAX_PITCH, MAX_VELOCITY, MIN_SEMI_H } from './const';
-import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
+import { CanvasComponent, ComponentMouseEvent } from '../libs/common/canvas/canvas-component';
 import { LassoSelector } from './lasso-selector';
 import { SelectedItemSet } from './selected-item-set';
 import { Note } from './types';
-import { Rector, IPoint } from '../common/canvas/types';
+import { Rector, IPoint } from '../libs/common/canvas/types';
 
 interface NotePosition {
   atomInd: number;

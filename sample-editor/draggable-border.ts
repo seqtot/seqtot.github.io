@@ -1,5 +1,5 @@
 import { SequencerDisplayModel } from './types';
-import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
+import { CanvasComponent, ComponentMouseEvent } from '../libs/common/canvas/canvas-component';
 
 export class DraggableBorder extends CanvasComponent {
   private initialPosition: number;

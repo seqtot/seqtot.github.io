@@ -1,6 +1,6 @@
-import {EventEmitter} from '../common/event-emitter';
-import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
-import { Rector, IPoint } from '../common/canvas/types';
+import {EventEmitter} from '../libs/common/event-emitter';
+import { CanvasComponent, ComponentMouseEvent } from '../libs/common/canvas/canvas-component';
+import { Rector, IPoint } from '../libs/common/canvas/types';
 
 import { SequencerDisplayModel } from './types';
 import { LassoSelector } from './lasso-selector';

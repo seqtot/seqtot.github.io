@@ -3,7 +3,7 @@
 import {KeyInfo } from './sound';
 import * as un from './utils';
 import {getInstrumentObj} from './instruments';
-import {WavePreset} from '../../waf-player/otypes';
+import {WavePreset} from '../waf-player/otypes';
 import {NoteLineInfo, WaveSlide} from './types';
 
 export type TicksInfo = {

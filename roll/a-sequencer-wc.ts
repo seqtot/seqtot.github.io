@@ -1,8 +1,8 @@
-import { RootComponentHolder } from '../common/canvas';
+import { RootComponentHolder } from '../libs/common/canvas';
 import { SequencerRoot } from './a-sequencer-root-cc';
 
 import {MeasureInfo, Colors, SequencerDisplayModel, NoteData} from './types';
-import { CustomElement } from '../common/custom-element';
+import { CustomElement } from '../libs/common/custom-element';
 import { LookAndFeel_Default, LookAndFeel_Live } from './look-and-feel';
 import { CSS_STYLE, defaultColors } from './const';
 

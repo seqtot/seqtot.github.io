@@ -1,7 +1,7 @@
-import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
+import { CanvasComponent, ComponentMouseEvent } from '../libs/common/canvas/canvas-component';
 import { Colors } from './types';
 import { SelectableItem, SelectedItemSet } from './selected-item-set';
-import {IPoint, IRect, Rector} from '../common/canvas/types';
+import {IPoint, IRect, Rector} from '../libs/common/canvas/types';
 
 interface Lasso<T extends SelectableItem> {
   startX: number;

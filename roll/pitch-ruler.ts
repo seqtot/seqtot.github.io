@@ -1,6 +1,6 @@
 import { SequencerDisplayModel } from './types';
 import { MAX_PITCH, MAX_SEMI_H, MIN_PITCH } from './const';
-import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
+import { CanvasComponent, ComponentMouseEvent } from '../libs/common/canvas/canvas-component';
 import { NoteGridComponent } from './note-grid-component';
 
 export class PitchRuler extends CanvasComponent {

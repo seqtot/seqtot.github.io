@@ -1,5 +1,5 @@
 import { Range, SequencerDisplayModel } from './types';
-import { CanvasComponent, ComponentMouseEvent } from '../common/canvas/canvas-component';
+import { CanvasComponent, ComponentMouseEvent } from '../libs/common/canvas/canvas-component';
 import { NoteGridComponent } from './note-grid-component';
 import { clamp } from './utils';
 

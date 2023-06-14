@@ -1,6 +1,6 @@
-import { EventEmitter } from '../common/event-emitter';
-import { RootComponentHolder } from '../common/canvas';
-import { CustomElement } from '../common/custom-element';
+import { EventEmitter } from '../libs/common/event-emitter';
+import { RootComponentHolder } from '../libs/common/canvas';
+import { CustomElement } from '../libs/common/custom-element';
 
 import { SampleEditorRootCc } from './a-sample-editor-root-cc';
 import { MeasureInfo, Colors, SequencerDisplayModel, NoteData } from './types';

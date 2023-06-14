@@ -1,5 +1,5 @@
 import { SequencerDisplayModel } from './types';
-import { CanvasComponent } from '../common/canvas/canvas-component';
+import { CanvasComponent } from '../libs/common/canvas/canvas-component';
 
 export class VelocityRuler extends CanvasComponent {
   constructor(private readonly context: {model: ()=> SequencerDisplayModel}) {

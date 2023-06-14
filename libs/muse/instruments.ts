@@ -3,7 +3,7 @@
 //import '../waf-fonts';
 import {parseInteger} from './utils';
 import {drumCodes} from './drums';
-import {WavePreset} from '../../waf-player/otypes';
+import {WavePreset} from '../waf-player/otypes';
 
 const toneChar = '$';
 const drumChar = '@';

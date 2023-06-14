@@ -1,5 +1,5 @@
 import { SequencerDisplayModel } from './types';
-import { CanvasComponent } from '../common/canvas/canvas-component';
+import { CanvasComponent } from '../libs/common/canvas/canvas-component';
 import { DraggableBorder } from './draggable-border';
 import { NoteGridComponent } from './note-grid-component';
 import { PitchRuler } from './pitch-ruler';

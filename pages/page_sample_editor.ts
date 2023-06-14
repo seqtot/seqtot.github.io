@@ -5,13 +5,13 @@ import { byId, dyName } from '../src/utils';
 import {Synthesizer} from '../libs/muse/synthesizer';
 import {KeyInfo, Sound} from '../libs/muse/sound';
 import {defaultSynthSettings} from '../libs/muse/keyboards';
-import {WavePreset} from '../waf-player/otypes';
+import {WavePreset} from '../libs/waf-player/otypes';
 import {Anchors} from '../sample-editor/a-wave-form-component';
 
 // SAMPLE EDITOR
 import { SampleEditorWc} from '../sample-editor/a-sample-editor-wc';
-import {EventEmitter} from '../common/event-emitter';
-import {getAudioBufferFromBlobString, getAudioBufferFromString} from '../waf-player/audio-buffer-to-wav';
+import {EventEmitter} from '../libs/common/event-emitter';
+import {getAudioBufferFromBlobString, getAudioBufferFromString} from '../libs/waf-player/audio-buffer-to-wav';
 
 import rawVoiceInst from './waf-fonts/voice_la';
 

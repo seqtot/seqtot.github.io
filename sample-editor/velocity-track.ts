@@ -4,7 +4,7 @@ import {
   ComponentMouseEvent,
   IPoint,
   squaredDistance,
-} from '../common/canvas';
+} from '../libs/common/canvas';
 import { LassoSelector } from './lasso-selector';
 import { WaveFormComponent } from './a-wave-form-component';
 import { Note, SequencerDisplayModel } from './types';

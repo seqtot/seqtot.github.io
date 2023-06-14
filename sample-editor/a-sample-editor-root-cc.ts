@@ -1,5 +1,5 @@
-import { CanvasComponent } from '../common/canvas/canvas-component';
-import { EventEmitter } from '../common/event-emitter';
+import { CanvasComponent } from '../libs/common/canvas/canvas-component';
+import { EventEmitter } from '../libs/common/event-emitter';
 
 import { SequencerDisplayModel } from './types';
 import { DraggableBorder } from './draggable-border';
