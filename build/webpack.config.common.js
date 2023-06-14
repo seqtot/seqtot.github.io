@@ -55,10 +55,10 @@ module.exports = (env) => {
         //   test: /\.scss$/,
         //   use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
         // },
-        // {
-        //   test: /\.less$/,
-        //   use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader'],
-        // },
+        {
+          test: /\.less$/,
+          use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader'],
+        },
         {
           test: /\.css$/,
           use: [MiniCssExtractPlugin.loader, 'css-loader'],

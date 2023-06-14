@@ -1,11 +1,13 @@
 import {Props} from 'framework7/types/modules/component/snabbdom/modules/props';
 import {ComponentContext} from 'framework7/modules/component/component';
 import {RollPage, KeyboardPage} from '../pages';
+import {MuseEditorPage} from '../pages/page_muse_editor';
 //import {SamplePage} from '../pages/page_sample_editor';
 
 const pages = {
     page_roll: RollPage,
-    page_keyboard: KeyboardPage
+    page_keyboard: KeyboardPage,
+    page_muse_editor: MuseEditorPage,
     //page_sample_editor: SamplePage,
 };
 

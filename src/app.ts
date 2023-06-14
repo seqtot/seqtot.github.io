@@ -45,6 +45,7 @@ const linksToPage = [
   { href: '/page/page_roll/', name: 'roll', isDev: true },
   { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
   { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
+  { href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
 ];
 
 const linksHtml = linksToPage

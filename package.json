@@ -20,6 +20,8 @@
     "is-browser": "^2.0.1",
     "is-buffer": "^2.0.0",
     "audio-buffer-utils": "^5.1.2",
+    "less": "^4.1.1",
+    "less-loader": "^9.0.0",
     "typescript": "^4.8.2",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.1",
