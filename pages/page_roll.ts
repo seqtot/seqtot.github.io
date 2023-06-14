@@ -1,4 +1,4 @@
-import {Props} from 'framework7/types/modules/component/snabbdom/modules/props';
+import {Props} from 'framework7/modules/component/snabbdom/modules/props';
 import {ComponentContext} from 'framework7/modules/component/component';
 import {Dom7Array} from 'dom7';
 

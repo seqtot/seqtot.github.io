@@ -1,24 +1,20 @@
 // https://framework7.io/docs/init-app.html
 // https://framework7.io/docs/kitchen-sink.html
 
-//import Framework7 from 'framework7';
-//import Framework7 from 'framework7/lite-bundle';
+import Framework7 from 'framework7';
 
-// Import core framework
-// import Framework7 from 'framework7';
-// Import framework with all components
-import Framework7 from 'framework7/bundle';
+// Import additional components
+import Range from 'framework7/components/range';
+import Panel from 'framework7/components/panel';
+// Import components styles
+import 'framework7/components/range/css';
+import 'framework7/components/panel/css';
+
+Framework7.use([Range, Panel]);
+
 import { mboxOldRc } from './mbox-old-rc';
 import { mboxRc } from './mbox-rc';
 import { pageRc } from './page-rc';
-
-// Import additional components
-// import Searchbar from 'framework7/components/searchbar/';
-// import Calendar from 'framework7/components/calendar/';
-// import Popup from 'framework7/components/popup/';
-// import Panel from 'framework7/components/panel/';
-// Install F7 Components using .use() method on class:
-// Framework7.use([Panel]);
 
 const appEl = document.getElementById('app');
 
@@ -61,7 +57,7 @@ const linksHtml = linksToPage
 
 const leftPanel = `
 <div
-  class="panel panel-left panel-cover panel-init theme-dark"
+  class="panel panel-left panel-cover panel-init dark"
   data-visible-breakpoint="2000"  
 >
   <div class="view view-init" data-view="left">
@@ -87,7 +83,7 @@ const leftPanel = `
 
 const rightPanel = `
 <div
-  class="panel panel-right panel-cover panel-init theme-dark"
+  class="panel panel-right panel-cover panel-init dark"
 >
   <div class="view view-init" data-view="right">
     <div class="page">
@@ -154,7 +150,6 @@ appEl.innerHTML = appTpl;
 const app = new Framework7({
   el: '#app',
   name: 'ITBand',
-  id: 'com.giv.itband',
   panel: {
     // swipe: true,
   },

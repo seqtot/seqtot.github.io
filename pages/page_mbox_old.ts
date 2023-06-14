@@ -1,6 +1,6 @@
-import {Props} from 'framework7/types/modules/component/snabbdom/modules/props';
+import {Props} from 'framework7/modules/component/snabbdom/modules/props';
 import {ComponentContext} from 'framework7/modules/component/component';
-import { Range } from 'framework7/types/components/range/range';
+import {Range} from 'framework7/framework7-types';
 import {Dom7Array} from 'dom7';
 
 import { byId, dyName } from '../src/utils';

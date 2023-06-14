@@ -1,5 +1,5 @@
-import { ComponentContext } from 'framework7/types/modules/component/component';
-import { Props } from 'framework7/types/modules/component/snabbdom/modules/props';
+import {ComponentContext} from 'framework7/modules/component/component';
+import {Props} from 'framework7/modules/component/snabbdom/modules/props';
 import { MBoxPage } from '../pages/page_mbox';
 import mboxes from '../mboxes';
 
