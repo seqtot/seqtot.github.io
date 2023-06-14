@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "framework7": "^8.1.0",
-    "framework7-icons": "^5.0.5"
+    "framework7-icons": "^5.0.5",
+    "webaudiofont": "^3.0.4"
   },
   "devDependencies": {
     "audio-buffer": "^5.0.0",
