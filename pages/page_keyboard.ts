@@ -4,16 +4,16 @@ import { Range } from 'framework7/types/components/range/range';
 import { Dom7Array } from 'dom7';
 
 import {byId, dyName, getWithDataAttr, getWithDataAttrValue} from '../src/utils';
-import { Sound } from '../muse/sound';
-import { MultiPlayer } from '../muse/multi-player';
-import { Synthesizer } from '../muse/synthesizer';
-import * as un from '../muse/utils/utils-note';
-import { toneAndDrumPlayerSettings } from '../muse/keyboards';
+import { Sound } from '../libs/muse/sound';
+import { MultiPlayer } from '../libs/muse/multi-player';
+import { Synthesizer } from '../libs/muse/synthesizer';
+import * as un from '../libs/muse/utils/utils-note';
+import { toneAndDrumPlayerSettings } from '../libs/muse/keyboards';
 import keyboardSet from './page_keyboard-utils';
-import { getNoteByOffset, parseInteger } from '../muse/utils/utils-note';
+import { getNoteByOffset, parseInteger } from '../libs/muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
 import {DrumCtrl} from './drum-ctrl';
-import {Ticker} from '../muse/ticker';
+import {Ticker} from '../libs/muse/ticker';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();

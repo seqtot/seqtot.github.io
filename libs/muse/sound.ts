@@ -1,7 +1,7 @@
 'use babel';
 
-import { WebAudioFontPlayer } from '../waf-player/player';
-import { preparePreset } from '../waf-player/prepare';
+import { WebAudioFontPlayer } from '../../waf-player/player';
+import { preparePreset } from '../../waf-player/prepare';
 
 import {
     freqByNoteHash,

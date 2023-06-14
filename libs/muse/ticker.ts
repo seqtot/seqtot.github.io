@@ -1,7 +1,7 @@
 'use babel';
 
-import {Sound} from '../muse/sound';
-import {WavePreset} from '../waf-player/otypes';
+import {Sound} from './sound';
+import {WavePreset} from '../../waf-player/otypes';
 
 export function tickOnTime(endTime: number, ctx: AudioContext, cb: () => void): OscillatorNode | undefined {
     if (ctx.currentTime >= endTime) {

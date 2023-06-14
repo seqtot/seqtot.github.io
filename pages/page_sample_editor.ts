@@ -2,9 +2,9 @@ import {Props} from 'framework7/types/modules/component/snabbdom/modules/props';
 import {ComponentContext} from 'framework7/modules/component/component';
 import {Dom7Array} from 'dom7';
 import { byId, dyName } from '../src/utils';
-import {Synthesizer} from '../muse/synthesizer';
-import {KeyInfo, Sound} from '../muse/sound';
-import {defaultSynthSettings} from '../muse/keyboards';
+import {Synthesizer} from '../libs/muse/synthesizer';
+import {KeyInfo, Sound} from '../libs/muse/sound';
+import {defaultSynthSettings} from '../libs/muse/keyboards';
 import {WavePreset} from '../waf-player/otypes';
 import {Anchors} from '../sample-editor/a-wave-form-component';
 

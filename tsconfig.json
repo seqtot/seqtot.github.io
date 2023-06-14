@@ -19,11 +19,12 @@
     "typeRoots": ["node_modules/@types"],
     "paths": {
       "@src/*": ["src/*"],
-      "@muse/*": ["muse/*"],
+      "@muse/*": ["libs/muse/*"],
       "@data/*": ["sets/*"]
     }
   },
   "include": [
-    "mboxes", "muse", "src"],
+    "mboxes",
+    "libs/muse", "src"],
   "files": ["index.ts"]
 }

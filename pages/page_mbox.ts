@@ -4,16 +4,16 @@ import { Range } from 'framework7/types/components/range/range';
 import {Dom7Array} from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import { Sound } from '../muse/sound';
-import { MultiPlayer } from '../muse/multi-player';
-import { Synthesizer } from '../muse/synthesizer';
-import * as un from '../muse/utils/utils-note';
-import { defaultSynthSettings } from '../muse/keyboards';
+import { Sound } from '../libs/muse/sound';
+import { MultiPlayer } from '../libs/muse/multi-player';
+import { Synthesizer } from '../libs/muse/synthesizer';
+import * as un from '../libs/muse/utils/utils-note';
+import { defaultSynthSettings } from '../libs/muse/keyboards';
 import { standardTicks as ticks } from './ticks';
-import { getMidiConfig, getTopOutList } from '../muse/utils/getMidiConfig';
-import { RowInfo } from '../muse/utils/getMidiConfig';
-import { FileSettings, getFileSettings } from '../muse/utils/getFileSettings';
-import {isPresent, parseInteger, TextBlock} from '../muse/utils/utils-note';
+import { getMidiConfig, getTopOutList } from '../libs/muse/utils/getMidiConfig';
+import { RowInfo } from '../libs/muse/utils/getMidiConfig';
+import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSettings';
+import {isPresent, parseInteger, TextBlock} from '../libs/muse/utils/utils-note';
 import mboxes from '../mboxes';
 
 const multiPlayer = new MultiPlayer();

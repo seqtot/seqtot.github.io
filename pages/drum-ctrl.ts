@@ -1,4 +1,4 @@
-import {drumInfo} from '../muse/drums';
+import {drumInfo} from '../libs/muse/drums';
 
 interface Page {
     getMetronomeContent(): string;

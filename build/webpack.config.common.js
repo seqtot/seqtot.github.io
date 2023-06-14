@@ -9,7 +9,7 @@ module.exports = (env) => {
       extensions: ['.js', '.ts'],
       alias: {
         '@src': path.resolve(__dirname, 'src'),
-        '@muse': path.resolve(__dirname, 'muse'),
+        '@muse': path.resolve(__dirname, 'libs/muse'),
         '@data': path.resolve(__dirname, 'sets'),
         // '@components': path.resolve(__dirname, 'src_au/components'),
         // '@style': path.resolve(__dirname, 'src_au/common/style'),
