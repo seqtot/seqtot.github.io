@@ -1,16 +1,16 @@
 // https://framework7.io/docs/init-app.html
 // https://framework7.io/docs/kitchen-sink.html
 
-import Framework7 from 'framework7';
+import Framework7 from 'framework7/bundle';
 
+// import Framework7 from 'framework7';
 // Import additional components
-import Range from 'framework7/components/range';
-import Panel from 'framework7/components/panel';
+// import Range from 'framework7/components/range';
+// import Panel from 'framework7/components/panel';
 // Import components styles
-import 'framework7/components/range/css';
-import 'framework7/components/panel/css';
-
-Framework7.use([Range, Panel]);
+// import 'framework7/components/range/css';
+// import 'framework7/components/panel/css';
+// Framework7.use([Range, Panel]);
 
 import { mboxOldRc } from './mbox-old-rc';
 import { mboxRc } from './mbox-rc';
@@ -57,7 +57,7 @@ const linksHtml = linksToPage
 
 const leftPanel = `
 <div
-  class="panel panel-left panel-cover panel-init dark"
+  class="panel panel-left panel-cover panel-init theme-dark"
   data-visible-breakpoint="2000"  
 >
   <div class="view view-init" data-view="left">
@@ -83,7 +83,7 @@ const leftPanel = `
 
 const rightPanel = `
 <div
-  class="panel panel-right panel-cover panel-init dark"
+  class="panel panel-right panel-cover panel-init theme-dark"
 >
   <div class="view view-init" data-view="right">
     <div class="page">
