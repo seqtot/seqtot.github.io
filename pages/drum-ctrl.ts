@@ -28,6 +28,7 @@ type KeyData = {
     down: number;
     up: number;
     next: number;
+    color?: string;
 };
 
 type BpmInfo = {
@@ -103,16 +104,18 @@ export class DrumCtrl {
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
                             <div 
-                                style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightcyan; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightblue; user-select: none; touch-action: none;"
                                 data-action-drum-key="cowbell"
-                                data-keyboard-id="${keyboardId}-${ind++}"                                
+                                data-keyboard-id="${keyboardId}-${ind++}"  
+                                data-color="steelblue"                              
                             >
                                 <!--<br/>&nbsp;K-k-->
                             </div>
                             <div 
-                                style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightyellow; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightgreen; user-select: none; touch-action: none;"
                                 data-action-drum-key="cowbell"
-                                data-keyboard-id="${keyboardId}-${ind++}"                                
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                                data-color="seagreen"                                
                             >
                                 <!--<br/>&nbsp;T-t-->
                             </div>
@@ -124,7 +127,8 @@ export class DrumCtrl {
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum-key="empty0"
-                                data-keyboard-id="${keyboardId}-${ind++}"                                
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                                data-color="lightgray"                                
                             >         
                                 <!--<br/>&nbsp;?-->
                             </div>
@@ -132,7 +136,8 @@ export class DrumCtrl {
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum-key="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
-                                data-highlight-drum="bd+hc"                                                                
+                                data-highlight-drum="bd+hc"  
+                                data-color="lightgray"
                             >  
                                 <!--<br/>&nbsp;X-x-->
                             </div>   
@@ -145,7 +150,8 @@ export class DrumCtrl {
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum-key="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
-                                data-highlight-drum="sn+hc"                                
+                                data-highlight-drum="sn+hc"  
+                                data-color="lightgray"
                             >       
                                 <!--<br/>&nbsp;X-x-->
                             </div>
@@ -154,7 +160,8 @@ export class DrumCtrl {
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum-key="empty1"
-                                data-keyboard-id="${keyboardId}-${ind++}"                                
+                                data-keyboard-id="${keyboardId}-${ind++}"   
+                                data-color="lightgray"
                             >     
                                 <!--<br/>&nbsp;?-->
                             </div>   
@@ -165,6 +172,7 @@ export class DrumCtrl {
                             data-action-drum-key="bd"
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-highlight-drum="bd+hc"
+                            data-color="sienna"
                         >
                             <!--&nbsp;O-o-->
                         </div>                    
@@ -175,7 +183,8 @@ export class DrumCtrl {
                             style="height: ${midRowHeight}rem; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
                             data-action-drum-key="sn"
                             data-keyboard-id="${keyboardId}-${ind++}"
-                            data-highlight-drum="sn+hc"                                                                                    
+                            data-highlight-drum="sn+hc"
+                            data-color="deeppink"                                                                                    
                         >
                             <!--&nbsp;V-v-->
                         </div>

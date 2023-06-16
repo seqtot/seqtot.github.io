@@ -1,5 +1,5 @@
-import {ComponentContainer as GlComponentContainer} from '../libs/gl/ts/container/component-container';
-import {ResolvedComponentItemConfig} from '../libs/gl/ts/config/resolved-config';
+import {ComponentContainer as GlComponentContainer} from '../../libs/gl/ts/container/component-container';
+import {ResolvedComponentItemConfig} from '../../libs/gl/ts/config/resolved-config';
 
 export class EmptyGlComponent {
     private glContainer: GlComponentContainer;

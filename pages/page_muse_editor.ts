@@ -1,13 +1,18 @@
 import { Props } from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
 import { Dom7Array } from 'dom7';
-
 import { GoldenLayout } from '../libs/gl/ts/golden-layout';
 import { LayoutConfig } from '../libs/gl/ts/config/config';
 import { ComponentContainer } from '../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../libs/gl/ts/config/resolved-config';
-
-import { EmptyGlComponent } from './empty-gl.component';
+import { EmptyGlComponent } from './ide/empty-gl.component';
+import { FileTreeGlComponent } from './ide/file-tree-gl.component';
+import { TextEditorGlComponent } from './ide/text-editor-gl.component';
+import ideService, {ideEvents} from './ide/ide-service';
+import {FileInfo} from './ide/file-service';
+import { ContentItem } from '../libs/gl/ts/items/content-item';
+import {LayoutManager} from '../libs/gl/ts/layout-manager';
+import { Stack } from 'libs/gl/ts/items/stack';
 
 function getViewport(): {width: number; height: number} {
     const win = window;
@@ -61,19 +66,20 @@ function glBindComponentEventListener(
     container: ComponentContainer,
     itemConfig: ResolvedComponentItemConfig
 ): ComponentContainer.BindableComponent {
-    console.log('glBindComponentEventListener', itemConfig);
+    //console.log('glBindComponentEventListener', itemConfig);
+
     const state = itemConfig.componentState as any;
 
     if (state.componentType === ComponentType.textEditor) {
         return {
-            component: new EmptyGlComponent(container, itemConfig), //new TextEditorComponent(container, itemConfig),
+            component: new TextEditorGlComponent(container, itemConfig),
             virtual: false, // true
         };
     }
 
     if (state.componentType === ComponentType.fileTree) {
         return {
-            component: new EmptyGlComponent(container, itemConfig), //new FileTreeComponent(container, itemConfig),
+            component: new FileTreeGlComponent(container, itemConfig),
             virtual: false, // true
         };
     }
@@ -85,8 +91,9 @@ function glBindComponentEventListener(
 }
 
 function glUnbindComponentEventListener(container: ComponentContainer) {
-    console.log('glUnbindComponentEventListener');
-    // this.handleUnbindComponentEvent(container);
+    //console.log('glUnbindComponentEventListener');
+
+    //this.handleUnbindComponentEvent(container);
 }
 
 const ids = {
@@ -142,9 +149,16 @@ export class MuseEditorPage {
     ) {}
 
     onMounted() {
-        this.setContent();
+        //console.log('PageMuseEditor.onMounted');
+        this.addTopContainers();
         this.setGl();
         this.setTopMenu();
+        this.subscribeEvents();
+    }
+
+    onUnmounted() {
+        //console.log('PageMuseEditor.onUnmounted');
+        this.unsubscribeEvents();
     }
 
     setTopMenu() {
@@ -184,6 +198,15 @@ export class MuseEditorPage {
 
     }
 
+    setGlContainerSize = () => {
+        const viewport = getViewport();
+        const glRect = this.glContainer.getBoundingClientRect();
+
+        this.glContainer.style.width = (viewport.width - 16) + 'px';
+        this.glContainer.style.height = (viewport.height - glRect.y - 16) + 'px';
+        this.glLayout.updateSizeFromContainer();
+    }
+
     setGl() {
         // http://golden-layout.com/tutorials/getting-started.html
         this.glContainer = document.getElementById(ids.glContainer);
@@ -195,27 +218,10 @@ export class MuseEditorPage {
         );
 
         this.glLayout.loadLayout(config);
-
-        function setGlContainerSize() {
-            const viewport = getViewport();
-            const glRect = this.glContainer.getBoundingClientRect();
-
-            this.glContainer.style.width = (viewport.width - 16) + 'px';
-            this.glContainer.style.height = (viewport.height - glRect.y - 16) + 'px';
-            this.glLayout.updateSizeFromContainer();
-        }
-
-        // window.addEventListener('resize', () => {
-        //     setGlContainerSize();
-        // });
-
-        // setTimeout(() => {
-        //     setGlContainerSize();
-        // }, 0);
+        setTimeout(() => this.setGlContainerSize(), 100);
     }
 
-    setContent() {
-        // <note-sequencer time-start="0" duration="4" theme="default"></note-sequencer>
+    addTopContainers() {
         this.el$.html(`
             <div style="height: 32px; margin: 2px;" id="${ids.menuContainer}"></div>
             <div id="${ids.glContainer}" style="width: 99%; height: calc(90% - 32px);"></div>
@@ -224,5 +230,60 @@ export class MuseEditorPage {
 
     getId(id: string): string {
         return this.pageId + '-' + id;
+    }
+
+    subscribeEvents() {
+        window.addEventListener('resize', this.setGlContainerSize);
+
+        ideService.on(ideEvents.openFile, this, (fileInfo: FileInfo)=> {
+            //console.log('pageMuseEditor.onOpenFile', fileInfo);
+            //console.log(this.glLayout.rootItem.contentItems);
+
+            const fileTree = this.glLayout.findFirstComponentItemById(ComponentType.fileTree);
+            let parentItem: ContentItem = null;
+
+            if (fileTree) {
+                parentItem = fileTree.parentItem;
+            }
+
+            for (let item of this.glLayout.rootItem.contentItems) {
+                if (item !== parentItem ) {
+                    parentItem = item;
+                    break;
+                }
+            }
+
+            (parentItem as Stack).addItem({
+                type: 'component',
+                componentType: ComponentType.textEditor,
+                componentState: {
+                    fileInfo,
+                    componentType: ComponentType.textEditor,
+                    title: fileInfo.name,
+                },
+                title: fileInfo.name,
+            }, 0);
+
+
+            // this.glLayout.newComponentAtLocation(ComponentType.textEditor, {
+            //     fileInfo,
+            //     componentType: ComponentType.textEditor,
+            //     title: fileInfo.name,
+            // }, fileInfo.name, [{
+            //   typeId: LayoutManager.LocationSelector.TypeId.Root,
+            //   index: 1,
+            // }]);
+
+            // this.glLayout.addComponent(ComponentType.textEditor, {
+            //     fileInfo,
+            //     componentType: ComponentType.textEditor,
+            //     title: fileInfo.name,
+            // }, fileInfo.name)
+        });
+    }
+
+    unsubscribeEvents() {
+        window.removeEventListener('resize', this.setGlContainerSize);
+        ideService.off(ideEvents.openFile, this);
     }
 }

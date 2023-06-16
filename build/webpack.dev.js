@@ -20,14 +20,23 @@ module.exports = (env) =>
             historyApiFallback: true,
             // заменить на setupMiddlewares
             //before: backendApi, setupMiddlewares
+            setupMiddlewares: backendApi,
         },
 });
 
 // https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch
 // https://stackoverflow.com/questions/7288814/download-a-file-from-nodejs-server-using-express
 
-function backendApi(app, server) {
+//middlewares, devServer
+//function backendApi(app, server) {
+function backendApi(middlewares, devServer) {
     //app.get('/api/readFile/:filePath', function(req, res){
+    const app = devServer.app;
+
+    if (!devServer) {
+        throw new Error('webpack-dev-server is not defined');
+    }
+
     app.get('/api/readFile', function(req, res){
         console.log('req.query', req.query);
         console.log('req.params', req.params);
@@ -35,7 +44,8 @@ function backendApi(app, server) {
         //const filePath = req.params.filePath.replace(':', '');
 
         //const filePath = `${__dirname}/public/${req.query.path}`;
-        const filePath = `${req.query.root}/${req.query.path}`;
+        //const filePath = `${req.query.root}/${req.query.path}`;
+        const filePath = `${req.query.path}`;
 
         //res.json({file});
         res.download(filePath); // Set disposition and send it.
@@ -60,6 +70,7 @@ function backendApi(app, server) {
                     result.push({
                         name: file,
                         path: path + '/' + file,
+                        isFile: true,
                     });
                 }
                 else if (Fs.lstatSync(path).isDirectory()) {
@@ -82,6 +93,8 @@ function backendApi(app, server) {
 
         res.json(result);
     });
+
+    return middlewares;
 
     // app.get('/api', function (req, res) {
     //   res.json({ custom: 'response' });

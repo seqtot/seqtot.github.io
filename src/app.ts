@@ -99,7 +99,6 @@ const rightPanel = `
         </div>
 
       </div><!-- page-content -->
-
     </div><!-- page -->
   </div>
 </div>
@@ -141,7 +140,7 @@ const appTpl = `
   ${rightPanel}
   ${navbar}
   <!-- Your main view, should have "view-main" class -->
-  <div class="view view-main view-init safe-areas" data-url="${defRoute}"></div>
+  <div class="view view-main view-init safe-areas" data-url="${defRoute}" id="app-view-main"></div>
 `;
 
 appEl.innerHTML = appTpl;

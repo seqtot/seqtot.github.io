@@ -337,7 +337,7 @@ export class KeyboardPage {
         });
     }
 
-    handleKeyRecord(code: string, time: number, type: 0 | 1) {
+    handleKeyRecord(code: string, time: number, color: string, type: 0 | 1) {
         //console.log(code, time, type);
 
         if (this.drumCtrl.mode !== 'record') {
@@ -358,6 +358,7 @@ export class KeyboardPage {
                 //quarterNio: this.tickInfo.quarterNio,
                 quarterTime: 0,
                 quarterNio: 0,
+                color: color || 'black',
             };
 
             return;
@@ -386,6 +387,7 @@ export class KeyboardPage {
                     //quarterNio: this.tickInfo.quarterNio,
                     quarterTime: 0,
                     quarterNio: 0,
+                    color: color || 'black',
                 };
 
                 //this.playSound(this.keyData.note);
@@ -467,7 +469,7 @@ export class KeyboardPage {
             // }
 
             if (currRow[offsetInd]) {
-                currRow[offsetInd].color = bgColor;
+                currRow[offsetInd].color = item.color;
                 currRow[offsetInd].text = 'x';
             }
         });
@@ -604,12 +606,16 @@ export class KeyboardPage {
             const notes = [note1, note2].filter(item => !!item && !item.startsWith('empty'));
             const volume = note1 === 'cowbell' ? 0.30 : undefined
             const keyboardId = el.dataset['keyboardId'];
+            const color = el.dataset['color'];
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+
                 const time = Date.now();
 
                 if (this.drumCtrl.mode === 'record') {
-                    return this.handleKeyRecord(note1, time, DOWN);
+                    return this.handleKeyRecord(note1, time, color, DOWN);
                 }
 
                 notes.forEach(keyOrNote => {
@@ -631,10 +637,13 @@ export class KeyboardPage {
             });
 
             el.addEventListener('pointerup', (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+
                 const time = Date.now();
 
                 if (this.drumCtrl.mode === 'record') {
-                    return this.handleKeyRecord(note1, time, UP);
+                    return this.handleKeyRecord(note1, time, color, UP);
                 }
 
                 notes.forEach(keyOrNote => {
