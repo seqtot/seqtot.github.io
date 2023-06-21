@@ -97,7 +97,7 @@ export function getMidiConfig(x: {
 
             let rows = x.currBlock.rows
                 .filter((item, i) => {
-                    console.log(item, i);
+                    //console.log(item, i);
 
                     return isRefLine(item) && i >= nearestIndex && !excludeIndex.includes(i);
                 })

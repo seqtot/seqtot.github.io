@@ -168,7 +168,7 @@ const app = new Framework7({
   ],
   on: {
     // init: function () {
-    //  console.log('App initialized', arguments.length, this);
+    //console.log('App initialized', arguments.length, this);
     // },
     // pageInit: function () {
     //console.log('Page initialized', arguments.length, arguments[0]);

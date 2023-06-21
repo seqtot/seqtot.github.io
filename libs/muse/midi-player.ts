@@ -4,7 +4,7 @@ import { freqByNoteHash } from './freq';
 import { Sound, PlayingItem, KeyInfo } from './sound';
 import { EventEmitter } from './ee';
 import * as un from './utils';
-import {MIDI_INSTR} from './keyboards';
+import {DEFAULT_TONE_INSTR} from './keyboards';
 import {getInstrCodeBy} from './instruments';
 import {Ticker} from './ticker';
 import {getSkedByQuarters, LoopAndTicksInfo} from './midi-player-utils'
@@ -149,7 +149,7 @@ export class MidiPlayer extends Sound {
         slides?: WaveSlide[],
         cent?: number,
     }) {
-        const instrCode = getInstrCodeBy(x.instrCode || MIDI_INSTR);
+        const instrCode = getInstrCodeBy(x.instrCode || DEFAULT_TONE_INSTR);
         const soundInfo = this.getSoundInfoArr(x.notes);
         const instrObj = this.instruments[instrCode];
 

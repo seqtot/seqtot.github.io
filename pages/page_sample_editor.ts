@@ -13,7 +13,7 @@ import { SampleEditorWc} from '../sample-editor/a-sample-editor-wc';
 import {EventEmitter} from '../libs/common/event-emitter';
 import {getAudioBufferFromBlobString, getAudioBufferFromString} from '../libs/waf-player/audio-buffer-to-wav';
 
-import rawVoiceInst from './waf-fonts/voice_la';
+import rawVoiceInst from '../waf-fonts/voice_la';
 
 if (customElements.get(SampleEditorWc.tag) == null) {
     customElements.define(SampleEditorWc.tag, SampleEditorWc);
@@ -180,11 +180,11 @@ export class SamplePage {
 
     onUnmounted() {
         //window.removeEventListener('mousedown', this.mouseDownListener);
-        console.log('on unmount');
+        //console.log('on unmount');
     }
 
     onBeforeUnmount() {
-        console.log('onBeforeUnmount');
+        //console.log('onBeforeUnmount');
     }
 
     setContent() {
@@ -330,7 +330,7 @@ export class SamplePage {
         this.currZone = iZone;
         this.addZoneKeys(font, iZone);
 
-        console.log('buildFont.anchors', this.anchors);
+        //console.log('buildFont.anchors', this.anchors);
 
         if (this.anchors && useAnchors) {
             const startOffsetSec = this.anchors.startOffsetSec || 0;
@@ -365,7 +365,7 @@ export class SamplePage {
         let audioBuffer: AudioBuffer;
         getAudioBufferFromBlobString(blobData).then(result => {
             audioBuffer = result;
-            console.log('audioBuffer', audioBuffer);
+            //console.log('audioBuffer', audioBuffer);
             this.ee.emit(ids.data, {
                 audioBuffer
             });
@@ -393,7 +393,7 @@ export class SamplePage {
             reader.readAsDataURL(file);
 
             reader.addEventListener('load', async (event) => {
-                console.log('ON LOAD WAV', event);
+                //console.log('ON LOAD WAV', event);
 
                 const result = event.target.result as string;
                 let audioBuffer = await getAudioBufferFromBlobString(result);
@@ -409,11 +409,11 @@ export class SamplePage {
             reader.readAsText(file);
 
             reader.addEventListener('load', async (event) => {
-                console.log('ON LOAD TEXT 1', event);
+                //console.log('ON LOAD TEXT 1', event);
 
                 const result = event.target.result as string;
 
-                console.log('ON LOAD TEXT 2', result);
+                //console.log('ON LOAD TEXT 2', result);
             });
         }
 
@@ -446,7 +446,7 @@ export class SamplePage {
             });
         }
 
-        console.log('FILE', fileList[0]);
+        //console.log('FILE', fileList[0]);
         // text/plain
         //text/javascript
         // application/json
@@ -517,7 +517,7 @@ export class SamplePage {
 
         // // if (evt.code === 'Space' && type === 'up') {
         // //   this.cmEditor.setCursor(this.cmEditor.getCursor().line + 1, 0);
-        // //   // console.log(this.cmEditor.getCursor());
+        // //   //console.log(this.cmEditor.getCursor());
         // // }
     }
 

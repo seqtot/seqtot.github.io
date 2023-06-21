@@ -3,6 +3,10 @@ import '../../libs/cm/addon/selection/active-line';
 import '../../libs/cm-addons/mode-musa.js';
 import '../../libs/cm-addons/mode-js.js';
 import '../../libs/cm-addons/mode-xml.js';
+import '../../libs/cm-addons/addon_dialog.js';
+import '../../libs/cm-addons/addon_search_jump-to-line';
+import '../../libs/cm-addons/addon_search_searchcursor';
+import '../../libs/cm-addons/addon_search_search';
 
 import { ComponentContainer as GlComponentContainer } from '../../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../../libs/gl/ts/config/resolved-config';
@@ -10,8 +14,8 @@ import { Editor as CmEditor } from 'codemirror';
 import { Synthesizer } from '../../libs/muse/synthesizer';
 import { defaultSynthSettings } from '../../libs/muse/keyboards';
 import { Sound } from '../../libs/muse/sound';
-import { FileInfo } from './file-service';
-import Fs from './file-service';
+import { FileInfo } from '../../libs/common/file-service';
+import Fs from '../../libs/common/file-service';
 import { LinePlayer } from './line-player';
 import {MultiPlayer} from '../../libs/muse/multi-player';
 
@@ -90,6 +94,7 @@ export class TextEditorGlComponent {
 
   cmWrapper: HTMLElement;
   menuEl: HTMLElement;
+  fileInfo: FileInfo;
 
   // element: HTMLElement
   // uri: string = '';
@@ -131,7 +136,7 @@ export class TextEditorGlComponent {
   }
 
   async createCmEditor(itemConfig?: ResolvedComponentItemConfig) {
-    console.log('createCmEditor', itemConfig);
+    //console.log('createCmEditor', itemConfig);
 
     this.menuEl = document.createElement('div');
     this.menuEl.style.height = "24px";
@@ -162,10 +167,10 @@ export class TextEditorGlComponent {
 
     this.addCongifBlocks(data);
 
-    let fileInfo = (itemConfig?.componentState as any)?.fileInfo as FileInfo;
+    this.fileInfo = (itemConfig?.componentState as any)?.fileInfo as FileInfo;
 
-    if (fileInfo) {
-      this.setValueByFileInfo(fileInfo)
+    if (this.fileInfo) {
+      this.setValueByFileInfo(this.fileInfo)
     } else {
       this.setValueByField(data, field);
     }
@@ -207,7 +212,7 @@ export class TextEditorGlComponent {
   }
 
   async setValueByFileInfo(fileInfo: FileInfo) {
-    let value = await Fs.readFile(fileInfo.path);
+    let value = await Fs.readTextFile(fileInfo.path);
     this.mainEditor.setOption("mode", 'musa');
     this.mainEditor.setValue(value);
   }
@@ -269,7 +274,39 @@ export class TextEditorGlComponent {
   // }
 
   handleTextKeyEvent(evt: KeyboardEvent, type: number) {
-    if (evt.ctrlKey || evt.altKey) {
+    if (evt.ctrlKey && evt.altKey && type === DOWN ) {
+      if (evt.code === 'ArrowDown') {
+        const ranges = this.mainEditor.listSelections();
+        if (ranges.length === 0) {
+          return skipEvent(evt);
+        }
+        const range = ranges[ranges.length - 1];
+        const nextLine = this.mainEditor.getLine(range.anchor.line + 1);
+        this.mainEditor.addSelection({
+          line: range.anchor.line + 1,
+          ch: range.anchor.ch // nextLine.length >= range.anchor.ch ? range.anchor.ch : nextLine.length
+        });
+
+        return skipEvent(evt);
+      }
+
+      if (evt.code === 'ArrowUp') {
+        const ranges = this.mainEditor.listSelections();
+        if (ranges.length === 0) {
+          return skipEvent(evt);
+        }
+        const range = ranges[0];
+        const nextLine = this.mainEditor.getLine(range.anchor.line - 1);
+        this.mainEditor.addSelection({
+          line: range.anchor.line - 1,
+          ch: range.anchor.ch // nextLine.length >= range.anchor.ch ? range.anchor.ch : nextLine.length
+        });
+
+        return skipEvent(evt);
+      }
+    }
+
+    if (evt.ctrlKey || evt.altKey || evt.shiftKey) {
       return;
     }
   }
@@ -401,10 +438,10 @@ export class TextEditorGlComponent {
 
     // СОХРАНЕНИЕ: TODO
     if (evt.ctrlKey && evt.code === 'KeyS') {
-      if (this.inputMode === 'text') {
-        console.log('this.saveMe()');
-        // this.saveMe();
+      if (this.inputMode === 'text' && this.fileInfo) {
+        Fs.writeTextFile(this.mainEditor.getValue(), this.fileInfo.path)
       }
+
       return skipEvent(evt, true);
     }
 
@@ -421,3 +458,15 @@ export class TextEditorGlComponent {
     return false;
   }
 }
+
+// Ctrl-F / Cmd-F                    = Start searching
+// Ctrl-G / Cmd-G                    = Find next
+// Shift-Ctrl-G / Shift-Cmd-G        = Find previous
+// Shift-Ctrl-F / Cmd-Option-F       =  Replace
+// Shift-Ctrl-R / Shift-Cmd-Option-F = // Replace all
+
+// Alt-F
+// Persistent search (dialog doesn't autoclose, enter to find next, Shift-Enter to find previous)
+// Alt-G
+// Jump to line
+//

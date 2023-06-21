@@ -14,13 +14,14 @@ import {
     skipEvent,
 } from './line-player-utils';
 import {NoteInfo} from '../../libs/muse/types';
+import ideService from './ide-service';
 
 import {getMidiConfig} from '../../libs/muse/utils/getMidiConfig';
 import {getFileSettings, FileSettings} from '../../libs/muse/utils/getFileSettings';
 import {getNextLinesForHandlePlay} from '../../libs/muse/utils/getNextLinesForHandlePlay';
 import {Sound} from '../../libs/muse/sound';
 import * as wav from '../../libs/muse/utils/node-wav'
-import Fs from './file-service';
+import Fs from '../../libs/common/file-service';
 import { parseInteger } from '../../libs/muse/utils';
 
 type Nil = null | undefined;
@@ -197,7 +198,7 @@ export class LinePlayer {
         uri?: string,
         mode?: 'line-player' | 'synthesizer' | 'beat-recorder'
     }) {
-        console.log('connect.params', params);
+        //console.log('connect.params', params);
 
         this.disconnect();
 
@@ -213,7 +214,7 @@ export class LinePlayer {
     }
 
     disconnect() {
-        console.log('disconnect.line-player');
+        //console.log('disconnect.line-player');
 
         this.downedKeys = {};
 
@@ -355,10 +356,10 @@ export class LinePlayer {
         if (type === DOWN) {
             this.synthesizer.playSound({
                 keyOrNote: evt.code,
-                //onlyStop: false,
                 pitchShift: parseInteger(this.settings.boardShift[0], 0),
                 print: true,
                 onlyStop: false,
+                instrCode: ideService.useToneInstrument,
             });
 
             return;
@@ -367,7 +368,6 @@ export class LinePlayer {
         if (type === UP) {
             this.synthesizer.playSound({
                 keyOrNote: evt.code,
-                //onlyStop: true,
                 pitchShift: parseInteger(this.settings.boardShift[0], 0),
                 onlyStop: true,
             });
@@ -598,7 +598,7 @@ export class LinePlayer {
             this.recorder = new Recorder(this.synthesizer.ctx);
             this.recorder.start();
 
-            console.log('ctrl + shift');
+            //console.log('ctrl + shift');
         }
     }
 
@@ -607,7 +607,7 @@ export class LinePlayer {
 
         this.settings = getFileSettings(un.getTextBlocks(text));
         this.pitchShift = un.parseInteger(this.settings.pitchShift[0]);
-        console.log('onConnect.settings', this.settings);
+        //console.log('onConnect.settings', this.settings);
 
         if (this.settings['import'].length) {
             //text = text + uc.readFileSync(uc.dirname(this.uri) + '/' + this.settings['import'][0]); // jjkl
@@ -625,7 +625,7 @@ export class LinePlayer {
     }
 
     setInputMode(val: InputMode) {
-        console.log('setInputMode', val);
+        //console.log('setInputMode', val);
 
 
         this.inputMode = val;

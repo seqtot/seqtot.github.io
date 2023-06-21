@@ -185,7 +185,7 @@ export async function getAudioBufferFromString(audioFile: string, ctx?: AudioCon
 //
 //     ctx.decodeAudioData(arrayBuffer, async (val) => {
 //         audioBuffer = val;
-//         console.log('audioBuffer', audioBuffer);
+//console.log('audioBuffer', audioBuffer);
 //
 //         //const blob = await getBlobFromAudioBuffer(audioBuffer);
 //         //console.log('BLOB', blob);
@@ -203,13 +203,13 @@ export async function getBlobString(blob: Blob): Promise<string> {
     const dfr = new Deferred();
 
     // blob.text().then(val => {
-    //   console.log('blobText', val);
+    //console.log('blobText', val);
     // });
     const reader = new FileReader();
 
     reader.onload = event => {
         const result = '' + event.target.result;
-        // console.log(dataURItoBlob(result)); // Blob
+        //console.log(dataURItoBlob(result)); // Blob
 
         dfr.resolve(result);
     };

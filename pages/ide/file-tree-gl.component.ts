@@ -1,8 +1,7 @@
 import { ComponentContainer as GlComponentContainer } from '../../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../../libs/gl/ts/config/resolved-config';
-import { Json } from '../../libs/gl/ts/utils/types';
 import ideService, {ideEvents} from './ide-service';
-import Fs from './file-service';
+import Fs from '../../libs/common/file-service';
 
 type FileInfo = {
     path: string,
@@ -14,14 +13,12 @@ type FileInfo = {
 export class FileTreeGlComponent {
     private glContainer: GlComponentContainer;
     private rootEl: HTMLElement;
-    private dirTreeEl: HTMLElement;
-    private fileTreeEl: HTMLElement;
-    private fileTree: any[] = [];
+    private fileTree: FileInfo[] = [];
 
     constructor(
-        glContainer: GlComponentContainer, itemConfig?: ResolvedComponentItemConfig
+        glContainer: GlComponentContainer,
+        itemConfig?: ResolvedComponentItemConfig
     ) {
-
         this.glContainer = glContainer;
 
         const el = document.createElement('div');
@@ -29,81 +26,92 @@ export class FileTreeGlComponent {
 
         this.rootEl = el;
 
-        const buttonFile = document.createElement('button');
-        const buttonDir = document.createElement('button');
-        this.dirTreeEl = document.createElement('div');
-        this.fileTreeEl = document.createElement('div');
-
-        buttonFile.innerText = 'file';
-        buttonDir.innerText = 'dir';
-
-        el.appendChild(buttonFile);
-        el.appendChild(buttonDir);
-        el.appendChild(this.dirTreeEl);
-        el.appendChild(this.fileTreeEl);
         el.style.backgroundColor = '#fff';
 
         this.glContainer.element.style.overflow = 'auto';
         this.glContainer.element.appendChild(el);
 
-        buttonFile.addEventListener('click', () => {
-            console.log(this.glContainer.layoutManager.root);
-            console.log(this.glContainer.layoutManager.rootItem);
-            console.log(this.glContainer.layoutManager.findFirstComponentItemById('fileTree'));
-
-            // Fs.readFile('bandit/agressive_samurai_A.notes.midi')
-            //     .then(data => {
-            //         console.log('Fs.readFile', data);
-            //     });
-        });
-
-        buttonDir.addEventListener('click', async () => {
-            this.fileTree = await Fs.readdir('');
-
-            this.dirTreeEl.innerHTML = null;
-            this.fileTreeEl.innerHTML = null;
-
-            this.fileTree.forEach(item => {
-                const el = document.createElement('div');
-
-                el.innerText = item.name;
-                el.dataset.path = item.path;
-                this.dirTreeEl.appendChild(el);
-
-                el.addEventListener('click', (event: MouseEvent) => {
-                    if (item.children) {
-                        this.fileTreeEl.innerHTML = null;
-                        item.children.forEach(item => {
-                            const el = document.createElement('div');
-
-                            el.innerText = item.name;
-                            el.dataset.path = item.path;
-                            this.fileTreeEl.appendChild(el);
-
-                            if (item.isFile) {
-                                this.clickByFile(el, item);
-                            }
-                        });
-                    }
-
-                    console.log('EVENT', event);
-                });
-            });
-
-            //console.log('Fs.readDir', files);
-        });
+        this.showTopLevel();
     }
 
     clickByFile(el: HTMLElement, fileInfo: FileInfo) {
         el.style.paddingLeft = '0.5rem';
 
         el.addEventListener('click', async () => {
-            const text = await Fs.readFile(fileInfo.path);
+            const text = await Fs.readTextFile(fileInfo.path);
 
             ideService.emit(ideEvents.openFile, fileInfo);
-
-            //console.log(fileInfo);
-            //console.log(text);
         });
+    }
+
+    async showDirContent(dir: FileInfo) {
+        this.rootEl.innerHTML = null;
+
+        const backEl = document.createElement('div');
+        backEl.style.paddingLeft = '.5rem';
+        backEl.style.cursor = 'pointer';
+        backEl.innerText = '...';
+        backEl.style.fontWeight = '700';
+
+        const titleEl = document.createElement('div');
+        titleEl.style.paddingLeft = '.5rem';
+        titleEl.innerText = dir.name;
+        titleEl.style.fontWeight = '700';
+
+        this.rootEl.appendChild(backEl);
+        this.rootEl.appendChild(titleEl);
+
+        backEl.addEventListener('click', () => {
+            this.showTopLevel();
+        });
+
+        if (!dir.children) {
+            return;
+        }
+
+        dir.children.forEach(item => {
+            const el = document.createElement('div');
+
+            el.innerText = item.name;
+            el.dataset.path = item.path;
+            this.rootEl.appendChild(el);
+
+            if (item.isFile) {
+                this.clickByFile(el, item);
+            }
+        });
+    }
+
+    async showTopLevel() {
+        this.rootEl.innerHTML = null;
+
+        // кнопка перезагрузки дерева
+        const updateTreeEl = document.createElement('button');
+        updateTreeEl.innerText = 'update';
+        updateTreeEl.addEventListener('click', () => this.showTopLevel());
+        this.rootEl.appendChild(updateTreeEl);
+
+        // загрузка дерева
+        this.fileTree = await Fs.readdir('');
+
+        // каталоги верхнего уровня
+        this.fileTree.forEach((item, i) => {
+            if (item.isFile) {
+                return;
+            }
+
+            const el = document.createElement('div');
+            el.style.paddingLeft = '.5rem';
+            el.style.cursor = 'pointer';
+            el.dataset.path = item.path;
+            el.innerText = item.name;
+
+            this.rootEl.appendChild(el);
+
+            el.addEventListener('click', el => {
+                this.showDirContent(item);
+            });
+        });
+
     }
 }

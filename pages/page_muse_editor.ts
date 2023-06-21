@@ -5,14 +5,16 @@ import { GoldenLayout } from '../libs/gl/ts/golden-layout';
 import { LayoutConfig } from '../libs/gl/ts/config/config';
 import { ComponentContainer } from '../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../libs/gl/ts/config/resolved-config';
-import { EmptyGlComponent } from './ide/empty-gl.component';
-import { FileTreeGlComponent } from './ide/file-tree-gl.component';
-import { TextEditorGlComponent } from './ide/text-editor-gl.component';
-import ideService, {ideEvents} from './ide/ide-service';
-import {FileInfo} from './ide/file-service';
+import {FileInfo} from '../libs/common/file-service';
 import { ContentItem } from '../libs/gl/ts/items/content-item';
 import {LayoutManager} from '../libs/gl/ts/layout-manager';
 import { Stack } from 'libs/gl/ts/items/stack';
+
+import ideService, { ideEvents } from './ide/ide-service';
+import { EmptyGlComponent } from './ide/empty-gl.component';
+import { FileTreeGlComponent } from './ide/file-tree-gl.component';
+import { TextEditorGlComponent } from './ide/text-editor-gl.component';
+import { FontViewerGlComponent } from './ide/font-viewer-gl.component';
 
 function getViewport(): {width: number; height: number} {
     const win = window;
@@ -28,9 +30,11 @@ function getViewport(): {width: number; height: number} {
 enum ComponentType {
     fileTree= 'fileTree',
     textEditor= 'textEditor',
+    fontViewer = 'fontViewer'
 }
 
 const COMPONENT = 'component';
+let guid = 1;
 
 let config: LayoutConfig = {
     root: {
@@ -66,9 +70,10 @@ function glBindComponentEventListener(
     container: ComponentContainer,
     itemConfig: ResolvedComponentItemConfig
 ): ComponentContainer.BindableComponent {
-    //console.log('glBindComponentEventListener', itemConfig);
+    console.log('glBindComponentEventListener', itemConfig);
 
     const state = itemConfig.componentState as any;
+    state.guid = guid++;
 
     if (state.componentType === ComponentType.textEditor) {
         return {
@@ -84,6 +89,13 @@ function glBindComponentEventListener(
         };
     }
 
+    if (state.componentType === ComponentType.fontViewer) {
+        return {
+            component: new FontViewerGlComponent(container, itemConfig),
+            virtual: false, // true
+        };
+    }
+
     return {
         component: new EmptyGlComponent(container, itemConfig),
         virtual: false, // true
@@ -91,7 +103,7 @@ function glBindComponentEventListener(
 }
 
 function glUnbindComponentEventListener(container: ComponentContainer) {
-    //console.log('glUnbindComponentEventListener');
+    console.log('glUnbindComponentEventListener', container);
 
     //this.handleUnbindComponentEvent(container);
 }
@@ -108,22 +120,14 @@ const topMenuLine = {
         field: 'short',
         componentType: ComponentType.textEditor
     },
-    billie: {
-        title: 'billie',
-        file: 'billieJean',
-        field: 'short',
-        componentType: ComponentType.textEditor
-    },
-    amadeus: {
-        title: 'amadeus',
-        file: 'amadeus',
-        field: 'short',
-        componentType: ComponentType.textEditor
-    },
     fileTree: {
         title: 'fileTree',
         componentType: ComponentType.fileTree
-    }
+    },
+    fontViewer: {
+        title: 'fontViewer',
+        componentType: ComponentType.fontViewer
+    },
 }
 
 export class MuseEditorPage {
@@ -154,6 +158,19 @@ export class MuseEditorPage {
         this.setGl();
         this.setTopMenu();
         this.subscribeEvents();
+
+        // this.glLayout.on('itemDestroyed', function() {
+        //     console.log('itemDestroyed', arguments);
+        // });
+        // this.glLayout.on('activeContentItemChanged', function() {
+        //     console.log('activeContentItemChanged', arguments);
+        // });
+        // this.glLayout.on('beforeItemDestroyed', function() {
+        //     console.log('beforeItemDestroyed', arguments);
+        // });
+        // this.glLayout.on('focus', function() {
+        //     console.log('focus', arguments);
+        // });
     }
 
     onUnmounted() {
@@ -180,20 +197,6 @@ export class MuseEditorPage {
                 },
                 item.title
             );
-
-            // glLayout.newDragSource(
-            //     el,
-            //     () => (<ComponentItemConfig>{
-            //         type: COMPONENT,
-            //         componentType: item.componentType,
-            //         title: item.title,
-            //         state: {
-            //             file: item.file,
-            //             field: item.short,
-            //             componentType: item.componentType,
-            //         },
-            //     })
-            // );
         });
 
     }

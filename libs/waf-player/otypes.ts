@@ -58,6 +58,7 @@ export type PresetInfo = {
 	url: string,
 	title: string,
 	pitch: number,
+	fileName: string,
 };
 export type ChordQueue = {
 	when: number,

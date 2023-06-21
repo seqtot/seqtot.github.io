@@ -205,7 +205,7 @@ export class Ticker {
                 audioBufferSourceNode.start();
                 audioBufferSourceNode.stop(Sound.ctx.currentTime + totalDurationSec);
                 audioBufferSourceNode.onended = () => {
-                    console.log('onended');
+                    //console.log('onended');
                     audioBufferSourceNode.disconnect(Sound.ctx.destination);
                 }
 

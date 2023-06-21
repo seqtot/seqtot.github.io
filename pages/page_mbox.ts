@@ -1,6 +1,6 @@
-import {Props} from 'framework7/modules/component/snabbdom/modules/props';
+import { Props } from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
-import {Range} from 'framework7/components/range/range';
+import { Range } from 'framework7/components/range/range';
 import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
@@ -13,7 +13,7 @@ import { standardTicks as ticks } from './ticks';
 import { getMidiConfig, getTopOutList } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSettings';
-import {isPresent, parseInteger, TextBlock} from '../libs/muse/utils/utils-note';
+import { isPresent, parseInteger, TextBlock } from '../libs/muse/utils/utils-note';
 import mboxes from '../mboxes';
 
 const multiPlayer = new MultiPlayer();
@@ -123,7 +123,7 @@ export class MBoxPage {
         this.pitchShift = un.parseInteger(this.settings.pitchShift[0]);
 
         //console.log('settings', this.settings);
-        console.log('this.blocks', this.blocks);
+        //console.log('this.blocks', this.blocks);
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
@@ -438,7 +438,7 @@ export class MBoxPage {
         x.currBlock = x.blocks.find((item) => item.id === 'out');
         getMidiConfig(x);
 
-        console.log('X', x);
+        //console.log('X', x);
 
         if (x.playBlock) {
             //this.playingWithMidi = true;

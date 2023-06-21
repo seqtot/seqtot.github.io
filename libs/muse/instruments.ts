@@ -1,9 +1,9 @@
 'use babel';
 
 //import '../waf-fonts';
-import {parseInteger} from './utils';
-import {drumCodes} from './drums';
-import {WavePreset} from '../waf-player/otypes';
+import { parseInteger } from './utils';
+import { drumCodes } from './drums';
+import { WavePreset } from '../waf-player/otypes';
 
 const toneChar = '$';
 const drumChar = '@';

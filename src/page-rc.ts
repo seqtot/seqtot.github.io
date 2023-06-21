@@ -39,7 +39,7 @@ export const pageRc = (props: Props, context: ComponentContext) => {
 
     // https://framework7.io/docs/router-component
     // (context as any).$on('pageInit', (e: any, page: Router.Page) => {
-    //  console.log('pageInit');
+    //console.log('pageInit');
     //   //console.log('# E', e);
     //   //console.log('# PROPS', props);
     //   //console.log('# PAGE', page);

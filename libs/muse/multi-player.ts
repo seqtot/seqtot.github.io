@@ -2,7 +2,7 @@
 
 import {Sound} from './sound';
 import {MidiPlayer} from './midi-player';
-import {toneAndDrumPlayerSettings, MIDI_INSTR} from './keyboards';
+import {toneAndDrumPlayerSettings, DEFAULT_TONE_INSTR} from './keyboards';
 import * as un from './utils';
 import {Ticker} from './ticker';
 import {TextBlock} from './utils';
@@ -326,7 +326,7 @@ export class MultiPlayer {
             bpm,
             isDrum: false, // isDrum,
             repeat,
-            instrCode: MIDI_INSTR, // instrAlias[key], // MIDI_INSTR
+            instrCode: DEFAULT_TONE_INSTR, // instrAlias[key], // MIDI_INSTR
             beatsMs: [],
         }).id;
 

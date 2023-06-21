@@ -2,7 +2,7 @@
 
 import {drumKeysRight, drumInfo, drumCodes} from './drums';
 
-export const MIDI_INSTR = 162;
+export const DEFAULT_TONE_INSTR = 162;
 
 // # bass 370
 // # Acoustic Bass: 366 - 374
@@ -279,7 +279,7 @@ export function setInstrument(data: string, instrCode?: number): string {
         .filter((item) => item && !item.startsWith('#'))
         .map((item) => item.trim())
         .map((item) => item.trim().replace(/,$/, ''))
-        .map((item) => item + `~${instrCode || MIDI_INSTR}` + ',')
+        .map((item) => item + `~${instrCode || DEFAULT_TONE_INSTR}` + ',')
         .join('')
         .split(',')
         .map((item) => item.trim())
@@ -294,14 +294,14 @@ export const drumSettings = {
 };
 
 export const defaultSynthSettings = {
-    keys: setInstrument(keysLeftToRight, MIDI_INSTR),
+    keys: setInstrument(keysLeftToRight, DEFAULT_TONE_INSTR),
     // drums: {
     //     Space: {...drumInfo.bassDrum2}
     // },
 };
 
 export const toneAndDrumPlayerSettings = {
-    keys: setInstrument(keysLeftToRight, MIDI_INSTR),
+    keys: setInstrument(keysLeftToRight, DEFAULT_TONE_INSTR),
     drums: {...drumInfo},
 };
 

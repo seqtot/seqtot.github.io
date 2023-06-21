@@ -1,7 +1,14 @@
-const path = require('path');
+const Path = require('path');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.config.common.js');
 const Fs = require('fs');
+
+function writeFileSync (fname, content) {
+    fname = Path.resolve(fname);
+    const fhnd = Fs.openSync(fname, 'w');
+    Fs.writeFileSync(fhnd, content);
+    Fs.closeSync(fhnd);
+}
 
 module.exports = (env) =>
     merge(common(env), {
@@ -26,9 +33,6 @@ module.exports = (env) =>
 
 // https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch
 // https://stackoverflow.com/questions/7288814/download-a-file-from-nodejs-server-using-express
-
-//middlewares, devServer
-//function backendApi(app, server) {
 function backendApi(middlewares, devServer) {
     //app.get('/api/readFile/:filePath', function(req, res){
     const app = devServer.app;
@@ -38,8 +42,8 @@ function backendApi(middlewares, devServer) {
     }
 
     app.get('/api/readFile', function(req, res){
-        console.log('req.query', req.query);
-        console.log('req.params', req.params);
+        //console.log('req.query', req.query);
+        //console.log('req.params', req.params);
         //const root = 'D:/motes';
         //const filePath = req.params.filePath.replace(':', '');
 
@@ -52,11 +56,6 @@ function backendApi(middlewares, devServer) {
     });
 
     // https://stackoverflow.com/questions/33997263/express-js-use-variables-in-routes-path
-    // app.use('/:companyName/something', function(req, res, next) {
-    //   console.log(req.params.companyName);
-    //   next();
-    // })
-
     app.get('/api/readdir', function(req, res) {
         let folder = req.query.path || '';
         folder = folder ? '/' + folder :  '';
@@ -94,48 +93,26 @@ function backendApi(middlewares, devServer) {
         res.json(result);
     });
 
+
+    app.post('/api/writeFile', function(req, res) {
+        // или прикрутить express bodyParser
+        const chunks = [];
+
+        req.on('data', (chunk) => chunks.push(chunk));
+
+        req.on('end', () => {
+            //console.log("all parts/chunks have arrived");
+            const data = Buffer.concat(chunks);
+            const buf = Buffer.from(data);
+            const json = JSON.parse(buf.toString());
+
+            if (json && json.path && json.text) {
+                writeFileSync(json.path, json.text);
+            }
+
+            res.json({result: 'OK'});
+        });
+    });
+
     return middlewares;
-
-    // app.get('/api', function (req, res) {
-    //   res.json({ custom: 'response' });
-    // });
 }
-
-
-
-// OLD BEFORE
-// before: function (app, server) {
-
-//   app.get('/api', function (req, res) {
-//     res.json({ custom: 'response' });
-//   });
-
-//   app.get('/api/readFile/:filePath', function(req, res){
-//     console.log(req.params.path);
-//     const filePath = req.params.filePath.replace(':', '');
-
-//     const file = `${__dirname}/public/${filePath}`;
-
-//     console.log('FILE', file);
-
-//     res.download(file); // Set disposition and send it.
-//   });
-
-//   // https://stackoverflow.com/questions/33997263/express-js-use-variables-in-routes-path
-//   // app.use('/:companyName/something', function(req, res, next) {
-//   //   console.log(req.params.companyName);
-//   //   next();
-//   // })
-
-// },
-// proxy: {
-//   '/api': {
-//     target: 'http://localhost:3000',
-//     bypass: function (req, res, proxyOptions) {
-//       if (req.headers.accept.indexOf('html') !== -1) {
-//         console.log('Skipping proxy for browser request.');
-//         return '/index.html';
-//       }
-//     },
-//   },
-// },

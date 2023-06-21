@@ -9,7 +9,7 @@ import {
     noteLatByNoteHash,
 } from './freq';
 import * as un from './utils';
-import { MIDI_INSTR } from './keyboards';
+import { DEFAULT_TONE_INSTR } from './keyboards';
 import { drumCodes } from './drums';
 import { hardcodedInstruments, instruments as instruments2 } from './instruments';
 
@@ -126,6 +126,12 @@ export class Sound {
         }, 100);
 
         return dfr.promise;
+    }
+
+    static setToneSound(id: number, varName: string, fontObj: any) {
+        window[varName] = fontObj;
+        Sound.Instruments[id] = window[varName];
+        preparePreset(this.ctx, <any>window[varName], id);
     }
 
     static AddToneSound(id: number) {
@@ -355,7 +361,7 @@ export class Sound {
         const keysAndNotes: { [key: string]: KeyInfo } = {};
 
         if (settings.keys) {
-            const obj = un.getKeysFromText(settings.keys, MIDI_INSTR);
+            const obj = un.getKeysFromText(settings.keys, DEFAULT_TONE_INSTR);
 
             Object.keys(obj).forEach((key) => {
                 const item = obj[key];
