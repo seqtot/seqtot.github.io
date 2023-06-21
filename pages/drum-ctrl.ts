@@ -238,10 +238,10 @@ export class DrumCtrl {
     }
 
     getCommandPanel(): string {
-        const style="font-size: 1.25rem; user-select: none;"
+        const style="font-size: 1.25rem; user-select: none; touch-action: none;"
 
         return `
-                <div style="width: 90%; margin: .5rem; user-select: none;">
+                <div style="width: 90%; padding: .5rem; user-select: none; touch-action: none;">
                     <!--span 
                         style="font-size: 1.5rem; user-select: none; touch-action: none;"
                         data-action-drum="clear"
@@ -447,7 +447,8 @@ export class DrumCtrl {
                 T-----k-----<br/>
                 O-----------<br/>
                 O-----k--t--<br/>
-            </div>            
+            </div>     
+            <br/>                   
             <div style="${style}" data-type="drum-pattern">
                 QoxoAoq_<br/>
                 X_qoA_xv<br/>
@@ -460,8 +461,7 @@ export class DrumCtrl {
                 X_q_A_xv<br/>
                 Q_q_Aoxo<br/>
                 X_qoA_xv
-            </div>
-        </div>`.trim();
+            </div>`.trim();
 
         return content;
     }
@@ -483,6 +483,8 @@ export class DrumCtrl {
             return acc;
         }, '');
 
+        console.log(drums);
+
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
@@ -491,18 +493,18 @@ export class DrumCtrl {
                 
                 <div
                     data-name="drum-record-out"
-                    style="widht: 90%; padding-left: 1%; line-height: 1.5rem; font-family: monospace;"
+                    style="width: 90%; padding-left: 1%;"
                 ></div>
 
+                <div style="font-size: 1.5rem;">
+                    ${drums}
+                </div>
+                
                 <div 
                     data-name="drum-patterns"                
-                    style="width: 90%;"
+                    style="width: 90%; padding-left: 1%;"
                 >
                     ${this.getPatternsContent()}               
-                </div>                                 
-
-                <div style="font-size: 1.5rem;">
-                    ${drums}            
                 </div>                
             </div>`.trim();
 
@@ -653,7 +655,8 @@ export class DrumCtrl {
         let totalOut = '';
 
         rows.forEach((row, iRow) => {
-            totalOut = totalOut + '<div style="box-sizing: border-box; margin: 0; padding: 0; line-height: 0;">';
+            totalOut = totalOut +
+                '<div style="box-sizing: border-box; margin: 0; padding: 0; line-height: 0; user-select: none; touch-action: none;">';
 
             const cells = getMask(row.durQ / row.cellSizeQ);
 
@@ -678,6 +681,7 @@ export class DrumCtrl {
                             height: 1.25rem;
                             background-color: ${cell.color};
                             user-select: none;
+                            touch-action: none;
                         "
                     ></div>`.trim();
 
