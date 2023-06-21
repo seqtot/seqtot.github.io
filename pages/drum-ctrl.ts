@@ -2,6 +2,8 @@ import {drumInfo} from '../libs/muse/drums';
 import {dyName, getWithDataAttr, getWithDataAttrValue} from '../src/utils';
 import {Synthesizer} from '../libs/muse/synthesizer';
 import * as un from '../libs/muse/utils/utils-note';
+import {parseInteger} from '../libs/common';
+import {LineModel, Line, NoteItem, KeyData} from './line-model';
 
 interface Page {
     bpmValue: number;
@@ -28,49 +30,12 @@ interface Page {
 //     },
 // }
 
-type KeyData = {
-    quarterTime: number;
-    quarterNio: number;
-    //quarterInfo: string;
-    code: string;
-    note: string;
-    down: number;
-    up: number;
-    next: number;
-    color?: string;
-};
-
-type ModelItem = {
-    nio: number;
-    lineNio: number;
-    cellSize: number;
-    lineDurQ: number;
-    cellInd: number;
-    durCell: number;
-    durQ: number;
-    durForNextCell: number;
-    durForNextQ: number;
-    note: string;
-    colorHead?: string;
-    colorBody?: string;
-    startOffsetQ: number;
-};
-
 type BpmInfo = {
     bpm: number;
     lastDownTime: number;
     pressCount: number;
     totalMs: number;
 };
-
-
-type Line = {
-    ind: number,
-    durQ: number,
-    startOffsetQ: number,
-    notes: ModelItem[],
-    cellSizeQ: number,
-}
 
 const emptyBpmInfo = (): BpmInfo => {
     //console.log('getEmptyBpm');
@@ -92,13 +57,72 @@ export class DrumCtrl {
     keySequence: KeyData[] = [];
     lastTickTime: number = 0;
     tickStartMs: number = 0;
-    model: Line[] = [];
+    activeCell = 0;
+    liner = new LineModel();
 
     constructor(public page: Page) {}
+
+    selectItemById(id: number | string) {
+        id = parseInteger(id, 0);
+
+        getWithDataAttr('drum-cell-id', this.page.pageEl).forEach(el => {
+            el.style.border = '1px solid white';
+        });
+
+        if (id) {
+            getWithDataAttrValue('drum-cell-id', id).forEach(el => {
+                el.style.border = '2px solid yellow';
+            });
+        }
+    }
+
+    selectItemByRowNio(rowNio: string) {
+        getWithDataAttr('drum-cell-row-nio', this.page.pageEl).forEach(el => {
+            el.style.border = '1px solid white';
+        });
+
+        getWithDataAttrValue('drum-cell-row-nio', rowNio).forEach(el => {
+            el.style.border = '2px solid yellow';
+        });
+    }
+
+    subscribeOutCells() {
+        getWithDataAttr('drum-cell-id', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('click', evt => {
+                this.activeCell = parseInteger(el.dataset['drumCellId'], 0);
+                this.selectItemById(this.activeCell);
+            });
+        });
+    }
+
+    subscribeEditCommands() {
+        const moveItem = (id: number, value: number) => {
+            const result = this.liner.moveItem(id, value);
+
+            if (result) {
+                this.printModel(this.liner.rows);
+                this.selectItemById(this.activeCell);
+            }
+        }
+
+        getWithDataAttrValue('action-out', 'left', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                moveItem(this.activeCell, -10);
+            });
+        });
+
+        getWithDataAttrValue('action-out', 'right', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                moveItem(this.activeCell, 10);
+            });
+        });
+    }
 
     subscribeEvents() {
         const page = this.page;
         const pageEl = page.pageEl;
+
+        this.subscribeEditCommands();
 
         getWithDataAttrValue('action-drum', 'get-bpm-or-stop', pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
@@ -267,7 +291,7 @@ export class DrumCtrl {
                         data-action-out="play"
                     >play&nbsp;&nbsp;</span>
                 </div>
-                <div style="width: 90%; margin: .5rem; user-select: none;">
+                <div style="width: 90%; margin: .5rem; user-select: none; touch-action: none;">
                     <span 
                         style="${style}"
                         data-action-out="left"
@@ -310,7 +334,8 @@ export class DrumCtrl {
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightblue; user-select: none; touch-action: none;"
                                 data-action-drum-key="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"  
-                                data-color="steelblue"                              
+                                data-color="steelblue"
+                                data-color2="lightblue"
                             >
                                 <!--<br/>&nbsp;K-k-->
                             </div>
@@ -319,6 +344,7 @@ export class DrumCtrl {
                                 data-action-drum-key="cowbell"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="seagreen"                                
+                                data-color2="lightgreen"
                             >
                                 <!--<br/>&nbsp;T-t-->
                             </div>
@@ -331,7 +357,8 @@ export class DrumCtrl {
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum-key="empty0"
                                 data-keyboard-id="${keyboardId}-${ind++}"
-                                data-color="lightgray"                                
+                                data-color="lightgray"
+                                data-color2="whitesmoke"                                                                
                             >         
                                 <!--<br/>&nbsp;?-->
                             </div>
@@ -341,6 +368,7 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-highlight-drum="bd+hc"  
                                 data-color="lightgray"
+                                data-color2="whitesmoke"
                             >  
                                 <!--<br/>&nbsp;X-x-->
                             </div>   
@@ -355,6 +383,7 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-highlight-drum="sn+hc"  
                                 data-color="lightgray"
+                                data-color2="whitesmoke"
                             >       
                                 <!--<br/>&nbsp;X-x-->
                             </div>
@@ -365,6 +394,7 @@ export class DrumCtrl {
                                 data-action-drum-key="empty1"
                                 data-keyboard-id="${keyboardId}-${ind++}"   
                                 data-color="lightgray"
+                                data-color2="whitesmoke"
                             >     
                                 <!--<br/>&nbsp;?-->
                             </div>   
@@ -376,6 +406,7 @@ export class DrumCtrl {
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-highlight-drum="bd+hc"
                             data-color="sienna"
+                            data-color2="tan"
                         >
                             <!--&nbsp;O-o-->
                         </div>                    
@@ -388,6 +419,7 @@ export class DrumCtrl {
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-highlight-drum="sn+hc"
                             data-color="deeppink"                                                                                    
+                            data-color2="lightpink"
                         >
                             <!--&nbsp;V-v-->
                         </div>
@@ -567,88 +599,18 @@ export class DrumCtrl {
         }
     }
 
-    getLineModel(bpm: number, seq: DrumCtrl['keySequence'] ): Line[] {
-        let startTimeMs = this.tickStartMs;
-        let qms = Math.round(60000/ bpm); // ms в четверти
-
-        let lines: Line[] = [];
-
-        // начало и номер четверти
-        seq.forEach(item => {
-            let diffMs = item.down - startTimeMs;
-            let quarterNio = Math.floor(diffMs/qms);
-            item.quarterTime = startTimeMs + (qms * quarterNio);
-            item.quarterNio = quarterNio;
-        });
-
-        const lastInd = seq.length - 1;
-        const firstTime = seq[0].quarterTime;
-        const lastTime = seq[lastInd].next;
-
-        // количество четвертей
-        const quarterCount = Math.ceil((lastTime - firstTime)/qms);
-
-        for (let ind = 0; ind < quarterCount; ind++) {
-            lines.push({
-                ind,
-                durQ: 120,
-                startOffsetQ: ind * 120,
-                notes: [],
-                cellSizeQ: 10,
-            })
-        }
-
-        //console.log('seq', seq);
-        //console.log('lines', lines);
-
-        const getLineByStartOffsetQ = (startOffsetQ: number): Line => {
-            return lines.find(item => {
-                return startOffsetQ >= item.startOffsetQ && startOffsetQ < (item.startOffsetQ + item.durQ);
-            });
-        }
-
-        seq.forEach((item, i) => {
-            let itemNew: ModelItem = {
-                nio: i,
-                cellInd: 0,
-                colorBody: '',
-                colorHead: '',
-                note: '',
-                durForNextCell: 0,
-                durForNextQ: 0,
-                durCell: 0,
-                durQ: 0,
-                lineDurQ: 0,
-                lineNio: 0,
-                cellSize: 10,
-                startOffsetQ: 0,
-            }
-
-            const startOffsetQ = Math.floor((item.down - firstTime) / qms * un.NUM_120 / 10) * 10;
-
-            itemNew.startOffsetQ = startOffsetQ;
-            itemNew.durQ = Math.floor(
-                (item.up - item.down) / qms * un.NUM_120 / 10
-            ) * 10 || 10;
-            itemNew.colorHead = item.color;
-            itemNew.note = item.note;
-
-            let quarter = getLineByStartOffsetQ(startOffsetQ);
-            if (quarter) quarter.notes.push(itemNew);
-        });
-
-        return lines;
+    getOut(bpm: number, seq: DrumCtrl['keySequence'] ) {
+        const rows = LineModel.GetLineModelFromRecord(bpm, this.tickStartMs, seq);
+        this.liner.setData(rows);
+        this.printModel(rows);
     }
 
-    getOut(bpm: number, seq: DrumCtrl['keySequence'] ) {
-        const rows = this.getLineModel(bpm, seq);
-        this.model = rows;
-
-        const getMask = (count: number): {color: string, nio: string}[] => {
+    printModel(rows: Line[]) {
+        const getMask = (count: number): {color: string, id: number}[] => {
             const arr = Array(count).fill(null);
             return arr.map(() => ({
                 color: 'whitesmoke',
-                nio: '',
+                id: 0,
             }));
         }
 
@@ -663,7 +625,7 @@ export class DrumCtrl {
             row.notes.forEach( info => {
                 const iCell = (info.startOffsetQ - row.startOffsetQ) / 10;
                 const cell = cells[iCell];
-                cell.nio = info.nio.toString();
+                cell.id = info.id;
                 cell.color = info.colorHead;
             });
 
@@ -671,8 +633,9 @@ export class DrumCtrl {
                 totalOut = totalOut +
                     `<div
                         data-drum-cell-row="${iRow}"
-                        data-drum-cell-cell="${iCell}"                        
-                        data-drum-cell-nio="${cell.nio}"
+                        data-drum-cell-nio="${iCell}"
+                        data-drum-cell-row-nio="${iRow}-${iCell}"                                                
+                        data-drum-cell-id="${cell.id}"
                         style="
                             box-sizing: border-box;
                             border: 1px solid white;
@@ -695,5 +658,7 @@ export class DrumCtrl {
             el.innerHTML = totalOut;
             el.style.height = '' + (rows.length * 1.25) + 'rem';
         }
+
+        this.subscribeOutCells();
     }
 }

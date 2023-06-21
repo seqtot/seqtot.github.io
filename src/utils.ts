@@ -251,7 +251,7 @@ export function getWithDataAttr<T extends HTMLElement = HTMLElement>(
 
 export function getWithDataAttrValue<T extends HTMLElement = HTMLElement>(
     name: string,
-    val: string,
+    val: string | number,
     el?: HTMLElement
 ): T[] {
   return ((el || document).querySelectorAll(`[data-${name}="${val}"]`) as any) || [];
