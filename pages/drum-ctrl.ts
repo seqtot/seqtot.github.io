@@ -675,7 +675,7 @@ export class DrumCtrl {
                             border: 1px solid white;
                             display: inline-block;
                             width: 7.5%;
-                            height: 1rem;
+                            height: 1.25rem;
                             background-color: ${cell.color};
                             user-select: none;
                         "
@@ -689,7 +689,7 @@ export class DrumCtrl {
         const el = dyName('drum-record-out', this.page.pageEl);
         if (el) {
             el.innerHTML = totalOut;
-            el.style.height = '' + rows.length + 'rem';
+            el.style.height = '' + (rows.length * 1.25) + 'rem';
         }
     }
 }
