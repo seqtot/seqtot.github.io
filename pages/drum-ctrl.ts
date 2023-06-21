@@ -238,60 +238,61 @@ export class DrumCtrl {
     }
 
     getCommandPanel(): string {
+        const style="font-size: 1.25rem; user-select: none;"
+
         return `
-                <div style="width: 90%; margin: .5rem; user-select: none; touch-action: none;">
+                <div style="width: 90%; margin: .5rem; user-select: none;">
                     <!--span 
                         style="font-size: 1.5rem; user-select: none; touch-action: none;"
                         data-action-drum="clear"
                     >clr&nbsp;&nbsp;</span-->                
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-drum="record"
                     >rec&nbsp;&nbsp;</span>
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-type="stop"
                     >stop&nbsp;&nbsp;</span>                                        
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-type="tick"
                     >1:4&nbsp;&nbsp;</span>
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-type="tick"
                     >3:4&nbsp;&nbsp;</span>                    
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-out="play"
                     >play&nbsp;&nbsp;</span>
                 </div>
-                <div style="width: 90%; margin: .5rem; user-select: none; touch-action: none;">
+                <div style="width: 90%; margin: .5rem; user-select: none;">
                     <span 
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-out="left"
                     >lft&nbsp;&nbsp;</span>                
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-out="right"
                     >rgt&nbsp;&nbsp;</span>
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-out="clear"
                     >clr&nbsp;&nbsp;</span>                                        
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-out="delete"
                     >del&nbsp;&nbsp;</span>                    
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-out="add"
                     >add&nbsp;&nbsp;</span>
                     <span
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                        style="${style}"
                         data-action-out="sub"
                     >sub&nbsp;&nbsp;</span>                    
                 </div>
-                
         `.trim();
     }
 
@@ -421,7 +422,7 @@ export class DrumCtrl {
     }
 
     getPatternsContent(): string {
-        const style = `font-size: 1.8rem; margin: .5rem; user-select: none; font-family: monospace;`;
+        const style = `font-size: 1.7rem; margin: .5rem; user-select: none; font-family: monospace;`;
 
         const content = `
             <div style="${style}" data-type="drum-pattern">
@@ -666,16 +667,18 @@ export class DrumCtrl {
             cells.forEach((cell, iCell) => {
                 totalOut = totalOut +
                     `<div
-                         data-drum-cell-row="${iRow}"
+                        data-drum-cell-row="${iRow}"
                         data-drum-cell-cell="${iCell}"                        
                         data-drum-cell-nio="${cell.nio}"
-                        style="box-sizing: border-box;
+                        style="
+                            box-sizing: border-box;
                             border: 1px solid white;
                             display: inline-block;
                             width: 7.5%;
                             height: 1rem;
                             background-color: ${cell.color};
-                            user-select: none;"
+                            user-select: none;
+                        "
                     ></div>`.trim();
 
             });
