@@ -295,10 +295,11 @@ export class DrumCtrl {
     }
 
     getCommandPanel(): string {
-        const style="border-radius: 0.25rem; border: 1px solid gray; font-size: 1rem; user-select: none; touch-action: none;"
+        const style = `border-radius: 0.25rem; border: 1px solid gray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const rowStyle = `width: 85%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;`;
 
         return `
-            <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
+            <div style="${rowStyle}">
                 <!--span 
                     style="font-size: 1.5rem; user-select: none; touch-action: none;"
                     data-action-drum="clear"
@@ -325,10 +326,10 @@ export class DrumCtrl {
                 >3:4&nbsp;</span-->                    
                 <span
                     style="${style}"
-                    data-action-out="ply"
+                    data-action-out="play"
                 >ply</span>
             </div>
-            <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
+            <div style="${rowStyle}">
                 <!--span 
                     style="font-size: 1.5rem; user-select: none; touch-action: none;"
                     data-action-drum="clear"
@@ -358,7 +359,7 @@ export class DrumCtrl {
                     data-action-out="sub"
                 >sub</span>                
             </div>
-            <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
+            <div style="${rowStyle}">
                 <span 
                     style="${style}"
                     data-action-out="left"
@@ -707,7 +708,7 @@ export class DrumCtrl {
                             box-sizing: border-box;
                             border: 1px solid white;
                             display: inline-block;
-                            width: 7.5%;
+                            width: 7.0%;
                             height: 1.25rem;
                             background-color: ${cell.color};
                             user-select: none;
