@@ -107,6 +107,18 @@ export class DrumCtrl {
             }
         }
 
+        getWithDataAttrValue('action-out', 'top', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                moveItem(this.activeCell, -120);
+            });
+        });
+
+        getWithDataAttrValue('action-out', 'bottom', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                moveItem(this.activeCell, 120);
+            });
+        });
+
         getWithDataAttrValue('action-out', 'left', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 moveItem(this.activeCell, -10);
@@ -286,7 +298,7 @@ export class DrumCtrl {
         const style="font-size: 1.25rem; user-select: none; touch-action: none;"
 
         return `
-                <div style="width: 90%; padding: .5rem; user-select: none; touch-action: none;">
+                <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
                     <!--span 
                         style="font-size: 1.5rem; user-select: none; touch-action: none;"
                         data-action-drum="clear"
@@ -294,49 +306,57 @@ export class DrumCtrl {
                     <span
                         style="${style}"
                         data-action-drum="record"
-                    >rec&nbsp;&nbsp;</span>
+                    >rec&nbsp;</span>
+                    <span
+                        style="${style}"
+                        data-action-out="top"
+                    >&nbsp;&uarr;&nbsp;&nbsp;</span>                    
                     <span
                         style="${style}"
                         data-action-type="stop"
-                    >stop&nbsp;&nbsp;</span>                                        
+                    >stp&nbsp;</span>                                        
                     <span
                         style="${style}"
                         data-action-type="tick"
-                    >1:4&nbsp;&nbsp;</span>
-                    <span
+                    >1:4&nbsp;</span>
+                    <!--span
                         style="${style}"
                         data-action-type="tick"
-                    >3:4&nbsp;&nbsp;</span>                    
+                    >3:4&nbsp;</span-->                    
                     <span
                         style="${style}"
                         data-action-out="play"
-                    >play&nbsp;&nbsp;</span>
+                    >play&nbsp;</span>
                 </div>
-                <div style="width: 90%; margin: .5rem; user-select: none; touch-action: none;">
+                <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
                     <span 
                         style="${style}"
                         data-action-out="left"
-                    >lft&nbsp;&nbsp;</span>                
+                    >&nbsp;&lt;&nbsp;&nbsp;</span>  
+                    <span
+                        style="${style}"
+                        data-action-out="bottom"
+                    >&nbsp;&darr;&nbsp;&nbsp;</span>                                  
                     <span
                         style="${style}"
                         data-action-out="right"
-                    >rgt&nbsp;&nbsp;</span>
-                    <span
+                    >&nbsp;&gt;&nbsp;&nbsp;</span>
+                    <!--span
                         style="${style}"
                         data-action-out="clear"
-                    >clr&nbsp;&nbsp;</span>                                        
+                    >clr&nbsp;</span-->                                        
                     <span
                         style="${style}"
                         data-action-out="delete"
-                    >del&nbsp;&nbsp;</span>                    
+                    >del&nbsp;</span>                    
                     <span
                         style="${style}"
                         data-action-out="add"
-                    >add&nbsp;&nbsp;</span>
+                    >add&nbsp;</span>
                     <span
                         style="${style}"
                         data-action-out="sub"
-                    >sub&nbsp;&nbsp;</span>                    
+                    >sub&nbsp;</span>                    
                 </div>
         `.trim();
     }
