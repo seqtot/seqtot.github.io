@@ -173,4 +173,112 @@ export class LineModel {
 
         return lines;
     }
+
+    getSortedNotes() {
+        const notes: NoteItem[] = [];
+
+        this.rows.forEach(row => {
+           row.notes.forEach(note => {
+              notes.push(note);
+           });
+        });
+
+        this.sortByStartOffsetQ(notes);
+
+        return notes;
+    }
+
+    sortByStartOffsetQ(arr: NoteItem[]) {
+        arr.sort((first, second) => {
+            if (first.startOffsetQ < second.startOffsetQ) {
+                return -1;
+            }
+
+            if (first.startOffsetQ > second.startOffsetQ) {
+                return 1;
+            }
+
+            return 0;
+        });
+    }
+
+    getNoteNames(arr: NoteItem[]): string[] {
+        const result: {[key: string]: string} = {};
+
+        arr.forEach(item => {
+            result[item.note] = item.note;
+        })
+
+        return Object.values(result);
+    }
+
+    getDurationQByRows() {
+        if (this.rows.length) {
+            return this.rows[this.rows.length-1].startOffsetQ + this.rows[this.rows.length-1].durQ;
+        }
+
+        return 0;
+    }
+
+    // getNoteNames(arr: NoteItem[]): string[] {
+    //     let durationQ = 0;
+    //
+    //     return Object.values(result);
+    // }
+
+    getDrumNotes(name?: string): string {
+        name = name || 'no_name';
+
+        const totalDurQ = this.getDurationQByRows();
+        const notes = this.getSortedNotes();
+        const noteNames = this.getNoteNames(notes);
+        const map: {[key: string]: string[]} = {};
+
+        if (!totalDurQ || !notes.length || !noteNames.length) {
+            return '';
+        }
+
+        const cellCount = totalDurQ / 10;
+        const quarterCount = Math.floor(cellCount / 12);
+
+        const emptyLine = new Array(cellCount).fill(' ');
+        const headerLine = [...emptyLine];
+
+        for (let i = 0; i < quarterCount; i++) {
+            headerLine[i*12] = '|';
+        }
+
+        noteNames.forEach(note => {
+            map[note] = [...emptyLine];
+        })
+
+        notes.forEach(note => {
+            const i = note.startOffsetQ / 10;
+
+            map[note.note][i] = 'x';
+        });
+
+        let result = `<${name} @>` + '\n';
+
+        let noteNameLen = noteNames.reduce((acc, val) => {
+            if (val.length > acc) return val.length;
+
+            return acc;
+        }, 0);
+
+        result += '-' + new Array(noteNameLen).fill(' ').join('') + ': ' + headerLine.join('') + ':' + '\n';
+
+        Object.keys(map).forEach(key => {
+            const emptyStr = new Array(noteNameLen - key.length).fill(' ').join('');
+
+            result += '@' + key + emptyStr + ': ' + map[key].join('') + ':' + '\n';
+        });
+
+        // <tick @>
+        // -             : 1   2   3   :
+        // @cowbell      : 1           :
+        // @nil          :     2   3   :
+
+        return result;
+    }
 }

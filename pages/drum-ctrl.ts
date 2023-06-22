@@ -1,9 +1,10 @@
-import {drumInfo} from '../libs/muse/drums';
-import {dyName, getWithDataAttr, getWithDataAttrValue} from '../src/utils';
-import {Synthesizer} from '../libs/muse/synthesizer';
+import { drumInfo } from '../libs/muse/drums';
+import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
+import { Synthesizer } from '../libs/muse/synthesizer';
 import * as un from '../libs/muse/utils/utils-note';
-import {parseInteger} from '../libs/common';
-import {LineModel, Line, NoteItem, KeyData} from './line-model';
+import { parseInteger } from '../libs/common';
+import { LineModel, Line, NoteItem, KeyData } from './line-model';
+import { MultiPlayer } from '../libs/muse/multi-player';
 
 interface Page {
     bpmValue: number;
@@ -12,6 +13,7 @@ interface Page {
     stopTicker();
     //getOut(bpm: number, seq: DrumCtrl['keySequence'] );
     synthesizer: Synthesizer;
+    multiPlayer: MultiPlayer;
 }
 
 // const drumsMap = {
@@ -114,6 +116,25 @@ export class DrumCtrl {
         getWithDataAttrValue('action-out', 'right', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 moveItem(this.activeCell, 10);
+            });
+        });
+
+        getWithDataAttrValue('action-out', 'play', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                const notes = this.liner.getDrumNotes('temp');
+
+                if (!notes) return;
+
+                let blocks = [
+                    '<out r1>',
+                    'temp',
+                    notes
+                ].join('');
+
+                this.page.multiPlayer.tryPlayMidiBlock({
+                    blocks,
+                    bpm: this.page.bpmValue,
+                });
             });
         });
     }

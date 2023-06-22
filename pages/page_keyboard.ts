@@ -63,6 +63,7 @@ export class KeyboardPage {
     }
     tickNode: AudioBufferSourceNode | null = null;
     synthesizer = synthesizer;
+    multiPlayer = multiPlayer;
 
     get pageId(): string {
         return this.props.id;
