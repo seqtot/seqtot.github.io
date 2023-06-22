@@ -295,69 +295,95 @@ export class DrumCtrl {
     }
 
     getCommandPanel(): string {
-        const style="font-size: 1rem; user-select: none; touch-action: none;"
+        const style="border-radius: 0.25rem; border: 1px solid gray; font-size: 1rem; user-select: none; touch-action: none;"
 
         return `
-                <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
-                    <!--span 
-                        style="font-size: 1.5rem; user-select: none; touch-action: none;"
-                        data-action-drum="clear"
-                    >clr&nbsp;&nbsp;</span-->                
-                    <span
-                        style="${style}"
-                        data-action-drum="record"
-                    >rec</span>
-                    <span
-                        style="${style}"
-                        data-action-out="top"
-                    >&nbsp;&uarr;&nbsp;</span>                    
-                    <span
-                        style="${style}"
-                        data-action-type="stop"
-                    >stp</span>                                        
-                    <span
-                        style="${style}"
-                        data-action-type="tick"
-                    >1:4</span>
-                    <!--span
-                        style="${style}"
-                        data-action-type="tick"
-                    >3:4&nbsp;</span-->                    
-                    <span
-                        style="${style}"
-                        data-action-out="play"
-                    >ply</span>
-                </div>
-                <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
-                    <span 
-                        style="${style}"
-                        data-action-out="left"
-                    >&nbsp;&lt;&nbsp;</span>  
-                    <span
-                        style="${style}"
-                        data-action-out="bottom"
-                    >&nbsp;&darr;&nbsp;</span>                                  
-                    <span
-                        style="${style}"
-                        data-action-out="right"
-                    >&nbsp;&gt;&nbsp;</span>
-                    <!--span
-                        style="${style}"
-                        data-action-out="clear"
-                    >clr&nbsp;</span-->                                        
-                    <span
-                        style="${style}"
-                        data-action-out="delete"
-                    >del</span>                    
-                    <span
-                        style="${style}"
-                        data-action-out="add"
-                    >add</span>
-                    <span
-                        style="${style}"
-                        data-action-out="sub"
-                    >sub</span>                    
-                </div>
+            <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
+                <!--span 
+                    style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                    data-action-drum="clear"
+                >clr&nbsp;&nbsp;</span-->                
+                <span
+                    style="${style}"
+                    data-action-drum="record"
+                >rec</span>
+                <span
+                    style="${style}"
+                    data-action-out="empty"
+                >&nbsp;&nbsp;&nbsp;</span>                    
+                <span
+                    style="${style}"
+                    data-action-type="stop"
+                >stp</span>                                        
+                <span
+                    style="${style}"
+                    data-action-type="tick"
+                >1:4</span>
+                <!--span
+                    style="${style}"
+                    data-action-type="tick"
+                >3:4&nbsp;</span-->                    
+                <span
+                    style="${style}"
+                    data-action-out="ply"
+                >ply</span>
+            </div>
+            <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
+                <!--span 
+                    style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                    data-action-drum="clear"
+                >clr&nbsp;&nbsp;</span-->                
+                <span
+                    style="${style}"
+                    data-action-drum="empty"
+                >&nbsp;&nbsp;&nbsp;</span>
+                <span
+                    style="${style}"
+                    data-action-out="top"
+                >&nbsp;&uarr;&nbsp;</span>                    
+                <span
+                    style="${style}"
+                    data-action-type="empty"
+                >&nbsp;&nbsp;&nbsp;</span>                                        
+                <span
+                    style="${style}"
+                    data-action-type="empty"
+                >&nbsp;&nbsp;&nbsp;</span>
+                <!--span
+                    style="${style}"
+                    data-action-type="tick"
+                >3:4&nbsp;</span-->                    
+                <span
+                    style="${style}"
+                    data-action-out="sub"
+                >sub</span>                
+            </div>
+            <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
+                <span 
+                    style="${style}"
+                    data-action-out="left"
+                >&nbsp;&lt;&nbsp;</span>  
+                <span
+                    style="${style}"
+                    data-action-out="bottom"
+                >&nbsp;&darr;&nbsp;</span>                                  
+                <span
+                    style="${style}"
+                    data-action-out="right"
+                >&nbsp;&gt;&nbsp;</span>
+                <!--span
+                    style="${style}"
+                    data-action-out="clear"
+                >clr&nbsp;</span-->                                        
+                <span
+                    style="${style}"
+                    data-action-out="delete"
+                >del</span>                    
+                <span
+                    style="${style}"
+                    data-action-out="add"
+                >add</span>                    
+            </div>
         `.trim();
     }
 
