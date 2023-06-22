@@ -129,7 +129,7 @@ export class DrumCtrl {
                     '<out r1>',
                     'temp',
                     notes
-                ].join('');
+                ].join('\n');
 
                 this.page.multiPlayer.tryPlayMidiBlock({
                     blocks,
