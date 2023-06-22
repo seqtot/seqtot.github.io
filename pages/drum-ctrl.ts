@@ -306,19 +306,19 @@ export class DrumCtrl {
                     <span
                         style="${style}"
                         data-action-drum="record"
-                    >rec&nbsp;</span>
+                    >rec</span>
                     <span
                         style="${style}"
                         data-action-out="top"
-                    >&nbsp;&uarr;&nbsp;&nbsp;</span>                    
+                    >&nbsp;&uarr;&nbsp;</span>                    
                     <span
                         style="${style}"
                         data-action-type="stop"
-                    >stp&nbsp;</span>                                        
+                    >stp</span>                                        
                     <span
                         style="${style}"
                         data-action-type="tick"
-                    >1:4&nbsp;</span>
+                    >1:4</span>
                     <!--span
                         style="${style}"
                         data-action-type="tick"
@@ -326,21 +326,21 @@ export class DrumCtrl {
                     <span
                         style="${style}"
                         data-action-out="play"
-                    >play&nbsp;</span>
+                    >ply</span>
                 </div>
                 <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
                     <span 
                         style="${style}"
                         data-action-out="left"
-                    >&nbsp;&lt;&nbsp;&nbsp;</span>  
+                    >&nbsp;&lt;&nbsp;</span>  
                     <span
                         style="${style}"
                         data-action-out="bottom"
-                    >&nbsp;&darr;&nbsp;&nbsp;</span>                                  
+                    >&nbsp;&darr;&nbsp;</span>                                  
                     <span
                         style="${style}"
                         data-action-out="right"
-                    >&nbsp;&gt;&nbsp;&nbsp;</span>
+                    >&nbsp;&gt;&nbsp;</span>
                     <!--span
                         style="${style}"
                         data-action-out="clear"
@@ -348,15 +348,15 @@ export class DrumCtrl {
                     <span
                         style="${style}"
                         data-action-out="delete"
-                    >del&nbsp;</span>                    
+                    >del</span>                    
                     <span
                         style="${style}"
                         data-action-out="add"
-                    >add&nbsp;</span>
+                    >add</span>
                     <span
                         style="${style}"
                         data-action-out="sub"
-                    >sub&nbsp;</span>                    
+                    >sub</span>                    
                 </div>
         `.trim();
     }
