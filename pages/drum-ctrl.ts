@@ -295,7 +295,7 @@ export class DrumCtrl {
     }
 
     getCommandPanel(): string {
-        const style="font-size: 1.1rem; user-select: none; touch-action: none;"
+        const style="font-size: 1rem; user-select: none; touch-action: none;"
 
         return `
                 <div style="width: 90%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;">
