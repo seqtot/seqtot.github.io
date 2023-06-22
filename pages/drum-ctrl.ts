@@ -296,7 +296,7 @@ export class DrumCtrl {
 
     getCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid gray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const rowStyle = `width: 85%; font-family: monospace; margin: .5rem; user-select: none; touch-action: none;`;
+        const rowStyle = `width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
 
         return `
             <div style="${rowStyle}">
@@ -593,7 +593,7 @@ export class DrumCtrl {
                 
                 <div
                     data-name="drum-record-out"
-                    style="width: 90%; padding-left: 1%;"
+                    style="width: 90%; padding-left: 2%;"
                 ></div>
 
                 <div style="font-size: 1.5rem;">
@@ -602,7 +602,7 @@ export class DrumCtrl {
                 
                 <div 
                     data-name="drum-patterns"                
-                    style="width: 90%; padding-left: 1%;"
+                    style="width: 90%; padding-left: 2%;"
                 >
                     ${this.getPatternsContent()}               
                 </div>                
@@ -683,10 +683,21 @@ export class DrumCtrl {
         }
 
         let totalOut = '';
+        let height = 1.25;
 
         rows.forEach((row, iRow) => {
             totalOut = totalOut +
-                '<div style="box-sizing: border-box; margin: 0; padding: 0; line-height: 0; user-select: none; touch-action: none;">';
+                `<div style="
+                    box-sizing: border-box;
+                    position: relative;
+                    margin: 0;
+                    padding: 0;
+                    font-size: 1rem;
+                    line-height: 1rem;
+                    color: white;                    
+                    user-select: none;
+                    height: ${height}rem;                    
+                ">`;
 
             const cells = getMask(row.durQ / row.cellSizeQ);
 
@@ -699,7 +710,7 @@ export class DrumCtrl {
 
             cells.forEach((cell, iCell) => {
                 totalOut = totalOut +
-                    `<div
+                    `<span
                         data-drum-cell-row="${iRow}"
                         data-drum-cell-nio="${iCell}"
                         data-drum-cell-row-nio="${iRow}-${iCell}"                                                
@@ -708,13 +719,18 @@ export class DrumCtrl {
                             box-sizing: border-box;
                             border: 1px solid white;
                             display: inline-block;
-                            width: 7.0%;
-                            height: 1.25rem;
+                            position: absolute;
+                            width: ${height}rem;
+                            height: ${height}rem;
                             background-color: ${cell.color};
                             user-select: none;
                             touch-action: none;
+                            text-align: center;
+                            font-weight: 700;
+                            left: ${iCell * height}rem;
                         "
-                    ></div>`.trim();
+                    ></span>`.trim();
+
 
             });
 
