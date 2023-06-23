@@ -3,7 +3,7 @@ import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Synthesizer } from '../libs/muse/synthesizer';
 import * as un from '../libs/muse/utils/utils-note';
 import { parseInteger } from '../libs/common';
-import { LineModel, Line, NoteItem, KeyData } from './line-model';
+import { LineModel, Line, NoteItem, KeyData, Cell } from './line-model';
 import { MultiPlayer } from '../libs/muse/multi-player';
 
 interface Page {
@@ -61,6 +61,12 @@ const emptyBpmInfo = (): BpmInfo => {
 
 const DOWN = 1;
 const UP = 0;
+
+type PrintCell = {
+    id: number,
+    color: string,
+    text: string,
+}
 
 export class DrumCtrl {
     bpmInfo: BpmInfo = emptyBpmInfo();
@@ -236,6 +242,7 @@ export class DrumCtrl {
             const volume = note1 === 'cowbell' ? 0.30 : undefined
             const keyboardId = el.dataset['keyboardId'];
             const color = el.dataset['color'];
+            const char = el.dataset['char'];
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 evt.preventDefault();
@@ -244,7 +251,7 @@ export class DrumCtrl {
                 const time = Date.now();
 
                 if (this.mode === 'record') {
-                    this.handleKeyRecord(note1, time, color, DOWN);
+                    this.handleKeyRecord(note1, time, color, char, DOWN);
                 }
 
                 notes.forEach(keyOrNote => {
@@ -270,7 +277,7 @@ export class DrumCtrl {
                 const time = Date.now();
 
                 if (this.mode === 'record') {
-                    return this.handleKeyRecord(note1, time, color, UP);
+                    return this.handleKeyRecord(note1, time, color, char, UP);
                 }
 
                 notes.forEach(keyOrNote => {
@@ -410,6 +417,7 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"  
                                 data-color="steelblue"
                                 data-color2="lightblue"
+                                data-char="k"
                             >
                                 <!--<br/>&nbsp;K-k-->
                             </div>
@@ -419,6 +427,7 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="seagreen"                                
                                 data-color2="lightgreen"
+                                data-char="t"
                             >
                                 <!--<br/>&nbsp;T-t-->
                             </div>
@@ -443,6 +452,7 @@ export class DrumCtrl {
                                 data-highlight-drum="bd+hc"  
                                 data-color="lightgray"
                                 data-color2="whitesmoke"
+                                data-char="x"
                             >  
                                 <!--<br/>&nbsp;X-x-->
                             </div>   
@@ -458,6 +468,7 @@ export class DrumCtrl {
                                 data-highlight-drum="sn+hc"  
                                 data-color="lightgray"
                                 data-color2="whitesmoke"
+                                data-char="x"
                             >       
                                 <!--<br/>&nbsp;X-x-->
                             </div>
@@ -481,6 +492,7 @@ export class DrumCtrl {
                             data-highlight-drum="bd+hc"
                             data-color="sienna"
                             data-color2="tan"
+                            data-char="O"
                         >
                             <!--&nbsp;O-o-->
                         </div>                    
@@ -494,6 +506,7 @@ export class DrumCtrl {
                             data-highlight-drum="sn+hc"
                             data-color="deeppink"                                                                                    
                             data-color2="lightpink"
+                            data-char="V"
                         >
                             <!--&nbsp;V-v-->
                         </div>
@@ -589,7 +602,7 @@ export class DrumCtrl {
             return acc;
         }, '');
 
-        console.log(drums);
+        //console.log(drums);
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
@@ -617,7 +630,7 @@ export class DrumCtrl {
         return content;
     }
 
-    handleKeyRecord(code: string, time: number, color: string, type: 0 | 1) {
+    handleKeyRecord(note: string, time: number, color: string, char: string, type: 0 | 1) {
         //console.log(code, time, type);
 
         if (this.mode !== 'record') {
@@ -627,9 +640,10 @@ export class DrumCtrl {
         // ПЕРВОЕ НАЖАТИЕ
         if (!this.keyData && type === DOWN) {
             this.keyData = {
-                code,
+                note,
+                char,
+                code: note,
                 down: time,
-                note: code,
                 up: 0,
                 next: 0,
                 //quarterTime: this.tickInfo.quarterTime,
@@ -637,18 +651,15 @@ export class DrumCtrl {
                 quarterTime: 0,
                 quarterNio: 0,
                 color: color || 'black',
+                color2: '',
             };
 
             return;
         }
 
-        if (
-            this.keyData
-            //&& ((type === UP && code === ctrl.keyData.code) || type === DOWN)
-        ) {
+        if (this.keyData) {
             if (type === UP) {
                 this.keyData.up = time;
-                //this.playSound(this.keyData.note, true);
             }
 
             if (type === DOWN) {
@@ -656,19 +667,17 @@ export class DrumCtrl {
                 this.keySequence.push(this.keyData);
 
                 this.keyData = {
-                    code,
+                    note,
+                    char,
+                    code: note,
                     down: time,
-                    note: code,
                     up: 0,
                     next: 0,
-                    //quarterTime: this.tickInfo.quarterTime,
-                    //quarterNio: this.tickInfo.quarterNio,
                     quarterTime: 0,
                     quarterNio: 0,
                     color: color || 'black',
+                    color2: '',
                 };
-
-                //this.playSound(this.keyData.note);
             }
         }
     }
@@ -680,11 +689,12 @@ export class DrumCtrl {
     }
 
     printModel(rows: Line[]) {
-        const getMask = (count: number): {color: string, id: number}[] => {
+        const getMask = (count: number): PrintCell[] => {
             const arr = Array(count).fill(null);
             return arr.map(() => ({
                 color: 'whitesmoke',
                 id: 0,
+                text: '',
             }));
         }
 
@@ -692,6 +702,8 @@ export class DrumCtrl {
         let height = 1.25;
 
         rows.forEach((row, iRow) => {
+            const offsets = this.liner.getOffsetsByRow(row);
+
             totalOut = totalOut +
                 `<div style="
                     box-sizing: border-box;
@@ -707,12 +719,29 @@ export class DrumCtrl {
 
             const cols = getMask(row.durQ / row.cellSizeQ);
 
-            row.cells.forEach( cell => {
-                const iCell = (cell.startOffsetQ - row.startOffsetQ) / 10;
+            for (let offset of offsets) {
+                const iCell = (offset - row.startOffsetQ) / 10;
+                const notes = this.liner.getNotesListByOffset(row, offset);
+                let mainNote = notes.find(item => item.note === 'bd') || notes.find(item => item.note === 'sn');
+                let text = '';
+
+                if (mainNote) {
+                    text = mainNote.char;
+                    if (notes.find(item => item.note === 'hc')) {
+                        text = mainNote.note === 'bd' ? 'Q' : 'A';
+                    }
+                }
+                else {
+                    mainNote = notes[0];
+                    text = mainNote.char;
+                }
+
                 const col = cols[iCell];
-                col.id = cell.id;
-                col.color = cell.notes[0].colorHead;
-            });
+
+                col.id = mainNote.id;
+                col.color = mainNote.colorHead;
+                col.text = text;
+            }
 
             cols.forEach((cell, iCell) => {
                 totalOut = totalOut +
@@ -735,7 +764,7 @@ export class DrumCtrl {
                             font-weight: 700;
                             left: ${iCell * height}rem;
                         "
-                    ></span>`.trim();
+                    >${cell.text}</span>`.trim();
             });
 
             totalOut = totalOut + '</div>';

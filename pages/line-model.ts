@@ -9,7 +9,9 @@ export type KeyData = {
     down: number;
     up: number;
     next: number;
-    color?: string;
+    color: string;
+    color2: string;
+    char: string;
 };
 
 export type NoteItem = {
@@ -19,6 +21,7 @@ export type NoteItem = {
     colorHead?: string;
     colorBody?: string;
     startOffsetQ: number;
+    char: string;
 };
 
 export type Cell = {
@@ -170,6 +173,7 @@ export class LineModel {
                 note: '',
                 durQ: 0,
                 startOffsetQ: 0,
+                char: item.char,
             }
 
             const startOffsetQ = Math.floor((item.down - firstTime) / qms * un.NUM_120 / 10) * 10;
@@ -250,6 +254,50 @@ export class LineModel {
         }
 
         return 0;
+    }
+
+    getOffsetsByRow(row: Line): number[] {
+        const result = []
+        const map = {};
+
+        row.cells.forEach(cell => {
+            if (!map[cell.startOffsetQ]) {
+                map[cell.startOffsetQ] = true;
+                result.push(cell.startOffsetQ);
+            }
+        });
+
+        return result;
+    }
+
+    getNotesListByOffset(row: Line, startOffsetQ: number): NoteItem[] {
+        const result: NoteItem[] = []
+
+        row.cells.forEach(cell => {
+            if (cell.startOffsetQ !== startOffsetQ) {
+                return
+            }
+
+            cell.notes.forEach(note => result.push(note));
+        });
+
+        return result;
+    }
+
+    getNotesHashByOffset(row: Line, startOffsetQ: number): {[key: string]: string} {
+        const result: {[key: string]: string} = {};
+
+        row.cells.forEach(cell => {
+            if (cell.startOffsetQ !== startOffsetQ) {
+                return
+            }
+
+            cell.notes.forEach(note => {
+                result[note.note] = note.note;
+            });
+        });
+
+        return result;
     }
 
     // getNoteNames(arr: NoteItem[]): string[] {
