@@ -21,12 +21,18 @@ export type NoteItem = {
     startOffsetQ: number;
 };
 
+export type Cell = {
+    id: number;
+    startOffsetQ: number;
+    notes: NoteItem[]
+}
+
 export type Line = {
     //nio: number,
     durQ: number,
     startOffsetQ: number,
-    notes: NoteItem[],
     cellSizeQ: number,
+    cells: Cell[],
 }
 
 export class LineModel {
@@ -45,21 +51,21 @@ export class LineModel {
 
         const rows = this.rows;
         const row = rows[ind.row];
-        const note = rows[ind.row].notes[ind.childInd];
+        const cell = rows[ind.row].cells[ind.childInd];
 
-        let newStartOffsetQ = note.startOffsetQ + value;
+        let newStartOffsetQ = cell.startOffsetQ + value;
 
         if (newStartOffsetQ >= row.startOffsetQ && newStartOffsetQ < (row.startOffsetQ + row.durQ)) {
-            note.startOffsetQ = newStartOffsetQ;
+            cell.startOffsetQ = newStartOffsetQ;
 
             return this.getRowAndCellIndexes(id);
         } else {
             const ind = this.findRowByOffset(newStartOffsetQ);
 
             if (ind > -1) {
-                note.startOffsetQ = newStartOffsetQ;
-                row.notes = row.notes.filter(item => item != note);
-                this.rows[ind].notes.push(note);
+                cell.startOffsetQ = newStartOffsetQ;
+                row.cells = row.cells.filter(item => item != cell);
+                this.rows[ind].cells.push(cell);
 
                 return this.getRowAndCellIndexes(id);
             }
@@ -80,8 +86,8 @@ export class LineModel {
         const rows = this.rows;
 
         for (let i = 0; i < rows.length; i++) {
-            for (let j = 0; j < rows[i].notes.length; j++) {
-                if (rows[i].notes[j].id === id) {
+            for (let j = 0; j < rows[i].cells.length; j++) {
+                if (rows[i].cells[j].id === id) {
                     return {
                         row: i,
                         childInd: j,
@@ -93,13 +99,13 @@ export class LineModel {
         return null;
     }
 
-    getItemById(id: number): NoteItem | null {
+    getItemById(id: number): Cell | null {
         if (!id) {
             return null;
         }
 
         for (let row of this.rows) {
-            for (let item of row.notes) {
+            for (let item of row.cells) {
                 if (item.id === id) {
                     return item;
                 }
@@ -111,31 +117,35 @@ export class LineModel {
 
     static GetLineModelFromRecord(bpm: number, startTimeMs, seq: KeyData[] ): Line[] {
         let qms = Math.round(60000/ bpm); // ms в четверти
-
-        let lines: Line[] = [];
+        let rows: Line[] = [];
 
         // начало и номер четверти
-        seq.forEach(item => {
+        for (let i = 0; i<seq.length; i++) {
+            const item = seq[i];
+            const next = seq[i+1];
             let diffMs = item.down - startTimeMs;
             let quarterNio = Math.floor(diffMs/qms);
             item.quarterTime = startTimeMs + (qms * quarterNio);
             item.quarterNio = quarterNio;
-        });
+
+            if (next && ((next.down - item.down) < 20) ) {
+                next.down = item.down;
+            }
+        }
 
         const lastInd = seq.length - 1;
         const firstTime = seq[0].quarterTime;
         const lastTime = seq[lastInd].next;
 
         // количество четвертей
-        const quarterCount = Math.ceil((lastTime - firstTime)/qms);
+        const rowCount = Math.ceil((lastTime - firstTime)/qms);
 
-        for (let ind = 0; ind < quarterCount; ind++) {
-            lines.push({
-                //nio:  ind,
+        for (let ind = 0; ind < rowCount; ind++) {
+            rows.push({
                 durQ: 120,
                 startOffsetQ: ind * 120,
-                notes: [],
                 cellSizeQ: 10,
+                cells: [],
             })
         }
 
@@ -143,9 +153,13 @@ export class LineModel {
         //console.log('lines', lines);
 
         const getLineByStartOffsetQ = (startOffsetQ: number): Line => {
-            return lines.find(item => {
+            return rows.find(item => {
                 return startOffsetQ >= item.startOffsetQ && startOffsetQ < (item.startOffsetQ + item.durQ);
             });
+        }
+
+        const getCellByStartOffsetQ = (startOffsetQ: number, row: Line): Cell => {
+            return row.cells.find(item => startOffsetQ === item.startOffsetQ);
         }
 
         seq.forEach((item, i) => {
@@ -167,19 +181,37 @@ export class LineModel {
             itemNew.colorHead = item.color;
             itemNew.note = item.note;
 
-            let quarter = getLineByStartOffsetQ(startOffsetQ);
-            if (quarter) quarter.notes.push(itemNew);
+            let row = getLineByStartOffsetQ(startOffsetQ);
+
+            if (row) {
+                let cell = getCellByStartOffsetQ(startOffsetQ, row) as Cell;
+
+                if (!cell) {
+                    cell = {
+                        id: itemNew.id,
+                        startOffsetQ: itemNew.startOffsetQ,
+                        notes: []
+                    }
+
+                    row.cells.push(cell);
+                }
+
+                cell.notes.push(itemNew);
+            }
         });
 
-        return lines;
+        return rows;
     }
 
-    getSortedNotes() {
+    getSortedNotes(): NoteItem[] {
         const notes: NoteItem[] = [];
 
         this.rows.forEach(row => {
-           row.notes.forEach(note => {
-              notes.push(note);
+           row.cells.forEach(cell => {
+               cell.notes.forEach(note => {
+                   note.startOffsetQ = cell.startOffsetQ;
+                   notes.push(note);
+               })
            });
         });
 
@@ -188,7 +220,7 @@ export class LineModel {
         return notes;
     }
 
-    sortByStartOffsetQ(arr: NoteItem[]) {
+    sortByStartOffsetQ(arr: (Cell | NoteItem) []) {
         arr.sort((first, second) => {
             if (first.startOffsetQ < second.startOffsetQ) {
                 return -1;

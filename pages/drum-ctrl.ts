@@ -32,6 +32,16 @@ interface Page {
 //     },
 // }
 
+const mapToLetter = {
+    'bd': 'O',
+    'hc': 'X',
+    'sn': 'V',
+    'bd+hc': 'Q',
+    'sn+hc': 'A',
+    'hc+bd': 'Q',
+    'hc+sn': 'A',
+};
+
 type BpmInfo = {
     bpm: number;
     lastDownTime: number;
@@ -234,7 +244,7 @@ export class DrumCtrl {
                 const time = Date.now();
 
                 if (this.mode === 'record') {
-                    return this.handleKeyRecord(note1, time, color, DOWN);
+                    this.handleKeyRecord(note1, time, color, DOWN);
                 }
 
                 notes.forEach(keyOrNote => {
@@ -244,8 +254,6 @@ export class DrumCtrl {
                         id: keyboardId,
                         onlyStop: false,
                     });
-
-                    //this.handleKeyRecord(keyOrNote, time, DOWN);
                 });
 
                 if (note2) {
@@ -271,8 +279,6 @@ export class DrumCtrl {
                         id: keyboardId,
                         onlyStop: true,
                     });
-
-                    //this.handleKeyRecord(keyOrNote, time, UP);
                 });
 
                 if (note2) {
@@ -699,16 +705,16 @@ export class DrumCtrl {
                     height: ${height}rem;                    
                 ">`;
 
-            const cells = getMask(row.durQ / row.cellSizeQ);
+            const cols = getMask(row.durQ / row.cellSizeQ);
 
-            row.notes.forEach( info => {
-                const iCell = (info.startOffsetQ - row.startOffsetQ) / 10;
-                const cell = cells[iCell];
-                cell.id = info.id;
-                cell.color = info.colorHead;
+            row.cells.forEach( cell => {
+                const iCell = (cell.startOffsetQ - row.startOffsetQ) / 10;
+                const col = cols[iCell];
+                col.id = cell.id;
+                col.color = cell.notes[0].colorHead;
             });
 
-            cells.forEach((cell, iCell) => {
+            cols.forEach((cell, iCell) => {
                 totalOut = totalOut +
                     `<span
                         data-drum-cell-row="${iRow}"
@@ -730,8 +736,6 @@ export class DrumCtrl {
                             left: ${iCell * height}rem;
                         "
                     ></span>`.trim();
-
-
             });
 
             totalOut = totalOut + '</div>';
