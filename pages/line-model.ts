@@ -483,4 +483,22 @@ export class LineModel {
 
         return result;
     }
+
+    cloneRows(): Line[] {
+        return this.rows.map(row => {
+            row = {...row};
+
+            row.cells = row.cells.map(cell => {
+                cell = {...cell};
+
+                cell.notes = cell.notes.map(note => {
+                    return {...note};
+                });
+
+                return cell;
+            });
+
+            return row;
+        });
+    }
 }

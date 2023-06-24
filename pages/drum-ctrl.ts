@@ -19,8 +19,8 @@ interface Page {
 const drumKodes = [
     'bd', 'sn', 'hc',
     'tl', 'tm', 'th',
-    'ho', 'hp', 'sr',
-    'cc'
+    // 'ho', 'hp', 'sr',
+    // 'cc'
 ];
 
 const someDrum = {
@@ -31,11 +31,11 @@ const someDrum = {
 }
 
 const drumNotesInfo = {
-    hc: {
-        note: 'hc',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'x',
+    bd: {
+        note: 'bd',
+        headColor: 'sienna',
+        bodyColor: 'tan',
+        char: 'O',
     },
     sn: {
         note: 'sn',
@@ -43,12 +43,30 @@ const drumNotesInfo = {
         bodyColor: 'lightgreen',
         char: 'V',
     },
-    bd: {
-        note: 'bd',
-        headColor: 'sienna',
-        bodyColor: 'tan',
-        char: 'O',
-    }
+    hc: {
+        note: 'hc',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+    tl: {
+        note: 'tl',
+        headColor: 'lightgray',
+        bodyColor: 'lightgray',
+        char: 'l',
+    },
+    tm: {
+        note: 'tm',
+        headColor: 'lightgray',
+        bodyColor: 'lightgray',
+        char: 'm',
+    },
+    th: {
+        note: 'th',
+        headColor: 'lightgray',
+        bodyColor: 'lightgray',
+        char: 'h',
+    },
 }
 
 
@@ -485,7 +503,8 @@ export class DrumCtrl {
     }
 
     getTopCommandPanel(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid gray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
         const rowStyle = `width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
         let result = '';
 
@@ -530,7 +549,7 @@ export class DrumCtrl {
                     data-action-drum="empty"
                 >&nbsp;&nbsp;&nbsp;</span>
                 <span
-                    style="${style}"
+                    style="${style2}"
                     data-action-out="top"
                 >&nbsp;&uarr;&nbsp;</span>                    
                 <span
@@ -551,15 +570,15 @@ export class DrumCtrl {
             </div>
             <div style="${rowStyle}">
                 <span 
-                    style="${style}"
+                    style="${style2}"
                     data-action-out="left"
                 >&nbsp;&lt;&nbsp;</span>  
                 <span
-                    style="${style}"
+                    style="${style2}"
                     data-action-out="bottom"
                 >&nbsp;&darr;&nbsp;</span>                                  
                 <span
-                    style="${style}"
+                    style="${style2}"
                     data-action-out="right"
                 >&nbsp;&gt;&nbsp;</span>
                 <span
@@ -613,10 +632,10 @@ export class DrumCtrl {
                 <div style="display: flex; user-select: none; touch-action: none; position: relative;">
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
-                            <!-- cowbell -->
+                            <!-- cowbell sr -->
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightblue; user-select: none; touch-action: none;"
-                                data-action-drum-key="sr"
+                                data-action-drum-key="th"
                                 data-keyboard-id="${keyboardId}-${ind++}"  
                                 data-color="steelblue"
                                 data-color2="lightblue"
@@ -624,10 +643,10 @@ export class DrumCtrl {
                             >
                                 <!--<br/>&nbsp;K-k-->
                             </div>
-                            <!-- cowbell -->                            
+                            <!-- cowbell sr -->
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightgreen; user-select: none; touch-action: none;"
-                                data-action-drum-key="sr"
+                                data-action-drum-key="tm"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="seagreen"                                
                                 data-color2="lightgreen"
@@ -716,7 +735,12 @@ export class DrumCtrl {
                         </div>
                         
                         <div 
-                            style="background-color: antiquewhite; width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"                                                            
+                            style="background-color: antiquewhite; width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"
+                            data-action-drum-key="tl"
+                            data-keyboard-id="${keyboardId}-${ind++}"
+                            data-color="lightgray"
+                            data-color2="lightgray"
+                            data-char="d"
                         >
                             <!--data-action-drum-key="sn+hc"
                             data-keyboard-id="${keyboardId}-${ind++}"-->
