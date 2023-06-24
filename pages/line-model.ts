@@ -165,6 +165,8 @@ export class LineModel {
             return row.cells.find(item => startOffsetQ === item.startOffsetQ);
         }
 
+        let cellId = 1;
+
         seq.forEach((item, i) => {
             let itemNew: NoteItem = {
                 id: i + 1,
@@ -188,11 +190,12 @@ export class LineModel {
             let row = getLineByStartOffsetQ(startOffsetQ);
 
             if (row) {
-                let cell = getCellByStartOffsetQ(startOffsetQ, row) as Cell;
+                //let cell = getCellByStartOffsetQ(startOffsetQ, row) as Cell;
+                let cell: Cell;
 
                 if (!cell) {
                     cell = {
-                        id: itemNew.id,
+                        id: cellId++,
                         startOffsetQ: itemNew.startOffsetQ,
                         notes: []
                     }
