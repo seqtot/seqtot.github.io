@@ -18,13 +18,13 @@ interface Page {
 
 const drumKeysMap = {
     tl: {
-        note: 'sideRimshot',
+        note: 'sr',
         headColor: 'steelblue',
         bodyColor: 'lightblue',
         char: 'k',
     },
     tm: {
-        note: 'sideRimshot',
+        note: 'sr',
         headColor: 'seagreen',
         bodyColor: 'lightgreen',
         char: 't',
@@ -474,7 +474,7 @@ export class DrumCtrl {
                             <!-- cowbell -->
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightblue; user-select: none; touch-action: none;"
-                                data-action-drum-key="sideRimshot"
+                                data-action-drum-key="sr"
                                 data-keyboard-id="${keyboardId}-${ind++}"  
                                 data-color="steelblue"
                                 data-color2="lightblue"
@@ -485,7 +485,7 @@ export class DrumCtrl {
                             <!-- cowbell -->                            
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightgreen; user-select: none; touch-action: none;"
-                                data-action-drum-key="sideRimshot"
+                                data-action-drum-key="sr"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="seagreen"                                
                                 data-color2="lightgreen"

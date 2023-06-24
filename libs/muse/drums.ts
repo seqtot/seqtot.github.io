@@ -120,6 +120,8 @@ export const drumCodes = {
     'sn2': 'drum_40',
 
     'sideRimshot': 'drum_37',
+    'sr': 'drum_37',
+
     'handClap': 'drum_39',
     'tambourine': 'drum_54',
     'vibraSlap': 'drum_58',
@@ -240,8 +242,8 @@ export const drumInfo: Record<
         octave: 'drum',
         volume: 0.5,
         instrCode: Drums.sideRimshot,
-        noteLat: 'sideRimshot',
-        noteRus: 'sideRimshot',
+        noteLat: 'sr',
+        noteRus: 'sr',
     },
 
     'bassDrum2': {
