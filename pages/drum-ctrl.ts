@@ -16,6 +16,42 @@ interface Page {
     multiPlayer: MultiPlayer;
 }
 
+const drumKodes = [
+    'bd', 'sn', 'hc',
+    'tl', 'tm', 'th',
+    'ho', 'hp', 'sr',
+    'cc'
+];
+
+const someDrum = {
+    note: '',
+    headColor: 'lightgray',
+    bodyColor: 'lightgray',
+    char: '?',
+}
+
+const drumNotesInfo = {
+    hc: {
+        note: 'hc',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+    sn: {
+        note: 'sn',
+        headColor: 'deeppink',
+        bodyColor: 'lightgreen',
+        char: 'V',
+    },
+    bd: {
+        note: 'bd',
+        headColor: 'sienna',
+        bodyColor: 'tan',
+        char: 'O',
+    }
+}
+
+
 const drumKeysMap = {
     tl: {
         note: 'sr',
@@ -126,6 +162,7 @@ type PrintCell = {
     id: number,
     color: string,
     text: string,
+    startOffsetQ: number,
 }
 
 export class DrumCtrl {
@@ -135,7 +172,11 @@ export class DrumCtrl {
     keySequence: KeyData[] = [];
     lastTickTime: number = 0;
     tickStartMs: number = 0;
-    activeCell = 0;
+    activeCellId = 0;
+    activeCellNio = 0;
+    activeCellRow = 0;
+    activeCellRowNio = '';
+
     liner = new LineModel();
 
     constructor(public page: Page) {}
@@ -154,7 +195,9 @@ export class DrumCtrl {
         }
     }
 
-    selectItemByRowNio(rowNio: string) {
+    selectItemByRowNio(rowNio?: string) {
+        rowNio = rowNio || this.activeCellRowNio;
+
         getWithDataAttr('drum-cell-row-nio', this.page.pageEl).forEach(el => {
             el.style.border = '1px solid white';
         });
@@ -165,10 +208,13 @@ export class DrumCtrl {
     }
 
     subscribeOutCells() {
-        getWithDataAttr('drum-cell-id', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttr('drum-cell-row-nio', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('click', evt => {
-                this.activeCell = parseInteger(el.dataset['drumCellId'], 0);
-                this.selectItemById(this.activeCell);
+                this.activeCellId = parseInteger(el.dataset['drumCellId'], 0); // data-drum-cell-id
+                this.activeCellNio = parseInteger(el.dataset['drumCellNio'], 0); // data-drum-cell-nio
+                this.activeCellRow = parseInteger(el.dataset['drumCellRow'], 0); // data-drum-cell-row
+                this.activeCellRowNio = el.dataset['drumCellRowNio']; // data-drum-cell-row-nio
+                this.selectItemByRowNio(this.activeCellRowNio);
             });
         });
     }
@@ -179,31 +225,31 @@ export class DrumCtrl {
 
             if (result) {
                 this.printModel(this.liner.rows);
-                this.selectItemById(this.activeCell);
+                this.selectItemById(this.activeCellId);
             }
         }
 
         getWithDataAttrValue('action-out', 'top', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCell, -120);
+                moveItem(this.activeCellId, -120);
             });
         });
 
         getWithDataAttrValue('action-out', 'bottom', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCell, 120);
+                moveItem(this.activeCellId, 120);
             });
         });
 
         getWithDataAttrValue('action-out', 'left', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCell, -10);
+                moveItem(this.activeCellId, -10);
             });
         });
 
         getWithDataAttrValue('action-out', 'right', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCell, 10);
+                moveItem(this.activeCellId, 10);
             });
         });
 
@@ -225,7 +271,78 @@ export class DrumCtrl {
                 });
             });
         });
+
+        getWithDataAttrValue('action-out', 'delete', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                const cell = getWithDataAttrValue('drum-cell-id', this.activeCellId)[0];
+
+                if (!cell) return;
+
+                const offsetQ = parseInteger(cell.dataset['offsetq'], null);
+
+                if (offsetQ === null) return;
+
+                this.liner.deleteCellByOffset(offsetQ);
+                this.printModel(this.liner.rows);
+                this.selectItemByRowNio(this.activeCellRowNio);
+            });
+        });
+
+        getWithDataAttr('action-drum-note', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                const cell = getWithDataAttrValue('drum-cell-row-nio', this.activeCellRowNio)[0];
+
+                if (!cell) return;
+
+                const offsetQ = parseInteger(cell.dataset['offsetq'], null);
+
+                if (offsetQ === null) return;
+
+                const note = el.dataset['actionDrumNote'];
+
+                if (!note) return;
+
+                let noteInfo = (drumNotesInfo[note] || someDrum) as NoteItem;
+                noteInfo = {
+                    ...noteInfo,
+                    note,
+                    durQ: 10,
+                }
+
+                noteInfo = this.liner.addNoteByOffset(offsetQ, noteInfo);
+                this.activeCellId = noteInfo.id;
+                this.printModel(this.liner.rows);
+                this.selectItemByRowNio(this.activeCellRowNio);
+
+                //console.log(el.dataset);
+            });
+        });
+
+        getWithDataAttrValue('action-out-row', 'add', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                this.liner.addRowAfter(this.activeCellRow);
+                this.printModel(this.liner.rows);
+                this.selectItemByRowNio(this.activeCellRowNio);
+            });
+        });
+
+        getWithDataAttrValue('action-out-row', 'insert', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                this.liner.addRowAfter(this.activeCellRow - 1);
+                this.printModel(this.liner.rows);
+                this.selectItemByRowNio(this.activeCellRowNio);
+            });
+        });
+
+        getWithDataAttrValue('action-out-row', 'delete', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                this.liner.deleteRow(this.activeCellRow);
+                this.printModel(this.liner.rows);
+                this.selectItemByRowNio(this.activeCellRowNio);
+            });
+        });
     }
+
 
     subscribeEvents() {
         const page = this.page;
@@ -367,11 +484,12 @@ export class DrumCtrl {
         this.bpmInfo = emptyBpmInfo();
     }
 
-    getCommandPanel(): string {
+    getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid gray; font-size: 1rem; user-select: none; touch-action: none;`;
         const rowStyle = `width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
+        let result = '';
 
-        return `
+        result = `
             <div style="${rowStyle}">
                 <!--span 
                     style="font-size: 1.5rem; user-select: none; touch-action: none;"
@@ -429,8 +547,7 @@ export class DrumCtrl {
                 >3:4&nbsp;</span-->                    
                 <span
                     style="${style}"
-                    data-action-out="sub"
-                >sub</span>                
+                >&nbsp;&nbsp;&nbsp;</span>                
             </div>
             <div style="${rowStyle}">
                 <span 
@@ -445,21 +562,46 @@ export class DrumCtrl {
                     style="${style}"
                     data-action-out="right"
                 >&nbsp;&gt;&nbsp;</span>
-                <!--span
+                <span
                     style="${style}"
-                    data-action-out="clear"
-                >clr&nbsp;</span-->                                        
+                >&nbsp;&nbsp;&nbsp;</span>                
                 <span
                     style="${style}"
                     data-action-out="delete"
-                >del</span>                    
+                >del</span>                                                                        
+            </div>
+            
+            <div style="${rowStyle}">
+                <span 
+                    style="${style}"
+                    data-action-out-row="add"
+                >addR</span>  
                 <span
                     style="${style}"
-                    data-action-out="add"
-                >add</span>                    
-            </div>
+                    data-action-out-row="insert"
+                >insR</span>                                  
+                <span
+                    style="${style}"
+                    data-action-out-row="delete"
+                >delR</span>                    
+            </div>            
         `.trim();
+
+        let instrPanel = ''
+
+        drumKodes.forEach(note => {
+            instrPanel = instrPanel + `
+                <span
+                    style="${style}"
+                    data-action-drum-note="${note}"
+                >${note}</span>
+            `;
+        });
+        instrPanel = `<div style="${rowStyle}">${instrPanel}</div>`;
+
+        return result + instrPanel;
     }
+
 
     getDrumBoardContent(keyboardId: string): string {
         const topRowHeight = 5;
@@ -670,7 +812,7 @@ export class DrumCtrl {
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
                 ${this.getDrumBoardContent(keyboardId)}
-                ${this.getCommandPanel()}
+                ${this.getTopCommandPanel()}
                 
                 <div
                     data-name="drum-record-out"
@@ -757,6 +899,7 @@ export class DrumCtrl {
                 color: 'whitesmoke',
                 id: 0,
                 text: '',
+                startOffsetQ: 0,
             }));
         }
 
@@ -779,10 +922,14 @@ export class DrumCtrl {
                     height: ${height}rem;                    
                 ">`;
 
+            const cellSizeQ = 10;
             const cols = getMask(row.durQ / row.cellSizeQ);
+            cols.forEach((col, i) => {
+               col.startOffsetQ = row.startOffsetQ + (cellSizeQ * i);
+            });
 
             for (let offset of offsets) {
-                const iCell = (offset - row.startOffsetQ) / 10;
+                const iCell = (offset - row.startOffsetQ) / cellSizeQ;
                 const notes = this.liner.getNotesListByOffset(row, offset);
                 let mainNote = notes.find(item => item.note === 'bd') || notes.find(item => item.note === 'sn');
                 let text = '';
@@ -801,17 +948,45 @@ export class DrumCtrl {
                 const col = cols[iCell];
 
                 col.id = mainNote.id;
-                col.color = mainNote.colorHead;
+                col.color = mainNote.headColor;
                 col.text = text;
+                col.startOffsetQ = mainNote.startOffsetQ;
             }
 
+            cols.forEach((col, iCol) => {
+                totalOut = totalOut +
+                    `<span
+                        data-drum-cell-row="${iRow}"
+                        data-drum-cell-nio="${iCol}"
+                        data-drum-cell-row-nio="${iRow}-${iCol}"
+                        data-drum-cell-id=""
+                        data-offsetq="${col.startOffsetQ}"                        
+                        style="
+                            box-sizing: border-box;
+                            border: 1px solid white;
+                            display: inline-block;
+                            position: absolute;
+                            width: ${height}rem;
+                            height: ${height}rem;
+                            background-color: ${col.color};
+                            user-select: none;
+                            touch-action: none;
+                            text-align: center;
+                            left: ${iCol * height}rem;
+                        "
+                    ></span>`.trim();
+            });
+
             cols.forEach((cell, iCell) => {
+                if (!cell.id) return;
+
                 totalOut = totalOut +
                     `<span
                         data-drum-cell-row="${iRow}"
                         data-drum-cell-nio="${iCell}"
                         data-drum-cell-row-nio="${iRow}-${iCell}"                                                
                         data-drum-cell-id="${cell.id}"
+                        data-offsetq="${cell.startOffsetQ}"                        
                         style="
                             box-sizing: border-box;
                             border: 1px solid white;

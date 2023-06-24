@@ -18,8 +18,8 @@ export type NoteItem = {
     id: number;
     durQ: number;
     note: string;
-    colorHead?: string;
-    colorBody?: string;
+    headColor?: string;
+    bodyColor?: string;
     startOffsetQ: number;
     char: string;
 };
@@ -41,10 +41,13 @@ export type Line = {
 export class LineModel {
     rows: Line[] = [];
 
-    findRowByOffset(startOffsetQ: number): number {
-        return this.rows.findIndex(row => startOffsetQ >= row.startOffsetQ && startOffsetQ < (row.startOffsetQ + row.durQ));
+    findRowIndByOffset(offsetQ: number): number {
+        return this.rows.findIndex(row => offsetQ >= row.startOffsetQ && offsetQ < (row.startOffsetQ + row.durQ));
     }
 
+    getRowByOffset(offsetQ: number): Line {
+        return this.rows[this.findRowIndByOffset(offsetQ)];
+    }
 
     moveItem(id: number, value: number): {row: number, childInd: number  } | null {
         const ind = this.getRowAndCellIndexes(id);
@@ -63,7 +66,7 @@ export class LineModel {
 
             return this.getRowAndCellIndexes(id);
         } else {
-            const ind = this.findRowByOffset(newStartOffsetQ);
+            const ind = this.findRowIndByOffset(newStartOffsetQ);
 
             if (ind > -1) {
                 cell.startOffsetQ = newStartOffsetQ;
@@ -79,6 +82,122 @@ export class LineModel {
 
     setData(rows: Line[]) {
         this.rows = rows;
+    }
+
+    deleteCellByOffset(offsetQ: number) {
+        const row = this.rows[this.findRowIndByOffset(offsetQ)];
+
+        if (!row) return;
+
+        row.cells = row.cells.filter(cell => {
+            return cell.startOffsetQ !== offsetQ;
+        });
+    }
+
+    getAllCells(): Cell[] {
+        const result: Cell[] = [];
+
+        this.rows.forEach(row => {
+            row.cells.forEach(cell => {
+                result.push(cell);
+            })
+        })
+
+        return  result;
+    }
+
+    getMaxCellId(): number {
+        const cells = this.getAllCells();
+        if (!cells.length) return 0;
+
+        return Math.max(...cells.map(item => item.id));
+    }
+
+    getMaxNoteId(): number {
+        const notes = this.getAllNotes();
+        if (!notes.length) return 0;
+
+        return Math.max(...notes.map(item => item.id));
+    }
+
+    getAllNotes(): NoteItem[] {
+        const cells = this.getAllCells();
+
+        if (!cells.length) return [];
+
+        return cells.reduce((acc, cell) => {
+            return acc = [...acc, ...cell.notes]
+        }, []);
+    }
+
+    addNoteByOffset(offsetQ: number, note: NoteItem): NoteItem {
+        const row = this.getRowByOffset(offsetQ);
+
+        if (!row) return;
+
+        note.id = this.getMaxNoteId() + 1;
+        note.startOffsetQ = offsetQ;
+
+        row.cells.push({
+           id: this.getMaxCellId() + 1,
+           startOffsetQ: offsetQ,
+           notes: [note]
+        });
+
+        return note;
+    }
+
+    deleteRow(i: number) {
+        if (this.rows.length === 1) {
+            this.rows = [];
+
+            return;
+        }
+
+        const topArr = this.rows.slice(0, i+1);
+        const botArr = this.rows.slice(i+1);
+        const delRow = topArr.pop();
+        this.addOffset(botArr, -delRow.durQ);
+
+        this.rows = [...topArr, ...botArr];
+    }
+
+    addRowAfter(i: number) {
+        const newRow = {
+            durQ: 120,
+            startOffsetQ: 0,
+            cells: [],
+            cellSizeQ: 10
+        };
+
+        if (!this.rows.length) {
+            this.rows.push(newRow);
+
+            return;
+        }
+
+        const topArr = this.rows.slice(0, i+1);
+        const botArr = this.rows.slice(i+1);
+
+        this.addOffset(botArr, 120);
+        newRow.startOffsetQ = topArr[topArr.length-1].startOffsetQ + topArr[topArr.length-1].durQ;
+        topArr.push(newRow);
+        this.rows = [...topArr, ...botArr];
+    }
+
+    addOffset(arr: Line[], offsetQ: number) {
+        for (let i = 0; i < arr.length; i++) {
+            const row = arr[i];
+
+            row.startOffsetQ = row.startOffsetQ + offsetQ;
+            row.cells.forEach(cell => {
+                cell.startOffsetQ = cell.startOffsetQ + offsetQ;
+                cell.notes.forEach(note => {
+                    note.startOffsetQ = note.startOffsetQ + offsetQ;
+                })
+            })
+
+        }
     }
 
     getRowAndCellIndexes(id: number): {row: number, childInd: number} | null {
@@ -170,8 +289,8 @@ export class LineModel {
         seq.forEach((item, i) => {
             let itemNew: NoteItem = {
                 id: i + 1,
-                colorBody: '',
-                colorHead: '',
+                bodyColor: '',
+                headColor: '',
                 note: '',
                 durQ: 0,
                 startOffsetQ: 0,
@@ -184,7 +303,7 @@ export class LineModel {
             itemNew.durQ = Math.floor(
                 (item.up - item.down) / qms * un.NUM_120 / 10
             ) * 10 || 10;
-            itemNew.colorHead = item.color;
+            itemNew.headColor = item.color;
             itemNew.note = item.note;
 
             let row = getLineByStartOffsetQ(startOffsetQ);

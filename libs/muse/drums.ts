@@ -10,10 +10,13 @@ export type DrumType =
     | 'bassDrum2'
     | 'bassDrum1'
     | 'handClap'
+    | 'lowTom'
     | 'lowTom2'
     | 'lowTom1'
+    | 'midTom'
     | 'midTom2'
     | 'midTom1'
+    | 'highTom'
     | 'highTom2'
     | 'highTom1'
     | 'crashCymbal1'
@@ -58,13 +61,16 @@ export const Drums: Record<DrumType, number> = {
     'snare1': 38,
     'handClap': 39,
     'snare2': 40, // sn
+    'lowTom': 41,
     'lowTom2': 41,
     'hiHatClosed': 42, // hc
     'lowTom1': 43,
     'hiHatPedal': 44,
+    'midTom': 45,
     'midTom2': 45,
     'hiHatOpened': 46, // ho
     'midTom1': 47,
+    'highTom': 48,
     'highTom2': 48,
     'crashCymbal1': 49,
     'highTom1': 50,
@@ -260,7 +266,13 @@ export const drumInfo: Record<
         noteLat: 'bd1',
         noteRus: 'бб1',
     },
-
+    'lowTom': {
+        octave: 'drum',
+        volume: 0.5,
+        instrCode: Drums.lowTom2,
+        noteLat: 'tl',
+        noteRus: 'тл',
+    },
     'lowTom2': {
         octave: 'drum',
         volume: 0.5,
@@ -275,6 +287,13 @@ export const drumInfo: Record<
         noteLat: 'tl1',
         noteRus: 'тл1',
     },
+    'midTom': {
+        octave: 'drum',
+        volume: 0.5,
+        instrCode: Drums.midTom2,
+        noteLat: 'tm',
+        noteRus: 'тм',
+    },
     'midTom2': {
         octave: 'drum',
         volume: 0.5,
@@ -288,6 +307,13 @@ export const drumInfo: Record<
         instrCode: Drums.midTom1,
         noteLat: 'tm1',
         noteRus: 'тм1',
+    },
+    'highTom': {
+        octave: 'drum',
+        volume: 0.5,
+        instrCode: Drums.highTom2,
+        noteLat: 'th',
+        noteRus: 'тх',
     },
     'highTom2': {
         octave: 'drum',
