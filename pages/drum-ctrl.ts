@@ -16,6 +16,66 @@ interface Page {
     multiPlayer: MultiPlayer;
 }
 
+const drumKeysMap = {
+    tl: {
+        note: 'sideRimshot',
+        headColor: 'steelblue',
+        bodyColor: 'lightblue',
+        char: 'k',
+    },
+    tm: {
+        note: 'sideRimshot',
+        headColor: 'seagreen',
+        bodyColor: 'lightgreen',
+        char: 't',
+    },
+    tr: {
+        note: 'sn',
+        headColor: 'deeppink',
+        bodyColor: 'lightgreen',
+        char: 'V',
+    },
+
+    mtl: {
+        note: 'empty',
+        headColor: 'whitesmoke',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+    mtr: {
+        note: 'hc',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+
+    mbl: {
+        note: 'hc',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+    mbr: {
+        note: 'empty',
+        headColor: 'whitesmoke',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+
+    bl: {
+        note: 'bd',
+        headColor: 'sienna',
+        bodyColor: 'tan',
+        char: 'O',
+    },
+    br: {
+        note: 'empty',
+        headColor: 'white',
+        bodyColor: 'white',
+        char: '',
+    },
+};
+
 // const drumsMap = {
 //     O: {
 //         instr: 'drum_35',
@@ -411,9 +471,10 @@ export class DrumCtrl {
                 <div style="display: flex; user-select: none; touch-action: none; position: relative;">
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
+                            <!-- cowbell -->
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightblue; user-select: none; touch-action: none;"
-                                data-action-drum-key="cowbell"
+                                data-action-drum-key="sideRimshot"
                                 data-keyboard-id="${keyboardId}-${ind++}"  
                                 data-color="steelblue"
                                 data-color2="lightblue"
@@ -421,9 +482,10 @@ export class DrumCtrl {
                             >
                                 <!--<br/>&nbsp;K-k-->
                             </div>
+                            <!-- cowbell -->                            
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightgreen; user-select: none; touch-action: none;"
-                                data-action-drum-key="cowbell"
+                                data-action-drum-key="sideRimshot"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="seagreen"                                
                                 data-color2="lightgreen"
@@ -438,7 +500,7 @@ export class DrumCtrl {
                         >
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum-key="empty0"
+                                data-action-drum-key="empty"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="lightgray"
                                 data-color2="whitesmoke"                                                                
@@ -446,7 +508,7 @@ export class DrumCtrl {
                                 <!--<br/>&nbsp;?-->
                             </div>
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: lightgray; user-select: none; touch-action: none;"
                                 data-action-drum-key="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-highlight-drum="bd+hc"  
@@ -462,7 +524,7 @@ export class DrumCtrl {
                             style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
                         >
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: lightgray; user-select: none; touch-action: none;"
                                 data-action-drum-key="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-highlight-drum="sn+hc"  
@@ -476,7 +538,7 @@ export class DrumCtrl {
                         
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum-key="empty1"
+                                data-action-drum-key="empty"
                                 data-keyboard-id="${keyboardId}-${ind++}"   
                                 data-color="lightgray"
                                 data-color2="whitesmoke"
@@ -512,7 +574,7 @@ export class DrumCtrl {
                         </div>
                         
                         <div 
-                            style="width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"                                                            
+                            style="background-color: antiquewhite; width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"                                                            
                         >
                             <!--data-action-drum-key="sn+hc"
                             data-keyboard-id="${keyboardId}-${ind++}"-->
