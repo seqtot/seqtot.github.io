@@ -177,10 +177,11 @@ export class LineModel {
         }
 
         const topArr = this.rows.slice(0, i+1);
+        const lastEl = topArr[topArr.length-1];
         const botArr = this.rows.slice(i+1);
 
         this.addOffset(botArr, 120);
-        newRow.startOffsetQ = topArr[topArr.length-1].startOffsetQ + topArr[topArr.length-1].durQ;
+        newRow.startOffsetQ = lastEl ? lastEl.startOffsetQ + lastEl.durQ : 0;
         topArr.push(newRow);
         this.rows = [...topArr, ...botArr];
     }

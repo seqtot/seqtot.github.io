@@ -53,22 +53,21 @@ const drumNotesInfo = {
         note: 'tl',
         headColor: 'lightgray',
         bodyColor: 'lightgray',
-        char: 'l',
+        char: 'd',
     },
     tm: {
         note: 'tm',
-        headColor: 'lightgray',
-        bodyColor: 'lightgray',
-        char: 'm',
+        headColor: 'seagreen',
+        bodyColor: 'lightgreen',
+        char: 't',
     },
     th: {
         note: 'th',
-        headColor: 'lightgray',
-        bodyColor: 'lightgray',
-        char: 'h',
+        headColor: 'steelblue',
+        bodyColor: 'lightblue',
+        char: 'k',
     },
 }
-
 
 const drumKeysMap = {
     tl: {
@@ -278,7 +277,7 @@ export class DrumCtrl {
                 if (!notes) return;
 
                 let blocks = [
-                    '<out r1>',
+                    '<out r100>',
                     'temp',
                     notes
                 ].join('\n');
@@ -974,7 +973,7 @@ export class DrumCtrl {
                 col.id = mainNote.id;
                 col.color = mainNote.headColor;
                 col.text = text;
-                col.startOffsetQ = mainNote.startOffsetQ;
+                //col.startOffsetQ = mainNote.startOffsetQ; ???
             }
 
             cols.forEach((col, iCol) => {
