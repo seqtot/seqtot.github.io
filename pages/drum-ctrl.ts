@@ -5,10 +5,11 @@ import * as un from '../libs/muse/utils/utils-note';
 import { parseInteger } from '../libs/common';
 import { LineModel, Line, NoteItem, KeyData, Cell } from './line-model';
 import { MultiPlayer } from '../libs/muse/multi-player';
-import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
+import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 import ideService from './ide/ide-service';
-import {getOutBlocksInfo} from '../libs/muse/utils/getOutBlocksInfo';
-import {ComponentContext} from 'framework7/modules/component/component';
+import { getOutBlocksInfo } from '../libs/muse/utils/getOutBlocksInfo';
+import { ComponentContext } from 'framework7/modules/component/component';
+import {createOutBlock, TextBlock} from '../libs/muse/utils/utils-note';
 
 const ids = {
     ideItem: 'ide-item',
@@ -18,7 +19,8 @@ const ids = {
     songName: 'song-name',
     ideAction: 'ide-action',
     ideContent: 'ide-content',
-}
+    bottomCommandPanel: 'bottom-command-panel',
+};
 
 interface Page {
     bpmValue: number;
@@ -247,12 +249,14 @@ export class DrumCtrl {
         });
     }
 
+    get hasCurrentItem(): boolean {
+        return !!this.currentIdeItem;
+    }
+
     subscribeIdeEvents() {
         getWithDataAttrValue('action-out', 'draft', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                if (!this.currentIdeItem) return;
-
-                console.log('this.currentIdeItem', this.currentIdeItem);
+                if (!this.hasCurrentItem) return;
 
                 let songNode: any;
                 if (!localStorage.getItem(this.currentIdeItem.songName)) {
@@ -289,8 +293,11 @@ export class DrumCtrl {
         getWithDataAttrValue(ids.ideAction, 'clear', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
                 ideService.currentEdit = {} as any;
-                this.currentIdeItem = {} as any;
+                this.currentIdeItem = null as any;
                 getWithDataAttr(ids.ideContent, this.page.pageEl)?.forEach((el: HTMLElement) => {
+                    el.innerHTML = null;
+                });
+                getWithDataAttr('bottom-command-panel', this.page.pageEl)?.forEach((el: HTMLElement) => {
                     el.innerHTML = null;
                 });
                 this.liner.fillLinesStructure('480');
@@ -306,18 +313,42 @@ export class DrumCtrl {
 
         getWithDataAttrValue(ids.ideAction, 'play', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
-                console.log('play', el);
+                if (!this.hasCurrentItem) return;
+
+                const midiConfig = this.getMidiConfig();
+                const playBlock = midiConfig.playBlockOut as TextBlock;
+                const playRow = playBlock.rows[this.currentIdeItem.rowInPart + 1];
+
+                const newOutBlock = createOutBlock({
+                    id: 'out',
+                    type: 'set',
+                    rows: [playRow],
+                    bpm: this.page.bpmValue
+                });
+
+                this.page.multiPlayer.tryPlayMidiBlock({
+                    blocks: midiConfig.blocks,
+                    playBlock: newOutBlock,
+                    bpm: this.page.bpmValue,
+                    repeatCount: 1,
+                });
+
+                // console.log('midiConfig', midiConfig);
+                // console.log('ideService', ideService);
+                // console.log('currItem', this.currentIdeItem);
+                // console.log('playRow', playRow);
+                // console.log('newPlayBlock', newPlayBlock);
             });
         });
 
         getWithDataAttr(ids.ideItem, this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
                 const item = {
-                    id: el.dataset[ids.ideItem],
-                    songName: el.dataset[ids.songName],
-                    duration: parseInteger(el.dataset[ids.duration], 0),
-                    partIndex: parseInteger(el.dataset[ids.partIndex], 0),
-                    rowInPart: parseInteger(el.dataset[ids.rowInPart], 0),
+                    id: el.dataset['ideItem'],
+                    songName: el.dataset['songName'],
+                    duration: parseInteger(el.dataset['duration'], 0),
+                    partIndex: parseInteger(el.dataset['partIndex'], 0),
+                    rowInPart: parseInteger(el.dataset['rowInPart'], 0),
                 };
                 this.currentIdeItem = item;
 
@@ -468,8 +499,6 @@ export class DrumCtrl {
                 this.activeCellId = noteInfo.id;
                 this.printModel(this.liner.rows);
                 this.selectItemByRowNio(this.activeCellRowNio);
-
-                //console.log(el.dataset);
             });
         });
 
@@ -647,20 +676,22 @@ export class DrumCtrl {
         let result = '';
 
         result = `
-            <div style="${rowStyle}">
-                <span 
-                    style="${style}"
-                    data-action-out="ready"
-                >ready</span>
-                <span
-                    style="${style}"
-                    data-action-out="draft"
-                >draft</span>
-                <span
-                    style="${style}"
-                    data-action-out="clear"
-                >clear</span>
-            </div>            
+            <div data-bottom-command-panel>
+                <div style="${rowStyle}">
+                    <span 
+                        style="${style}"
+                        data-action-out="ready"
+                    >ready</span>
+                    <span
+                        style="${style}"
+                        data-action-out="draft"
+                    >draft</span>
+                    <span
+                        style="${style}"
+                        data-action-out="clear"
+                    >clear</span>
+                </div>
+            </div>
         `.trim();
 
         return result;
@@ -978,16 +1009,8 @@ export class DrumCtrl {
         return content;
     }
 
-
-    getIdeContent(): string {
+    getMidiConfig(): MidiConfig {
         const currentEdit = ideService.currentEdit;
-        const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-
-        if (!currentEdit || !currentEdit.editIndex || !currentEdit.outList || !currentEdit.outBlock || !currentEdit.blocks) {
-            return '';
-        }
-
-        //console.log('currentEdit', currentEdit);
 
         const outBlock = un.createOutBlock({
             id: 'out',
@@ -996,9 +1019,10 @@ export class DrumCtrl {
             volume: 50,
             type: 'text'
         });
-        console.log('outBlock', outBlock);
 
-        const midiConfig = {
+        //console.log('outBlock', outBlock);
+
+        const midiConfig: MidiConfig = {
             blocks: currentEdit.blocks,
             excludeIndex: [],
             currRowInfo: {first: 0, last: 0},
@@ -1009,10 +1033,23 @@ export class DrumCtrl {
         };
 
         getMidiConfig(midiConfig);
-        // console.log('midiConfig', midiConfig);
+
+        return midiConfig;
+    }
+
+    getIdeContent(): string {
+        const currentEdit = ideService.currentEdit;
+        const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+
+        if (!currentEdit || !currentEdit.editIndex || !currentEdit.outList || !currentEdit.outBlock || !currentEdit.blocks) {
+            return '';
+        }
+
+        const midiConfig = this.getMidiConfig();
+        //console.log('midiConfig', midiConfig);
 
         const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
-        console.log('outBlocksInfo', outBlocksInfo);
+        //console.log('outBlocksInfo', outBlocksInfo);
 
         // const loopsInfo = this.page.multiPlayer.getLoopsInfo({
         //     blocks: currentEdit.blocks,
@@ -1047,6 +1084,10 @@ export class DrumCtrl {
 
         return `
             <div data-ide-content>
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="back"
+                >back</span>            
                 <span 
                     style="padding: .5rem;"
                 >${currentEdit.name + ' - ' + currentEdit.outList[currentEdit.editIndex - 1] + ' - ' + currentEdit.editIndex}</span>
@@ -1059,10 +1100,6 @@ export class DrumCtrl {
                     data-ide-action="stop"
                 >stop</span>
                 ${innerContent}
-                <span
-                    style="${cmdStyle}"
-                    data-ide-action="back"
-                >back</span>
                 <span
                     style="${cmdStyle}"
                     data-ide-action="clear"

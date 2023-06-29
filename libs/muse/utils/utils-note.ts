@@ -630,7 +630,6 @@ export function createOutBlock({bpm, volume, currBlock, rows, id, type}: {
     bpm = bpm || currBlock.bpm || DEFAULT_BPM;
     type = type || 'set';
 
-
     volume = getSafeVolume(volume, 0) || getSafeVolume(currBlock.volume);
 
     const head = `out b${bpm} v${volume}`;

@@ -1,6 +1,7 @@
 'use babel';
 
 import * as un from './index';
+import {TextBlock} from './index';
 
 export type RowInfo = {
     first: number,
@@ -31,15 +32,17 @@ export function getNearestCharIndex(char: string, from: number, arr: string[]) {
     return -1;
 }
 
-export function getMidiConfig(x: {
-    blocks: un.TextBlock[],
-    currBlock: un.TextBlock,
-    currRowInfo: RowInfo,
-    excludeIndex?: number[],
-    playBlockOut: string | un.TextBlock,
-    midiBlockOut: un.TextBlock,
+export type MidiConfig = {
+    blocks: TextBlock[],
+    excludeIndex: number[],
+    currBlock: TextBlock,
+    currRowInfo: {first: number, last: number},
+    midiBlockOut: TextBlock,
+    playBlockOut: string | TextBlock,
     topBlocksOut: string[],
-}) {
+}
+
+export function getMidiConfig(x: MidiConfig) {
     const excludeIndex = Array.isArray(x.excludeIndex) ? x.excludeIndex: [];
 
     if (x.currBlock.type === 'set') {

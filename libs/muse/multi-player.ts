@@ -363,6 +363,8 @@ export class MultiPlayer {
         const allBlocks = Array.isArray(x.blocks) ? x.blocks : un.getTextBlocks(x.blocks);
         const outBlock = un.getOutBlock(playBlock, allBlocks);
 
+        //console.log('outBlock', playBlock, outBlock);
+
         const metaByLines = x.metaByLines || {};
         const volumeByLines = Object.keys(metaByLines).reduce((acc, key) => {
             acc[key] = un.getVolumeFromString(metaByLines[key]);
