@@ -8,6 +8,17 @@ import { MultiPlayer } from '../libs/muse/multi-player';
 import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
 import ideService from './ide/ide-service';
 import {getOutBlocksInfo} from '../libs/muse/utils/getOutBlocksInfo';
+import {ComponentContext} from 'framework7/modules/component/component';
+
+const ids = {
+    ideItem: 'ide-item',
+    duration: 'duration',
+    rowInPart: 'row-in-part',
+    partIndex: 'part-index',
+    songName: 'song-name',
+    ideAction: 'ide-action',
+    ideContent: 'ide-content',
+}
 
 interface Page {
     bpmValue: number;
@@ -17,6 +28,7 @@ interface Page {
     //getOut(bpm: number, seq: DrumCtrl['keySequence'] );
     synthesizer: Synthesizer;
     multiPlayer: MultiPlayer;
+    context: ComponentContext,
 }
 
 const drumKodes = [
@@ -274,16 +286,38 @@ export class DrumCtrl {
             });
         });
 
-        // duration: 120, ideItem: name:1:5  partIndex: 1, rowInPart: 5, songName: name
+        getWithDataAttrValue(ids.ideAction, 'clear', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => {
+                ideService.currentEdit = {} as any;
+                this.currentIdeItem = {} as any;
+                getWithDataAttr(ids.ideContent, this.page.pageEl)?.forEach((el: HTMLElement) => {
+                    el.innerHTML = null;
+                });
+                this.liner.fillLinesStructure('480');
+                this.printModel(this.liner.rows);
+            });
+        });
 
-        getWithDataAttr('ide-item', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue(ids.ideAction, 'back', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => {
+                this.page.context.$f7router.navigate(`/mbox/${ideService.currentEdit.name}/`);
+            });
+        });
+
+        getWithDataAttrValue(ids.ideAction, 'play', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => {
+                console.log('play', el);
+            });
+        });
+
+        getWithDataAttr(ids.ideItem, this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
                 const item = {
-                    id: el.dataset['ideItem'],
-                    songName: el.dataset['songName'],
-                    duration: parseInteger(el.dataset['duration'], 0),
-                    partIndex: parseInteger(el.dataset['partIndex'], 0),
-                    rowInPart: parseInteger(el.dataset['rowInPart'], 0),
+                    id: el.dataset[ids.ideItem],
+                    songName: el.dataset[ids.songName],
+                    duration: parseInteger(el.dataset[ids.duration], 0),
+                    partIndex: parseInteger(el.dataset[ids.partIndex], 0),
+                    rowInPart: parseInteger(el.dataset[ids.rowInPart], 0),
                 };
                 this.currentIdeItem = item;
 
@@ -308,6 +342,12 @@ export class DrumCtrl {
                 }
 
                 this.printModel(this.liner.rows);
+
+                // выделение
+                getWithDataAttr(ids.ideItem, this.page.pageEl)?.forEach(iEl => {
+                   iEl.style.fontWeight = '400';
+                });
+                el.style.fontWeight = '600';
             });
         });
     }
@@ -941,6 +981,8 @@ export class DrumCtrl {
 
     getIdeContent(): string {
         const currentEdit = ideService.currentEdit;
+        const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+
         if (!currentEdit || !currentEdit.editIndex || !currentEdit.outList || !currentEdit.outBlock || !currentEdit.blocks) {
             return '';
         }
@@ -1004,12 +1046,29 @@ export class DrumCtrl {
         }, '');
 
         return `
-            <div style="padding: .5rem;">
-                ${currentEdit.name + ' - ' + currentEdit.outList[currentEdit.editIndex - 1] + ' - ' + currentEdit.editIndex}
-            </div>
-            <div style="">
+            <div data-ide-content>
+                <span 
+                    style="padding: .5rem;"
+                >${currentEdit.name + ' - ' + currentEdit.outList[currentEdit.editIndex - 1] + ' - ' + currentEdit.editIndex}</span>
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="play"
+                >play</span>
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="stop"
+                >stop</span>
                 ${innerContent}
-            </div>`.trim();
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="back"
+                >back</span>
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="clear"
+                >clear</span>
+            </div>
+        `.trim();
     }
 
     getContent(keyboardId: string): string {
@@ -1033,7 +1092,6 @@ export class DrumCtrl {
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-                ${this.getIdeContent()}
                 ${metronome}
                 ${this.getDrumBoardContent(keyboardId)}
                 ${this.getTopCommandPanel()}
@@ -1044,6 +1102,7 @@ export class DrumCtrl {
                 ></div>
                 
                 ${ideService.currentEdit && ideService.currentEdit.editIndex ? this.getBottomCommandPanel() : ''}
+                ${this.getIdeContent()}                
                 
                 <div style="font-size: 1.5rem;">
                     ${drums}
