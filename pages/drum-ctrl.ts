@@ -5,6 +5,9 @@ import * as un from '../libs/muse/utils/utils-note';
 import { parseInteger } from '../libs/common';
 import { LineModel, Line, NoteItem, KeyData, Cell } from './line-model';
 import { MultiPlayer } from '../libs/muse/multi-player';
+import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
+import ideService from './ide/ide-service';
+import {getOutBlocksInfo} from '../libs/muse/utils/getOutBlocksInfo';
 
 interface Page {
     bpmValue: number;
@@ -196,6 +199,14 @@ export class DrumCtrl {
 
     liner = new LineModel();
 
+    currentIdeItem: {
+        id: string,
+        songName: string,
+        duration: number,
+        partIndex: number,
+        rowInPart: number,
+    }
+
     constructor(public page: Page) {}
 
     selectItemById(id: number | string) {
@@ -221,6 +232,83 @@ export class DrumCtrl {
 
         getWithDataAttrValue('drum-cell-row-nio', rowNio).forEach(el => {
             el.style.border = '2px solid yellow';
+        });
+    }
+
+    subscribeIdeEvents() {
+        getWithDataAttrValue('action-out', 'draft', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                if (!this.currentIdeItem) return;
+
+                console.log('this.currentIdeItem', this.currentIdeItem);
+
+                let songNode: any;
+                if (!localStorage.getItem(this.currentIdeItem.songName)) {
+                    songNode = {};
+                } else {
+                    songNode = JSON.parse(localStorage.getItem(this.currentIdeItem.songName));
+                }
+
+                let itemNode = songNode[this.currentIdeItem.id];
+                if (!itemNode) {
+                    itemNode = {
+                        items: []
+                    };
+                    songNode[this.currentIdeItem.id] = itemNode;
+                }
+
+                let drumsNode = itemNode.items.find(item => item['id'] === this.currentIdeItem.id && item['type'] === 'drums');
+                if (!drumsNode) {
+                    drumsNode = {
+                        id: this.currentIdeItem.id,
+                        type: 'drums',
+                        status: 'draft',
+                        rows: []
+                    };
+                    itemNode.items.push(drumsNode);
+                }
+
+                drumsNode.rows = this.liner.rows;
+
+                localStorage.setItem(this.currentIdeItem.songName, JSON.stringify(songNode));
+            });
+        });
+
+        // duration: 120, ideItem: name:1:5  partIndex: 1, rowInPart: 5, songName: name
+
+        getWithDataAttr('ide-item', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => {
+                const item = {
+                    id: el.dataset['ideItem'],
+                    songName: el.dataset['songName'],
+                    duration: parseInteger(el.dataset['duration'], 0),
+                    partIndex: parseInteger(el.dataset['partIndex'], 0),
+                    rowInPart: parseInteger(el.dataset['rowInPart'], 0),
+                };
+                this.currentIdeItem = item;
+
+                let hasNode = false;
+
+                let songNode: any = localStorage.getItem(this.currentIdeItem.songName);
+                if (songNode) {
+                    songNode = JSON.parse(songNode);
+
+                    if (songNode[this.currentIdeItem.id]) {
+                        let items = songNode[this.currentIdeItem.id]['items'];
+                        let node = items.find(item => item['id'] = this.currentIdeItem.id && item['type'] === 'drums');
+                        if (node) {
+                            hasNode = true;
+                            this.liner.setData(node.rows);
+                        }
+                    }
+                }
+
+                if (!hasNode) {
+                    this.liner.fillLinesStructure(el.dataset['duration']);
+                }
+
+                this.printModel(this.liner.rows);
+            });
         });
     }
 
@@ -286,6 +374,16 @@ export class DrumCtrl {
                     blocks,
                     bpm: this.page.bpmValue,
                 });
+            });
+        });
+
+        getWithDataAttrValue('action-out', 'test', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                // 3*(2*120+1*60)_2*60
+                //this.liner.fillLinesStructure('1*120_1*60_1*120_1*60');
+                this.liner.fillLinesStructure('480');
+                this.printModel(this.liner.rows);
+
             });
         });
 
@@ -366,6 +464,7 @@ export class DrumCtrl {
         const pageEl = page.pageEl;
 
         this.subscribeEditCommands();
+        this.subscribeIdeEvents();
 
         getWithDataAttrValue('action-drum', 'get-bpm-or-stop', pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
@@ -501,6 +600,32 @@ export class DrumCtrl {
         this.bpmInfo = emptyBpmInfo();
     }
 
+    getBottomCommandPanel(): string {
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
+        const rowStyle = `width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
+        let result = '';
+
+        result = `
+            <div style="${rowStyle}">
+                <span 
+                    style="${style}"
+                    data-action-out="ready"
+                >ready</span>
+                <span
+                    style="${style}"
+                    data-action-out="draft"
+                >draft</span>
+                <span
+                    style="${style}"
+                    data-action-out="clear"
+                >clear</span>
+            </div>            
+        `.trim();
+
+        return result;
+    }
+
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
@@ -582,7 +707,8 @@ export class DrumCtrl {
                 >&nbsp;&gt;&nbsp;</span>
                 <span
                     style="${style}"
-                >&nbsp;&nbsp;&nbsp;</span>                
+                    data-action-out="test"
+                >tst</span>                
                 <span
                     style="${style}"
                     data-action-out="delete"
@@ -812,6 +938,80 @@ export class DrumCtrl {
         return content;
     }
 
+
+    getIdeContent(): string {
+        const currentEdit = ideService.currentEdit;
+        if (!currentEdit || !currentEdit.editIndex || !currentEdit.outList || !currentEdit.outBlock || !currentEdit.blocks) {
+            return '';
+        }
+
+        //console.log('currentEdit', currentEdit);
+
+        const outBlock = un.createOutBlock({
+            id: 'out',
+            bpm: this.page.bpmValue,
+            rows: [`> ${currentEdit.outList[currentEdit.editIndex - 1]}`],
+            volume: 50,
+            type: 'text'
+        });
+        console.log('outBlock', outBlock);
+
+        const midiConfig = {
+            blocks: currentEdit.blocks,
+            excludeIndex: [],
+            currRowInfo: {first: 0, last: 0},
+            currBlock: outBlock,
+            midiBlockOut: null as any,
+            playBlockOut: null as any,
+            topBlocksOut: [],
+        };
+
+        getMidiConfig(midiConfig);
+        // console.log('midiConfig', midiConfig);
+
+        const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
+        console.log('outBlocksInfo', outBlocksInfo);
+
+        // const loopsInfo = this.page.multiPlayer.getLoopsInfo({
+        //     blocks: currentEdit.blocks,
+        //     playBlock: midiConfig.playBlockOut,
+        // });
+        // console.log('loopsInfo', loopsInfo);
+
+        const innerContent = outBlocksInfo.rows.reduce((acc, row, i) => {
+            if (i === 0) {
+                return acc;
+            }
+
+            const rowCount = Math.ceil(row.rowDurationByHeadQ / un.NUM_120);
+            let cellCount = 0;
+            if (row.rowDurationByHeadQ % un.NUM_120) {
+                cellCount = Math.floor((row.rowDurationByHeadQ % un.NUM_120) / 10);
+            }
+
+            const name = `${currentEdit.name}:${currentEdit.editIndex}:${i}`
+
+            acc = acc + `<span
+                style="padding: .5rem; display: inline-block;"
+                data-ide-item="${name}"
+                data-duration="${row.rowDurationByHeadQ}"
+                data-row-in-part="${i}"
+                data-part-index="${currentEdit.editIndex}"
+                data-song-name="${currentEdit.name}"
+            >${i}:${rowCount + (cellCount ? ':' + cellCount : '')}</span>`;
+
+            return acc
+        }, '');
+
+        return `
+            <div style="padding: .5rem;">
+                ${currentEdit.name + ' - ' + currentEdit.outList[currentEdit.editIndex - 1] + ' - ' + currentEdit.editIndex}
+            </div>
+            <div style="">
+                ${innerContent}
+            </div>`.trim();
+    }
+
     getContent(keyboardId: string): string {
         let metronome = `
             <div style="padding: 1rem .5rem 1rem .5rem;">
@@ -833,6 +1033,7 @@ export class DrumCtrl {
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
+                ${this.getIdeContent()}
                 ${metronome}
                 ${this.getDrumBoardContent(keyboardId)}
                 ${this.getTopCommandPanel()}
@@ -841,7 +1042,9 @@ export class DrumCtrl {
                     data-name="drum-record-out"
                     style="width: 90%; padding-left: 2%;"
                 ></div>
-
+                
+                ${ideService.currentEdit && ideService.currentEdit.editIndex ? this.getBottomCommandPanel() : ''}
+                
                 <div style="font-size: 1.5rem;">
                     ${drums}
                 </div>

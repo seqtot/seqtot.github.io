@@ -617,6 +617,42 @@ export function startWithChar(char: string, val: string) {
     return regExp.test(val);
 }
 
+export function createOutBlock({bpm, volume, currBlock, rows, id, type}: {
+    id?: string,
+    bpm?: number,
+    volume?: number,
+    currBlock?: TextBlock,
+    rows: string[],
+    type?: BlockType,
+}): TextBlock {
+    currBlock = currBlock || <TextBlock>{};
+    id = id || 'out';
+    bpm = bpm || currBlock.bpm || DEFAULT_BPM;
+    type = type || 'set';
+
+
+    volume = getSafeVolume(volume, 0) || getSafeVolume(currBlock.volume);
+
+    const head = `out b${bpm} v${volume}`;
+
+    return <TextBlock>{
+        id,
+        head,
+        bpm,
+        volume,
+        repeat: 1,
+        startRow: 0,
+        endRow: rows.length,
+        type,
+        nio: 0,
+        rows: [
+            `<${head} >`,
+            ...rows,
+        ],
+    };
+}
+
+
 // arduino гармошка
 // https://www.youtube.com/watch?v=aVjl3yQguc4
 

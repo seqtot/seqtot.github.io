@@ -381,7 +381,8 @@ export class MultiPlayer {
         const outBlocks = un.getOutBlocksInfo(allBlocks, <any>playBlock);
         const repeat = x.repeat || un.getRepeatFromString(outBlock.head);
 
-        //console.log('getLoopsInfo.outBlocks', outBlocks);
+        //console.log('getLoopsInfo.outBlock', outBlock);
+        console.log('getLoopsInfo.outBlocks', outBlocks);
 
         let startRowBeatIndex = 0;
         let bpm = x.bpm || un.getBpmFromString(outBlock.head, 0);
@@ -409,7 +410,7 @@ export class MultiPlayer {
             });
         });
 
-        console.log('outBlocks', outBlocks);
+        //console.log('outBlocks', outBlocks);
 
         const rowLoops = outBlocks.rows.map((rowLoop) => {
             const result: {
@@ -475,7 +476,12 @@ export class MultiPlayer {
             return result;
         });
 
-        const result = {repeat, rowLoops, durationInFullQ, durationInFullQMs};
+        const result = {
+            repeat,
+            rowLoops,
+            durationInFullQ,
+            durationInFullQMs
+        };
 
         //console.log('getLoopsInfo', result);
 

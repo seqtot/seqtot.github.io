@@ -36,6 +36,7 @@ export type Line = {
     startOffsetQ: number,
     cellSizeQ: number,
     cells: Cell[],
+    endLine?: boolean,
 }
 
 export class LineModel {
@@ -502,4 +503,77 @@ export class LineModel {
             return row;
         });
     }
+
+    fillLinesStructure(pVal: string | number) {
+        this.rows = [];
+        let startOffsetQ = 0;
+
+        if (un.parseInteger(pVal, 0)) {
+            const durQ = un.parseInteger(pVal);
+            const fullLineCount = Math.floor(durQ / un.NUM_120);
+            const endLineDurQ = durQ % un.NUM_120;
+
+            for (let i = 0; i < fullLineCount; i++) {
+                this.rows.push({
+                    durQ: 120,
+                    cells: [],
+                    startOffsetQ,
+                    cellSizeQ: 10,
+                });
+                startOffsetQ = startOffsetQ + 120;
+            }
+
+            if (endLineDurQ) {
+                this.rows.push({
+                    durQ: endLineDurQ,
+                    cells: [],
+                    startOffsetQ,
+                    cellSizeQ: 10,
+                });
+            }
+
+            return;
+        }
+
+        pVal = ('' + pVal).trim();
+        // let arr = val.trim().split('\n');
+        // arr = arr.filter(item => !!item)
+        //     .map(item => item.trim())
+        //     .filter(item => item && !item.startsWith('#') && item.includes('['));
+
+
+
+        let topArr = pVal.split('_');
+        topArr.forEach(row => {
+            const arr = row.split('*');
+            const durQ = un.parseInteger(arr[arr.length-1], 0);
+            let blockCount = 1;
+            let rowInBlock = 1;
+
+            if (arr.length === 3 ) {
+                blockCount = un.parseInteger(arr[0], 0);
+                rowInBlock = un.parseInteger(arr[1], 0);
+            }
+            else if (arr.length === 2) {
+                rowInBlock = un.parseInteger(arr[0], 0);
+            }
+
+            for (let i = 0; i < blockCount; i++) {
+                for (let j = 0; j < rowInBlock; j++) {
+                    this.rows.push({
+                        durQ: durQ,
+                        cells: [],
+                        startOffsetQ,
+                        cellSizeQ: 10,
+                        endLine: j === rowInBlock -1,
+                    });
+
+                    startOffsetQ = startOffsetQ + durQ;
+                }
+            }
+
+        });
+    }
+
+
 }

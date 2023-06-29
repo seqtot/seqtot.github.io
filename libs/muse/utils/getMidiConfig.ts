@@ -1,7 +1,6 @@
 'use babel';
 
 import * as un from './index';
-import {clearEndComment} from './index';
 
 export type RowInfo = {
     first: number,
@@ -12,7 +11,7 @@ export function isRefLine(val: string): boolean {
     return /^\s*>/.test(val)
 }
 
-function getNearestCharIndex(char: string, from: number, arr: string[]) {
+export function getNearestCharIndex(char: string, from: number, arr: string[]) {
     const regExp = new RegExp(`^\\s*${char}`);
 
     // ищем вверх
@@ -32,60 +31,28 @@ function getNearestCharIndex(char: string, from: number, arr: string[]) {
     return -1;
 }
 
-function createOutBlock({bpm, volume, currBlock, rows, id}: {
-    id?: string,
-    bpm?: number,
-    volume?: number,
-    currBlock?: un.TextBlock,
-    rows: string[],
-}): un.TextBlock {
-    currBlock = currBlock || <un.TextBlock>{};
-    id = id || 'out';
-    bpm = bpm || currBlock.bpm || un.DEFAULT_BPM;
-
-    volume = un.getSafeVolume(volume, 0) || un.getSafeVolume(currBlock.volume);
-
-    const head = `out b${bpm} v${volume}`;
-
-    return <un.TextBlock>{
-        id,
-        head,
-        bpm,
-        volume,
-        repeat: 1,
-        startRow: 0,
-        endRow: rows.length,
-        type: 'set',
-        nio: 0,
-        rows: [
-            `<${head} >`,
-            ...rows,
-        ],
-    };
-}
-
 export function getMidiConfig(x: {
     blocks: un.TextBlock[],
-        midiBlock: un.TextBlock,
-        currBlock: un.TextBlock,
-        playBlock: string | un.TextBlock,
-        currRowInfo: RowInfo,
-        topBlocks: string[],
-        excludeIndex?: number[],
+    currBlock: un.TextBlock,
+    currRowInfo: RowInfo,
+    excludeIndex?: number[],
+    playBlockOut: string | un.TextBlock,
+    midiBlockOut: un.TextBlock,
+    topBlocksOut: string[],
 }) {
     const excludeIndex = Array.isArray(x.excludeIndex) ? x.excludeIndex: [];
 
     if (x.currBlock.type === 'set') {
-        x.midiBlock = x.currBlock;
-        x.playBlock = x.midiBlock.id;
+        x.midiBlockOut = x.currBlock;
+        x.playBlockOut = x.midiBlockOut.id;
     }
     else if (x.currBlock.type === 'tones' || x.currBlock.type === 'drums') {
         //console.log('currBlock', x.currBlock);
         const repeat = x.currBlock.repeat || 1;
-        x.midiBlock = x.currBlock;
-        x.playBlock = createOutBlock({
+        x.midiBlockOut = x.currBlock;
+        x.playBlockOut = un.createOutBlock({
             currBlock: x.currBlock,
-            rows: [`${x.midiBlock.id}-${repeat}`],
+            rows: [`${x.midiBlockOut.id}-${repeat}`],
         });
     }
     else {
@@ -108,10 +75,10 @@ export function getMidiConfig(x: {
 
             if (rows.length) {
                 rows.unshift('tick');
-                x.topBlocks = rows;
+                x.topBlocksOut = rows;
                 rows = un.buildOutBlock(x.blocks, rows);
-                x.midiBlock = createOutBlock({currBlock: x.currBlock, rows});
-                x.playBlock = x.midiBlock;
+                x.midiBlockOut = un.createOutBlock({currBlock: x.currBlock, rows});
+                x.playBlockOut = x.midiBlockOut;
             }
         }
     }
@@ -121,7 +88,7 @@ export function getTopOutList(currBlock: un.TextBlock): string[] {
     let result: string[] = [];
 
     currBlock.rows.forEach(row => {
-        row = clearEndComment(row).trim();
+        row = un.clearEndComment(row).trim();
 
         if (!isRefLine(row)) {
             return;

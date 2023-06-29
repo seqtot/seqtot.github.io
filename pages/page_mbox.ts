@@ -15,6 +15,7 @@ import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSettings';
 import { isPresent, parseInteger, TextBlock } from '../libs/muse/utils/utils-note';
 import mboxes from '../mboxes';
+import ideService from './ide/ide-service';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -63,6 +64,10 @@ export class MBoxPage {
 
     get outBlock(): TextBlock {
         return  this.blocks.find((item) => item.id === 'out');
+    }
+
+    get outList(): string[] {
+        return  getTopOutList(this.outBlock);
     }
 
     getId(id: string): string {
@@ -185,10 +190,7 @@ export class MBoxPage {
     }
 
     getTracksContent(): string {
-        let outBlock = this.blocks.find((item) => item.id === 'out');
-        let itemsNew = getTopOutList(outBlock);
-
-        //console.log('itemsNew', itemsNew);
+        let outList = this.outList;
 
         let stopAndPlayActions = `
             <div style="margin: .5rem 1rem;">
@@ -196,18 +198,18 @@ export class MBoxPage {
                 <a data-action-type="play-all"><b>play</b></a>&emsp;                
             </div>`.trim();
 
-        // if (!this.pageData?.tracks?.length) {
-        //     return '';
-        // }
-
-        let tracks = itemsNew.reduce((acc, item, i) => {
+        let tracks = outList.reduce((acc, item, i) => {
             acc = acc + `
                 <div class="row">
                     <span
-                        style="margin-left: 1rem; font-weight: 700;"
+                        style="margin-left: 1rem; font-weight: 700; user-select: none;"
                         data-track-item-index="${i+1}"
                         data-track-item="${item}"                        
                     >${item}</span>
+                    <span
+                        style="margin-right: 1rem; user-select: none;"
+                        data-track-item-edit="${i+1}"                                           
+                    >edit</span>                    
                 </div>
             `.trim();
 
@@ -287,6 +289,24 @@ export class MBoxPage {
                     this.excludeIndex.push(index);
                     el.style.fontWeight = '400';
                 }
+            });
+        });
+
+        getWithDataAttr('track-item-edit', this.pageEl)?.forEach((el) => {
+            el.addEventListener('click', (evt: MouseEvent) => {
+                let index = parseInteger(el.dataset.trackItemEdit, null);
+
+                if (!isPresent(index)) {
+                    return;
+                }
+
+                ideService.currentEdit.name = this.pageId;
+                ideService.currentEdit.outList = this.outList;
+                ideService.currentEdit.blocks = this.blocks;
+                ideService.currentEdit.outBlock = this.outBlock;
+                ideService.currentEdit.editIndex = index;
+
+                this.context.$f7router.navigate('/page/page_keyboard/');
             });
         });
 
@@ -427,25 +447,25 @@ export class MBoxPage {
 
         const x = {
             blocks: this.blocks,
-            midiBlock: null as un.TextBlock,
-            playBlock: '' as string | un.TextBlock,
             currBlock: null as un.TextBlock,
             currRowInfo: currRowInfo,
-            topBlocks: [],
             excludeIndex: this.excludeIndex,
+            midiBlockOut: null as un.TextBlock,
+            playBlockOut: '' as string | un.TextBlock,
+            topBlocksOut: [],
         };
 
         x.currBlock = x.blocks.find((item) => item.id === 'out');
         getMidiConfig(x);
 
-        //console.log('X', x);
+        //console.log('getMidiConfig', x);
 
-        if (x.playBlock) {
+        if (x.playBlockOut) {
             //this.playingWithMidi = true;
             //console.log('midiBlock', midiBlock);
             multiPlayer.tryPlayMidiBlock({
                 blocks: x.blocks,
-                playBlock: x.playBlock,
+                playBlock: x.playBlockOut,
                 cb: (type: string, data: any) => {
                     if (type === 'break' || type === 'finish') {
                         // this.playingWithMidi = false;

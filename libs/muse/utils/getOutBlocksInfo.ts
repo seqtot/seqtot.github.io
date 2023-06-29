@@ -33,6 +33,8 @@ type OutBlocksInfo = {
         rowDurationByHeadQ: number;
         rowRepeat: number;
         bpm?: number,
+        mask?: string | number,
+        text?: string,
     }[],
     durationQ: number,
 }
@@ -111,6 +113,7 @@ export function getOutBlocksInfo(
     const rootVolume = getSafeVolume(outBlock.volume);
 
     // строки для вывода в out
+    //console.log('outBlocks2', [...outBlock.rows]);
     const textRows = outBlock.rows
         .map((item) => clearEndComment(item)) // jjkl
         .map((item) => item.trim())
@@ -132,10 +135,28 @@ export function getOutBlocksInfo(
 
     // цикл по строкам out - это не ссылки на другие блоки
     textRows.forEach((row, iRow) => {
+        let mask = '';
+        // const colArr = (row || '')
+        //     .split(' ')
+        //     .map((item) => item.trim())
+        //     .filter((item) => !!item);
+
         const colArr = (row || '')
             .split(' ')
-            .map((item) => item.trim())
-            .filter((item) => !!item);
+            .filter(item => !!item)
+            .reduce((acc, item) => {
+                if (item.startsWith('[')) {
+                    mask = item.replace(/[\[\]]/g, '');
+
+                    return acc;
+                }
+
+                acc.push(item);
+
+                return acc;
+            }, []);
+
+        //console.log('colArr', colArr);
 
         let headLoopRepeat = 1;
         let headLoopDurationQ = 0;
@@ -158,7 +179,6 @@ export function getOutBlocksInfo(
             let colLoopDurationQ = 0;
 
             colRepeat = parseInteger(colInfoArr[1], 0) || getRepeatFromString(colInfoStr, headLoopRepeat);
-
             block = findBlockById(blocks, colId);
 
             if (!block) {
@@ -223,6 +243,8 @@ export function getOutBlocksInfo(
             headLoopDurationQ,
             rowDurationByHeadQ,
             rowRepeat,
+            mask: mask || rowDurationByHeadQ,
+            text: row
         });
     });
 

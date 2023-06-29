@@ -541,12 +541,12 @@ export class LinePlayer {
     getCurrBlockInfo(evt: KeyboardEvent) {
         const x = {
             blocks: this.blocks,
-            midiBlock: null as un.TextBlock,
-            playBlock: '' as string | un.TextBlock,
             currBlock: null as un.TextBlock,
             currRowInfo: this.currRowInfo,
-            topBlocks: [],
             excludeIndex: [],
+            midiBlockOut: null as un.TextBlock,
+            playBlockOut: '' as string | un.TextBlock,
+            topBlocksOut: [],
         };
 
         const rowInd = getCurrRowCm(this.textInput);
@@ -565,12 +565,12 @@ export class LinePlayer {
         }
 
         const playingWithMidi = this.playingWithMidi;
-        if (x.playBlock) {
+        if (x.playBlockOut) {
             this.playingWithMidi = true;
             //console.log('midiBlock', midiBlock);
             this.multiPlayer.tryPlayMidiBlock({
                 blocks: x.blocks,
-                playBlock: x.playBlock,
+                playBlock: x.playBlockOut,
                 cb: (type: string, data: any) => {
                     if (type === 'break' || type === 'finish') {
                         this.playingWithMidi = false;
@@ -584,7 +584,7 @@ export class LinePlayer {
             });
         }
 
-        if (x.currBlock && x.currBlock !== x.midiBlock) {
+        if (x.currBlock && x.currBlock !== x.midiBlockOut) {
             this.getNextLinesForHandlePlay(false, !playingWithMidi);
             this.syncCurrentLine();
         }

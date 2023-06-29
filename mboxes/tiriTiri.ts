@@ -15,9 +15,36 @@ _ $back: v5; $mark: v0;
 > СОЛО2  # b#A  B#CDE  D#CD#F  B#CDE  D#F#B
 > ТЕМА   # -
 > КОДА   # a#ab
+
 # ---------------------------------------------------------
-<КОДА b84 set>
-лыКыБы
+# a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C 
+<ТЕМА b84 set>
+лыКы      [2*120]         #  А#A
+setBDAB   [3*3*120_1*120] #  BDAB
+выЛы      [2*120]         #  #FA    
+setBDAB   [3*3*120_1*120] #  BDAB   
+руМу      [2*120]         #  DE     
+box1_2    [3*3*120_1*120] #  D#FAB  
+выЛы      [2*120]         #  #FA   
+setBDAB   [3*3*120_1*120] #  BDAB   
+руМу      [2*120]         #  de     
+box1_3    [4*3*120]       #  #F#ABG 
+box1_4    [3*3*120_1*120] #  #FED#C
+
+# ---------------------------------------------------------
+# a#a BDAB #fa BDAB de D#FAB BDAB de #F#ABG #FED#C
+<СОЛО1 b84 set>
+лыКы              #  a#a
+solo1_1RS solo1_1 #  BDAB
+выЛы              #  #fa
+solo1_1RS solo1_2 #  BDAB
+руМу              #  de
+solo1_2RS solo1_3 #  D#FAB
+solo1_1RS solo1_4 #  BDAB
+руМу              #  de
+solo1_3RS solo1_5 #  #F#ABG
+solo1_4RS solo1_6 #  #FED#C
+
 # ---------------------------------------------------------
 # b#A  B#CDE  D#CD#F  B#CDE  D#F#B
 <СОЛО2 b84 set>
@@ -26,6 +53,12 @@ solo2_1RS solo2_1  # B#CDE
 solo2_2RS solo2_2  # D#CD#F
 solo2_1RS solo2_3  # B#CDE
 solo2_3RS solo2_4  # D#F#B
+
+# ---------------------------------------------------------
+<КОДА b84 set>
+лыКыБы
+
+# ---------------------------------------------------------
 
 <solo2_4 b84 $> #720
 $solo: 0   ва=60 ве=30 ме=30 ре=30 ба=30 $organ*r
@@ -52,7 +85,6 @@ $solo: 180 60    ма=120_30_1=15_-1=15_-2=30_-3=30 $organ*r
 $solo: 360 60    ра=30 ма=30 ва=30 ра=30 $organ*r
 $solo: 540 0     ма=60 ва=60 ма=60 $organ*r
 
-
 <testSlide b60 $> #720
 $solo: ма=120 ма=120 ма=240_120_2=120 $organ*r
 #$solo: ма=120_30_1=15_-1=15_-2=30_-3=30 $organ*r
@@ -77,18 +109,6 @@ $back: бу=180 то=180 ро=180 мо=180 $flute
 $mark:  да=60 300  да=60 $xylo
 
 # ---------------------------------------------------------
-# a#a BDAB #fa BDAB de D#FAB BDAB de #F#ABG #FED#C
-<СОЛО1 b84 set>
-лыКы              #  a#a
-solo1_1RS solo1_1 #  BDAB
-выЛы              #  #fa
-solo1_1RS solo1_2 #  BDAB
-руМу              #  de
-solo1_2RS solo1_3 #  D#FAB
-solo1_1RS solo1_4 #  BDAB
-руМу              #  de
-solo1_3RS solo1_5 #  #F#ABG
-solo1_4RS solo1_6 #  #FED#C
 
 <solo1_1 b84 $>
 $solo: 0   60    бо=30 та=30 ра=30 ма=30       $organ*r
@@ -148,19 +168,6 @@ $back: ва=180 ма=180 ра=180 та=60 $flute
 $mark: да=60 300  да=60 $xylo
 
 #---------------------------------------------------------
-# a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C 
-<ТЕМА b84 set>
-лыКы   #  А#A
-box1_1 #  BDAB
-выЛы   #  #FA
-box1_1 #  BDAB
-руМу   #  DE
-box1_2 #  D#FAB
-выЛы   #  #FA
-box1_1 #  BDAB
-руМу   #  de
-box1_3 #  #F#ABG
-box1_4 #  #FED#C
 
 <box1_4 b80 $>
 # #FED#C
@@ -211,7 +218,7 @@ $back: 540 бо=60 $flute
 $mark: 0   да=60 300  да=60 $xylo
 #     600 5Q
 
-<box1_1 b84 $>
+<setBDAB b84 $>
 # BDAB 
 $bass: 0   БЫ=180 $cBass*s
 $back: 0   ра=180 $flute
@@ -239,7 +246,6 @@ $back: ло=60 та=60 $flute
 <лыКыБы b80 $>
 $bass: лы=60 кы=60 бы=360 $cBass*s
 $back: ло=60 та=60 бо=360 $flute
-
 
 <выЛы b80 $>
 $bass: вы=60 лы=60 $cBass*s

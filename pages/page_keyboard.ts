@@ -15,6 +15,7 @@ import { getNoteByOffset, parseInteger } from '../libs/muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
 import {DrumCtrl} from './drum-ctrl';
 import {Ticker} from '../libs/muse/ticker';
+import ideService from './ide/ide-service';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -95,6 +96,7 @@ export class KeyboardPage {
     }
 
     onMounted() {
+        //console.log(ideService.currentEdit);
         this.setRightPanelContent();
         this.setPageContent();
         setTimeout(() => {
@@ -196,6 +198,7 @@ export class KeyboardPage {
 
         this.view = 'drums';
         this.el$.html(this.drumCtrl.getContent('drums'));
+
         this.bpmRange = (this.context.$f7 as any).range.create({
             el: dyName('slider', this.pageEl),
             on: {
