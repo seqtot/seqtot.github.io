@@ -48,6 +48,7 @@ const someDrum = {
     char: '?',
 }
 
+// black deeppink sienna
 const drumNotesInfo = {
     bd: {
         note: 'bd',
@@ -190,9 +191,10 @@ type EditedItem = {
 
 type PrintCell = {
     id: number,
-    color: string,
-    text: string,
+    bgColor: string,
+    char: string,
     startOffsetQ: number,
+    underline: boolean,
 }
 
 const emptyBpmInfo = (): BpmInfo => {
@@ -1293,16 +1295,72 @@ export class DrumCtrl {
         const getMask = (count: number): PrintCell[] => {
             const arr = Array(count).fill(null);
             return arr.map(() => ({
-                color: 'whitesmoke',
+                bgColor: 'whitesmoke',
                 id: 0,
-                text: '',
+                char: '',
                 startOffsetQ: 0,
+                underline: false,
             }));
         }
 
         let totalOut = '';
         let height = 1.26;
         let padding = .07;
+
+        const getTextAndColor = (arr: NoteItem[]): PrintCell => {
+            const result: PrintCell = {
+                id: 0,
+                char: '',
+                //color: 'white',
+                bgColor: 'lightgray',
+                underline: false,
+                startOffsetQ: 0,
+            }
+
+            const map = {
+                bd: 0,
+                sn: 0,
+                hc: 0
+            }
+
+            arr = arr.filter(item => {
+                if (item.note === 'bd' || item.note === 'sn' || item.note === 'hc') {
+                    map[item.note] = item.id;
+
+                    return false;
+                }
+
+                return true;
+            });
+
+            if (arr.length) {
+                result.char = arr[0].char || '?';
+                result.id = arr[0].id || 0;
+            }
+            else {
+                result.char = map.hc ? '_' : '';
+                result.id = map.hc ? map.hc : 0;
+            }
+
+            if (map.bd && map.sn) {
+                result.id = map.bd;
+                result.bgColor = 'black';
+            } else if (map.bd) {
+                result.id = map.bd;
+                result.bgColor = 'sienna';
+            } else if (map.sn) {
+                result.id = map.sn;
+                result.bgColor = 'deeppink';
+            } else if (arr.length) {
+                result.bgColor = 'darkgray';
+            }
+
+            if (map.hc) {
+                result.underline = true;
+            }
+
+            return result;
+        }
 
         rows.forEach((row, iRow) => {
             const offsets = this.liner.getOffsetsByRow(row);
@@ -1331,26 +1389,14 @@ export class DrumCtrl {
             for (let offset of offsets) {
                 const iCell = (offset - row.startOffsetQ) / cellSizeQ;
                 const notes = this.liner.getNotesListByOffset(row, offset);
-                let mainNote = notes.find(item => item.note === 'bd') || notes.find(item => item.note === 'sn');
-                let text = '';
-
-                if (mainNote) {
-                    text = mainNote.char;
-                    if (notes.find(item => item.note === 'hc')) {
-                        text = mainNote.note === 'bd' ? 'Q' : 'A';
-                    }
-                }
-                else {
-                    mainNote = notes[0];
-                    text = mainNote.char;
-                }
 
                 const col = cols[iCell];
+                const textAndColor = getTextAndColor(notes);
 
-                col.id = mainNote.id;
-                col.color = mainNote.headColor;
-                col.text = text;
-                //col.startOffsetQ = mainNote.startOffsetQ; ???
+                col.id = textAndColor.id;
+                col.bgColor = textAndColor.bgColor;
+                col.char = textAndColor.char;
+                col.underline = textAndColor.underline;
             }
 
             cols.forEach((col, iCol) => {
@@ -1369,7 +1415,7 @@ export class DrumCtrl {
                             position: absolute;
                             width: ${height}${rem};
                             height: ${height}${rem};
-                            background-color: ${col.color};
+                            background-color: ${col.bgColor};
                             user-select: none;
                             touch-action: none;
                             text-align: center;
@@ -1380,6 +1426,9 @@ export class DrumCtrl {
 
             cols.forEach((cell, iCell) => {
                 if (!cell.id) return;
+
+                const textDecoration = cell.underline ? 'underline' : 'none';
+                const rem = 'rem';
 
                 totalOut = totalOut +
                     `<span
@@ -1395,15 +1444,16 @@ export class DrumCtrl {
                             position: absolute;
                             width: ${height}${rem};
                             height: ${height}${rem};
-                            background-color: ${cell.color};
+                            background-color: ${cell.bgColor};
                             user-select: none;
                             touch-action: none;
                             text-align: center;
                             font-weight: 700;
                             z-index: 0;
-                            left: ${iCell * height}rem;
+                            text-decoration: ${textDecoration};
+                            left: ${iCell * height}${rem};
                         "
-                    >${cell.text}</span>`.trim();
+                    >${cell.char}</span>`.trim();
             });
 
             totalOut = totalOut + '</div>';
