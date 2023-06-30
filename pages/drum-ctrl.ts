@@ -27,6 +27,7 @@ interface Page {
     pageEl: HTMLElement;
     getMetronomeContent(): string;
     stopTicker();
+    stop();
     //getOut(bpm: number, seq: DrumCtrl['keySequence'] );
     synthesizer: Synthesizer;
     multiPlayer: MultiPlayer;
@@ -177,7 +178,22 @@ type BpmInfo = {
     lastDownTime: number;
     pressCount: number;
     totalMs: number;
-};
+}
+
+type EditedItem = {
+    id: string,
+    songName: string,
+    duration: number,
+    partIndex: number,
+    rowInPart: number,
+}
+
+type PrintCell = {
+    id: number,
+    color: string,
+    text: string,
+    startOffsetQ: number,
+}
 
 const emptyBpmInfo = (): BpmInfo => {
     //console.log('getEmptyBpm');
@@ -192,13 +208,6 @@ const emptyBpmInfo = (): BpmInfo => {
 const DOWN = 1;
 const UP = 0;
 
-type PrintCell = {
-    id: number,
-    color: string,
-    text: string,
-    startOffsetQ: number,
-}
-
 export class DrumCtrl {
     bpmInfo: BpmInfo = emptyBpmInfo();
     mode: 'record' | null = null;
@@ -210,73 +219,83 @@ export class DrumCtrl {
     activeCellNio = 0;
     activeCellRow = 0;
     activeCellRowNio = '';
-
     liner = new LineModel();
-
-    currentIdeItem: {
-        id: string,
-        songName: string,
-        duration: number,
-        partIndex: number,
-        rowInPart: number,
-    }
+    editedItems: EditedItem[] = [];
 
     constructor(public page: Page) {}
 
-    selectItemById(id: number | string) {
+    highlightCellById(id: number | string) {
         id = parseInteger(id, 0);
 
         getWithDataAttr('drum-cell-id', this.page.pageEl).forEach(el => {
-            el.style.border = '1px solid white';
+            el.style.outline = null;
+            el.style.zIndex = '0';
+            el.dataset['selected'] = '';
         });
 
         if (id) {
             getWithDataAttrValue('drum-cell-id', id).forEach(el => {
-                el.style.border = '2px solid yellow';
+                el.style.outline = '3px solid yellow';
+                el.style.zIndex = '1';
+                el.dataset['selected'] = 'true';
             });
         }
     }
 
-    selectItemByRowNio(rowNio?: string) {
+    highlightCellByRowNio(rowNio: string, highlight: boolean = true) {
         rowNio = rowNio || this.activeCellRowNio;
 
         getWithDataAttr('drum-cell-row-nio', this.page.pageEl).forEach(el => {
-            el.style.border = '1px solid white';
+            el.style.outline = null;
+            el.style.zIndex = '0';
+            el.dataset['selected'] = '';
         });
 
-        getWithDataAttrValue('drum-cell-row-nio', rowNio).forEach(el => {
-            el.style.border = '2px solid yellow';
-        });
+        if (highlight) {
+            getWithDataAttrValue('drum-cell-row-nio', rowNio).forEach(el => {
+                el.style.outline = '3px solid yellow';
+                el.style.zIndex = '1';
+                el.dataset['selected'] = 'true';
+            });
+        }
     }
 
-    get hasCurrentItem(): boolean {
-        return !!this.currentIdeItem;
+    get hasEditedItems(): boolean {
+        return !!this.editedItems.length;
     }
+
+    get hasIdeItem(): boolean {
+        const item = ideService.currentEdit;
+
+        return !!item && !!item.editIndex && !!item.outList &&  !!item.outBlock && !!item.blocks;
+    }
+
 
     subscribeIdeEvents() {
-        getWithDataAttrValue('action-out', 'draft', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue(ids.ideAction, 'draft', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                if (!this.hasCurrentItem) return;
+                if (!this.hasEditedItems) return;
+                const editedItem = this.editedItems[0];
 
                 let songNode: any;
-                if (!localStorage.getItem(this.currentIdeItem.songName)) {
+                if (!localStorage.getItem(editedItem.songName)) {
                     songNode = {};
                 } else {
-                    songNode = JSON.parse(localStorage.getItem(this.currentIdeItem.songName));
+                    songNode = JSON.parse(localStorage.getItem(editedItem.songName));
                 }
 
-                let itemNode = songNode[this.currentIdeItem.id];
+                let itemNode = songNode[editedItem.id];
                 if (!itemNode) {
                     itemNode = {
                         items: []
                     };
-                    songNode[this.currentIdeItem.id] = itemNode;
+                    songNode[editedItem.id] = itemNode;
                 }
 
-                let drumsNode = itemNode.items.find(item => item['id'] === this.currentIdeItem.id && item['type'] === 'drums');
+                let drumsNode = itemNode.items.find(item => item['id'] === editedItem.id && item['type'] === 'drums');
                 if (!drumsNode) {
                     drumsNode = {
-                        id: this.currentIdeItem.id,
+                        id: editedItem.id,
                         type: 'drums',
                         status: 'draft',
                         rows: []
@@ -284,16 +303,21 @@ export class DrumCtrl {
                     itemNode.items.push(drumsNode);
                 }
 
+                this.liner.rows.forEach(row => {
+                    row.name = editedItem.id;
+                    row.blockOffsetQ = 0;
+                })
+
                 drumsNode.rows = this.liner.rows;
 
-                localStorage.setItem(this.currentIdeItem.songName, JSON.stringify(songNode));
+                localStorage.setItem(editedItem.songName, JSON.stringify(songNode));
             });
         });
 
         getWithDataAttrValue(ids.ideAction, 'clear', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
                 ideService.currentEdit = {} as any;
-                this.currentIdeItem = null as any;
+                this.editedItems = [];
                 getWithDataAttr(ids.ideContent, this.page.pageEl)?.forEach((el: HTMLElement) => {
                     el.innerHTML = null;
                 });
@@ -313,11 +337,11 @@ export class DrumCtrl {
 
         getWithDataAttrValue(ids.ideAction, 'play', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
-                if (!this.hasCurrentItem) return;
+                if (!this.hasEditedItems) return;
 
                 const midiConfig = this.getMidiConfig();
                 const playBlock = midiConfig.playBlockOut as TextBlock;
-                const playRow = playBlock.rows[this.currentIdeItem.rowInPart + 1];
+                const playRow = playBlock.rows[this.editedItems[0].rowInPart + 1];
 
                 const newOutBlock = createOutBlock({
                     id: 'out',
@@ -326,18 +350,49 @@ export class DrumCtrl {
                     bpm: this.page.bpmValue
                 });
 
+                this.page.stop();
                 this.page.multiPlayer.tryPlayMidiBlock({
                     blocks: midiConfig.blocks,
                     playBlock: newOutBlock,
                     bpm: this.page.bpmValue,
                     repeatCount: 1,
+                    metaByLines: ideService.currentEdit.metaByLines,
+                });
+            });
+        });
+
+        getWithDataAttrValue(ids.ideAction, 'play-both', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => {
+                if (!this.hasEditedItems) return;
+
+                const notes = this.liner.getDrumNotes(ideService.guid.toString());
+
+                const midiConfig = this.getMidiConfig();
+                let blocks = midiConfig.blocks;
+                let playBlock = midiConfig.playBlockOut as TextBlock;
+                let playRow = un.clearEndComment(playBlock.rows[this.editedItems[0].rowInPart + 1]);
+
+                if (notes) {
+                    const block = un.getTextBlocks(notes)[0];
+                    playRow = playRow + ' ' + block.id;
+                    blocks = [...blocks, block];
+                }
+
+                playBlock = createOutBlock({
+                    id: 'out',
+                    type: 'set',
+                    rows: [playRow],
+                    bpm: this.page.bpmValue
                 });
 
-                // console.log('midiConfig', midiConfig);
-                // console.log('ideService', ideService);
-                // console.log('currItem', this.currentIdeItem);
-                // console.log('playRow', playRow);
-                // console.log('newPlayBlock', newPlayBlock);
+                this.page.stop();
+                this.page.multiPlayer.tryPlayMidiBlock({
+                    blocks,
+                    playBlock,
+                    bpm: this.page.bpmValue,
+                    repeatCount: 1,
+                    metaByLines: ideService.currentEdit.metaByLines,
+                });
             });
         });
 
@@ -350,17 +405,18 @@ export class DrumCtrl {
                     partIndex: parseInteger(el.dataset['partIndex'], 0),
                     rowInPart: parseInteger(el.dataset['rowInPart'], 0),
                 };
-                this.currentIdeItem = item;
+                this.editedItems = [item];
 
                 let hasNode = false;
 
-                let songNode: any = localStorage.getItem(this.currentIdeItem.songName);
+                let editedItem = this.editedItems[0];
+                let songNode: any = localStorage.getItem(editedItem.songName);
                 if (songNode) {
                     songNode = JSON.parse(songNode);
 
-                    if (songNode[this.currentIdeItem.id]) {
-                        let items = songNode[this.currentIdeItem.id]['items'];
-                        let node = items.find(item => item['id'] = this.currentIdeItem.id && item['type'] === 'drums');
+                    if (songNode[editedItem.id]) {
+                        let items = songNode[editedItem.id]['items'];
+                        let node = items.find(item => item['id'] = editedItem.id && item['type'] === 'drums');
                         if (node) {
                             hasNode = true;
                             this.liner.setData(node.rows);
@@ -386,11 +442,22 @@ export class DrumCtrl {
     subscribeOutCells() {
         getWithDataAttr('drum-cell-row-nio', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('click', evt => {
-                this.activeCellId = parseInteger(el.dataset['drumCellId'], 0); // data-drum-cell-id
-                this.activeCellNio = parseInteger(el.dataset['drumCellNio'], 0); // data-drum-cell-nio
-                this.activeCellRow = parseInteger(el.dataset['drumCellRow'], 0); // data-drum-cell-row
-                this.activeCellRowNio = el.dataset['drumCellRowNio']; // data-drum-cell-row-nio
-                this.selectItemByRowNio(this.activeCellRowNio);
+                console.log(el.dataset);
+
+                if (!el.dataset['selected']) {
+                    this.activeCellId = parseInteger(el.dataset['drumCellId'], 0); // data-drum-cell-id
+                    this.activeCellNio = parseInteger(el.dataset['drumCellNio'], 0); // data-drum-cell-nio
+                    this.activeCellRow = parseInteger(el.dataset['drumCellRow'], 0); // data-drum-cell-row
+                    this.activeCellRowNio = el.dataset['drumCellRowNio']; // data-drum-cell-row-nio
+                    this.highlightCellByRowNio(this.activeCellRowNio);
+                } else {
+                    this.highlightCellByRowNio(this.activeCellRowNio, false);
+
+                    this.activeCellId = 0;
+                    this.activeCellNio = 0;
+                    this.activeCellRow = 0;
+                    this.activeCellRowNio = '';
+                }
             });
         });
     }
@@ -401,7 +468,7 @@ export class DrumCtrl {
 
             if (result) {
                 this.printModel(this.liner.rows);
-                this.selectItemById(this.activeCellId);
+                this.highlightCellById(this.activeCellId);
             }
         }
 
@@ -429,7 +496,7 @@ export class DrumCtrl {
             });
         });
 
-        getWithDataAttrValue('action-out', 'play', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-out', 'play-one', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 const notes = this.liner.getDrumNotes('temp');
 
@@ -441,6 +508,7 @@ export class DrumCtrl {
                     notes
                 ].join('\n');
 
+                this.page.stop();
                 this.page.multiPlayer.tryPlayMidiBlock({
                     blocks,
                     bpm: this.page.bpmValue,
@@ -470,7 +538,7 @@ export class DrumCtrl {
 
                 this.liner.deleteCellByOffset(offsetQ);
                 this.printModel(this.liner.rows);
-                this.selectItemByRowNio(this.activeCellRowNio);
+                this.highlightCellByRowNio(this.activeCellRowNio);
             });
         });
 
@@ -498,7 +566,7 @@ export class DrumCtrl {
                 noteInfo = this.liner.addNoteByOffset(offsetQ, noteInfo);
                 this.activeCellId = noteInfo.id;
                 this.printModel(this.liner.rows);
-                this.selectItemByRowNio(this.activeCellRowNio);
+                this.highlightCellByRowNio(this.activeCellRowNio);
             });
         });
 
@@ -506,7 +574,7 @@ export class DrumCtrl {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 this.liner.addRowAfter(this.activeCellRow);
                 this.printModel(this.liner.rows);
-                this.selectItemByRowNio(this.activeCellRowNio);
+                this.highlightCellByRowNio(this.activeCellRowNio);
             });
         });
 
@@ -514,7 +582,7 @@ export class DrumCtrl {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 this.liner.addRowAfter(this.activeCellRow - 1);
                 this.printModel(this.liner.rows);
-                this.selectItemByRowNio(this.activeCellRowNio);
+                this.highlightCellByRowNio(this.activeCellRowNio);
             });
         });
 
@@ -522,7 +590,7 @@ export class DrumCtrl {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 this.liner.deleteRow(this.activeCellRow);
                 this.printModel(this.liner.rows);
-                this.selectItemByRowNio(this.activeCellRowNio);
+                this.highlightCellByRowNio(this.activeCellRowNio);
             });
         });
     }
@@ -680,16 +748,20 @@ export class DrumCtrl {
                 <div style="${rowStyle}">
                     <span 
                         style="${style}"
-                        data-action-out="ready"
+                        data-ide-action="ready"
                     >ready</span>
                     <span
                         style="${style}"
-                        data-action-out="draft"
+                        data-ide-action="draft"
                     >draft</span>
                     <span
                         style="${style}"
-                        data-action-out="clear"
+                        data-ide-action="clear"
                     >clear</span>
+                    <span
+                        style="${style}"
+                        data-ide-action="play-both"
+                    >play</span>
                 </div>
             </div>
         `.trim();
@@ -731,8 +803,8 @@ export class DrumCtrl {
                 >3:4&nbsp;</span-->                    
                 <span
                     style="${style}"
-                    data-action-out="play"
-                >ply</span>
+                    data-action-out="play-one"
+                >play</span>
             </div>
             <div style="${rowStyle}">
                 <!--span 
@@ -823,6 +895,7 @@ export class DrumCtrl {
         const midRowHeight = 10;
         const botRowHeight = 5;
         let ind = 0;
+        const rem = 'rem';
 
         const content = `
                 <div style="display: flex; user-select: none; touch-action: none; position: relative;">
@@ -878,10 +951,10 @@ export class DrumCtrl {
                         </div>
                                                  
                         <div
-                            style="display: flex; width: 100%; height: ${midRowHeight/2}rem; background-color: whitesmoke; user-select: none; touch-action: none;"                        
+                            style="display: flex; width: 100%; height: ${midRowHeight/2}${rem}; background-color: whitesmoke; user-select: none; touch-action: none;"                        
                         >
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: lightgray; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}${rem}; box-sizing: border-box; text-align: center; background-color: lightgray; user-select: none; touch-action: none;"
                                 data-action-drum-key="hc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-highlight-drum="sn+hc"  
@@ -894,7 +967,7 @@ export class DrumCtrl {
                             
                         
                             <div 
-                                style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
+                                style="width: 50%; height: ${midRowHeight/2}${rem}; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
                                 data-action-drum-key="empty"
                                 data-keyboard-id="${keyboardId}-${ind++}"   
                                 data-color="lightgray"
@@ -905,7 +978,7 @@ export class DrumCtrl {
                         </div>                        
                         
                         <div
-                            style="width: 100%; height: ${botRowHeight}rem; background-color: tan; user-select: none; touch-action: none;"
+                            style="width: 100%; height: ${botRowHeight}${rem}; background-color: tan; user-select: none; touch-action: none;"
                             data-action-drum-key="bd"
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-highlight-drum="bd+hc"
@@ -919,7 +992,7 @@ export class DrumCtrl {
 
                     <div style="width: 33%; user-select: none; touch-action: none;">
                         <div
-                            style="height: ${midRowHeight}rem; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
+                            style="height: ${midRowHeight}${rem}; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
                             data-action-drum-key="sn"
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-highlight-drum="sn+hc"
@@ -931,7 +1004,7 @@ export class DrumCtrl {
                         </div>
                         
                         <div 
-                            style="background-color: antiquewhite; width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"
+                            style="background-color: antiquewhite; width: 100%; height: ${botRowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
                             data-action-drum-key="tl"
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-color="lightgray"
@@ -944,7 +1017,7 @@ export class DrumCtrl {
                         </div>                        
                         
                         <div 
-                            style="width: 100%; height: ${botRowHeight}rem; text-align: center; user-select: none; touch-action: none;"
+                            style="width: 100%; height: ${botRowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
                             data-action-drum="get-bpm-or-stop"
                         >
                             <!--data-action-drum-key="bd+hc"
@@ -1038,12 +1111,13 @@ export class DrumCtrl {
     }
 
     getIdeContent(): string {
+        if (!this.hasIdeItem) return '';
+
         const currentEdit = ideService.currentEdit;
         const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        this.page.bpmValue = currentEdit.outBlock.bpm;
 
-        if (!currentEdit || !currentEdit.editIndex || !currentEdit.outList || !currentEdit.outBlock || !currentEdit.blocks) {
-            return '';
-        }
+        console.log('this.page.bpmValue', this.page.bpmValue);
 
         const midiConfig = this.getMidiConfig();
         //console.log('midiConfig', midiConfig);
@@ -1215,6 +1289,7 @@ export class DrumCtrl {
     }
 
     printModel(rows: Line[]) {
+        const rem = 'rem';
         const getMask = (count: number): PrintCell[] => {
             const arr = Array(count).fill(null);
             return arr.map(() => ({
@@ -1226,7 +1301,8 @@ export class DrumCtrl {
         }
 
         let totalOut = '';
-        let height = 1.25;
+        let height = 1.26;
+        let padding = .07;
 
         rows.forEach((row, iRow) => {
             const offsets = this.liner.getOffsetsByRow(row);
@@ -1241,7 +1317,9 @@ export class DrumCtrl {
                     line-height: 1rem;
                     color: white;                    
                     user-select: none;
-                    height: ${height}rem;                    
+                    padding-top: .07rem;
+                    height: 1.4rem;
+                    border-bottom: 1px solid lightgray;
                 ">`;
 
             const cellSizeQ = 10;
@@ -1287,14 +1365,15 @@ export class DrumCtrl {
                             box-sizing: border-box;
                             border: 1px solid white;
                             display: inline-block;
+                            z-index: 0;
                             position: absolute;
-                            width: ${height}rem;
-                            height: ${height}rem;
+                            width: ${height}${rem};
+                            height: ${height}${rem};
                             background-color: ${col.color};
                             user-select: none;
                             touch-action: none;
                             text-align: center;
-                            left: ${iCol * height}rem;
+                            left: ${iCol * height}${rem};
                         "
                     ></span>`.trim();
             });
@@ -1314,13 +1393,14 @@ export class DrumCtrl {
                             border: 1px solid white;
                             display: inline-block;
                             position: absolute;
-                            width: ${height}rem;
-                            height: ${height}rem;
+                            width: ${height}${rem};
+                            height: ${height}${rem};
                             background-color: ${cell.color};
                             user-select: none;
                             touch-action: none;
                             text-align: center;
                             font-weight: 700;
+                            z-index: 0;
                             left: ${iCell * height}rem;
                         "
                     >${cell.text}</span>`.trim();

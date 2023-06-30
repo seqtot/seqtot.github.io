@@ -34,6 +34,8 @@ export type Line = {
     //nio: number,
     durQ: number,
     startOffsetQ: number,
+    blockOffsetQ: number,
+    name: string,
     cellSizeQ: number,
     cells: Cell[],
     endLine?: boolean,
@@ -164,11 +166,13 @@ export class LineModel {
     }
 
     addRowAfter(i: number) {
-        const newRow = {
+        const newRow: Line = {
             durQ: 120,
             startOffsetQ: 0,
             cells: [],
-            cellSizeQ: 10
+            cellSizeQ: 10,
+            blockOffsetQ: 0,
+            name: '',
         };
 
         if (!this.rows.length) {
@@ -270,6 +274,8 @@ export class LineModel {
                 startOffsetQ: ind * 120,
                 cellSizeQ: 10,
                 cells: [],
+                blockOffsetQ: 0,
+                name: '',
             })
         }
 
@@ -519,6 +525,8 @@ export class LineModel {
                     cells: [],
                     startOffsetQ,
                     cellSizeQ: 10,
+                    blockOffsetQ: 0,
+                    name: '',
                 });
                 startOffsetQ = startOffsetQ + 120;
             }
@@ -529,6 +537,8 @@ export class LineModel {
                     cells: [],
                     startOffsetQ,
                     cellSizeQ: 10,
+                    blockOffsetQ: 0,
+                    name: '',
                 });
             }
 
@@ -566,6 +576,8 @@ export class LineModel {
                         startOffsetQ,
                         cellSizeQ: 10,
                         endLine: j === rowInBlock -1,
+                        blockOffsetQ: 0,
+                        name: '',
                     });
 
                     startOffsetQ = startOffsetQ + durQ;
@@ -574,6 +586,4 @@ export class LineModel {
 
         });
     }
-
-
 }

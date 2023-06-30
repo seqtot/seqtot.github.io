@@ -7,14 +7,20 @@ const openedFiles: {[key: string]: string} = {
 }
 
 class IdeService extends  EventEmitter {
+    private _guid = 1;
     useToneInstrument: number = DEFAULT_TONE_INSTR;
     currentEdit: {
         blocks: TextBlock[],
         outBlock: TextBlock,
         outList: string[],
         editIndex: number,
-        name: string
+        name: string,
+        metaByLines: {[key: string]: string},
     } = { } as any;
+
+    get guid(): number {
+        return this._guid++;
+    }
 }
 
 const instance = new IdeService();

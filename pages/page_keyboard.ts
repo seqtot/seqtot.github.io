@@ -135,6 +135,7 @@ export class KeyboardPage {
         setTimeout(() => {
             this.subscribeCommonPageEvents();
             this.subscribePageEvents();
+            this.bpmRange.setValue(this.bpmValue);
         }, 100);
     }
 
@@ -199,6 +200,8 @@ export class KeyboardPage {
         this.view = 'drums';
         this.el$.html(this.drumCtrl.getContent('drums'));
 
+        //console.log('setDrumContent', this.bpmValue);
+
         this.bpmRange = (this.context.$f7 as any).range.create({
             el: dyName('slider', this.pageEl),
             on: {
@@ -207,6 +210,12 @@ export class KeyboardPage {
                 },
             },
         });
+
+        // setTimeout(() => {
+        //     this.subscribeViewInfoEvents();
+        //     this.bpmValue = this.outBlock.bpm;
+        //     this.bpmRange.setValue(this.bpmValue);
+        // }, 100);
     }
 
     setBassSoloContent() {
