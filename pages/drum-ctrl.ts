@@ -463,6 +463,9 @@ export class DrumCtrl {
                 getWithDataAttr('bottom-command-panel', this.page.pageEl)?.forEach((el: HTMLElement) => {
                     el.innerHTML = null;
                 });
+                getWithDataAttr('row-actions', this.page.pageEl)?.forEach((el: HTMLElement) => {
+                    el.style.display = 'block';
+                });
                 this.liner.fillLinesStructure('480');
                 this.printModel(this.liner.rows);
             });
@@ -830,6 +833,32 @@ export class DrumCtrl {
         return result;
     }
 
+    getRowActionsCommands(): string {
+        const display = `display: ${this.hasIdeItem ? 'none': 'block'};`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const rowStyle = `${display} width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
+
+        return `
+            <div
+                data-row-actions 
+                style="${rowStyle}"
+            >
+                <span
+                    style="${style}"
+                    data-action-out-row="add"
+                >addR</span>  
+                <span
+                    style="${style}"
+                    data-action-out-row="insert"
+                >insR</span>                                  
+                <span
+                    style="${style}"
+                    data-action-out-row="delete"
+                >delR</span>                    
+            </div>        
+        `.trim();
+    }
+
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
@@ -918,21 +947,7 @@ export class DrumCtrl {
                     data-action-out="delete"
                 >del</span>                                                                        
             </div>
-            
-            <div style="${rowStyle}">
-                <span 
-                    style="${style}"
-                    data-action-out-row="add"
-                >addR</span>  
-                <span
-                    style="${style}"
-                    data-action-out-row="insert"
-                >insR</span>                                  
-                <span
-                    style="${style}"
-                    data-action-out-row="delete"
-                >delR</span>                    
-            </div>            
+            ${this.getRowActionsCommands()}            
         `.trim();
 
         let instrPanel = ''
@@ -945,7 +960,9 @@ export class DrumCtrl {
                 >${note}</span>
             `;
         });
-        instrPanel = `<div style="${rowStyle}">${instrPanel}</div>`;
+        instrPanel = `<div
+            style="${rowStyle}"
+        >${instrPanel}</div>`;
 
         return result + instrPanel;
     }
