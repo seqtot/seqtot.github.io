@@ -35,7 +35,7 @@ export type Line = {
     durQ: number,
     startOffsetQ: number,
     blockOffsetQ: number,
-    name: string,
+    rowInPartId: string,
     cellSizeQ: number,
     cells: Cell[],
     endLine?: boolean,
@@ -45,7 +45,10 @@ export class LineModel {
     rows: Line[] = [];
 
     findRowIndByOffset(offsetQ: number): number {
-        return this.rows.findIndex(row => offsetQ >= row.startOffsetQ && offsetQ < (row.startOffsetQ + row.durQ));
+        return this.rows.findIndex(row => {
+            const rowOffsetQ  = row.startOffsetQ + row.blockOffsetQ;
+            return offsetQ >= rowOffsetQ && offsetQ < (rowOffsetQ + row.durQ)
+        });
     }
 
     getRowByOffset(offsetQ: number): Line {
@@ -62,19 +65,21 @@ export class LineModel {
         const row = rows[ind.row];
         const cell = rows[ind.row].cells[ind.childInd];
 
-        let newStartOffsetQ = cell.startOffsetQ + value;
+        let newTotalOffsetQ = row.blockOffsetQ + cell.startOffsetQ + value;
+        let oldTotalOffsetQ = row.startOffsetQ + row.blockOffsetQ;
 
-        if (newStartOffsetQ >= row.startOffsetQ && newStartOffsetQ < (row.startOffsetQ + row.durQ)) {
-            cell.startOffsetQ = newStartOffsetQ;
+        if (newTotalOffsetQ >= oldTotalOffsetQ && newTotalOffsetQ < (oldTotalOffsetQ + row.durQ)) {
+            cell.startOffsetQ = newTotalOffsetQ - row.blockOffsetQ;
 
             return this.getRowAndCellIndexes(id);
         } else {
-            const ind = this.findRowIndByOffset(newStartOffsetQ);
+            const ind = this.findRowIndByOffset(newTotalOffsetQ);
 
             if (ind > -1) {
-                cell.startOffsetQ = newStartOffsetQ;
+                const newRow = this.rows[ind];
                 row.cells = row.cells.filter(item => item != cell);
-                this.rows[ind].cells.push(cell);
+                cell.startOffsetQ = newTotalOffsetQ - newRow.blockOffsetQ;
+                newRow.cells.push(cell);
 
                 return this.getRowAndCellIndexes(id);
             }
@@ -84,6 +89,16 @@ export class LineModel {
     }
 
     setData(rows: Line[]) {
+        let id = 1;
+
+        rows.forEach(row => {
+            row.cells.forEach(cell => {
+                cell.notes.forEach(note => {
+                    note.id = id++;
+                })
+            })
+        });
+
         this.rows = rows;
     }
 
@@ -91,6 +106,8 @@ export class LineModel {
         const row = this.rows[this.findRowIndByOffset(offsetQ)];
 
         if (!row) return;
+
+        offsetQ = offsetQ - row.blockOffsetQ;
 
         row.cells = row.cells.filter(cell => {
             return cell.startOffsetQ !== offsetQ;
@@ -139,11 +156,11 @@ export class LineModel {
         if (!row) return;
 
         note.id = this.getMaxNoteId() + 1;
-        note.startOffsetQ = offsetQ;
+        note.startOffsetQ = offsetQ - row.blockOffsetQ;
 
         row.cells.push({
            id: this.getMaxCellId() + 1,
-           startOffsetQ: offsetQ,
+           startOffsetQ: note.startOffsetQ,
            notes: [note]
         });
 
@@ -172,7 +189,7 @@ export class LineModel {
             cells: [],
             cellSizeQ: 10,
             blockOffsetQ: 0,
-            name: '',
+            rowInPartId: '',
         };
 
         if (!this.rows.length) {
@@ -275,7 +292,7 @@ export class LineModel {
                 cellSizeQ: 10,
                 cells: [],
                 blockOffsetQ: 0,
-                name: '',
+                rowInPartId: '',
             })
         }
 
@@ -337,10 +354,11 @@ export class LineModel {
         return rows;
     }
 
-    getSortedNotes(): NoteItem[] {
+    getSortedNotes(rows: Line[]): NoteItem[] {
+        rows = Array.isArray(rows) ? rows : this.rows;
         const notes: NoteItem[] = [];
 
-        this.rows.forEach(row => {
+        rows.forEach(row => {
            row.cells.forEach(cell => {
                cell.notes.forEach(note => {
                    note.startOffsetQ = cell.startOffsetQ;
@@ -352,6 +370,21 @@ export class LineModel {
         this.sortByStartOffsetQ(notes);
 
         return notes;
+    }
+
+
+    sortByField(arr: any[], field: string) {
+        arr.sort((first, second) => {
+            if (first[field] < second[field]) {
+                return -1;
+            }
+
+            if (first[field] > second[field]) {
+                return 1;
+            }
+
+            return 0;
+        });
     }
 
     sortByStartOffsetQ(arr: (Cell | NoteItem) []) {
@@ -378,9 +411,11 @@ export class LineModel {
         return Object.values(result);
     }
 
-    getDurationQByRows() {
-        if (this.rows.length) {
-            return this.rows[this.rows.length-1].startOffsetQ + this.rows[this.rows.length-1].durQ;
+    getDurationQByRows(rows?: Line[]) {
+        rows = Array.isArray(rows) ? rows : this.rows;
+
+        if (rows.length) {
+            return rows[rows.length-1].startOffsetQ + rows[rows.length-1].durQ;
         }
 
         return 0;
@@ -436,11 +471,12 @@ export class LineModel {
     //     return Object.values(result);
     // }
 
-    getDrumNotes(name?: string): string {
+    getDrumNotes(name?: string, rows?: Line[]): string {
         name = name || 'no_name';
+        rows = Array.isArray(rows) ? rows : this.rows;
 
-        const totalDurQ = this.getDurationQByRows();
-        const notes = this.getSortedNotes();
+        const totalDurQ = this.getDurationQByRows(rows);
+        const notes = this.getSortedNotes(rows);
         const noteNames = this.getNoteNames(notes);
         const map: {[key: string]: string[]} = {};
 
@@ -510,50 +546,48 @@ export class LineModel {
         });
     }
 
-    fillLinesStructure(pVal: string | number) {
-        this.rows = [];
+    getLinesByMask(pMask: string | number): Line[] {
+        const rows: Line[] = [];
         let startOffsetQ = 0;
 
-        if (un.parseInteger(pVal, 0)) {
-            const durQ = un.parseInteger(pVal);
+        if (un.parseInteger(pMask, 0)) {
+            const durQ = un.parseInteger(pMask);
             const fullLineCount = Math.floor(durQ / un.NUM_120);
             const endLineDurQ = durQ % un.NUM_120;
 
             for (let i = 0; i < fullLineCount; i++) {
-                this.rows.push({
+                rows.push({
                     durQ: 120,
                     cells: [],
                     startOffsetQ,
                     cellSizeQ: 10,
                     blockOffsetQ: 0,
-                    name: '',
+                    rowInPartId: '',
                 });
                 startOffsetQ = startOffsetQ + 120;
             }
 
             if (endLineDurQ) {
-                this.rows.push({
+                rows.push({
                     durQ: endLineDurQ,
                     cells: [],
                     startOffsetQ,
                     cellSizeQ: 10,
                     blockOffsetQ: 0,
-                    name: '',
+                    rowInPartId: '',
                 });
             }
 
-            return;
+            return rows;
         }
 
-        pVal = ('' + pVal).trim();
+        pMask = ('' + pMask).trim();
         // let arr = val.trim().split('\n');
         // arr = arr.filter(item => !!item)
         //     .map(item => item.trim())
         //     .filter(item => item && !item.startsWith('#') && item.includes('['));
 
-
-
-        let topArr = pVal.split('_');
+        let topArr = pMask.split('_');
         topArr.forEach(row => {
             const arr = row.split('*');
             const durQ = un.parseInteger(arr[arr.length-1], 0);
@@ -570,14 +604,14 @@ export class LineModel {
 
             for (let i = 0; i < blockCount; i++) {
                 for (let j = 0; j < rowInBlock; j++) {
-                    this.rows.push({
+                    rows.push({
                         durQ: durQ,
                         cells: [],
                         startOffsetQ,
                         cellSizeQ: 10,
                         endLine: j === rowInBlock -1,
                         blockOffsetQ: 0,
-                        name: '',
+                        rowInPartId: '',
                     });
 
                     startOffsetQ = startOffsetQ + durQ;
@@ -585,5 +619,11 @@ export class LineModel {
             }
 
         });
+
+        return rows;
+    }
+
+    fillLinesStructure(mask: string | number) {
+        this.rows = this.getLinesByMask(mask);
     }
 }

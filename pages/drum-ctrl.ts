@@ -12,7 +12,7 @@ import { ComponentContext } from 'framework7/modules/component/component';
 import {createOutBlock, TextBlock} from '../libs/muse/utils/utils-note';
 
 const ids = {
-    ideItem: 'ide-item',
+    editingItem: 'editing-item',
     duration: 'duration',
     rowInPart: 'row-in-part',
     partIndex: 'part-index',
@@ -182,11 +182,11 @@ type BpmInfo = {
 }
 
 type EditedItem = {
-    id: string,
+    rowInPartId: string,
+    rowInPart: number,
     songName: string,
     duration: number,
     partIndex: number,
-    rowInPart: number,
 }
 
 type PrintCell = {
@@ -194,8 +194,22 @@ type PrintCell = {
     bgColor: string,
     char: string,
     startOffsetQ: number,
+    totalOffsetQ: number,
     underline: boolean,
 }
+
+type StoredItem = {
+    rowInPartId: string,
+    type: string,
+    status: string,
+    rows: Line[]
+}
+
+type StoredSongNode ={
+    [key: string]: {
+        items: StoredItem[]
+    }
+};
 
 const emptyBpmInfo = (): BpmInfo => {
     //console.log('getEmptyBpm');
@@ -272,48 +286,171 @@ export class DrumCtrl {
         return !!item && !!item.editIndex && !!item.outList &&  !!item.outBlock && !!item.blocks;
     }
 
+    saveEditingItems() {
+        if (!this.hasEditedItems) return;
+
+        let songName = this.editedItems[0].songName;
+        let songNode: StoredSongNode;
+
+        if (!localStorage.getItem(songName)) {
+            songNode = {};
+        } else {
+            songNode = JSON.parse(localStorage.getItem(songName));
+        }
+
+        this.editedItems.forEach(item => {
+            const rows = this.liner.rows.filter(row => row.rowInPartId === item.rowInPartId);
+            if (!rows.length) return;
+
+            let itemsNode = songNode[item.rowInPartId];
+            if (!itemsNode) {
+                itemsNode = {
+                    items: []
+                };
+                songNode[item.rowInPartId] = itemsNode;
+            }
+
+            let drumsNode = itemsNode.items.find(iItem => iItem.rowInPartId === item.rowInPartId && iItem.type === 'drums');
+            if (!drumsNode) {
+                drumsNode = {
+                    rowInPartId: item.rowInPartId,
+                    type: 'drums',
+                    status: 'draft',
+                    rows: []
+                };
+                itemsNode.items.push(drumsNode);
+            }
+
+            drumsNode.rows = rows;
+        });
+
+        localStorage.setItem(songName, JSON.stringify(songNode));
+    }
+
+    addEditingItem(item: EditedItem, el: HTMLElement) {
+        if (this.editedItems.find(iItem => iItem.rowInPart === item.rowInPart)) {
+            this.editedItems = this.editedItems.filter(iItem => iItem.rowInPart !== item.rowInPart);
+            el.style.fontWeight = '400';
+
+            return;
+        }
+
+        this.editedItems.push(item);
+        el.style.fontWeight = '600';
+        this.liner.sortByField(this.editedItems, 'rowInPart');
+
+        // выделение
+        // getWithDataAttr(ids.editingItem, this.page.pageEl)?.forEach(iEl => {
+        //     iEl.style.fontWeight = '400';
+        // });
+        // el.style.fontWeight = '600';
+    }
+
+    songRowClick(el: HTMLElement) {
+        const item = {
+            rowInPartId: el.dataset['editingItem'],
+            songName: el.dataset['songName'],
+            duration: parseInteger(el.dataset['duration'], 0),
+            partIndex: parseInteger(el.dataset['partIndex'], 0),
+            rowInPart: parseInteger(el.dataset['rowInPart'], 0),
+        };
+
+        this.addEditingItem(item, el);
+
+        let rows = [];
+        let blockOffsetQ = 0;
+
+        this.editedItems.forEach(editedItem => {
+            let iRows: Line[] = this.liner.rows.filter(row => row.rowInPartId === editedItem.rowInPartId);
+
+            let songNode: StoredSongNode = localStorage.getItem(editedItem.songName) as any;
+            if (!iRows.length && songNode) {
+                songNode = JSON.parse(songNode as any as string);
+
+                if (songNode[editedItem.rowInPartId]) {
+                    let items = songNode[editedItem.rowInPartId].items;
+                    let node = items.find(item => item.rowInPartId === editedItem.rowInPartId && item.type === 'drums');
+                    if (node) {
+                        iRows = node.rows;
+                    }
+                }
+            }
+
+            if (!iRows.length) {
+                iRows = this.liner.getLinesByMask(editedItem.duration);
+            }
+
+            iRows.forEach(row => {
+                row.rowInPartId = editedItem.rowInPartId;
+                row.blockOffsetQ = blockOffsetQ;
+            });
+
+            rows = [...rows, ...iRows];
+            blockOffsetQ = blockOffsetQ + editedItem.duration;
+        });
+
+        this.liner.setData(rows);
+        this.printModel(this.liner.rows);
+    }
+
+    playBoth() {
+        if (!this.hasEditedItems) return;
+
+        let playRows: string[] = [];
+
+        const midiConfig = this.getMidiConfig();
+        let blocks = midiConfig.blocks;
+        let playBlock = midiConfig.playBlockOut as TextBlock;
+
+        this.editedItems.forEach(item => {
+            let playRow = un.clearEndComment(playBlock.rows[item.rowInPart + 1]);
+            const rows = this.liner.rows.filter(row => row.rowInPartId === item.rowInPartId)
+            const notes = this.liner.getDrumNotes(ideService.guid.toString(), rows);
+
+            if (notes) {
+                const block = un.getTextBlocks(notes)[0];
+
+                playRows.push(`${playRow} ${block.id}`);
+                blocks = [...blocks, block];
+            } else {
+                playRows.push(`${playRow}`);
+            }
+        });
+
+        playBlock = createOutBlock({
+            id: 'out',
+            type: 'set',
+            rows: playRows,
+            bpm: this.page.bpmValue
+        });
+
+        this.page.stop();
+        this.page.multiPlayer.tryPlayMidiBlock({
+            blocks,
+            playBlock,
+            bpm: this.page.bpmValue,
+            repeatCount: 1,
+            metaByLines: ideService.currentEdit.metaByLines,
+        });
+    }
 
     subscribeIdeEvents() {
+        getWithDataAttrValue(ids.ideAction, 'play-both', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => this.playBoth());
+        });
+
         getWithDataAttrValue(ids.ideAction, 'draft', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                if (!this.hasEditedItems) return;
-                const editedItem = this.editedItems[0];
+            el.addEventListener('pointerdown', (evt: MouseEvent) => this.saveEditingItems());
+        });
 
-                let songNode: any;
-                if (!localStorage.getItem(editedItem.songName)) {
-                    songNode = {};
-                } else {
-                    songNode = JSON.parse(localStorage.getItem(editedItem.songName));
-                }
-
-                let itemNode = songNode[editedItem.id];
-                if (!itemNode) {
-                    itemNode = {
-                        items: []
-                    };
-                    songNode[editedItem.id] = itemNode;
-                }
-
-                let drumsNode = itemNode.items.find(item => item['id'] === editedItem.id && item['type'] === 'drums');
-                if (!drumsNode) {
-                    drumsNode = {
-                        id: editedItem.id,
-                        type: 'drums',
-                        status: 'draft',
-                        rows: []
-                    };
-                    itemNode.items.push(drumsNode);
-                }
-
-                this.liner.rows.forEach(row => {
-                    row.name = editedItem.id;
-                    row.blockOffsetQ = 0;
-                })
-
-                drumsNode.rows = this.liner.rows;
-
-                localStorage.setItem(editedItem.songName, JSON.stringify(songNode));
+        getWithDataAttrValue(ids.ideAction, 'back', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => {
+                this.page.context.$f7router.navigate(`/mbox/${ideService.currentEdit.name}/`);
             });
+        });
+
+        getWithDataAttr(ids.editingItem, this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => this.songRowClick(el));
         });
 
         getWithDataAttrValue(ids.ideAction, 'clear', this.page.pageEl)?.forEach((el: HTMLElement) => {
@@ -331,24 +468,20 @@ export class DrumCtrl {
             });
         });
 
-        getWithDataAttrValue(ids.ideAction, 'back', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => {
-                this.page.context.$f7router.navigate(`/mbox/${ideService.currentEdit.name}/`);
-            });
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'play', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue(ids.ideAction, 'play-active', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
                 if (!this.hasEditedItems) return;
 
                 const midiConfig = this.getMidiConfig();
                 const playBlock = midiConfig.playBlockOut as TextBlock;
-                const playRow = playBlock.rows[this.editedItems[0].rowInPart + 1];
+                const playingRows = this.editedItems.map(item => {
+                    return playBlock.rows[item.rowInPart + 1]
+                })
 
                 const newOutBlock = createOutBlock({
                     id: 'out',
                     type: 'set',
-                    rows: [playRow],
+                    rows: playingRows,
                     bpm: this.page.bpmValue
                 });
 
@@ -362,89 +495,12 @@ export class DrumCtrl {
                 });
             });
         });
-
-        getWithDataAttrValue(ids.ideAction, 'play-both', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => {
-                if (!this.hasEditedItems) return;
-
-                const notes = this.liner.getDrumNotes(ideService.guid.toString());
-
-                const midiConfig = this.getMidiConfig();
-                let blocks = midiConfig.blocks;
-                let playBlock = midiConfig.playBlockOut as TextBlock;
-                let playRow = un.clearEndComment(playBlock.rows[this.editedItems[0].rowInPart + 1]);
-
-                if (notes) {
-                    const block = un.getTextBlocks(notes)[0];
-                    playRow = playRow + ' ' + block.id;
-                    blocks = [...blocks, block];
-                }
-
-                playBlock = createOutBlock({
-                    id: 'out',
-                    type: 'set',
-                    rows: [playRow],
-                    bpm: this.page.bpmValue
-                });
-
-                this.page.stop();
-                this.page.multiPlayer.tryPlayMidiBlock({
-                    blocks,
-                    playBlock,
-                    bpm: this.page.bpmValue,
-                    repeatCount: 1,
-                    metaByLines: ideService.currentEdit.metaByLines,
-                });
-            });
-        });
-
-        getWithDataAttr(ids.ideItem, this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => {
-                const item = {
-                    id: el.dataset['ideItem'],
-                    songName: el.dataset['songName'],
-                    duration: parseInteger(el.dataset['duration'], 0),
-                    partIndex: parseInteger(el.dataset['partIndex'], 0),
-                    rowInPart: parseInteger(el.dataset['rowInPart'], 0),
-                };
-                this.editedItems = [item];
-
-                let hasNode = false;
-
-                let editedItem = this.editedItems[0];
-                let songNode: any = localStorage.getItem(editedItem.songName);
-                if (songNode) {
-                    songNode = JSON.parse(songNode);
-
-                    if (songNode[editedItem.id]) {
-                        let items = songNode[editedItem.id]['items'];
-                        let node = items.find(item => item['id'] = editedItem.id && item['type'] === 'drums');
-                        if (node) {
-                            hasNode = true;
-                            this.liner.setData(node.rows);
-                        }
-                    }
-                }
-
-                if (!hasNode) {
-                    this.liner.fillLinesStructure(el.dataset['duration']);
-                }
-
-                this.printModel(this.liner.rows);
-
-                // выделение
-                getWithDataAttr(ids.ideItem, this.page.pageEl)?.forEach(iEl => {
-                   iEl.style.fontWeight = '400';
-                });
-                el.style.fontWeight = '600';
-            });
-        });
     }
 
     subscribeOutCells() {
         getWithDataAttr('drum-cell-row-nio', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('click', evt => {
-                console.log(el.dataset);
+                //console.log(el.dataset);
 
                 if (!el.dataset['selected']) {
                     this.activeCellId = parseInteger(el.dataset['drumCellId'], 0); // data-drum-cell-id
@@ -467,6 +523,9 @@ export class DrumCtrl {
     subscribeEditCommands() {
         const moveItem = (id: number, value: number) => {
             const result = this.liner.moveItem(id, value);
+
+            //console.log(result);
+            //console.log(this.liner.rows);
 
             if (result) {
                 this.printModel(this.liner.rows);
@@ -534,11 +593,11 @@ export class DrumCtrl {
 
                 if (!cell) return;
 
-                const offsetQ = parseInteger(cell.dataset['offsetq'], null);
+                const totalOffset = parseInteger(cell.dataset['totalOffset'], null);
 
-                if (offsetQ === null) return;
+                if (totalOffset === null) return;
 
-                this.liner.deleteCellByOffset(offsetQ);
+                this.liner.deleteCellByOffset(totalOffset);
                 this.printModel(this.liner.rows);
                 this.highlightCellByRowNio(this.activeCellRowNio);
             });
@@ -550,9 +609,9 @@ export class DrumCtrl {
 
                 if (!cell) return;
 
-                const offsetQ = parseInteger(cell.dataset['offsetq'], null);
+                const totalOffsetQ = parseInteger(cell.dataset['totalOffset'], null);
 
-                if (offsetQ === null) return;
+                if (totalOffsetQ === null) return;
 
                 const note = el.dataset['actionDrumNote'];
 
@@ -565,7 +624,7 @@ export class DrumCtrl {
                     durQ: 10,
                 }
 
-                noteInfo = this.liner.addNoteByOffset(offsetQ, noteInfo);
+                noteInfo = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
                 this.activeCellId = noteInfo.id;
                 this.printModel(this.liner.rows);
                 this.highlightCellByRowNio(this.activeCellRowNio);
@@ -763,7 +822,7 @@ export class DrumCtrl {
                     <span
                         style="${style}"
                         data-ide-action="play-both"
-                    >play</span>
+                    >play2</span>
                 </div>
             </div>
         `.trim();
@@ -806,7 +865,7 @@ export class DrumCtrl {
                 <span
                     style="${style}"
                     data-action-out="play-one"
-                >play</span>
+                >play1</span>
             </div>
             <div style="${rowStyle}">
                 <!--span 
@@ -1119,7 +1178,7 @@ export class DrumCtrl {
         const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         this.page.bpmValue = currentEdit.outBlock.bpm;
 
-        console.log('this.page.bpmValue', this.page.bpmValue);
+        //console.log('this.page.bpmValue', this.page.bpmValue);
 
         const midiConfig = this.getMidiConfig();
         //console.log('midiConfig', midiConfig);
@@ -1144,16 +1203,16 @@ export class DrumCtrl {
                 cellCount = Math.floor((row.rowDurationByHeadQ % un.NUM_120) / 10);
             }
 
-            const name = `${currentEdit.name}:${currentEdit.editIndex}:${i}`
+            const rowInPartId = `${currentEdit.editIndex}:${i}`
 
             acc = acc + `<span
-                style="padding: .5rem; display: inline-block;"
-                data-ide-item="${name}"
+                style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0;"
+                data-editing-item="${rowInPartId}"
                 data-duration="${row.rowDurationByHeadQ}"
                 data-row-in-part="${i}"
                 data-part-index="${currentEdit.editIndex}"
                 data-song-name="${currentEdit.name}"
-            >${i}:${rowCount + (cellCount ? ':' + cellCount : '')}</span>`;
+            >${i}:${rowCount + (cellCount ? '.' + cellCount : '')}</span>`;
 
             return acc
         }, '');
@@ -1166,11 +1225,15 @@ export class DrumCtrl {
                 >back</span>            
                 <span 
                     style="padding: .5rem;"
-                >${currentEdit.name + ' - ' + currentEdit.outList[currentEdit.editIndex - 1] + ' - ' + currentEdit.editIndex}</span>
+                >${currentEdit.name}-${currentEdit.outList[currentEdit.editIndex - 1]}-${currentEdit.editIndex}</span>
                 <span
                     style="${cmdStyle}"
-                    data-ide-action="play"
-                >play</span>
+                    data-ide-action="play-all"
+                >playAll</span>                
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="play-active"
+                >playActive</span>                
                 <span
                     style="${cmdStyle}"
                     data-ide-action="stop"
@@ -1299,6 +1362,7 @@ export class DrumCtrl {
                 id: 0,
                 char: '',
                 startOffsetQ: 0,
+                totalOffsetQ: 0,
                 underline: false,
             }));
         }
@@ -1306,6 +1370,7 @@ export class DrumCtrl {
         let totalOut = '';
         let height = 1.26;
         let padding = .07;
+        let rowHeight = 1.4;
 
         const getTextAndColor = (arr: NoteItem[]): PrintCell => {
             const result: PrintCell = {
@@ -1315,6 +1380,7 @@ export class DrumCtrl {
                 bgColor: 'lightgray',
                 underline: false,
                 startOffsetQ: 0,
+                totalOffsetQ: 0,
             }
 
             const map = {
@@ -1384,6 +1450,7 @@ export class DrumCtrl {
             const cols = getMask(row.durQ / row.cellSizeQ);
             cols.forEach((col, i) => {
                col.startOffsetQ = row.startOffsetQ + (cellSizeQ * i);
+               col.totalOffsetQ = col.startOffsetQ + row.blockOffsetQ;
             });
 
             for (let offset of offsets) {
@@ -1406,7 +1473,7 @@ export class DrumCtrl {
                         data-drum-cell-nio="${iCol}"
                         data-drum-cell-row-nio="${iRow}-${iCol}"
                         data-drum-cell-id=""
-                        data-offsetq="${col.startOffsetQ}"                        
+                        data-total-offset="${col.totalOffsetQ}"                        
                         style="
                             box-sizing: border-box;
                             border: 1px solid white;
@@ -1436,7 +1503,7 @@ export class DrumCtrl {
                         data-drum-cell-nio="${iCell}"
                         data-drum-cell-row-nio="${iRow}-${iCell}"                                                
                         data-drum-cell-id="${cell.id}"
-                        data-offsetq="${cell.startOffsetQ}"                        
+                        data-total-offset="${cell.totalOffsetQ}"                        
                         style="
                             box-sizing: border-box;
                             border: 1px solid white;
@@ -1462,7 +1529,7 @@ export class DrumCtrl {
         const el = dyName('drum-record-out', this.page.pageEl);
         if (el) {
             el.innerHTML = totalOut;
-            el.style.height = '' + (rows.length * 1.25) + 'rem';
+            el.style.height = `${rows.length * rowHeight}rem`;
         }
 
         this.subscribeOutCells();
