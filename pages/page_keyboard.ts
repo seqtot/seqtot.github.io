@@ -135,7 +135,7 @@ export class KeyboardPage {
         setTimeout(() => {
             this.subscribeCommonPageEvents();
             this.subscribePageEvents();
-            this.bpmRange.setValue(this.bpmValue);
+            //this.bpmRange.setValue(this.bpmValue);
         }, 100);
     }
 
@@ -211,11 +211,11 @@ export class KeyboardPage {
             },
         });
 
-        // setTimeout(() => {
-        //     this.subscribeViewInfoEvents();
-        //     this.bpmValue = this.outBlock.bpm;
-        //     this.bpmRange.setValue(this.bpmValue);
-        // }, 100);
+        setTimeout(() => {
+            //  this.subscribeViewInfoEvents();
+            //  this.bpmValue = this.outBlock.bpm;
+            this.bpmRange.setValue(this.bpmValue);
+        }, 100);
     }
 
     setBassSoloContent() {
