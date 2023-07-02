@@ -72,19 +72,19 @@ const drumNotesInfo = {
         note: 'tl',
         headColor: 'lightgray',
         bodyColor: 'lightgray',
-        char: 'p',
+        char: 'l',
     },
     tm: {
         note: 'tm',
         headColor: 'seagreen',
         bodyColor: 'lightgreen',
-        char: 't',
+        char: 'm',
     },
     th: {
         note: 'th',
         headColor: 'steelblue',
         bodyColor: 'lightblue',
-        char: 'k',
+        char: 'h',
     },
 }
 
@@ -819,7 +819,7 @@ export class DrumCtrl {
     getBottomCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
-        const rowStyle = `width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
         let result = '';
 
         result = `
@@ -856,11 +856,11 @@ export class DrumCtrl {
     getRowActionsCommands(): string {
         const display = `display: ${this.hasIdeItem ? 'none': 'block'};`;
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const rowStyle = `${display} width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
+        const rowStyle = `${display} width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
 
         return `
             <div
-                data-row-actions 
+                data-row-actions
                 style="${rowStyle}"
             >
                 <span
@@ -882,7 +882,7 @@ export class DrumCtrl {
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
-        const rowStyle = `width: 85%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; margin-left: 2%; user-select: none;`;
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
         let result = '';
 
         result = `
@@ -981,6 +981,7 @@ export class DrumCtrl {
             `;
         });
         instrPanel = `<div
+            data-drum-instruments
             style="${rowStyle}"
         >${instrPanel}</div>`;
 
@@ -1006,7 +1007,7 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"  
                                 data-color="steelblue"
                                 data-color2="lightblue"
-                                data-char="k"
+                                data-char="h"
                             >
                                 <!--<br/>&nbsp;K-k-->
                             </div>
@@ -1017,7 +1018,7 @@ export class DrumCtrl {
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="seagreen"                                
                                 data-color2="lightgreen"
-                                data-char="t"
+                                data-char="m"
                             >
                                 <!--<br/>&nbsp;T-t-->
                             </div>
@@ -1107,7 +1108,7 @@ export class DrumCtrl {
                             data-keyboard-id="${keyboardId}-${ind++}"
                             data-color="lightgray"
                             data-color2="lightgray"
-                            data-char="d"
+                            data-char="l"
                         >
                             <!--data-action-drum-key="sn+hc"
                             data-keyboard-id="${keyboardId}-${ind++}"-->
@@ -1311,7 +1312,7 @@ export class DrumCtrl {
                 
                 <div
                     data-name="drum-record-out"
-                    style="width: 90%; padding-left: 2%;"
+                    style="width: 90%; padding-left: 1rem;"
                 ></div>
                 
                 ${ideService.currentEdit && ideService.currentEdit.editIndex ? this.getBottomCommandPanel() : ''}
@@ -1471,6 +1472,7 @@ export class DrumCtrl {
         }
 
         rows.forEach((row, iRow) => {
+            const nextRow = rows[iRow + 1];
             const offsets = this.liner.getOffsetsByRow(row);
 
             totalOut = totalOut +
@@ -1479,8 +1481,8 @@ export class DrumCtrl {
                     position: relative;
                     margin: 0;
                     padding: 0;
-                    font-size: 1rem;
-                    line-height: 1rem;
+                    font-size: 1.2rem;
+                    line-height: .9rem;
                     color: white;                    
                     user-select: none;
                     padding-top: .07rem;
