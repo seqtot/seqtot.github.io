@@ -72,7 +72,7 @@ const drumNotesInfo = {
         note: 'tl',
         headColor: 'lightgray',
         bodyColor: 'lightgray',
-        char: 'd',
+        char: 'p',
     },
     tm: {
         note: 'tm',
@@ -190,7 +190,8 @@ type EditedItem = {
 }
 
 type PrintCell = {
-    id: number,
+    noteId: number,
+    cellId: number,
     bgColor: string,
     char: string,
     startOffsetQ: number,
@@ -339,15 +340,15 @@ export class DrumCtrl {
         el.style.fontWeight = '600';
         this.liner.sortByField(this.editedItems, 'rowInPart');
 
-        // выделение
-        // getWithDataAttr(ids.editingItem, this.page.pageEl)?.forEach(iEl => {
-        //     iEl.style.fontWeight = '400';
+        // let offsetFromStart = 0;
+        // this.editedItems.forEach(item => {
+        //     item.offsetFromStart = offsetFromStart;
+        //     offsetFromStart = offsetFromStart + item.duration;
         // });
-        // el.style.fontWeight = '600';
     }
 
     songRowClick(el: HTMLElement) {
-        const item = {
+        const item: EditedItem = {
             rowInPartId: el.dataset['editingItem'],
             songName: el.dataset['songName'],
             duration: parseInteger(el.dataset['duration'], 0),
@@ -498,6 +499,12 @@ export class DrumCtrl {
                 });
             });
         });
+
+        getWithDataAttrValue(ids.ideAction, 'stop', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', evt => {
+                this.page.stop();
+            });
+        });
     }
 
     subscribeOutCells() {
@@ -525,7 +532,7 @@ export class DrumCtrl {
 
     subscribeEditCommands() {
         const moveItem = (id: number, value: number) => {
-            const result = this.liner.moveItem(id, value);
+            const result = this.liner.moveCell(id, value);
 
             //console.log(result);
             //console.log(this.liner.rows);
@@ -625,6 +632,14 @@ export class DrumCtrl {
                     ...noteInfo,
                     note,
                     durQ: 10,
+                }
+
+                const notes = this.liner.getNotesByOffset(totalOffsetQ);
+
+                for (let iNote of notes) {
+                    if (iNote.note === note) {
+                        return;
+                    }
                 }
 
                 noteInfo = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
@@ -810,18 +825,23 @@ export class DrumCtrl {
         result = `
             <div data-bottom-command-panel>
                 <div style="${rowStyle}">
-                    <span 
+                    <!--span 
                         style="${style}"
                         data-ide-action="ready"
-                    >ready</span>
+                    >ready</span-->
                     <span
                         style="${style}"
                         data-ide-action="draft"
-                    >draft</span>
-                    <span
+                    >save</span>
+                    &nbsp;                    
+                    <!--span
                         style="${style}"
                         data-ide-action="clear"
-                    >clear</span>
+                    >clear</span-->
+                    <span
+                        style="${style}"
+                        data-ide-action="stop"
+                    >stop</span>
                     <span
                         style="${style}"
                         data-ide-action="play-both"
@@ -894,7 +914,7 @@ export class DrumCtrl {
                 <span
                     style="${style}"
                     data-action-out="play-one"
-                >play1</span>
+                >ply</span>
             </div>
             <div style="${rowStyle}">
                 <!--span 
@@ -1220,7 +1240,7 @@ export class DrumCtrl {
                 cellCount = Math.floor((row.rowDurationByHeadQ % un.NUM_120) / 10);
             }
 
-            const rowInPartId = `${currentEdit.editIndex}:${i}`
+            const rowInPartId = `${currentEdit.editIndex}-${i}`
 
             acc = acc + `<span
                 style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0;"
@@ -1243,10 +1263,10 @@ export class DrumCtrl {
                 <span 
                     style="padding: .5rem;"
                 >${currentEdit.name}-${currentEdit.outList[currentEdit.editIndex - 1]}-${currentEdit.editIndex}</span>
-                <span
+                <!--span
                     style="${cmdStyle}"
                     data-ide-action="play-all"
-                >playAll</span>                
+                >playAll</span-->                
                 <span
                     style="${cmdStyle}"
                     data-ide-action="play-active"
@@ -1376,7 +1396,8 @@ export class DrumCtrl {
             const arr = Array(count).fill(null);
             return arr.map(() => ({
                 bgColor: 'whitesmoke',
-                id: 0,
+                noteId: 0,
+                cellId: 0,
                 char: '',
                 startOffsetQ: 0,
                 totalOffsetQ: 0,
@@ -1391,7 +1412,8 @@ export class DrumCtrl {
 
         const getTextAndColor = (arr: NoteItem[]): PrintCell => {
             const result: PrintCell = {
-                id: 0,
+                noteId: 0,
+                cellId: 0,
                 char: '',
                 //color: 'white',
                 bgColor: 'lightgray',
@@ -1418,21 +1440,21 @@ export class DrumCtrl {
 
             if (arr.length) {
                 result.char = arr[0].char || '?';
-                result.id = arr[0].id || 0;
+                result.noteId = arr[0].id || 0;
             }
             else {
                 result.char = map.hc ? '_' : '';
-                result.id = map.hc ? map.hc : 0;
+                result.noteId = map.hc ? map.hc : 0;
             }
 
             if (map.bd && map.sn) {
-                result.id = map.bd;
+                result.noteId = map.bd;
                 result.bgColor = 'black';
             } else if (map.bd) {
-                result.id = map.bd;
+                result.noteId = map.bd;
                 result.bgColor = 'sienna';
             } else if (map.sn) {
-                result.id = map.sn;
+                result.noteId = map.sn;
                 result.bgColor = 'deeppink';
             } else if (arr.length) {
                 result.bgColor = 'darkgray';
@@ -1441,6 +1463,9 @@ export class DrumCtrl {
             if (map.hc) {
                 result.underline = true;
             }
+
+            const cell = this.liner.getCellByNoteId(result.noteId);
+            result.cellId = cell?.id;
 
             return result;
         }
@@ -1477,7 +1502,8 @@ export class DrumCtrl {
                 const col = cols[iCell];
                 const textAndColor = getTextAndColor(notes);
 
-                col.id = textAndColor.id;
+                col.cellId = textAndColor.cellId;
+                col.noteId = textAndColor.noteId;
                 col.bgColor = textAndColor.bgColor;
                 col.char = textAndColor.char;
                 col.underline = textAndColor.underline;
@@ -1509,7 +1535,7 @@ export class DrumCtrl {
             });
 
             cols.forEach((cell, iCell) => {
-                if (!cell.id) return;
+                if (!cell.cellId) return;
 
                 const textDecoration = cell.underline ? 'underline' : 'none';
                 const rem = 'rem';
@@ -1519,7 +1545,7 @@ export class DrumCtrl {
                         data-drum-cell-row="${iRow}"
                         data-drum-cell-nio="${iCell}"
                         data-drum-cell-row-nio="${iRow}-${iCell}"                                                
-                        data-drum-cell-id="${cell.id}"
+                        data-drum-cell-id="${cell.cellId}"
                         data-total-offset="${cell.totalOffsetQ}"                        
                         style="
                             box-sizing: border-box;

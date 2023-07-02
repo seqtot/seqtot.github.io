@@ -55,8 +55,25 @@ export class LineModel {
         return this.rows[this.findRowIndByOffset(offsetQ)];
     }
 
-    moveItem(id: number, value: number): {row: number, childInd: number  } | null {
+    getCellByNoteId(id: number): Cell {
+        for (let row of this.rows) {
+            for (let cell of row.cells) {
+                for (let note of cell.notes) {
+                    if (note.id === id) {
+                        return cell;
+                    }
+                }
+            }
+        }
+
+        return null as any;
+    }
+
+    moveCell(id: number, value: number): {row: number, childInd: number  } | null {
         const ind = this.getRowAndCellIndexes(id);
+
+        console.log(id, value, ind);
+
         if (!ind) {
             return null;
         }
@@ -89,12 +106,14 @@ export class LineModel {
     }
 
     setData(rows: Line[]) {
-        let id = 1;
+        let noteId = 1;
+        let cellId = 1;
 
         rows.forEach(row => {
             row.cells.forEach(cell => {
+                cell.id = cellId++;
                 cell.notes.forEach(note => {
-                    note.id = id++;
+                    note.id = noteId++;
                 })
             })
         });
@@ -441,6 +460,24 @@ export class LineModel {
         row.cells.forEach(cell => {
             if (cell.startOffsetQ !== startOffsetQ) {
                 return
+            }
+
+            cell.notes.forEach(note => result.push(note));
+        });
+
+        return result;
+    }
+
+    getNotesByOffset(offsetQ: number): NoteItem[] {
+        const result: NoteItem[] = []
+
+        const row = this.getRowByOffset(offsetQ);
+
+        if (!row) return result
+
+        row.cells.forEach(cell => {
+            if ((cell.startOffsetQ + row.blockOffsetQ) !== offsetQ) {
+                return result;
             }
 
             cell.notes.forEach(note => result.push(note));
