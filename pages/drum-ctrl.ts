@@ -1000,18 +1000,18 @@ export class DrumCtrl {
                 <div style="display: flex; user-select: none; touch-action: none; position: relative;">
                     <div style="width: 66%;">
                         <div style="display: flex; width: 100%;">
-                            <!-- cowbell sr -->
                             <div 
-                                style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightblue; user-select: none; touch-action: none;"
-                                data-action-drum-key="th"
-                                data-keyboard-id="${keyboardId}-${ind++}"  
-                                data-color="steelblue"
-                                data-color2="lightblue"
-                                data-char="h"
+                                style="background-color: antiquewhite; width: 50%; height: ${botRowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                                data-action-drum-key="tl"
+                                data-keyboard-id="${keyboardId}-${ind++}"
+                                data-color="lightgray"
+                                data-color2="lightgray"
+                                data-char="l"
                             >
-                                <!--<br/>&nbsp;K-k-->
+                                <!--data-action-drum-key="sn+hc"
+                                data-keyboard-id="${keyboardId}-${ind++}"-->
+                                <!--<br/>&nbsp;A-a-->
                             </div>
-                            <!-- cowbell sr -->
                             <div 
                                 style="width: 50%; height: ${topRowHeight}rem; text-align: center; background-color: lightgreen; user-select: none; touch-action: none;"
                                 data-action-drum-key="tm"
@@ -1090,6 +1090,17 @@ export class DrumCtrl {
                     </div>
 
                     <div style="width: 33%; user-select: none; touch-action: none;">
+                        <div 
+                            style="width: 100%; height: ${topRowHeight}${rem}; text-align: center; background-color: lightblue; user-select: none; touch-action: none;"
+                            data-action-drum-key="th"
+                            data-keyboard-id="${keyboardId}-${ind++}"  
+                            data-color="steelblue"
+                            data-color2="lightblue"
+                            data-char="h"
+                        >
+                            <!--<br/>&nbsp;K-k-->
+                        </div>
+                                                
                         <div
                             style="height: ${midRowHeight}${rem}; width: 100%; background-color: lightpink; user-select: none; touch-action: none;"
                             data-action-drum-key="sn"
@@ -1101,19 +1112,6 @@ export class DrumCtrl {
                         >
                             <!--&nbsp;V-v-->
                         </div>
-                        
-                        <div 
-                            style="background-color: antiquewhite; width: 100%; height: ${botRowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                            data-action-drum-key="tl"
-                            data-keyboard-id="${keyboardId}-${ind++}"
-                            data-color="lightgray"
-                            data-color2="lightgray"
-                            data-char="l"
-                        >
-                            <!--data-action-drum-key="sn+hc"
-                            data-keyboard-id="${keyboardId}-${ind++}"-->
-                            <!--<br/>&nbsp;A-a-->
-                        </div>                        
                         
                         <div 
                             style="width: 100%; height: ${botRowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
