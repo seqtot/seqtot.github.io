@@ -131,7 +131,12 @@ export class Sound {
     static setToneSound(id: number, varName: string, fontObj: any) {
         window[varName] = fontObj;
         Sound.Instruments[id] = window[varName];
-        preparePreset(this.ctx, <any>window[varName], id);
+        preparePreset({
+            audioContext: this.ctx,
+            preset: <any>window[varName],
+            var: varName,
+            id
+        });
     }
 
     static AddToneSound(id: number) {
@@ -153,7 +158,12 @@ export class Sound {
             // и он есть
             if (instrObj) {
                 //console.log('prepare', id);
-                preparePreset(this.ctx, <any>instrObj, id);
+                preparePreset({
+                    audioContext: this.ctx,
+                    preset: <any>instrObj,
+                    var: variable,
+                    id
+                });
                 instruments[id] = instrObj;
 
                 delete Sound.LoadingInstruments[id];
@@ -208,7 +218,12 @@ export class Sound {
 
             // и он есть
             if (instrObj) {
-                preparePreset(this.ctx, <any>instrObj, id);
+                preparePreset({
+                    audioContext: this.ctx,
+                    preset: <any>instrObj,
+                    var: variable,
+                    id
+                });
                 instruments[id] = instrObj;
 
                 delete Sound.LoadingInstruments[id];

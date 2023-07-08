@@ -43,7 +43,11 @@ export class WebAudioFontLoader {
 	decodeAfterLoading(audioContext: AudioContext, variableName: string) {
 		var me = this;
 		this.waitOrFinish(variableName, function () {
-			preparePreset(audioContext, (window[variableName] as any) as WavePreset);
+			preparePreset({
+				audioContext,
+				preset: (window[variableName] as any) as WavePreset,
+				var: variableName,
+			});
 		});
 	};
 	waitOrFinish(variableName: string, onFinish: () => void) {
@@ -488,24 +492,143 @@ export class WebAudioFontLoader {
 		if (this.drumKeyArray.length == 0) {
 			this.drumKeyArray = [
 				//'35_0_SBLive_sf2'
-				'35_0_Chaos_sf2_file'
-				, '35_12_JCLive_sf2_file', '35_16_JCLive_sf2_file', '35_18_JCLive_sf2_file', '35_4_Chaos_sf2_file', '36_0_SBLive_sf2', '36_12_JCLive_sf2_file', '36_16_JCLive_sf2_file', '36_18_JCLive_sf2_file'
-				, '36_4_Chaos_sf2_file', '37_0_SBLive_sf2', '37_12_JCLive_sf2_file', '37_16_JCLive_sf2_file', '37_18_JCLive_sf2_file', '37_4_Chaos_sf2_file', '38_0_SBLive_sf2', '38_12_JCLive_sf2_file'
-				, '38_16_JCLive_sf2_file', '38_18_JCLive_sf2_file', '38_4_Chaos_sf2_file', '39_0_SBLive_sf2', '39_12_JCLive_sf2_file', '39_16_JCLive_sf2_file', '39_18_JCLive_sf2_file', '39_4_Chaos_sf2_file'
-				, '40_0_SBLive_sf2', '40_12_JCLive_sf2_file', '40_16_JCLive_sf2_file', '40_18_JCLive_sf2_file', '40_4_Chaos_sf2_file', '41_0_SBLive_sf2', '41_12_JCLive_sf2_file', '41_16_JCLive_sf2_file'
-				, '41_18_JCLive_sf2_file', '41_4_Chaos_sf2_file', '42_0_SBLive_sf2', '42_12_JCLive_sf2_file', '42_16_JCLive_sf2_file', '42_18_JCLive_sf2_file', '42_4_Chaos_sf2_file', '43_0_SBLive_sf2'
-				, '43_12_JCLive_sf2_file', '43_16_JCLive_sf2_file', '43_18_JCLive_sf2_file', '43_4_Chaos_sf2_file', '44_0_SBLive_sf2', '44_12_JCLive_sf2_file', '44_16_JCLive_sf2_file', '44_18_JCLive_sf2_file'
-				, '44_4_Chaos_sf2_file', '45_0_SBLive_sf2', '45_12_JCLive_sf2_file', '45_16_JCLive_sf2_file', '45_18_JCLive_sf2_file', '45_4_Chaos_sf2_file', '46_0_SBLive_sf2', '46_12_JCLive_sf2_file'
-				, '46_16_JCLive_sf2_file', '46_18_JCLive_sf2_file', '46_4_Chaos_sf2_file', '47_0_SBLive_sf2', '47_12_JCLive_sf2_file', '47_16_JCLive_sf2_file', '47_18_JCLive_sf2_file', '47_4_Chaos_sf2_file'
-				, '48_0_SBLive_sf2', '48_12_JCLive_sf2_file', '48_16_JCLive_sf2_file', '48_18_JCLive_sf2_file', '48_4_Chaos_sf2_file', '49_0_SBLive_sf2', '49_12_JCLive_sf2_file', '49_16_JCLive_sf2_file'
-				, '49_18_JCLive_sf2_file', '49_4_Chaos_sf2_file', '50_0_SBLive_sf2', '50_12_JCLive_sf2_file', '50_16_JCLive_sf2_file', '50_18_JCLive_sf2_file', '50_4_Chaos_sf2_file', '51_0_SBLive_sf2'
-				, '51_12_JCLive_sf2_file', '51_16_JCLive_sf2_file', '51_18_JCLive_sf2_file', '51_4_Chaos_sf2_file', '52_0_SBLive_sf2', '52_12_JCLive_sf2_file', '52_16_JCLive_sf2_file', '52_18_JCLive_sf2_file'
-				, '52_4_Chaos_sf2_file', '53_0_SBLive_sf2', '53_12_JCLive_sf2_file', '53_16_JCLive_sf2_file', '53_18_JCLive_sf2_file', '53_4_Chaos_sf2_file', '54_0_SBLive_sf2', '54_12_JCLive_sf2_file'
-				, '54_16_JCLive_sf2_file', '54_18_JCLive_sf2_file', '54_4_Chaos_sf2_file', '55_0_SBLive_sf2', '55_12_JCLive_sf2_file', '55_16_JCLive_sf2_file', '55_18_JCLive_sf2_file', '55_4_Chaos_sf2_file'
-				, '56_0_SBLive_sf2', '56_12_JCLive_sf2_file', '56_16_JCLive_sf2_file', '56_18_JCLive_sf2_file', '56_4_Chaos_sf2_file', '57_0_SBLive_sf2', '57_12_JCLive_sf2_file', '57_16_JCLive_sf2_file'
-				, '57_18_JCLive_sf2_file', '57_4_Chaos_sf2_file', '58_0_SBLive_sf2', '58_12_JCLive_sf2_file', '58_16_JCLive_sf2_file', '58_18_JCLive_sf2_file', '58_4_Chaos_sf2_file', '59_0_SBLive_sf2'
-				, '59_12_JCLive_sf2_file', '59_16_JCLive_sf2_file', '59_18_JCLive_sf2_file', '59_4_Chaos_sf2_file', '60_0_SBLive_sf2', '60_12_JCLive_sf2_file', '60_16_JCLive_sf2_file', '60_18_JCLive_sf2_file'
-				, '60_4_Chaos_sf2_file', '61_0_SBLive_sf2', '61_12_JCLive_sf2_file', '61_16_JCLive_sf2_file', '61_18_JCLive_sf2_file', '61_4_Chaos_sf2_file', '62_0_SBLive_sf2', '62_12_JCLive_sf2_file'
+				'35_0_Chaos_sf2_file', // 0
+				'35_12_JCLive_sf2_file',
+				'35_16_JCLive_sf2_file',
+				'35_18_JCLive_sf2_file',
+				'35_4_Chaos_sf2_file',
+				'36_0_SBLive_sf2',
+				'36_12_JCLive_sf2_file',
+				'36_16_JCLive_sf2_file',
+				'36_18_JCLive_sf2_file',
+				'36_4_Chaos_sf2_file',
+				'37_0_SBLive_sf2', // `10
+				'37_12_JCLive_sf2_file',
+				'37_16_JCLive_sf2_file',
+				'37_18_JCLive_sf2_file',
+				'37_4_Chaos_sf2_file',
+				'38_0_SBLive_sf2',
+				'38_12_JCLive_sf2_file',
+				'38_16_JCLive_sf2_file',
+				'38_18_JCLive_sf2_file',
+				'38_4_Chaos_sf2_file',
+				'39_0_SBLive_sf2', // 20
+				'39_12_JCLive_sf2_file',
+				'39_16_JCLive_sf2_file',
+				'39_18_JCLive_sf2_file',
+				'39_4_Chaos_sf2_file',
+				'40_0_SBLive_sf2',
+				'40_12_JCLive_sf2_file',
+				'40_16_JCLive_sf2_file',
+				'40_18_JCLive_sf2_file',
+				'40_4_Chaos_sf2_file',
+				'41_0_SBLive_sf2', // 30
+				'41_12_JCLive_sf2_file',
+				'41_16_JCLive_sf2_file',
+				'41_18_JCLive_sf2_file',
+				'41_4_Chaos_sf2_file',
+				'42_0_SBLive_sf2',
+				'42_12_JCLive_sf2_file',
+				'42_16_JCLive_sf2_file',
+				'42_18_JCLive_sf2_file',
+				'42_4_Chaos_sf2_file',
+				'43_0_SBLive_sf2', // 40
+				'43_12_JCLive_sf2_file',
+				'43_16_JCLive_sf2_file',
+				'43_18_JCLive_sf2_file',
+				'43_4_Chaos_sf2_file',
+				'44_0_SBLive_sf2',
+				'44_12_JCLive_sf2_file',
+				'44_16_JCLive_sf2_file',
+				'44_18_JCLive_sf2_file',
+				'44_4_Chaos_sf2_file',
+				'45_0_SBLive_sf2', // 50
+				'45_12_JCLive_sf2_file',
+				'45_16_JCLive_sf2_file',
+				'45_18_JCLive_sf2_file',
+				'45_4_Chaos_sf2_file',
+				'46_0_SBLive_sf2',
+				'46_12_JCLive_sf2_file',
+				'46_16_JCLive_sf2_file',
+				'46_18_JCLive_sf2_file',
+				'46_4_Chaos_sf2_file',
+				'47_0_SBLive_sf2', // 60
+				'47_12_JCLive_sf2_file',
+				'47_16_JCLive_sf2_file',
+				'47_18_JCLive_sf2_file',
+				'47_4_Chaos_sf2_file',
+				'48_0_SBLive_sf2',
+				'48_12_JCLive_sf2_file',
+				'48_16_JCLive_sf2_file',
+				'48_18_JCLive_sf2_file',
+				'48_4_Chaos_sf2_file',
+				'49_0_SBLive_sf2', // 70
+				'49_12_JCLive_sf2_file',
+				'49_16_JCLive_sf2_file',
+				'49_18_JCLive_sf2_file',
+				'49_4_Chaos_sf2_file',
+				'50_0_SBLive_sf2',
+				'50_12_JCLive_sf2_file',
+				'50_16_JCLive_sf2_file',
+				'50_18_JCLive_sf2_file',
+				'50_4_Chaos_sf2_file',
+				'51_0_SBLive_sf2',
+				'51_12_JCLive_sf2_file',
+				'51_16_JCLive_sf2_file',
+				'51_18_JCLive_sf2_file',
+				'51_4_Chaos_sf2_file',
+				'52_0_SBLive_sf2',
+				'52_12_JCLive_sf2_file',
+				'52_16_JCLive_sf2_file',
+				'52_18_JCLive_sf2_file',
+				'52_4_Chaos_sf2_file',
+				'53_0_SBLive_sf2',
+				'53_12_JCLive_sf2_file',
+				'53_16_JCLive_sf2_file',
+				'53_18_JCLive_sf2_file',
+				'53_4_Chaos_sf2_file',
+				'54_0_SBLive_sf2',
+				'54_12_JCLive_sf2_file',
+				'54_16_JCLive_sf2_file',
+				'54_18_JCLive_sf2_file',
+				'54_4_Chaos_sf2_file',
+				'55_0_SBLive_sf2',
+				'55_12_JCLive_sf2_file',
+				'55_16_JCLive_sf2_file',
+				'55_18_JCLive_sf2_file',
+				'55_4_Chaos_sf2_file',
+				'56_0_SBLive_sf2',
+				'56_12_JCLive_sf2_file',
+				'56_16_JCLive_sf2_file',
+				'56_18_JCLive_sf2_file',
+				'56_4_Chaos_sf2_file',
+				'57_0_SBLive_sf2',
+				'57_12_JCLive_sf2_file',
+				'57_16_JCLive_sf2_file',
+				'57_18_JCLive_sf2_file',
+				'57_4_Chaos_sf2_file',
+				'58_0_SBLive_sf2',
+				'58_12_JCLive_sf2_file',
+				'58_16_JCLive_sf2_file',
+				'58_18_JCLive_sf2_file',
+				'58_4_Chaos_sf2_file',
+				'59_0_SBLive_sf2',
+				'59_12_JCLive_sf2_file',
+				'59_16_JCLive_sf2_file',
+				'59_18_JCLive_sf2_file',
+				'59_4_Chaos_sf2_file',
+				'60_0_SBLive_sf2',
+				'60_12_JCLive_sf2_file',
+				'60_16_JCLive_sf2_file',
+				'60_18_JCLive_sf2_file',
+				'60_4_Chaos_sf2_file',
+				'61_0_SBLive_sf2',
+				'61_12_JCLive_sf2_file',
+				'61_16_JCLive_sf2_file',
+				'61_18_JCLive_sf2_file',
+				'61_4_Chaos_sf2_file',
+				'62_0_SBLive_sf2',
+				'62_12_JCLive_sf2_file'
 				, '62_16_JCLive_sf2_file', '62_18_JCLive_sf2_file', '62_4_Chaos_sf2_file', '63_0_SBLive_sf2', '63_12_JCLive_sf2_file', '63_16_JCLive_sf2_file', '63_18_JCLive_sf2_file', '63_4_Chaos_sf2_file'
 				, '64_0_SBLive_sf2', '64_12_JCLive_sf2_file', '64_16_JCLive_sf2_file', '64_18_JCLive_sf2_file', '64_4_Chaos_sf2_file', '65_0_SBLive_sf2', '65_12_JCLive_sf2_file', '65_16_JCLive_sf2_file'
 				, '65_18_JCLive_sf2_file', '65_4_Chaos_sf2_file', '66_0_SBLive_sf2', '66_12_JCLive_sf2_file', '66_16_JCLive_sf2_file', '66_18_JCLive_sf2_file', '66_4_Chaos_sf2_file', '67_0_SBLive_sf2'

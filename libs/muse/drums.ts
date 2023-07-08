@@ -152,14 +152,18 @@ export const drumCodes = {
     'highTom1': 'drum_50',
     'th1': 'drum_50',
 
+    'cc': 'drum_57',
     'crashCymbal2': 'drum_57',
     'cc2': 'drum_57',
-
     'crashCymbal1': 'drum_49',
     'cc1': 'drum_49',
 
+    'rc': 'drum_59',
     'rideCymbal2': 'drum_59',
+    'rc2': 'drum_59',
     'rideCymbal1': 'drum_51',
+    'rc1': 'drum_51',
+
     'splashCymbal': 'drum_55',
     'chineseCymbal': 'drum_52',
 
@@ -335,8 +339,8 @@ export const drumInfo: Record<
         octave: 'drum',
         volume: 0.5,
         instrCode: Drums.crashCymbal2,
-        noteLat: 'cc2',
-        noteRus: 'cc2',
+        noteLat: 'cc',
+        noteRus: 'cc',
     },
 
     'crashCymbal1': {
@@ -362,8 +366,8 @@ export const drumInfo: Record<
         octave: 'drum',
         volume: 0.5,
         instrCode: Drums.rideCymbal2,
-        noteLat: 'rideCymbal2',
-        noteRus: 'rideCymbal2',
+        noteLat: 'rc',
+        noteRus: 'rc',
     },
 
     'rideCymbal1': {
@@ -371,8 +375,8 @@ export const drumInfo: Record<
         octave: 'drum',
         volume: 0.5,
         instrCode: Drums.rideCymbal1,
-        noteLat: 'rideCymbal1',
-        noteRus: 'rideCymbal1',
+        noteLat: 'rc1',
+        noteRus: 'rc1',
     },
 
     'chineseCymbal': {

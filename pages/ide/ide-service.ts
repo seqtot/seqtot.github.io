@@ -16,6 +16,7 @@ class IdeService extends  EventEmitter {
         editIndex: number,
         name: string,
         metaByLines: {[key: string]: string},
+        freezeStructure: boolean,
     } = { } as any;
 
     get guid(): number {

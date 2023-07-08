@@ -192,7 +192,7 @@ export class DrumBoard {
                         >
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}rem; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum-key="empty"
+                                data-action-drum-key="cc"
                                 data-keyboard-id="${keyboardId}-${ind++}"
                                 data-color="lightgray"
                                 data-color2="whitesmoke"                                                                
@@ -230,7 +230,7 @@ export class DrumBoard {
                         
                             <div 
                                 style="width: 50%; height: ${midRowHeight/2}${rem}; box-sizing: border-box; text-align: center; background-color: whitesmoke; user-select: none; touch-action: none;"
-                                data-action-drum-key="empty"
+                                data-action-drum-key="rc"                                
                                 data-keyboard-id="${keyboardId}-${ind++}"   
                                 data-color="lightgray"
                                 data-color2="whitesmoke"

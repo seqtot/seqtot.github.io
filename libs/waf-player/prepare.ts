@@ -263,18 +263,30 @@ export async function prepareZone (ctx: AudioContext, zone: WaveZone): Promise<W
 	return dfr.promise;
 }
 
-export async function preparePreset (audioContext: AudioContext, preset: WavePreset, info?: any): Promise<WavePreset | null> {
-	if (!preset) {
-		console.log('preparePreset: preset is null', info);
+export async function preparePreset(
+	x: {
+		audioContext: AudioContext,
+		preset: WavePreset,
+		var?: string,
+		id?: number | string
+	} & {[key: string]: any}
+): Promise<WavePreset | null> {
+	if (!x.preset) {
+		console.log('preparePreset: preset is null', x);
 
 		return Promise.resolve(null);
 	}
 
-	preset.pitchShift = numValue(preset.pitchShift, 0);
+	x.preset.pitchShift = numValue(x.preset.pitchShift, 0);
 
-	for (let i = 0; i < preset.zones.length; i++) {
-		prepareZone(audioContext, preset.zones[i]);
+	// TODO: сделать нормальный override
+	if (x.var === '_tone_0180_FluidR3_GM_sf2_file') {
+		x.preset.pitchShift = 12;
 	}
 
-	return Promise.resolve(preset);
+	for (let i = 0; i < x.preset.zones.length; i++) {
+		prepareZone(x.audioContext, x.preset.zones[i]);
+	}
+
+	return Promise.resolve(x.preset);
 }

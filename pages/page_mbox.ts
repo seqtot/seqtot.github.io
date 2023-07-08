@@ -306,6 +306,7 @@ export class MBoxPage {
                 ideService.currentEdit.outBlock = this.outBlock;
                 ideService.currentEdit.editIndex = index;
                 ideService.currentEdit.metaByLines = this.getMetaByLines();
+                ideService.currentEdit.freezeStructure = true;
 
                 this.context.$f7router.navigate('/page/page_keyboard/');
             });

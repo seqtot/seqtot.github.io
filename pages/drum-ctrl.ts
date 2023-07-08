@@ -36,11 +36,20 @@ interface Page {
     context: ComponentContext,
 }
 
-const drumKodes = [
-    'bd', 'sn', 'hc',
-    'tl', 'tm', 'th',
-    // 'ho', 'hp', 'sr',
-    // 'cc'
+const drumKodes1 = [
+    {note: 'bd', alias: 'пы'},
+    {note: 'sn', alias: 'ба'},
+    {note: 'tl', alias: 'ту'},
+    {note: 'tm', alias: 'тo'},
+    {note: 'th', alias: 'та'},
+];
+
+const drumKodes2 = [
+    {note: 'hc', alias: 'чи'},
+    {note: 'ho', alias: 'ho'},
+    {note: 'hp', alias: 'hp'},
+    {note: 'cc', alias: 'щи'},
+    {note: 'rc', alias: 'ци'},
 ];
 
 const someDrum = {
@@ -70,23 +79,47 @@ const drumNotesInfo = {
         bodyColor: 'whitesmoke',
         char: 'x',
     },
+    ho: {
+        note: 'ho',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+    hp: {
+        note: 'hp',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+    },
+    cc: {
+        note: 'cc',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'щ',
+    },
+    rc: {
+        note: 'rc',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'ц',
+    },
     tl: {
         note: 'tl',
         headColor: 'lightgray',
         bodyColor: 'lightgray',
-        char: 'l',
+        char: 'у',
     },
     tm: {
         note: 'tm',
         headColor: 'seagreen',
         bodyColor: 'lightgreen',
-        char: 'm',
+        char: 'о',
     },
     th: {
         note: 'th',
         headColor: 'steelblue',
         bodyColor: 'lightblue',
-        char: 'h',
+        char: 'а',
     },
 }
 
@@ -247,6 +280,41 @@ export class DrumCtrl {
         return !!item && !!item.editIndex && !!item.outList &&  !!item.outBlock && !!item.blocks;
     }
 
+    loadFile() {
+        // https://webtips.dev/download-any-file-with-javascript
+        let songName = ideService.currentEdit?.name || '';
+
+        if (!songName) return;
+
+        let songNode: StoredSongNode;
+
+        if (!localStorage.getItem(songName)) {
+            songNode = {};
+        } else {
+            songNode = JSON.parse(localStorage.getItem(songName));
+        }
+
+        let data = JSON.stringify(songNode);
+        let type = 'application/json';
+        let name = `${songName}.json`;
+
+        downloader(data, type, name)
+
+        function downloader(data, type, name) {
+            let blob = new Blob([data], {type});
+            let url = (window as any).URL.createObjectURL(blob);
+            downloadURI(url, name);
+            (window as any).URL.revokeObjectURL(url);
+        }
+
+        function downloadURI(uri, name) {
+            let link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            link.click();
+        }
+    }
+
     saveEditingItems() {
         if (!this.hasEditedItems) return;
 
@@ -400,8 +468,12 @@ export class DrumCtrl {
             el.addEventListener('pointerdown', evt => this.playBoth());
         });
 
-        getWithDataAttrValue(ids.ideAction, 'draft', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => this.saveEditingItems());
+        getWithDataAttrValue(ids.ideAction, 'save', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.saveEditingItems());
+        });
+
+        getWithDataAttrValue(ids.ideAction, 'load', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.loadFile());
         });
 
         getWithDataAttrValue(ids.ideAction, 'back', this.page.pageEl)?.forEach((el: HTMLElement) => {
@@ -676,6 +748,10 @@ export class DrumCtrl {
         });
     }
 
+    drumInstrumentClick(el: HTMLElement) {
+
+    }
+
     subscribeEvents() {
         const page = this.page;
         const pageEl = page.pageEl;
@@ -765,6 +841,8 @@ export class DrumCtrl {
                 }
 
                 notes.forEach(keyOrNote => {
+                    //console.log(keyOrNote);
+
                     page.synthesizer.playSound({
                         keyOrNote,
                         volume,
@@ -832,7 +910,7 @@ export class DrumCtrl {
                     >ready</span-->
                     <span
                         style="${style}"
-                        data-ide-action="draft"
+                        data-ide-action="save"
                     >save</span>
                     &nbsp;
                     <span
@@ -859,7 +937,7 @@ export class DrumCtrl {
     }
 
     getRowActionsCommands(): string {
-        const display = `display: ${this.hasIdeItem ? 'none': 'block'};`;
+        const display = `display: ${ideService.currentEdit?.freezeStructure ? 'none': 'block'};`;
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const rowStyle = `${display} width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
 
@@ -877,7 +955,7 @@ export class DrumCtrl {
                     data-action-out-row="insert-row"
                 >insR</span>                                  
                 <span
-                    style="${style}"
+                    style="${style} color: red;"
                     data-action-out-row="delete-row"
                 >delR</span>                    
             </div>        
@@ -975,22 +1053,37 @@ export class DrumCtrl {
             ${this.getRowActionsCommands()}            
         `.trim();
 
-        let instrPanel = ''
+        let instrPanel1 = ''
 
-        drumKodes.forEach(note => {
-            instrPanel += `
+        drumKodes1.forEach(item => {
+            instrPanel1 += `
                 <span
                     style="${style}"
-                    data-${ids.actionDrumNote}="${note}"
-                >${note}</span>
+                    data-${ids.actionDrumNote}="${item.note}"
+                >${item.alias}</span>
             `;
         });
-        instrPanel = `<div
-            data-drum-instruments
-            style="${rowStyle}"
-        >${instrPanel}</div>`;
 
-        return result + instrPanel;
+        instrPanel1 = `<div
+            style="${rowStyle}"
+        >${instrPanel1}</div>`;
+
+        let instrPanel2 = ''
+
+        drumKodes2.forEach(item => {
+            instrPanel2 += `
+                <span
+                    style="${style}"
+                    data-${ids.actionDrumNote}="${item.note}"
+                >${item.alias}</span>
+            `;
+        });
+
+        instrPanel2 = `<div
+            style="${rowStyle}"
+        >${instrPanel2}</div>`;
+
+        return result + instrPanel1 + instrPanel2;
     }
 
     getDrumBoardContent(keyboardId: string): string {
@@ -1301,7 +1394,7 @@ export class DrumCtrl {
             });
 
             if (arr.length) {
-                result.char = arr[0].char || '?';
+                result.char = (drumNotesInfo[arr[0].note])?.char || '?';
                 result.noteId = arr[0].id || 0;
             }
             else {
