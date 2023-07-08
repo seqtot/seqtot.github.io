@@ -21,6 +21,7 @@ const ids = {
     ideAction: 'ide-action',
     ideContent: 'ide-content',
     bottomCommandPanel: 'bottom-command-panel',
+    actionDrumNote: 'action-drum-note',
 };
 
 interface Page {
@@ -173,10 +174,20 @@ export class DrumCtrl {
     keySequence: KeyData[] = [];
     lastTickTime: number = 0;
     tickStartMs: number = 0;
-    activeCellId = 0;
-    activeCellNio = 0;
-    activeCellRow = 0;
-    activeCellRowNio = '';
+    activeCell: {
+        id: number,
+        col: number,
+        row: number,
+        rowCol: string,
+        offset: number,
+    } = {
+        id: 0,
+        col: 0,
+        row: 0,
+        rowCol: '',
+        offset: 0
+    };
+
     liner = new LineModel();
     editedItems: EditedItem[] = [];
     board: DrumBoard;
@@ -185,40 +196,45 @@ export class DrumCtrl {
         this.board = new DrumBoard();
     }
 
-    highlightCellById(id: number | string) {
-        id = parseInteger(id, 0);
+    highlightCellByRowCol(rowCol: string, highlight: boolean = true) {
+        rowCol = rowCol || this.activeCell.rowCol;
 
-        getWithDataAttr('drum-cell-id', this.page.pageEl).forEach(el => {
-            el.style.outline = null;
-            el.style.zIndex = '0';
-            el.dataset['selected'] = '';
-        });
-
-        if (id) {
-            getWithDataAttrValue('drum-cell-id', id).forEach(el => {
-                el.style.outline = '3px solid yellow';
-                el.style.zIndex = '1';
-                el.dataset['selected'] = 'true';
-            });
-        }
-    }
-
-    highlightCellByRowNio(rowNio: string, highlight: boolean = true) {
-        rowNio = rowNio || this.activeCellRowNio;
-
-        getWithDataAttr('drum-cell-row-nio', this.page.pageEl).forEach(el => {
+        getWithDataAttr('drum-cell-row-col', this.page.pageEl).forEach(el => {
             el.style.outline = null;
             el.style.zIndex = '0';
             el.dataset['selected'] = '';
         });
 
         if (highlight) {
-            getWithDataAttrValue('drum-cell-row-nio', rowNio).forEach(el => {
+            this.setActiveCell(null);
+            const el = getWithDataAttrValue('drum-cell-with-id-row-col', rowCol)[0] || getWithDataAttrValue('drum-cell-row-col', rowCol)[0];
+
+            if (el) {
+                this.setActiveCell(el);
+
                 el.style.outline = '3px solid yellow';
                 el.style.zIndex = '1';
                 el.dataset['selected'] = 'true';
-            });
+
+                this.highlightInstruments();
+            }
         }
+    }
+
+    highlightInstruments() {
+        getWithDataAttr(ids.actionDrumNote, this.page.pageEl).forEach(el => {
+            el.style.fontWeight = '400';
+            el.style.backgroundColor = 'white';
+        });
+
+        const notes = this.liner.getNotesByOffset(this.activeCell.offset);
+
+        notes.forEach(note => {
+            getWithDataAttrValue(ids.actionDrumNote, note.note, this.page.pageEl).forEach(el => {
+                el.style.fontWeight = '700';
+                el.style.backgroundColor = 'lightgray';
+            });
+        });
     }
 
     get hasEditedItems(): boolean {
@@ -451,64 +467,163 @@ export class DrumCtrl {
         });
     }
 
-    subscribeOutCells() {
-        getWithDataAttr('drum-cell-row-nio', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('click', evt => {
-                //console.log(el.dataset);
-
-                if (!el.dataset['selected']) {
-                    this.activeCellId = parseInteger(el.dataset['drumCellId'], 0); // data-drum-cell-id
-                    this.activeCellNio = parseInteger(el.dataset['drumCellNio'], 0); // data-drum-cell-nio
-                    this.activeCellRow = parseInteger(el.dataset['drumCellRow'], 0); // data-drum-cell-row
-                    this.activeCellRowNio = el.dataset['drumCellRowNio']; // data-drum-cell-row-nio
-                    this.highlightCellByRowNio(this.activeCellRowNio);
-                } else {
-                    this.highlightCellByRowNio(this.activeCellRowNio, false);
-
-                    this.activeCellId = 0;
-                    this.activeCellNio = 0;
-                    this.activeCellRow = 0;
-                    this.activeCellRowNio = '';
-                }
-            });
-        });
+    getCellId(el: HTMLElement) {
+        return parseInteger(el.dataset['drumCellId'], 0);
     }
 
-    subscribeEditCommands() {
-        const moveItem = (id: number, value: number) => {
-            const result = this.liner.moveCell(id, value);
-
-            //console.log(result);
-            //console.log(this.liner.rows);
-
-            if (result) {
-                this.printModel(this.liner.rows);
-                this.highlightCellById(this.activeCellId);
+    getCellInfo(el?: HTMLElement): this['activeCell'] {
+        if (!el) {
+            return  {
+                id: 0,
+                col: 0,
+                row: 0,
+                rowCol: '',
+                offset: 0,
             }
         }
 
+        return {
+            id: this.getCellId(el), // data-drum-cell-id
+            row: parseInteger(el.dataset['drumCellRow'], 0), // data-drum-cell-row
+            col: parseInteger(el.dataset['drumCellCol'], 0), // data-drum-cell-col
+            rowCol: el.dataset['drumCellRowCol'], // data-drum-cell-row-col
+            offset: parseInteger(el.dataset['totalOffset'], 0), // data-total-offset
+        }
+    }
+
+    setActiveCell(el?: HTMLElement) {
+        this.activeCell = this.getCellInfo(el);
+    }
+
+    chessCellClick(el: HTMLElement) {
+        console.log(el.dataset);
+
+        const offset = parseInteger(el.dataset['totalOffset'], null);
+
+        if (offset === null) {
+            return;
+        }
+
+        if (!el.dataset['selected']) {
+            this.setActiveCell(el);
+            this.highlightCellByRowCol(this.activeCell.rowCol);
+        } else {
+            this.highlightCellByRowCol(this.activeCell.rowCol, false);
+            this.setActiveCell(null);
+        }
+    }
+
+    subscribeOutCells() {
+        getWithDataAttr('drum-cell-row-col', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.chessCellClick(el));
+        });
+    }
+
+    drumNoteClick(el: HTMLElement) {
+        const rowCol = this.activeCell.rowCol;
+        const cell = getWithDataAttrValue('drum-cell-row-col', rowCol)[0];
+
+        if (!cell) return;
+
+        const totalOffsetQ = parseInteger(cell.dataset['totalOffset'], null);
+
+        if (totalOffsetQ === null) return;
+
+        const note = el.dataset['actionDrumNote'];
+
+        if (!note) return;
+
+        let noteInfo = (drumNotesInfo[note] || someDrum) as NoteItem;
+        noteInfo = {
+            ...noteInfo,
+            note,
+            durQ: 10,
+        }
+
+        const notes = this.liner.getNotesByOffset(totalOffsetQ);
+
+        let isDelete = false;
+
+        for (let iNote of notes) {
+            if (iNote.note === note) {
+                isDelete = true;
+
+                this.liner.deleteNoteByNoteAndOffset(totalOffsetQ, note);
+            }
+        }
+
+        if (!isDelete) {
+            let info = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
+            this.printModel(this.liner.rows);
+            this.highlightCellByRowCol(rowCol);
+            this.activeCell.id = info.note.id;
+        } else {
+            this.printModel(this.liner.rows);
+            this.highlightCellByRowCol(rowCol);
+        }
+    }
+
+    moveCell(id: number, value: number) {
+        const result = this.liner.moveCell(id, value);
+
+        if (result) {
+            this.printModel(this.liner.rows);
+            this.highlightCellByRowCol(`${result.row}-${result.col}`);
+            this.activeCell.id = id;
+        }
+    }
+
+    deleteCell(el: HTMLElement) {
+        const cellEl = getWithDataAttrValue('drum-cell-row-col', this.activeCell.rowCol)[0];
+
+        if (!cellEl) return;
+
+        const totalOffset = parseInteger(cellEl.dataset['totalOffset'], null);
+
+        if (totalOffset === null) return;
+
+        this.liner.deleteCellByOffset(totalOffset);
+        this.printModel(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    deleteRow() {
+        if (!this.activeCell.rowCol) {
+            return null;
+        }
+
+        this.liner.deleteRow(this.activeCell.row);
+        this.printModel(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    insertRow() {
+        this.liner.addRowAfter(this.activeCell.row - 1);
+        this.printModel(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    addRow() {
+        this.liner.addRowAfter(this.activeCell.row);
+        this.printModel(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    subscribeEditCommands() {
         getWithDataAttrValue('action-out', 'top', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCellId, -120);
-            });
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, -120));
         });
 
         getWithDataAttrValue('action-out', 'bottom', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCellId, 120);
-            });
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, 120));
         });
 
         getWithDataAttrValue('action-out', 'left', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCellId, -10);
-            });
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, -10));
         });
 
         getWithDataAttrValue('action-out', 'right', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                moveItem(this.activeCellId, 10);
-            });
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, 10));
         });
 
         getWithDataAttrValue('action-out', 'play-one', this.page.pageEl)?.forEach((el: HTMLElement) => {
@@ -535,89 +650,31 @@ export class DrumCtrl {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 // 3*(2*120+1*60)_2*60
                 //this.liner.fillLinesStructure('1*120_1*60_1*120_1*60');
-                this.liner.fillLinesStructure('480');
-                this.printModel(this.liner.rows);
-
+                //this.liner.fillLinesStructure('480');
+                //this.printModel(this.liner.rows);
             });
         });
 
-        getWithDataAttrValue('action-out', 'delete', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                const cell = getWithDataAttrValue('drum-cell-id', this.activeCellId)[0];
-
-                if (!cell) return;
-
-                const totalOffset = parseInteger(cell.dataset['totalOffset'], null);
-
-                if (totalOffset === null) return;
-
-                this.liner.deleteCellByOffset(totalOffset);
-                this.printModel(this.liner.rows);
-                this.highlightCellByRowNio(this.activeCellRowNio);
-            });
+        getWithDataAttrValue('action-out', 'delete-cell', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.deleteCell(el));
         });
 
-        getWithDataAttr('action-drum-note', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                const cell = getWithDataAttrValue('drum-cell-row-nio', this.activeCellRowNio)[0];
-
-                if (!cell) return;
-
-                const totalOffsetQ = parseInteger(cell.dataset['totalOffset'], null);
-
-                if (totalOffsetQ === null) return;
-
-                const note = el.dataset['actionDrumNote'];
-
-                if (!note) return;
-
-                let noteInfo = (drumNotesInfo[note] || someDrum) as NoteItem;
-                noteInfo = {
-                    ...noteInfo,
-                    note,
-                    durQ: 10,
-                }
-
-                const notes = this.liner.getNotesByOffset(totalOffsetQ);
-
-                for (let iNote of notes) {
-                    if (iNote.note === note) {
-                        return;
-                    }
-                }
-
-                noteInfo = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
-                this.activeCellId = noteInfo.id;
-                this.printModel(this.liner.rows);
-                this.highlightCellByRowNio(this.activeCellRowNio);
-            });
+        getWithDataAttr(ids.actionDrumNote, this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
         });
 
-        getWithDataAttrValue('action-out-row', 'add', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                this.liner.addRowAfter(this.activeCellRow);
-                this.printModel(this.liner.rows);
-                this.highlightCellByRowNio(this.activeCellRowNio);
-            });
+        getWithDataAttrValue('action-out-row', 'add-row', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addRow());
         });
 
-        getWithDataAttrValue('action-out-row', 'insert', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                this.liner.addRowAfter(this.activeCellRow - 1);
-                this.printModel(this.liner.rows);
-                this.highlightCellByRowNio(this.activeCellRowNio);
-            });
+        getWithDataAttrValue('action-out-row', 'insert-row', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.insertRow());
         });
 
-        getWithDataAttrValue('action-out-row', 'delete', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                this.liner.deleteRow(this.activeCellRow);
-                this.printModel(this.liner.rows);
-                this.highlightCellByRowNio(this.activeCellRowNio);
-            });
+        getWithDataAttrValue('action-out-row', 'delete-row', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.deleteRow());
         });
     }
-
 
     subscribeEvents() {
         const page = this.page;
@@ -777,7 +834,11 @@ export class DrumCtrl {
                         style="${style}"
                         data-ide-action="draft"
                     >save</span>
-                    &nbsp;                    
+                    &nbsp;
+                    <span
+                        style="${style}"
+                        data-ide-action="load"
+                    >load</span>
                     <!--span
                         style="${style}"
                         data-ide-action="clear"
@@ -809,15 +870,15 @@ export class DrumCtrl {
             >
                 <span
                     style="${style}"
-                    data-action-out-row="add"
+                    data-action-out-row="add-row"
                 >addR</span>  
                 <span
                     style="${style}"
-                    data-action-out-row="insert"
+                    data-action-out-row="insert-row"
                 >insR</span>                                  
                 <span
                     style="${style}"
-                    data-action-out-row="delete"
+                    data-action-out-row="delete-row"
                 >delR</span>                    
             </div>        
         `.trim();
@@ -907,8 +968,8 @@ export class DrumCtrl {
                     data-action-out="test"
                 >tst</span>                
                 <span
-                    style="${style}"
-                    data-action-out="delete"
+                    style="${style} background-color: red; color: white;"
+                    data-action-out="delete-cell"
                 >del</span>                                                                        
             </div>
             ${this.getRowActionsCommands()}            
@@ -917,10 +978,10 @@ export class DrumCtrl {
         let instrPanel = ''
 
         drumKodes.forEach(note => {
-            instrPanel = instrPanel + `
+            instrPanel += `
                 <span
                     style="${style}"
-                    data-action-drum-note="${note}"
+                    data-${ids.actionDrumNote}="${note}"
                 >${note}</span>
             `;
         });
@@ -1315,8 +1376,8 @@ export class DrumCtrl {
                 totalOut = totalOut +
                     `<span
                         data-drum-cell-row="${iRow}"
-                        data-drum-cell-nio="${iCol}"
-                        data-drum-cell-row-nio="${iRow}-${iCol}"
+                        data-drum-cell-col="${iCol}"
+                        data-drum-cell-row-col="${iRow}-${iCol}"
                         data-drum-cell-id=""
                         data-total-offset="${col.totalOffsetQ}"                        
                         style="
@@ -1345,10 +1406,12 @@ export class DrumCtrl {
                 totalOut = totalOut +
                     `<span
                         data-drum-cell-row="${iRow}"
-                        data-drum-cell-nio="${iCell}"
-                        data-drum-cell-row-nio="${iRow}-${iCell}"                                                
+                        data-drum-cell-col="${iCell}"
+                        data-drum-cell-row-col="${iRow}-${iCell}"                                                
                         data-drum-cell-id="${cell.cellId}"
-                        data-total-offset="${cell.totalOffsetQ}"                        
+                        data-total-offset="${cell.totalOffsetQ}"
+                        data-drum-cell-with-id-offset="${cell.totalOffsetQ}"
+                        data-drum-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
                         style="
                             box-sizing: border-box;
                             border: 1px solid white;

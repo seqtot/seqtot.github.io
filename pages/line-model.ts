@@ -41,6 +41,12 @@ export type Line = {
     endLine?: boolean,
 }
 
+type CellCoord = {
+    row: number,
+    ind: number,
+    col: number,
+}
+
 export class LineModel {
     rows: Line[] = [];
 
@@ -69,18 +75,16 @@ export class LineModel {
         return null as any;
     }
 
-    moveCell(id: number, value: number): {row: number, childInd: number  } | null {
-        const ind = this.getRowAndCellIndexes(id);
+    moveCell(id: number, value: number): CellCoord | null {
+        const info = this.getRowAndCellIndexes(id);
 
-        console.log(id, value, ind);
-
-        if (!ind) {
+        if (!info) {
             return null;
         }
 
         const rows = this.rows;
-        const row = rows[ind.row];
-        const cell = rows[ind.row].cells[ind.childInd];
+        const row = rows[info.row];
+        const cell = rows[info.row].cells[info.ind];
 
         let newTotalOffsetQ = row.blockOffsetQ + cell.startOffsetQ + value;
         let oldTotalOffsetQ = row.startOffsetQ + row.blockOffsetQ;
@@ -119,6 +123,20 @@ export class LineModel {
         });
 
         this.rows = rows;
+    }
+
+    deleteNoteByNoteAndOffset(offset: number, note: string) {
+        const {row, cells} = this.getCellsByOffset(offset);
+
+        if (!row) return;
+
+        cells.forEach(cell => {
+            cell.notes = cell.notes.filter(iNote => iNote.note !== note);
+        });
+
+        row.cells = row.cells.filter(cell => !!cell.notes.length);
+
+        console.log(row, cells);
     }
 
     deleteCellByOffset(offsetQ: number) {
@@ -169,7 +187,10 @@ export class LineModel {
         }, []);
     }
 
-    addNoteByOffset(offsetQ: number, note: NoteItem): NoteItem {
+    addNoteByOffset(offsetQ: number, note: NoteItem): {
+        note: NoteItem,
+        coord: CellCoord,
+    } {
         const row = this.getRowByOffset(offsetQ);
 
         if (!row) return;
@@ -177,13 +198,18 @@ export class LineModel {
         note.id = this.getMaxNoteId() + 1;
         note.startOffsetQ = offsetQ - row.blockOffsetQ;
 
+        const id = this.getMaxCellId() + 1;
+
         row.cells.push({
-           id: this.getMaxCellId() + 1,
+           id,
            startOffsetQ: note.startOffsetQ,
            notes: [note]
         });
 
-        return note;
+        return {
+            note,
+            coord: this.getRowAndCellIndexes(id)
+        };
     }
 
     deleteRow(i: number) {
@@ -242,7 +268,7 @@ export class LineModel {
         }
     }
 
-    getRowAndCellIndexes(id: number): {row: number, childInd: number} | null {
+    getRowAndCellIndexes(id: number): CellCoord | null {
         if (!id || !this.rows) {
             return null;
         }
@@ -252,9 +278,12 @@ export class LineModel {
         for (let i = 0; i < rows.length; i++) {
             for (let j = 0; j < rows[i].cells.length; j++) {
                 if (rows[i].cells[j].id === id) {
+                    const offset = rows[i].cells[j].startOffsetQ - rows[i].startOffsetQ;
+
                     return {
                         row: i,
-                        childInd: j,
+                        ind: j,
+                        col: Math.ceil(offset / rows[i].cellSizeQ)
                     };
                 }
             }
@@ -477,11 +506,37 @@ export class LineModel {
 
         row.cells.forEach(cell => {
             if ((cell.startOffsetQ + row.blockOffsetQ) !== offsetQ) {
-                return result;
+                return;
             }
 
             cell.notes.forEach(note => result.push(note));
         });
+
+        return result;
+    }
+
+    getCellsByOffset(offsetQ: number): {
+        row: Line,
+        cells: Cell[]
+    } {
+        const result = {
+            row: null as Line,
+            cells: [],
+        }
+
+        const row = this.getRowByOffset(offsetQ);
+
+        if (!row) return result;
+
+        result.row = row;
+
+        row.cells.forEach(cell => {
+            if ((cell.startOffsetQ + row.blockOffsetQ) !== offsetQ) {
+                return;
+            }
+
+            result.cells.push(cell);
+        })
 
         return result;
     }
