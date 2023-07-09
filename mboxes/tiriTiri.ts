@@ -8,7 +8,7 @@ _ $back: v5; $mark: v0;
 # 120  240  360  480  600  720  840  960  1080 1200 1320 1440
 # 1560 1680 1800 1920 2040 2160 2280 2400 2520 2640 2760 2880
 
-<out b84 b90>
+<out b84>
 > ТЕМА   # a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C
 > СОЛО1  # a#a BDAB #fa BDAB de D#FAB     BDAB de #F#ABG #FED#C
 > ТЕМА   # -

@@ -1367,6 +1367,8 @@ export class DrumCtrl {
         rows.forEach((row, iRow) => {
             const nextRow = rows[iRow + 1];
             const offsets = this.liner.getOffsetsByRow(row);
+            const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
+            const rowBorderBottom = hasLine ? '1px solid gray;' : 'none;';
 
             totalOut = totalOut +
                 `<div style="
@@ -1380,7 +1382,7 @@ export class DrumCtrl {
                     user-select: none;
                     padding-top: .07rem;
                     height: 1.4rem;
-                    border-bottom: 1px solid lightgray;
+                    border-bottom: ${rowBorderBottom};
                 ">`;
 
             const cellSizeQ = 10;
