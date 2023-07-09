@@ -347,7 +347,10 @@ export class DrumCtrl {
 
         this.editedItems.forEach(item => {
             let playRow = un.clearEndComment(playBlock.rows[item.rowInPart + 1]);
-            const rows = this.liner.rows.filter(row => row.rowInPartId === item.rowInPartId)
+            let rows = this.liner.rows.filter(row => row.rowInPartId === item.rowInPartId)
+            rows = this.liner.cloneRows(rows);
+            rows.forEach(row => (row.blockOffsetQ = 0));
+
             const notes = this.liner.getDrumNotes(ideService.guid.toString(), rows);
 
             if (notes) {

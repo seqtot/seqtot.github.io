@@ -557,6 +557,18 @@ export class LineModel {
         return result;
     }
 
+    recalcAndClearBlockOffset(rows: Line[]): Line[] {
+        rows.forEach(row => {
+            row.startOffsetQ = row.startOffsetQ + row.blockOffsetQ;
+            row.cells.forEach(cell => {
+                cell.startOffsetQ = cell.startOffsetQ + row.blockOffsetQ;
+            });
+            row.blockOffsetQ = 0;
+        });
+
+        return rows;
+    }
+
     // getNoteNames(arr: NoteItem[]): string[] {
     //     let durationQ = 0;
     //
@@ -566,12 +578,7 @@ export class LineModel {
     getDrumNotes(name?: string, rows?: Line[]): string {
         name = name || 'no_name';
         rows = this.cloneRows(rows);
-
-        rows.forEach(row => {
-            row.cells.forEach(cell => {
-                cell.startOffsetQ = cell.startOffsetQ + row.blockOffsetQ;
-            });
-        });
+        rows = this.recalcAndClearBlockOffset(rows);
 
         const totalDurQ = this.getDurationQByRows(rows);
         const notes = this.getSortedNotes(rows);
