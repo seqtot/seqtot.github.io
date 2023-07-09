@@ -208,8 +208,9 @@ export class DrumCtrl {
         }
 
         let data = JSON.stringify(songNode);
-        let type = 'application/json';
-        let name = `${songName}.json`;
+        //let type = 'application/json';
+        let type = 'application/text';
+        let name = `${songName}.txt`;
 
         downloader(data, type, name)
 
@@ -841,7 +842,7 @@ export class DrumCtrl {
                         data-ide-action="stop"
                     >stop</span>
                     <span
-                        style="${style}"
+                        style="${style} color: blue;"
                         data-ide-action="play-both"
                     >play2</span>
                 </div>
@@ -897,7 +898,7 @@ export class DrumCtrl {
             data-action-type="stop"
         >stop</span>`.trim();
         topRow += `&nbsp;<span
-            style="${style}"
+            style="${style} color: blue;"
             data-action-out="play-one"
         >play</span>`.trim();
 
@@ -964,7 +965,7 @@ export class DrumCtrl {
                     data-action-type="tick"
                 >3:4&nbsp;</span-->                    
                 <span
-                    style="${style}"
+                    style="${style} color: blue;"
                     data-action-out="play-one"
                 >ply</span>
             </div>
@@ -1013,7 +1014,7 @@ export class DrumCtrl {
                 <span
                     style="${style}"
                     data-action-out="test"
-                >tst</span>                
+                >&nbsp;&nbsp;&nbsp;</span>                
                 <span
                     style="${style} background-color: red; color: white;"
                     data-action-out="delete-cell"
@@ -1162,7 +1163,7 @@ export class DrumCtrl {
                     data-ide-action="play-all"
                 >playAll</span-->                
                 <span
-                    style="${cmdStyle}"
+                    style="${cmdStyle} color: blue;"
                     data-ide-action="play-active"
                 >playActive</span>                
                 <span
