@@ -883,8 +883,19 @@ export class DrumCtrl {
 
 
     getDrumNotesPanel(): string {
-        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        const rowStyle = `width: 100%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; user-select: none;`;
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+
+        let wrapper = `
+            <div style="display: flex; width: 90%; justify-content: space-between; user-select: none;">
+                <div style="border-radius: .5rem; margin-left: .5rem; padding-left: .5rem; padding-right: .5rem; border: 1px solid lightgray;">
+                    %instruments%
+                </div>
+                <div style="padding: .5rem;">
+                    %actions%
+                </div>                
+            </div>
+        `.trim();
 
         let topRow = ''
         drumKodesTop.forEach(item => {
@@ -896,15 +907,6 @@ export class DrumCtrl {
                 >${info.vocalism}</span>
             `;
         });
-        topRow += `&nbsp;&nbsp;<span
-            style="${style}"
-            data-action-type="stop"
-        >stop</span>`.trim();
-        topRow += `&nbsp;<span
-            style="${style} color: blue;"
-            data-action-out="play-one"
-        >play</span>`.trim();
-
         topRow = `<div style="${rowStyle}">${topRow}</div>`;
 
         let midRow = ''
@@ -931,8 +933,22 @@ export class DrumCtrl {
         });
         botRow = `<div style="${rowStyle}">${botRow}</div>`;
 
+        let actions = `
+            <span
+                style="${style}"
+                data-action-type="stop"
+            >stop</span>
+            &nbsp;
+            <span
+                style="${style} color: blue;"
+                data-action-out="play-one"
+            >play</span>        
+        `.trim();
 
-        return topRow + midRow + botRow;
+        wrapper = wrapper.replace('%instruments%', topRow + midRow + botRow);
+        wrapper = wrapper.replace('%actions%', actions);
+
+        return wrapper;
     }
 
     getTopCommandPanel(): string {

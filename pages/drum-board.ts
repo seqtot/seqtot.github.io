@@ -231,8 +231,8 @@ export class DrumBoard {
     }
 
     getContent(keyboardId: string, view?: string): string {
-        const rowHeight = 6;
         let ind = 0;
+        const rowHeight = 6;
         const rem = 'rem';
         const info = drumNotesInfo;
         const rowStyle = 'display: flex; width: 100%; user-select: none; touch-action: none;';
