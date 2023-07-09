@@ -8,151 +8,84 @@ const attrs = {
     bodyColor: 'body-color',
 }
 
-
-const drumKodes = [
-    'bd', 'sn', 'hc',
-    'tl', 'tm', 'th',
-    // 'ho', 'hp', 'sr',
-    // 'cc'
-];
-
-const someDrum = {
-    note: '',
-    headColor: 'lightgray',
-    bodyColor: 'lightgray',
-    char: '?',
-}
-
 // black deeppink sienna
-const drumNotesInfo = {
+export const drumNotesInfo = {
     bd: {
         note: 'bd',
         headColor: 'sienna',
         bodyColor: 'tan',
         char: 'O',
+        vocalism: 'пы',
     },
     sn: {
         note: 'sn',
-        headColor: 'deeppink',
-        bodyColor: 'lightgreen',
+        headColor: 'tomato',
+        bodyColor: 'tomato',
         char: 'V',
+        vocalism: 'ба',
     },
     hc: {
         note: 'hc',
         headColor: 'lightgray',
         bodyColor: 'whitesmoke',
         char: 'x',
+        vocalism: 'чи',
+    },
+    ho: {
+        note: 'ho',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+        vocalism: 'ча',
+    },
+    hp: {
+        note: 'hp',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'x',
+        vocalism: 'hp',
+    },
+    cc: {
+        note: 'cc',
+        headColor: 'orange',
+        bodyColor: 'orange',
+        char: 'щ',
+        vocalism: 'щи',
+    },
+    rc: {
+        note: 'rc',
+        headColor: 'lightgray',
+        bodyColor: 'whitesmoke',
+        char: 'ц',
+        vocalism: 'ци',
     },
     tl: {
         note: 'tl',
-        headColor: 'lightgray',
-        bodyColor: 'lightgray',
-        char: 'l',
+        headColor: 'bisque',
+        bodyColor: 'bisque',
+        char: 'у',
+        vocalism: 'ту',
     },
     tm: {
         note: 'tm',
         headColor: 'seagreen',
         bodyColor: 'lightgreen',
-        char: 'm',
+        char: 'о',
+        vocalism: 'то',
     },
     th: {
         note: 'th',
         headColor: 'steelblue',
         bodyColor: 'lightblue',
-        char: 'h',
+        char: 'а',
+        vocalism: 'та',
     },
 }
-
-const drumKeysMap = {
-    tl: {
-        note: 'sr',
-        headColor: 'steelblue',
-        bodyColor: 'lightblue',
-        char: 'k',
-    },
-    tm: {
-        note: 'sr',
-        headColor: 'seagreen',
-        bodyColor: 'lightgreen',
-        char: 't',
-    },
-    tr: {
-        note: 'sn',
-        headColor: 'deeppink',
-        bodyColor: 'lightgreen',
-        char: 'V',
-    },
-
-    mtl: {
-        note: 'empty',
-        headColor: 'whitesmoke',
-        bodyColor: 'whitesmoke',
-        char: 'x',
-    },
-    mtr: {
-        note: 'hc',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'x',
-    },
-
-    mbl: {
-        note: 'hc',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'x',
-    },
-    mbr: {
-        note: 'empty',
-        headColor: 'whitesmoke',
-        bodyColor: 'whitesmoke',
-        char: 'x',
-    },
-
-    bl: {
-        note: 'bd',
-        headColor: 'sienna',
-        bodyColor: 'tan',
-        char: 'O',
-    },
-    br: {
-        note: 'empty',
-        headColor: 'white',
-        bodyColor: 'white',
-        char: '',
-    },
-};
-
-// const drumsMap = {
-//     O: {
-//         instr: 'drum_35',
-//         note: 'bd',
-//
-//     },
-//     V: {
-//         note: 'sn',
-//         instr: 'drum_40',
-//     },
-//     X: {
-//         note: 'hc',
-//         instr: 'drum_42',
-//     },
-// }
-
-const mapToLetter = {
-    'bd': 'O',
-    'hc': 'X',
-    'sn': 'V',
-    'bd+hc': 'Q',
-    'sn+hc': 'A',
-    'hc+bd': 'Q',
-    'hc+sn': 'A',
-};
 
 export class DrumBoard {
     constructor() {}
 
-    getContent(keyboardId: string, view?: string): string {
+    getContentOld(keyboardId: string, view?: string): string {
         const topRowHeight = 5;
         const midRowHeight = 10;
         const botRowHeight = 5;
@@ -293,6 +226,125 @@ export class DrumBoard {
                     </div>
                 </div>
             `.trim();
+
+        return content;
+    }
+
+    getContent(keyboardId: string, view?: string): string {
+        const rowHeight = 6;
+        let ind = 0;
+        const rem = 'rem';
+        const info = drumNotesInfo;
+        const rowStyle = 'display: flex; width: 100%; user-select: none; touch-action: none;';
+
+        const content = `
+            <div style="user-select: none; touch-action: none; position: relative;">
+                <div style="${rowStyle}">
+                    <div 
+                        style="background-color: ${info.ho.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.ho.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.ho.bodyColor}"
+                        data-color2="${info.ho.headColor}"
+                        data-char="${info.ho.char}"
+                    >
+                        <br/>${info.ho.vocalism}
+                    </div>
+                    <div 
+                        style="background-color: ${info.cc.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.cc.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.cc.bodyColor}"
+                        data-color2="${info.cc.headColor}"
+                        data-char="${info.cc.char}"
+                    >
+                        <br/>${info.cc.vocalism}
+                    </div>
+                    <div 
+                        style="background-color: ${info.rc.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.rc.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.rc.bodyColor}"
+                        data-color2="${info.rc.headColor}"
+                        data-char="${info.rc.char}"
+                    >
+                        <br/>${info.rc.vocalism}
+                    </div>                        
+                </div>                        
+                    
+                <div style="${rowStyle}">
+                    <div 
+                        style="background-color: ${info.th.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.th.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.th.bodyColor}"
+                        data-color2="${info.th.headColor}"
+                        data-char="${info.th.char}"                                                                
+                    >         
+                        <br/>${info.th.vocalism}
+                    </div>
+                    <div 
+                        style="background-color: ${info.tm.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.tm.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.tm.bodyColor}"
+                        data-color2="${info.tm.headColor}"
+                        data-char="${info.tm.char}"                                                                
+                    >         
+                        <br/>${info.tm.vocalism}
+                    </div>   
+                    <div 
+                        style="background-color: ${info.tl.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.tl.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.tl.bodyColor}"
+                        data-color2="${info.tl.headColor}"
+                        data-char="${info.tl.char}"                                                                
+                    >         
+                        <br/>${info.tl.vocalism}
+                    </div>                        
+                </div>
+
+                <div style="${rowStyle}">
+                    <div 
+                        style="background-color: ${info.hc.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.hc.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.hc.bodyColor}"
+                        data-color2="${info.hc.headColor}"
+                        data-char="${info.hc.char}"                                                                
+                    >         
+                        <br/>${info.hc.vocalism}
+                    </div>
+                    <div 
+                        style="background-color: ${info.sn.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.sn.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.sn.bodyColor}"
+                        data-color2="${info.sn.headColor}"
+                        data-char="${info.sn.char}"                                                                
+                    >         
+                        <br/>${info.sn.vocalism}
+                    </div>
+                    <div 
+                        style="background-color: ${info.bd.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.bd.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.bd.bodyColor}"
+                        data-color2="${info.bd.headColor}"
+                        data-char="${info.bd.char}"                                                                
+                    >         
+                        <br/>${info.bd.vocalism}
+                    </div>                        
+                </div>
+                    
+                <div 
+                    style="font-size: 1.7rem; font-family: monospace; height: 20rem; width: 100%; position: absolute; top: 0; pointer-events: none; user-select: none; touch-action: none; padding-left: .5rem;"
+                    data-name="drum-text-under-board"
+                >
+                </div>
+            </div>
+        `.trim();
 
         return content;
     }

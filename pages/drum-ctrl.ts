@@ -10,7 +10,7 @@ import ideService from './ide/ide-service';
 import { getOutBlocksInfo } from '../libs/muse/utils/getOutBlocksInfo';
 import { ComponentContext } from 'framework7/modules/component/component';
 import {createOutBlock, TextBlock} from '../libs/muse/utils/utils-note';
-import { DrumBoard } from './drum-board';
+import { DrumBoard, drumNotesInfo } from './drum-board';
 
 const ids = {
     editingItem: 'editing-item',
@@ -36,21 +36,24 @@ interface Page {
     context: ComponentContext,
 }
 
-const drumKodes1 = [
-    {note: 'bd', alias: 'пы'},
-    {note: 'sn', alias: 'ба'},
-    {note: 'tl', alias: 'ту'},
-    {note: 'tm', alias: 'тo'},
-    {note: 'th', alias: 'та'},
-];
-
-const drumKodes2 = [
-    {note: 'hc', alias: 'чи'},
-    {note: 'ho', alias: 'ho'},
-    {note: 'hp', alias: 'hp'},
+const drumKodesTop = [
+    {note: 'ho', alias: 'ча'},
     {note: 'cc', alias: 'щи'},
     {note: 'rc', alias: 'ци'},
 ];
+
+const drumKodesMid = [
+    {note: 'th', alias: 'та'},
+    {note: 'tm', alias: 'тo'},
+    {note: 'tl', alias: 'ту'},
+];
+
+const drumKodesBot = [
+    {note: 'hc', alias: 'чи'},
+    {note: 'sn', alias: 'ба'},
+    {note: 'bd', alias: 'пы'},
+];
+
 
 const someDrum = {
     note: '',
@@ -58,96 +61,6 @@ const someDrum = {
     bodyColor: 'lightgray',
     char: '?',
 }
-
-// black deeppink sienna
-const drumNotesInfo = {
-    bd: {
-        note: 'bd',
-        headColor: 'sienna',
-        bodyColor: 'tan',
-        char: 'O',
-    },
-    sn: {
-        note: 'sn',
-        headColor: 'deeppink',
-        bodyColor: 'lightgreen',
-        char: 'V',
-    },
-    hc: {
-        note: 'hc',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'x',
-    },
-    ho: {
-        note: 'ho',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'x',
-    },
-    hp: {
-        note: 'hp',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'x',
-    },
-    cc: {
-        note: 'cc',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'щ',
-    },
-    rc: {
-        note: 'rc',
-        headColor: 'lightgray',
-        bodyColor: 'whitesmoke',
-        char: 'ц',
-    },
-    tl: {
-        note: 'tl',
-        headColor: 'lightgray',
-        bodyColor: 'lightgray',
-        char: 'у',
-    },
-    tm: {
-        note: 'tm',
-        headColor: 'seagreen',
-        bodyColor: 'lightgreen',
-        char: 'о',
-    },
-    th: {
-        note: 'th',
-        headColor: 'steelblue',
-        bodyColor: 'lightblue',
-        char: 'а',
-    },
-}
-
-// const drumsMap = {
-//     O: {
-//         instr: 'drum_35',
-//         note: 'bd',
-//
-//     },
-//     V: {
-//         note: 'sn',
-//         instr: 'drum_40',
-//     },
-//     X: {
-//         note: 'hc',
-//         instr: 'drum_42',
-//     },
-// }
-
-const mapToLetter = {
-    'bd': 'O',
-    'hc': 'X',
-    'sn': 'V',
-    'bd+hc': 'Q',
-    'sn+hc': 'A',
-    'hc+bd': 'Q',
-    'hc+sn': 'A',
-};
 
 type BpmInfo = {
     bpm: number;
@@ -702,6 +615,8 @@ export class DrumCtrl {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 const notes = this.liner.getDrumNotes('temp');
 
+                console.log(notes)
+
                 if (!notes) return;
 
                 let blocks = [
@@ -962,6 +877,60 @@ export class DrumCtrl {
         `.trim();
     }
 
+
+    getDrumNotesPanel(): string {
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+
+        let topRow = ''
+        drumKodesTop.forEach(item => {
+            const info = drumNotesInfo[item.note];
+            topRow += `
+                <span
+                    style="${style}"
+                    data-${ids.actionDrumNote}="${info.note}"
+                >${info.vocalism}</span>
+            `;
+        });
+        topRow += `&nbsp;&nbsp;<span
+            style="${style}"
+            data-action-type="stop"
+        >stop</span>`.trim();
+        topRow += `&nbsp;<span
+            style="${style}"
+            data-action-out="play-one"
+        >play</span>`.trim();
+
+        topRow = `<div style="${rowStyle}">${topRow}</div>`;
+
+        let midRow = ''
+        drumKodesMid.forEach(item => {
+            const info = drumNotesInfo[item.note];
+            midRow += `
+                <span
+                    style="${style}"
+                    data-${ids.actionDrumNote}="${info.note}"
+                >${info.vocalism}</span>
+            `;
+        });
+        midRow = `<div style="${rowStyle}">${midRow}</div>`;
+
+        let botRow = ''
+        drumKodesBot.forEach(item => {
+            const info = drumNotesInfo[item.note];
+            botRow += `
+                <span
+                    style="${style}"
+                    data-${ids.actionDrumNote}="${info.note}"
+                >${info.vocalism}</span>
+            `;
+        });
+        botRow = `<div style="${rowStyle}">${botRow}</div>`;
+
+
+        return topRow + midRow + botRow;
+    }
+
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
@@ -1053,37 +1022,7 @@ export class DrumCtrl {
             ${this.getRowActionsCommands()}            
         `.trim();
 
-        let instrPanel1 = ''
-
-        drumKodes1.forEach(item => {
-            instrPanel1 += `
-                <span
-                    style="${style}"
-                    data-${ids.actionDrumNote}="${item.note}"
-                >${item.alias}</span>
-            `;
-        });
-
-        instrPanel1 = `<div
-            style="${rowStyle}"
-        >${instrPanel1}</div>`;
-
-        let instrPanel2 = ''
-
-        drumKodes2.forEach(item => {
-            instrPanel2 += `
-                <span
-                    style="${style}"
-                    data-${ids.actionDrumNote}="${item.note}"
-                >${item.alias}</span>
-            `;
-        });
-
-        instrPanel2 = `<div
-            style="${rowStyle}"
-        >${instrPanel2}</div>`;
-
-        return result + instrPanel1 + instrPanel2;
+        return result + this.getDrumNotesPanel();
     }
 
     getDrumBoardContent(keyboardId: string): string {
@@ -1407,12 +1346,12 @@ export class DrumCtrl {
                 result.bgColor = 'black';
             } else if (map.bd) {
                 result.noteId = map.bd;
-                result.bgColor = 'sienna';
+                result.bgColor = drumNotesInfo.bd.headColor;
             } else if (map.sn) {
                 result.noteId = map.sn;
-                result.bgColor = 'deeppink';
+                result.bgColor = drumNotesInfo.sn.headColor;
             } else if (arr.length) {
-                result.bgColor = 'darkgray';
+                result.bgColor = drumNotesInfo[arr[0].note]?.headColor || 'darkgray';
             }
 
             if (map.hc) {

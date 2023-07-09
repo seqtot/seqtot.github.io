@@ -565,7 +565,13 @@ export class LineModel {
 
     getDrumNotes(name?: string, rows?: Line[]): string {
         name = name || 'no_name';
-        rows = Array.isArray(rows) ? rows : this.rows;
+        rows = this.cloneRows(rows);
+
+        rows.forEach(row => {
+            row.cells.forEach(cell => {
+                cell.startOffsetQ = cell.startOffsetQ + row.blockOffsetQ;
+            });
+        });
 
         const totalDurQ = this.getDurationQByRows(rows);
         const notes = this.getSortedNotes(rows);
@@ -620,8 +626,10 @@ export class LineModel {
         return result;
     }
 
-    cloneRows(): Line[] {
-        return this.rows.map(row => {
+    cloneRows(rows?: Line[]): Line[] {
+        rows = Array.isArray(rows) ? rows : this.rows;
+
+        return rows.map(row => {
             row = {...row};
 
             row.cells = row.cells.map(cell => {
