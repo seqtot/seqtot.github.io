@@ -4,11 +4,7 @@ import { Range } from 'framework7/components/range/range';
 import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import { Sound } from '../libs/muse/sound';
-import { MultiPlayer } from '../libs/muse/multi-player';
-import { Synthesizer } from '../libs/muse/synthesizer';
 import * as un from '../libs/muse/utils/utils-note';
-import { defaultSynthSettings } from '../libs/muse/keyboards';
 import { standardTicks as ticks } from './ticks';
 import { getMidiConfig, getTopOutList } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
@@ -16,12 +12,6 @@ import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSetting
 import { isPresent, parseInteger, TextBlock } from '../libs/muse/utils/utils-note';
 import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
-
-const multiPlayer = new MultiPlayer();
-const metronome = new MultiPlayer();
-const synthesizer = new Synthesizer();
-synthesizer.connect({ ctx: Sound.ctx });
-synthesizer.setSettings(defaultSynthSettings);
 
 const ns = {
     setBmpAction: 'set-bmp-action',
@@ -43,6 +33,10 @@ export class MBoxPage {
         return this.props.id;
     }
 
+    get songId(): string {
+        return this.props.song;
+    }
+
     get pageEl(): HTMLElement {
         return this.context.$el.value[0] as HTMLElement;
     }
@@ -59,7 +53,7 @@ export class MBoxPage {
         hideMetronome?: boolean;
         score: string;
     } {
-        return mboxes[this.pageId];
+        return mboxes[this.songId];
     }
 
     get outBlock(): TextBlock {
@@ -85,10 +79,12 @@ export class MBoxPage {
     }
 
     setRightPanelContent() {
-        dyName('panel-right-content').innerHTML = `
-      <p data-name="action-info">табы</p>
-      <p data-name="action-drums">барабан</p>
-    `;
+        // dyName('panel-right-content').innerHTML = `
+        //   <p data-name="action-info">табы</p>
+        //   <p data-name="action-drums">барабан</p>
+        // `;
+
+        dyName('panel-right-content').innerHTML = ``.trim();
     }
 
     getMetronomeContent(): string {
@@ -223,7 +219,7 @@ export class MBoxPage {
         name = name || '';
         this.playingTick = name;
 
-        metronome.stopAndClearMidiPlayer();
+        ideService.metronome.stopAndClearMidiPlayer();
 
         const tick = ticks[this.playingTick];
 
@@ -240,7 +236,7 @@ export class MBoxPage {
         ${tick}
         `;
 
-        metronome.tryPlayMidiBlock({
+        ideService.metronome.tryPlayMidiBlock({
             blocks,
             bpm: this.bpmValue,
         });
@@ -300,7 +296,7 @@ export class MBoxPage {
                     return;
                 }
 
-                ideService.currentEdit.name = this.pageId;
+                ideService.currentEdit.name = this.songId;
                 ideService.currentEdit.outList = this.outList;
                 ideService.currentEdit.blocks = this.blocks;
                 ideService.currentEdit.outBlock = this.outBlock;
@@ -331,21 +327,21 @@ export class MBoxPage {
     }
 
     subscribePageEvents() {
-        dyName('action-drums', dyName('panel-right-content')).addEventListener(
-            'click',
-            () => {
-                //console.log('action-info');
-                this.setViewDrums();
-            }
-        );
+        // dyName('action-drums', dyName('panel-right-content')).addEventListener(
+        //     'click',
+        //     () => {
+        //         //console.log('action-info');
+        //         this.setViewDrums();
+        //     }
+        // );
 
-        dyName('action-info', dyName('panel-right-content')).addEventListener(
-            'click',
-            () => {
-                //console.log('action-info');
-                this.setPageContent();
-            }
-        );
+        // dyName('action-info', dyName('panel-right-content')).addEventListener(
+        //     'click',
+        //     () => {
+        //         //console.log('action-info');
+        //         this.setPageContent();
+        //     }
+        // );
 
         getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
             el.addEventListener('click', (evt: MouseEvent) => {
@@ -421,7 +417,7 @@ export class MBoxPage {
     }
 
     async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
-        return multiPlayer.tryPlayTextLine({ text, repeat });
+        return ideService.multiPlayer.tryPlayTextLine({ text, repeat });
     }
 
     getMetaByLines(): {[key: string]: string} {
@@ -465,7 +461,7 @@ export class MBoxPage {
         if (x.playBlockOut) {
             //this.playingWithMidi = true;
             //console.log('midiBlock', midiBlock);
-            multiPlayer.tryPlayMidiBlock({
+            ideService.multiPlayer.tryPlayMidiBlock({
                 blocks: x.blocks,
                 playBlock: x.playBlockOut,
                 cb: (type: string, data: any) => {
@@ -484,15 +480,15 @@ export class MBoxPage {
             return;
         }
 
-        multiPlayer.stopAndClearMidiPlayer();
+        ideService.multiPlayer.stopAndClearMidiPlayer();
     }
 
     stop() {
-        multiPlayer.stopAndClearMidiPlayer();
+        ideService.multiPlayer.stopAndClearMidiPlayer();
     }
 
     async play(text: string, repeatCount?: number) {
-        multiPlayer.tryPlayMidiBlock({
+        ideService.multiPlayer.tryPlayMidiBlock({
             blocks: text,
             repeatCount,
             //bpmMultiple: this.bpmMultiple,

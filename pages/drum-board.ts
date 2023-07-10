@@ -235,7 +235,7 @@ export class DrumBoard {
         const rowHeight = 6;
         const rem = 'rem';
         const info = drumNotesInfo;
-        const rowStyle = 'display: flex; width: 100%; user-select: none; touch-action: none;';
+        const rowStyle = 'display: flex; width: 100%; user-select: none; touch-action: none; font-size: 1.2rem;';
 
         const content = `
             <div style="user-select: none; touch-action: none; position: relative;">
@@ -274,7 +274,7 @@ export class DrumBoard {
                     
                 <div style="${rowStyle}">
                     <div 
-                        style="background-color: ${info.th.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        style="background-color: ${info.th.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
                         data-action-drum-key="${info.th.note}"
                         data-keyboard-id="${keyboardId}-${ind++}"
                         data-color="${info.th.bodyColor}"
@@ -284,7 +284,7 @@ export class DrumBoard {
                         <br/>${info.th.vocalism}
                     </div>
                     <div 
-                        style="background-color: ${info.tm.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        style="background-color: ${info.tm.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
                         data-action-drum-key="${info.tm.note}"
                         data-keyboard-id="${keyboardId}-${ind++}"
                         data-color="${info.tm.bodyColor}"
@@ -307,7 +307,7 @@ export class DrumBoard {
 
                 <div style="${rowStyle}">
                     <div 
-                        style="background-color: ${info.hc.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        style="background-color: ${info.hc.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
                         data-action-drum-key="${info.hc.note}"
                         data-keyboard-id="${keyboardId}-${ind++}"
                         data-color="${info.hc.bodyColor}"
@@ -317,7 +317,7 @@ export class DrumBoard {
                         <br/>${info.hc.vocalism}
                     </div>
                     <div 
-                        style="background-color: ${info.sn.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        style="background-color: ${info.sn.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
                         data-action-drum-key="${info.sn.note}"
                         data-keyboard-id="${keyboardId}-${ind++}"
                         data-color="${info.sn.bodyColor}"

@@ -1,6 +1,6 @@
 import {Props} from 'framework7/modules/component/snabbdom/modules/props';
 import {ComponentContext} from 'framework7/modules/component/component';
-import {RollPage, KeyboardPage} from '../pages';
+import {RollPage, KeyboardPage, MBoxPage} from '../pages';
 import {MuseEditorPage} from '../pages/page_muse_editor';
 //import {SamplePage} from '../pages/page_sample_editor';
 
@@ -8,6 +8,7 @@ const pages = {
     page_roll: RollPage,
     page_keyboard: KeyboardPage,
     page_muse_editor: MuseEditorPage,
+    mbox: MBoxPage,
     //page_sample_editor: SamplePage,
 };
 
@@ -15,6 +16,8 @@ const pages = {
 // https://framework7.io/docs/kitchen-sink.html
 // https://framework7.io/docs/router-component
 export const pageRc = (props: Props, context: ComponentContext) => {
+
+    console.log('props.id', props.id);
 
     if (!pages[props.id]) {
         return () => context.$h`<div class="page">COMPONENT NOT FOUND</div>`;

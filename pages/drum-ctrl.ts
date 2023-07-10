@@ -887,7 +887,7 @@ export class DrumCtrl {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
 
         let wrapper = `
-            <div style="display: flex; width: 90%; justify-content: space-between; user-select: none;">
+            <div style="display: flex; width: 90%; justify-content: space-between; user-select: none; margin-bottom: .5rem;">
                 <div style="border-radius: .5rem; margin-left: .5rem; padding-left: .5rem; padding-right: .5rem; border: 1px solid lightgray;">
                     %instruments%
                 </div>

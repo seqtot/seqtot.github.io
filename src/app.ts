@@ -13,7 +13,6 @@ import Framework7 from 'framework7/bundle';
 // Framework7.use([Range, Panel]);
 
 import { mboxOldRc } from './mbox-old-rc';
-import { mboxRc } from './mbox-rc';
 import { pageRc } from './page-rc';
 
 const appEl = document.getElementById('app');
@@ -32,12 +31,7 @@ const defRoute = isDev ? '/page/page_keyboard/' : '/set/set_all/';
 
 const linksToPage = [
   { href: '/set/set_all/', name: 'Список' },
-  // { href: '/set/set_blackNight/', name: 'Black Night' },
-  // { href: '/set/set_E/', name: 'set E' },
-  // { href: '/set/set_Battle/', name: 'Продолжается бой' },
-  { href: '/set/set_hardToHandle/', name: 'hardToHandle', isDev: true },
-  //{ href: '/mbox/tiriTiri/', name: 'tiriTiri', isDev: false },
-  //{ href: '/set/set_ItsMyLife/', name: 'Its my life', isDev: true },
+  { href: '/set/page_my/', name: 'Мои вещи' },
   { href: '/page/page_roll/', name: 'roll', isDev: true },
   { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
   { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
@@ -46,7 +40,7 @@ const linksToPage = [
 
 const linksHtml = linksToPage
   .map((item) => {
-    if (!isDev && item.isDev) {
+    if (!isDev && item['isDev']) {
       return '';
     }
 
@@ -158,11 +152,11 @@ const app = new Framework7({
       component: mboxOldRc,
     },
     {
-      path: '/mbox/:id',
-      component: mboxRc,
+      path: '/page/:id',
+      component: pageRc,
     },
     {
-      path: '/page/:id',
+      path: '/:id/:song',
       component: pageRc,
     },
   ],

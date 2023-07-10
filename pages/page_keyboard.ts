@@ -1,33 +1,17 @@
 import {Props} from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
-import {Range} from 'framework7/components/range/range';
-
+import { Range } from 'framework7/components/range/range';
 import { Dom7Array } from 'dom7';
-
-import {byId, dyName, getWithDataAttr, getWithDataAttrValue} from '../src/utils';
-import { Sound } from '../libs/muse/sound';
-import { MultiPlayer } from '../libs/muse/multi-player';
-import { Synthesizer } from '../libs/muse/synthesizer';
+import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils/utils-note';
-import { toneAndDrumPlayerSettings } from '../libs/muse/keyboards';
 import keyboardSet from './page_keyboard-utils';
 import { getNoteByOffset, parseInteger } from '../libs/muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
-import {DrumCtrl} from './drum-ctrl';
-import {Ticker} from '../libs/muse/ticker';
+import { DrumCtrl } from './drum-ctrl';
+import {BassSoloCtrl} from './tone-bass-solo-ctrl';
 import ideService from './ide/ide-service';
 
-const multiPlayer = new MultiPlayer();
-const metronome = new MultiPlayer();
-const synthesizer = new Synthesizer();
-const ticker = new Ticker(Sound.ctx);
-synthesizer.connect({ ctx: Sound.ctx });
-synthesizer.setSettings(toneAndDrumPlayerSettings);
-
-const DOWN = 1;
-const UP = 0;
-
-type ViewType = 'bassSolo' | 'drums';
+type ViewType = 'bassSolo' | 'drums' | 'bass';
 
 const ns = {
     setBmpAction: 'set-bmp-action',
@@ -36,19 +20,14 @@ const ns = {
 
 const defaultNote = 'da';
 
-export class BassSoloCtrl {
-
-}
-
-
 interface Page {
     getMetronomeContent(): string;
 }
 
 export class KeyboardPage {
     view: ViewType = 'drums'; // 'bassSolo';
-    ctrl: BassSoloCtrl = new BassSoloCtrl();
     drumCtrl: DrumCtrl;
+    toneCtrl: BassSoloCtrl;
 
     bpmValue = 100;
     playingTick = '';
@@ -63,8 +42,8 @@ export class KeyboardPage {
         quarterNio: 0,
     }
     tickNode: AudioBufferSourceNode | null = null;
-    synthesizer = synthesizer;
-    multiPlayer = multiPlayer;
+    synthesizer = ideService.synthesizer;
+    multiPlayer = ideService.multiPlayer;
 
     get pageId(): string {
         return this.props.id;
@@ -219,13 +198,17 @@ export class KeyboardPage {
     }
 
     setBassSoloContent() {
+        this.toneCtrl = new BassSoloCtrl();
+
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${this.getTracksContent()}                
                 <div data-name="setContent">
-                    ${this.setInfo.content}
+                    ${this.toneCtrl.getContent()}
                 </div>
             </div>`.trim();
+
+        //${this.setInfo.content}
 
         this.el$.html(content);
 
@@ -333,7 +316,7 @@ export class KeyboardPage {
         const soloChar = (this.playingNote.solo || '')[0];
 
         getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-            el.style.backgroundColor = 'white';
+            el.style.backgroundColor = el.dataset['bgColor'] || 'white';
             const data = (el?.dataset || {}) as {
                 keyboardId: string;
                 noteLat: string;
@@ -356,7 +339,7 @@ export class KeyboardPage {
             const keyOrNote = el?.dataset?.noteLat || '';
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                synthesizer.playSound({
+                ideService.synthesizer.playSound({
                     keyOrNote: this.playingNote[keyboardId],
                     id: keyboardId,
                     onlyStop: true,
@@ -364,7 +347,7 @@ export class KeyboardPage {
 
                 this.playingNote[keyboardId] = keyOrNote;
 
-                synthesizer.playSound({
+                ideService.synthesizer.playSound({
                     keyOrNote,
                     id: keyboardId,
                     // instrCode: 366,
@@ -374,7 +357,7 @@ export class KeyboardPage {
             });
 
             el.addEventListener('pointerup', (evt: MouseEvent) => {
-                synthesizer.playSound({
+                ideService.synthesizer.playSound({
                     keyOrNote,
                     id: keyboardId,
                     onlyStop: true,
@@ -386,7 +369,7 @@ export class KeyboardPage {
 
         const clearColor = () => {
             getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-                el.style.backgroundColor = 'white';
+                el.style.backgroundColor = el.dataset['bgColor'] || 'white';
             });
         };
 
@@ -409,7 +392,7 @@ export class KeyboardPage {
 
                 if (key) {
                     clearColor();
-                    key.style.backgroundColor = 'lightgray';
+                    key.style.backgroundColor = 'gray';
                 }
             });
         }
@@ -445,7 +428,7 @@ export class KeyboardPage {
         fixEl?.addEventListener('pointerdown', (evt: MouseEvent) => {
             const keyboardId = fixEl?.dataset?.keyboardId;
 
-            synthesizer.playSound({
+            ideService.synthesizer.playSound({
                 keyOrNote: this.playingNote[keyboardId],
                 id: keyboardId,
                 onlyStop: true,
@@ -459,7 +442,7 @@ export class KeyboardPage {
             this.playingNote[keyboardId] = this.lastRelativeNote;
             zeroEl.innerText = this.lastRelativeNote;
 
-            synthesizer.playSound({
+            ideService.synthesizer.playSound({
                 keyOrNote: this.lastRelativeNote,
                 id: keyboardId,
             });
@@ -469,7 +452,7 @@ export class KeyboardPage {
         fixEl?.addEventListener('pointerup', (evt: MouseEvent) => {
             const keyboardId = fixEl?.dataset?.keyboardId;
 
-            synthesizer.playSound({
+            ideService.synthesizer.playSound({
                 keyOrNote: this.lastRelativeNote,
                 id: keyboardId,
                 onlyStop: true,
@@ -495,7 +478,7 @@ export class KeyboardPage {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 const note = getNoteByOffset(this.fixedRelativeNote, offset);
 
-                synthesizer.playSound({
+                ideService.synthesizer.playSound({
                     keyOrNote: this.playingNote[keyboardId],
                     id: keyboardId,
                     onlyStop: true,
@@ -511,7 +494,7 @@ export class KeyboardPage {
                     fixEl.innerText = note;
                 }
 
-                synthesizer.playSound({
+                ideService.synthesizer.playSound({
                     keyOrNote: note,
                     id: keyboardId,
                 });
@@ -522,7 +505,7 @@ export class KeyboardPage {
             el.addEventListener('pointerup', (evt: MouseEvent) => {
                 const note = getNoteByOffset(this.fixedRelativeNote, offset);
 
-                synthesizer.playSound({
+                ideService.synthesizer.playSound({
                     keyOrNote: note,
                     id: keyboardId,
                     onlyStop: true,
@@ -593,8 +576,8 @@ export class KeyboardPage {
     }
 
     stopTicker() {
-        ticker.stop();
-        synthesizer.playSound({
+        ideService.ticker.stop();
+        ideService.synthesizer.playSound({
             keyOrNote: 'cowbell',
             id: 'ticker',
             onlyStop: true,
@@ -619,9 +602,9 @@ export class KeyboardPage {
             // }, 2000);
         }
 
-        ticker.createTickSource({
+        ideService.ticker.createTickSource({
             qms: Math.round(60000/ this.bpmValue),
-            preset:synthesizer.instruments['drum_56'],
+            preset: ideService.synthesizer.instruments['drum_56'],
             repeat: 100,
             cb,
         });
@@ -633,15 +616,15 @@ export class KeyboardPage {
             quarterNio: -1,
         }
 
-        ticker.tickByBpm({
+        ideService.ticker.tickByBpm({
             bpm: this.bpmValue,
         }, () => {
-            synthesizer.playSound({
+            ideService.synthesizer.playSound({
                 keyOrNote: 'cowbell',
                 id: 'ticker',
                 onlyStop: true,
             });
-            synthesizer.playSound({
+            ideService.synthesizer.playSound({
                 keyOrNote: 'cowbell',
                 id: 'ticker',
                 onlyStop: false,
@@ -657,7 +640,7 @@ export class KeyboardPage {
         name = name || '';
         this.playingTick = name;
 
-        metronome.stopAndClearMidiPlayer();
+        ideService.metronome.stopAndClearMidiPlayer();
 
         const tick = ticks[this.playingTick];
 
@@ -674,7 +657,7 @@ export class KeyboardPage {
         ${tick}
         `;
 
-        metronome.tryPlayMidiBlock({
+        ideService.metronome.tryPlayMidiBlock({
             blocks,
             bpm: this.bpmValue,
             // cb: (type, data) => {
@@ -688,17 +671,17 @@ export class KeyboardPage {
     }
 
     async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
-        return multiPlayer.tryPlayTextLine({ text, repeat });
+        return ideService.multiPlayer.tryPlayTextLine({ text, repeat });
     }
 
     stop() {
-        multiPlayer.stopAndClearMidiPlayer();
-        metronome.stopAndClearMidiPlayer();
+        ideService.multiPlayer.stopAndClearMidiPlayer();
+        ideService.metronome.stopAndClearMidiPlayer();
         this.stopTicker();
     }
 
     async play(text: string, repeatCount?: number) {
-        multiPlayer.tryPlayMidiBlock({
+        ideService.multiPlayer.tryPlayMidiBlock({
             blocks: text,
             repeatCount,
             //bpmMultiple: this.bpmMultiple,
