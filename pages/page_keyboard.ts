@@ -103,8 +103,8 @@ export class KeyboardPage {
         view = view ||  this.view;
         this.view = view;
 
-        if (this.view === 'bassSolo') {
-            this.setToneContent('bassSolo');
+        if (this.view === 'bassSolo' || this.view === 'bass') {
+            this.setToneContent(this.view);
         }
         else
         {
@@ -120,9 +120,11 @@ export class KeyboardPage {
 
     setRightPanelContent() {
         dyName('panel-right-content').innerHTML = `
-      <p data-action-set-view="bassSolo">bassSolo</p>
-      <p data-action-set-view="drums">drums</p>
-    `;
+            <p data-action-set-view="bass">Bass</p>
+            <p data-action-set-view="bassSolo">Harmonica</p>
+            <p data-action-set-view="drums">Percussion</p>
+            <p data-action-set-view="drums">Drums</p>
+        `;
     }
 
     getMetronomeContent(): string {
@@ -198,7 +200,7 @@ export class KeyboardPage {
     }
 
     setToneContent(type: ToneKeyboardType) {
-        this.toneCtrl = new BassSoloCtrl();
+        this.toneCtrl = new BassSoloCtrl(<ToneKeyboardType>this.view);
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
@@ -243,7 +245,7 @@ export class KeyboardPage {
     }
 
     subscribePageEvents() {
-        if (this.view === 'bassSolo') {
+        if (this.view === 'bassSolo' || this.view === 'bass') {
             this.subscribeBassSoloEvents();
         }
         else if (this.view === 'drums') {

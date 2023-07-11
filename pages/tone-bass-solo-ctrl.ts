@@ -2,12 +2,102 @@ import { ToneCtrl } from './tone-ctrl';
 
 export type ToneKeyboardType = 'bass' | 'solo' | 'bassSolo';
 
-const lightBgColor = '#ddd';
+const lightBgColor = '#eee';
 const mainBgColor = '#ccc';
-const darkBgColor = '#bbb';
+const darkBgColor = '#aaa';
 
+const mapNoteToChar = {
+    d: 'C',
+    t: 't',
+    r: 'D',
+    n: 'n',
+    m: 'E',
+    f: 'F',
+    v: 'v',
+    s: 'G',
+    z: 'z',
+    l: 'A',
+    k: 'k',
+    b: 'H'
+}
 
-function getBgColor(note: string): string {
+function getBassСellStyles(note: string, iRow: number, iCol: number): {
+    bgColor: string,
+    borders: string,
+    text: string,
+} {
+    note = note || '';
+
+    let bgColor = mainBgColor;
+    let text = '&nbsp;'
+
+    if (iRow === 0 || iRow === 12) {
+        text = mapNoteToChar[note[0]] || text;
+    }
+
+    if (iRow === 0 || iRow === 3 || iRow === 5 || iRow === 7 || iRow === 9 || iRow === 12) {
+        bgColor = darkBgColor;
+    }
+    // if (note[0] === 'd') {
+    //     bgColor = 'white';
+    // }
+    //
+    // if (note[0] === 't') {
+    //
+    // }
+    //
+    // if (note[0] === 'r') {
+    //
+    // }
+    //
+    // if (note[0] === 'n') {
+    //     bgColor = 'white';
+    // }
+    //
+    // if (note[0] === 'm') {
+    //
+    // }
+    //
+    // if (note[0] === 'f') {
+    //
+    // }
+    //
+    // if (note[0] === 'v') {
+    //
+    // }
+    //
+    // if (note[0] === 's') {
+    //
+    // }
+    //
+    // if (note[0] === 'z') {
+    //     bgColor = 'white';
+    // }
+    //
+    // if (note[0] === 'l') {
+    //
+    // }
+    //
+    // if (note[0] === 'k') {
+    //
+    // }
+    //
+    // if (note[0] === 'b') {
+    //     bgColor = 'white';
+    // }
+
+    return {
+        bgColor,
+        borders: 'border: 1px solid black;',
+        text,
+    };
+}
+
+function getHarmonicaCellStyles(note: string): {
+    bgColor: string,
+    borders: string,
+    text: string,
+} {
     note = note || '';
 
     let bgColor = '#ccc';
@@ -60,54 +150,56 @@ function getBgColor(note: string): string {
         bgColor = 'white';
     }
 
-    return bgColor;
+    return {
+        bgColor,
+        borders: 'border: none;',
+        text: '&nbsp;'
+    };
 }
 
-function getKeyFn(params: {
+function getKeyFn(x: {
     id: string | number;
     cellSize?: string;
     fontSize?: string;
-}): (note: string, symbol: string) => string {
-    const id = params.id || '';
-    const fontSize = params.fontSize || '1.3rem';
-    const cellSize = params.cellSize || '1.5rem';
+    cellStylesFn: (note: string, iRow?: number, iCell?: number) => {bgColor: string, borders: string, text: string}
+}): (note: string, symbol: string, iRow?: number, iCol?: number) => string {
+    const id = x.id || '';
+    const fontSize = x.fontSize || '1.3rem';
+    const cellSize = x.cellSize || '1.5rem';
 
-    return (note: string, symbol: string): string => {
-        symbol = '&nbsp;';
-
+    return (note: string, symbol: string, iRow?: number, iCol?: number): string => {
         let step = note[0];
 
-        let fontWeight = ['m', 'f', 'v', 's'].find((item) => item === step)
-            ? 800
-            : 400;
+        // let fontWeight = ['m', 'f', 'v', 's'].find((item) => item === step)
+        //     ? 800
+        //     : 400;
+        let fontWeight = 400;
         let fontColor = 'black';
-        let bgColor = getBgColor(note);
-
-        console.log(note, bgColor);
+        let cellStyles = x.cellStylesFn(note, iRow, iCol);
 
         return `<div
-      style="
-        box-sizing: border-box;    
-        margin: 0;
-        padding: 0;
-        display: inline-block;
-        width: ${cellSize};
-        height: ${cellSize};
-        user-select: none;
-        touch-action: none;
-        font-size: ${fontSize};
-        line-height: ${fontSize};
-        font-weight: ${fontWeight};
-        text-align: center;
-        color: ${fontColor};        
-        background-color: ${bgColor};"                
-        data-note-key="${note}"
-        data-name="note-key-${note}"
-        data-note-lat="${note}"
-        data-keyboard-id="${id}"
-        data-bg-color="${bgColor}"
-
-        >${symbol}</div>`
+            style="
+            box-sizing: border-box;    
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+            width: ${cellSize};
+            height: ${cellSize};
+            user-select: none;
+            touch-action: none;
+            font-size: ${fontSize};
+            line-height: ${fontSize};
+            font-weight: ${fontWeight};
+            text-align: center;
+            color: ${fontColor};
+            ${cellStyles.borders}        
+            background-color: ${cellStyles.bgColor};"                
+            data-note-key="${note}"
+            data-name="note-key-${note}"
+            data-note-lat="${note}"
+            data-keyboard-id="${id}"
+            data-bg-color="${cellStyles.bgColor}"
+        >${cellStyles.text}</div>`
             .replace(/\n/g, ' ')
             .replace(/ +/g, ' ');
     };
@@ -168,10 +260,18 @@ const soloKeys: string[][] = [
 
 
 
-function getVerticalHarmKeyboard(id: number | string, keys: string[][]): string {
+function getVerticalKeyboard(
+    id: number | string,
+    type: ToneKeyboardType,
+    keys: string[][],
+): string {
     id = id || '';
 
-    const getKey = getKeyFn({ id, cellSize: '1.9rem', fontSize: '1.5rem' });
+    const getKey = getKeyFn({
+        id, cellSize: '1.9rem',
+        fontSize: '1.5rem',
+        cellStylesFn: type === 'bassSolo' ? getHarmonicaCellStyles: getBassСellStyles,
+    });
 
     let keyboard = `
         <div style="
@@ -184,11 +284,11 @@ function getVerticalHarmKeyboard(id: number | string, keys: string[][]): string 
     `.trim();
 
     let tpl = '';
-    keys.forEach(row => {
+    keys.forEach((row, iRow) => {
         tpl = tpl + '<div>';
 
-        row.forEach(note => {
-            tpl = tpl + getKey(note, note)
+        row.forEach((note, iCol) => {
+            tpl = tpl + getKey(note, note, iRow, iCol)
         })
 
         tpl = tpl + '</div>';
@@ -203,6 +303,10 @@ export class BassSoloCtrl extends ToneCtrl {
     lightBgColor = lightBgColor;
     mainBgColor = mainBgColor;
     darkBgColor = darkBgColor;
+
+    constructor(public type: ToneKeyboardType) {
+        super();
+    }
 
     getPatternsList(patterns?: string[]): string {
         patterns = [
@@ -263,10 +367,10 @@ export class BassSoloCtrl extends ToneCtrl {
         return  result;
     }
 
-    getContent(type?: ToneKeyboardType): string {
+    getHarmonicaContent(): string {
         let wrapper = `<div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-            ${getVerticalHarmKeyboard('bass', bassKeys)}
-            ${getVerticalHarmKeyboard('solo', soloKeys)}
+            ${getVerticalKeyboard('bass', 'bassSolo', bassKeys)}
+            ${getVerticalKeyboard('solo', 'bassSolo', soloKeys)}
             <div 
                 style="font-size: 2rem;
                 font-family: monospace;
@@ -285,6 +389,23 @@ export class BassSoloCtrl extends ToneCtrl {
 
         return wrapper;
     }
+
+    getBassContent(): string {
+        let wrapper = `<div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
+            ${getVerticalKeyboard('bass', 'bass', bassGuitarKeys)}            
+        </div>`.trim();
+
+        return wrapper;
+    }
+
+    getContent(type?: ToneKeyboardType): string {
+        if (type === 'bassSolo') {
+            return this.getHarmonicaContent();
+        }
+        else if(type === 'bass') {
+            return this.getBassContent();
+        }
+    }
 }
 
 
@@ -301,42 +422,3 @@ export class BassSoloCtrl extends ToneCtrl {
 > SOLO5: (A) луНаЩаСу луЛуСуЛу <!-- ACFE DCHA --><br/>
 > SOLO5: (D) щаОЛаО саМуСаЛа лаНаСуМу щаЩуСаЩу лаСаСаО зу <!-- DDEE FSDE VAJE AEFC DTEE A -->
 */
-
-
-/*
-
-*/
-
-
-
-/*
-ABCDEFGHIGKLMNOPQRSTUVWXYZ
-A CDEFGH             V
-
-CsDtEiFvGjAoH
-
- */
-
-// (A) о... наОмаЩу<br/>
-// (A) луНаЩаСу<br/>
-// (D) луЛуСуЛу<br/>
-// (D) щаСаСаСа<br/>
-// (E) суЙуЙаЙу<br/>
-// (A) щаНаЩаСу<br/>
-// (D) луЛуСуЛу<br/>
-// (D) щаСаСаСаВу<br/>
-// (A) о... наОмаЩу <br/>
-// (C) саМаЩаЛу<br/>
-// (F) луСуЛуО<br/>
-// (G) щаОЖуЛа<br/>
-// (C) саЛаЛаМу<br/>
-// (F) щаСуЛуМа<br/>
-// (G) саЛуСуМа<br/>
-// (A) саОзуМа<br/>
-// (E) луОоО<br/>
-// (E) оОлуЛуСуЛу<br/>
-// (E) заОоО<br/>
-// (E) оОлуЛуСуЛу<br/>
-// (J) гаНуСуСуСа<br/>
-// (D) луЛуСу<br/>
-// (A) лу... наОмаЩу<br/>

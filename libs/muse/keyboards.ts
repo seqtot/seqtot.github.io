@@ -156,58 +156,6 @@ ShiftRight  ~бе~0.5,
 
 `;
 
-export const keysSigns = `
-KeyX        ~x~ч
-KeyS        ~s~ы
-KeyW        ~w~ц
-Digit2      ~2~2
-KeyZ        ~z~я
-KeyA        ~a~ф
-KeyQ        ~q~й
-Digit1      ~1~1
-ShiftLeft   ~ ~
-CapsLock    ~ ~
-Tab         ~ ~
-Backquote   ~ ~ё
-KeyB        ~b~и
-KeyG        ~g~п
-KeyT        ~t~е
-Digit5      ~5~5
-KeyV        ~v~м
-KeyF        ~f~а
-KeyR        ~r~к
-Digit4      ~4~4
-KeyC        ~c~с
-KeyD        ~d~в
-KeyE        ~e~у
-Digit3      ~3~3
-Comma       ~,~б
-KeyK        ~k~л
-KeyI        ~i~ш
-Digit8      ~8~8
-KeyM        ~m~ь
-KeyJ        ~j~о
-KeyU        ~u~г
-Digit7      ~7~7
-KeyN        ~n~т
-KeyH        ~h~р
-KeyY        ~y~н
-Digit6      ~6~6
-ShiftRight  ~ ~
-Quote       ~'~э
-BracketLeft ~[~х
-Minus       ~-~-
-Slash       ~/~.
-Semicolon   ~;~ж
-KeyP        ~p~з
-Digit0      ~0~0
-Period      ~.~ю
-KeyL        ~l~д
-KeyO        ~o~щ
-Digit9      ~9~9
-}
-`;
-
 export const keysRightToLeft = `
 # 0-key 1-note 2-volume 3-instrCode
 KeyX        ~де~0.5,
