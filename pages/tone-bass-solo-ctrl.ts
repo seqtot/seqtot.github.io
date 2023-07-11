@@ -1,20 +1,27 @@
 import { ToneCtrl } from './tone-ctrl';
 
+export type ToneKeyboardType = 'bass' | 'solo' | 'bassSolo';
+
+const lightBgColor = '#ddd';
+const mainBgColor = '#ccc';
+const darkBgColor = '#bbb';
+
+
 function getBgColor(note: string): string {
     note = note || '';
 
-    let bgColor = 'white';
+    let bgColor = '#ccc';
 
     if (note[0] === 'd') {
         bgColor = 'white';
     }
 
     if (note[0] === 't') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 'r') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 'n') {
@@ -22,19 +29,19 @@ function getBgColor(note: string): string {
     }
 
     if (note[0] === 'm') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 'f') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 'v') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 's') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 'z') {
@@ -42,11 +49,11 @@ function getBgColor(note: string): string {
     }
 
     if (note[0] === 'l') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 'k') {
-        bgColor = 'lightgray';
+
     }
 
     if (note[0] === 'b') {
@@ -106,6 +113,21 @@ function getKeyFn(params: {
     };
 } // getKeyFn
 
+const bassGuitarKeys: string[][] = [
+    ['bj', 'mu', 'lu', 'ry', 'sy', 'do'],
+    ['du', 'fu', 'ku', 'ny', 'zy', 'to'],
+    ['tu', 'vu', 'bu', 'my', 'ly', 'ro'],
+    ['ru', 'su', 'dy', 'fy', 'ky', 'no'],
+    ['nu', 'zu', 'ty', 'vy', 'by', 'mo'],
+    ['mu', 'lu', 'ry', 'sy', 'do', 'fo'],
+    ['fu', 'ku', 'ny', 'zy', 'to', 'vo'],
+    ['vu', 'bu', 'my', 'ly', 'ro', 'so'],
+    ['su', 'dy', 'fy', 'ky', 'no', 'zo'],
+    ['zu', 'ty', 'vy', 'by', 'mo', 'lo'],
+    ['lu', 'ry', 'sy', 'do', 'fo', 'ko'],
+    ['ku', 'ny', 'zy', 'to', 'vo', 'bo'],
+    ['bu', 'my', 'ly', 'ro', 'so', 'da'],
+];
 
 const bassKeys: string[][] = [
     ['za', 'la', 'ka', 'ba'],
@@ -178,12 +200,48 @@ function getVerticalHarmKeyboard(id: number | string, keys: string[][]): string 
 }
 
 export class BassSoloCtrl extends ToneCtrl {
-    getContent(): string {
-        let wrapper = `<div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between;">
+    lightBgColor = lightBgColor;
+    mainBgColor = mainBgColor;
+    darkBgColor = darkBgColor;
+
+    getContent(type?: ToneKeyboardType): string {
+        let wrapper = `<div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
             ${getVerticalHarmKeyboard('bass', bassKeys)}
             ${getVerticalHarmKeyboard('solo', soloKeys)}
+            <div 
+                style="font-size: 1.7rem;
+                font-family: monospace;
+                width: 100%;
+                position: absolute;
+                top: 0;
+                pointer-events: none;
+                user-select: none;
+                touch-action: none;
+                padding-left: .5rem;"
+                data-type="text-under-board"
+            >
+> ИНТРО: (A) о... наОмаЩу <!-- cceh --> <br/>
+> SOLO1: (A) луНаЩаСу  луЛуСуЛу щаСаСаСа суЙуЙаЙу <!-- ACFE DCHA DTEF EeEe--> <br/>
+> SOLO2: (A) щаНаЩаСу луЛуСуЛу щаСаСаСа ву:      <!-- ACFE DCHA DTEF A --><br/>
+> ИНТРО: (A) о... наОмаЩу <br/>
+> SOLO3: (C) саМаЩаЛу луСуЛуО щаОЖуЛа саЛаЛаМу <!--ДМЛС ФМРР ССЛБ ДРМД--> <br/>
+> SOLO4: (F) щаСуЛуМа саЛуСуМа саОзуМа <!-- ФМРВ СФМЗ ЛЛРВ --><br/>
+> SOLO4: (E) луОоО оОлуЛуСуЛу заОоО оОлуЛуСуЛу <!--  ММММ ММрдбл ММММ ММрдбл --> <br/>
+> SOLO4: (J) гаНуСуСуСа луЛуСу <!-- зфмнм рдб --><br/>
+> ИНТРО: (A) лу... наОмаЩу <br/>
+> SOLO5: (A) луНаЩаСу луЛуСуЛу <!-- ACFE DCHA --><br/>
+> SOLO5: (D) щаОЛаО саМуСаЛа лаНаСуМу щаЩуСаЩу лаСаСаО зу <!-- DDEE FSDE VAJE AEFC DTEE A -->
+            </div>            
         </div>`.trim();
 
         return wrapper;
     }
 }
+
+/*
+ABCDEFGHIGKLMNOPQRSTUVWXYZ
+A CDEFGH             V
+
+CsDtEiFvGjAoH
+
+ */

@@ -7,11 +7,11 @@ import * as un from '../libs/muse/utils/utils-note';
 import keyboardSet from './page_keyboard-utils';
 import { getNoteByOffset, parseInteger } from '../libs/muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
-import { DrumCtrl } from './drum-ctrl';
-import {BassSoloCtrl} from './tone-bass-solo-ctrl';
+import { DrumCtrl, DrumKeyboardType } from './drum-ctrl';
+import {BassSoloCtrl, ToneKeyboardType} from './tone-bass-solo-ctrl';
 import ideService from './ide/ide-service';
 
-type ViewType = 'bassSolo' | 'drums' | 'bass';
+type ViewType = ToneKeyboardType | DrumKeyboardType;
 
 const ns = {
     setBmpAction: 'set-bmp-action',
@@ -104,11 +104,11 @@ export class KeyboardPage {
         this.view = view;
 
         if (this.view === 'bassSolo') {
-            this.setBassSoloContent();
+            this.setToneContent('bassSolo');
         }
         else
         {
-            this.setDrumsContent();
+            this.setDrumsContent('drums');
         }
 
         setTimeout(() => {
@@ -173,7 +173,7 @@ export class KeyboardPage {
         );
     }
 
-    setDrumsContent() {
+    setDrumsContent(type: DrumKeyboardType) {
         this.drumCtrl = new DrumCtrl(this);
 
         this.view = 'drums';
@@ -197,14 +197,14 @@ export class KeyboardPage {
         }, 100);
     }
 
-    setBassSoloContent() {
+    setToneContent(type: ToneKeyboardType) {
         this.toneCtrl = new BassSoloCtrl();
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${this.getTracksContent()}                
                 <div data-name="setContent">
-                    ${this.toneCtrl.getContent()}
+                    ${this.toneCtrl.getContent(type)}
                 </div>
             </div>`.trim();
 
@@ -312,6 +312,7 @@ export class KeyboardPage {
     }
 
     setKeysColor() {
+        const bassNote = this.playingNote.bass;
         const bassChar = (this.playingNote.bass || '')[0];
         const soloChar = (this.playingNote.solo || '')[0];
 
@@ -321,15 +322,16 @@ export class KeyboardPage {
                 keyboardId: string;
                 noteLat: string;
             };
-            const firstChar = data.noteLat[0];
+            const note = data.noteLat || '';
 
-            if (data.keyboardId === 'solo' && firstChar === bassChar) {
-                el.style.backgroundColor = '#eee';
+            if (data.keyboardId === 'solo') {
+                if (note[0] === bassChar) {
+                    el.style.backgroundColor = this.toneCtrl.lightBgColor;
+                }
+                if (note === bassNote) {
+                    el.style.backgroundColor = this.toneCtrl.darkBgColor;
+                }
             }
-
-            // if (data.keyboardId === 'bass' && firstChar === soloChar) {
-            //   el.style.backgroundColor = 'lightgray';
-            // }
         });
     }
 

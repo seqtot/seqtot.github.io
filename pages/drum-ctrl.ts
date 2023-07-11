@@ -113,6 +113,8 @@ const emptyBpmInfo = (): BpmInfo => {
 const DOWN = 1;
 const UP = 0;
 
+export type DrumKeyboardType = 'drums' | 'perc';
+
 export class DrumCtrl {
     bpmInfo: BpmInfo = emptyBpmInfo();
     mode: 'record' | null = null;

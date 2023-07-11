@@ -248,7 +248,7 @@ $guit: 720  бо=60 ма=60 ло=60 ма=60 $guit*edm
 
 
 <solo4_4 b150 $>
-# EEEE 
+# EEEE ММММ
 $____: 0    МО=240 $organ*r
 $bass: 0    му=240 $cBass*s
 $guit: 0    мо=60=70 v60 зо=60 бо=60 ма=60 $guit*edm
@@ -264,7 +264,7 @@ $guit: 720  ба=60 ма=60 ма=60 ма=60 $guit*edm
 
 
 <solo4_3 b150 $>
-# AAD#F
+# AADF# ЛЛРВ 
 $____: 0    ЛО=240 $organ*r
 $bass: 0    лу=240 $cBass*s
 $guit: 0    ло=60=70 v60 да=60 да=60 да=60 $guit*edm
@@ -280,7 +280,7 @@ $guit: 720  во=60=70 v60 ло=60 ло=60 ло=60 $guit*edm
 
 
 <solo4_2 b150 $>
-# GFE#G
+# GFE#G СФМЗ
 $____: 0    СО=240 $organ*r
 $bass: 0    су=240 $cBass*s
 $guit: 0    со=60=70 v60 бо=60 бо=60 бо=60 $guit*edm
@@ -296,7 +296,7 @@ $guit: 720  зо=60=70 v60 ра=60 ра=60 ра=60 $guit*edm
 
 
 <solo4_1 b150 $>
-# FED#F
+# FED#F ФМРВ
 $____: 0    ФО=240 $organ*r
 $bass: 0    фу=240 $cBass*s
 $guit: 0    фо=60=70 v60 ло=60 ло=60 ло=60 $guit*edm
