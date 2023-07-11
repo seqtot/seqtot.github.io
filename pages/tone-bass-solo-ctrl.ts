@@ -204,12 +204,71 @@ export class BassSoloCtrl extends ToneCtrl {
     mainBgColor = mainBgColor;
     darkBgColor = darkBgColor;
 
+    getPatternsList(patterns?: string[]): string {
+        patterns = [
+            `
+            (A) о... наОмаЩу
+            (A) луНаЩаСу
+            (D) луЛуСуЛу
+            (D) щаСаСаСа
+            (E) суЙуЙаЙу
+            (A) щаНаЩаСу
+            (D) луЛуСуЛу
+            (D) щаСаСаСаВу`,
+            `
+            (A) о... наОмаЩу
+            (C) саМаЩаЛу
+            (F) луСуЛуО
+            (G) щаОЖуЛа
+            (C) саЛаЛаМу
+            (F) щаСуЛуМа
+            (G) саЛуСуМа
+            (A) саОзуМа
+            (E) луОоО
+            (E) оОлуЛуСуЛу
+            (E) заОоО
+            (E) оОлуЛуСуЛу
+            (J) гаНуСуСуСа
+            (D) луЛуСу
+            (A) лу... наОмаЩу`,
+            `
+            (A) луНаЩаСу
+            (D) луЛуСуЛу
+            (D) щаОЛаО
+            (F) саМуСаЛа
+            (V) лаНаСуМу
+            (A) щаЩуСаЩу
+            (D) лаСаСаОЗу            
+            `
+        ];
+
+        const topArr: string[][] = [];
+        let result = '';
+
+        patterns.forEach(block => {
+            block = block.trim();
+            const arr = block.split('\n').map(item => item.trim()).filter(item => item);
+            topArr.push(arr);
+        })
+
+        topArr.forEach(block => {
+            result = result + '<div data-type="pattern-block" style="margin-bottom: .5rem;">'
+            block.forEach(item => {
+                result = result + `<p data-type="pattern-item" style="margin: 0; padding: 0;">${item}</p>`
+            })
+
+            result = result + '</div>'
+        });
+
+        return  result;
+    }
+
     getContent(type?: ToneKeyboardType): string {
         let wrapper = `<div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
             ${getVerticalHarmKeyboard('bass', bassKeys)}
             ${getVerticalHarmKeyboard('solo', soloKeys)}
             <div 
-                style="font-size: 1.7rem;
+                style="font-size: 2rem;
                 font-family: monospace;
                 width: 100%;
                 position: absolute;
@@ -220,8 +279,18 @@ export class BassSoloCtrl extends ToneCtrl {
                 padding-left: .5rem;"
                 data-type="text-under-board"
             >
+                ${this.getPatternsList()}
+            </div>            
+        </div>`.trim();
+
+        return wrapper;
+    }
+}
+
+
+/*
 > ИНТРО: (A) о... наОмаЩу <!-- cceh --> <br/>
-> SOLO1: (A) луНаЩаСу  луЛуСуЛу щаСаСаСа суЙуЙаЙу <!-- ACFE DCHA DTEF EeEe--> <br/>
+> SOLO1: (A) луНаЩаСу  луЛуСуЛу щаСаСаСа суЙуЙаЙу <!-- ACFE DCBA DNEF EeEe--> <br/>
 > SOLO2: (A) щаНаЩаСу луЛуСуЛу щаСаСаСа ву:      <!-- ACFE DCHA DTEF A --><br/>
 > ИНТРО: (A) о... наОмаЩу <br/>
 > SOLO3: (C) саМаЩаЛу луСуЛуО щаОЖуЛа саЛаЛаМу <!--ДМЛС ФМРР ССЛБ ДРМД--> <br/>
@@ -231,12 +300,14 @@ export class BassSoloCtrl extends ToneCtrl {
 > ИНТРО: (A) лу... наОмаЩу <br/>
 > SOLO5: (A) луНаЩаСу луЛуСуЛу <!-- ACFE DCHA --><br/>
 > SOLO5: (D) щаОЛаО саМуСаЛа лаНаСуМу щаЩуСаЩу лаСаСаО зу <!-- DDEE FSDE VAJE AEFC DTEE A -->
-            </div>            
-        </div>`.trim();
+*/
 
-        return wrapper;
-    }
-}
+
+/*
+
+*/
+
+
 
 /*
 ABCDEFGHIGKLMNOPQRSTUVWXYZ
@@ -245,3 +316,27 @@ A CDEFGH             V
 CsDtEiFvGjAoH
 
  */
+
+// (A) о... наОмаЩу<br/>
+// (A) луНаЩаСу<br/>
+// (D) луЛуСуЛу<br/>
+// (D) щаСаСаСа<br/>
+// (E) суЙуЙаЙу<br/>
+// (A) щаНаЩаСу<br/>
+// (D) луЛуСуЛу<br/>
+// (D) щаСаСаСаВу<br/>
+// (A) о... наОмаЩу <br/>
+// (C) саМаЩаЛу<br/>
+// (F) луСуЛуО<br/>
+// (G) щаОЖуЛа<br/>
+// (C) саЛаЛаМу<br/>
+// (F) щаСуЛуМа<br/>
+// (G) саЛуСуМа<br/>
+// (A) саОзуМа<br/>
+// (E) луОоО<br/>
+// (E) оОлуЛуСуЛу<br/>
+// (E) заОоО<br/>
+// (E) оОлуЛуСуЛу<br/>
+// (J) гаНуСуСуСа<br/>
+// (D) луЛуСу<br/>
+// (A) лу... наОмаЩу<br/>
