@@ -33,7 +33,7 @@ type OutBlocksInfo = {
         rowDurationByHeadQ: number;
         rowRepeat: number;
         bpm?: number,
-        mask?: string | number,
+        //mask?: string | number,
         text?: string,
     }[],
     durationQ: number,
@@ -135,18 +135,21 @@ export function getOutBlocksInfo(
 
     // цикл по строкам out - это не ссылки на другие блоки
     textRows.forEach((row, iRow) => {
-        let mask = '';
-        // const colArr = (row || '')
-        //     .split(' ')
-        //     .map((item) => item.trim())
-        //     .filter((item) => !!item);
+        let metaByLine = '';
+        let partRowId = '';
 
         const colArr = (row || '')
             .split(' ')
             .filter(item => !!item)
             .reduce((acc, item) => {
                 if (item.startsWith('[')) {
-                    mask = item.replace(/[\[\]]/g, '');
+                    metaByLine =  (metaByLine + ' ' + item.replace(/[\[\]]/g, '')).trim();
+
+                    return acc;
+                }
+
+                if (item.startsWith('№')) {
+                    partRowId =  item;
 
                     return acc;
                 }
@@ -156,7 +159,7 @@ export function getOutBlocksInfo(
                 return acc;
             }, []);
 
-        //console.log('colArr', colArr);
+        //console.log('metaByLine', metaByLine );
 
         let headLoopRepeat = 1;
         let headLoopDurationQ = 0;
@@ -169,7 +172,7 @@ export function getOutBlocksInfo(
         for (let iCol = 0; iCol < colArr.length; iCol++) {
             const item = colArr[iCol];
             const typeByName = getBlockType(item); // $: voice @:drum
-            const colInfoArr = (item || '').split('-').filter(item => !!item);
+            const colInfoArr = (item || '').split(/[:]/).filter(item => !!item); // [-:]
             const colInfoStr = colInfoArr.join(' ');
             let noteLinesWithName: {name: string, noteLine: string}[];
             let colNoteLns: NoteLn[] = [];
@@ -243,7 +246,7 @@ export function getOutBlocksInfo(
             headLoopDurationQ,
             rowDurationByHeadQ,
             rowRepeat,
-            mask: mask || rowDurationByHeadQ,
+            //mask: mask || rowDurationByHeadQ,
             text: row
         });
     });

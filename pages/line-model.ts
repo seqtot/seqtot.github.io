@@ -402,24 +402,27 @@ export class LineModel {
         return rows;
     }
 
-    getSortedNotes(rows: Line[]): NoteItem[] {
-        rows = Array.isArray(rows) ? rows : this.rows;
+    static GetSortedNotes(rows: Line[]): NoteItem[] {
+        rows = Array.isArray(rows) ? rows : [];
         const notes: NoteItem[] = [];
 
         rows.forEach(row => {
-           row.cells.forEach(cell => {
-               cell.notes.forEach(note => {
-                   note.startOffsetQ = cell.startOffsetQ;
-                   notes.push(note);
-               })
-           });
+            row.cells.forEach(cell => {
+                cell.notes.forEach(note => {
+                    note.startOffsetQ = cell.startOffsetQ;
+                    notes.push(note);
+                })
+            });
         });
 
-        this.sortByStartOffsetQ(notes);
+        this.SortByStartOffsetQ(notes);
 
         return notes;
     }
 
+    getSortedNotes(rows: Line[]): NoteItem[] {
+        return LineModel.GetSortedNotes(Array.isArray(rows) ? rows : this.rows);
+    }
 
     sortByField(arr: any[], field: string) {
         arr.sort((first, second) => {
@@ -435,7 +438,7 @@ export class LineModel {
         });
     }
 
-    sortByStartOffsetQ(arr: (Cell | NoteItem) []) {
+    static SortByStartOffsetQ(arr: (Cell | NoteItem) []) {
         arr.sort((first, second) => {
             if (first.startOffsetQ < second.startOffsetQ) {
                 return -1;
@@ -449,7 +452,11 @@ export class LineModel {
         });
     }
 
-    getNoteNames(arr: NoteItem[]): string[] {
+    sortByStartOffsetQ(arr: (Cell | NoteItem) []) {
+        LineModel.SortByStartOffsetQ(arr);
+    }
+
+    static GetNoteNames(arr: NoteItem[]): string[] {
         const result: {[key: string]: string} = {};
 
         arr.forEach(item => {
@@ -459,14 +466,22 @@ export class LineModel {
         return Object.values(result);
     }
 
-    getDurationQByRows(rows?: Line[]) {
-        rows = Array.isArray(rows) ? rows : this.rows;
+    getNoteNames(arr: NoteItem[]): string[] {
+        return LineModel.GetNoteNames(arr);
+    }
+
+    static GetDurationQByRows(rows: Line[]) {
+        rows = Array.isArray(rows) ? rows : [];
 
         if (rows.length) {
             return rows[rows.length-1].startOffsetQ + rows[rows.length-1].durQ;
         }
 
         return 0;
+    }
+
+    getDurationQByRows(rows?: Line[]) {
+        return LineModel.GetDurationQByRows(Array.isArray(rows) ? rows : this.rows);
     }
 
     getOffsetsByRow(row: Line): number[] {
@@ -557,7 +572,7 @@ export class LineModel {
         return result;
     }
 
-    recalcAndClearBlockOffset(rows: Line[]): Line[] {
+    static RecalcAndClearBlockOffset(rows: Line[]): Line[] {
         rows.forEach(row => {
             row.startOffsetQ = row.startOffsetQ + row.blockOffsetQ;
             row.cells.forEach(cell => {
@@ -569,20 +584,24 @@ export class LineModel {
         return rows;
     }
 
+    recalcAndClearBlockOffset(rows: Line[]): Line[] {
+        return LineModel.RecalcAndClearBlockOffset(rows);
+    }
+
     // getNoteNames(arr: NoteItem[]): string[] {
     //     let durationQ = 0;
     //
     //     return Object.values(result);
     // }
 
-    getDrumNotes(name?: string, rows?: Line[]): string {
+    static GetDrumNotes(name: string, rows: Line[]): string {
         name = name || 'no_name';
-        rows = this.cloneRows(rows);
-        rows = this.recalcAndClearBlockOffset(rows);
+        rows = this.CloneRows(rows);
+        rows = this.RecalcAndClearBlockOffset(rows);
 
-        const totalDurQ = this.getDurationQByRows(rows);
-        const notes = this.getSortedNotes(rows);
-        const noteNames = this.getNoteNames(notes);
+        const totalDurQ = this.GetDurationQByRows(rows);
+        const notes = this.GetSortedNotes(rows);
+        const noteNames = this.GetNoteNames(notes);
         const map: {[key: string]: string[]} = {};
 
         if (!totalDurQ || !notes.length || !noteNames.length) {
@@ -633,8 +652,15 @@ export class LineModel {
         return result;
     }
 
-    cloneRows(rows?: Line[]): Line[] {
+    getDrumNotes(name?: string, rows?: Line[]): string {
+        name = name || 'no_name';
         rows = Array.isArray(rows) ? rows : this.rows;
+
+        return LineModel.GetDrumNotes(name, rows);
+    }
+
+    static CloneRows(rows: Line[]): Line[] {
+        rows = Array.isArray(rows) ? rows : [];
 
         return rows.map(row => {
             row = {...row};
@@ -651,6 +677,12 @@ export class LineModel {
 
             return row;
         });
+    }
+
+    cloneRows(rows?: Line[]): Line[] {
+        rows = Array.isArray(rows) ? rows : this.rows;
+
+        return LineModel.CloneRows(rows);
     }
 
     getLinesByMask(pMask: string | number): Line[] {

@@ -50,7 +50,6 @@ export function getMidiConfig(x: MidiConfig) {
         x.playBlockOut = x.midiBlockOut.id;
     }
     else if (x.currBlock.type === 'tones' || x.currBlock.type === 'drums') {
-        //console.log('currBlock', x.currBlock);
         const repeat = x.currBlock.repeat || 1;
         x.midiBlockOut = x.currBlock;
         x.playBlockOut = un.createOutBlock({
@@ -65,21 +64,21 @@ export function getMidiConfig(x: MidiConfig) {
             x.currRowInfo.first = nearestIndex;
             x.currRowInfo.last = nearestIndex;
 
-            let rows = x.currBlock.rows
-                .filter((item, i) => {
-                    //console.log(item, i);
-
-                    return isRefLine(item) && i >= nearestIndex && !excludeIndex.includes(i);
-                })
-                .join('|')
-                .split('|')
-                .map(item => un.clearEndComment(item))
-                .map(item => item.replace('>', '').trim());
+            let rows = getTopOutList({
+                topBlock: x.currBlock,
+                nearestIndex,
+                excludeIndex,
+                printN: true
+            });
 
             if (rows.length) {
-                rows.unshift('tick');
                 x.topBlocksOut = rows;
                 rows = un.buildOutBlock(x.blocks, rows);
+
+                if (x.blocks.find(item => item.id === 'tick')) {
+                    rows.unshift('tick');
+                }
+
                 x.midiBlockOut = un.createOutBlock({currBlock: x.currBlock, rows});
                 x.playBlockOut = x.midiBlockOut;
             }
@@ -87,18 +86,50 @@ export function getMidiConfig(x: MidiConfig) {
     }
 }
 
-export function getTopOutList(currBlock: un.TextBlock): string[] {
-    let result: string[] = [];
+export function getTopOutList(x: {
+    topBlock: un.TextBlock,
+    nearestIndex?: number,
+    excludeIndex?: number[]
+    printN?: boolean,
+}
+): string[] {
+    let partNio = 0;
+    let nearestIndex = x.nearestIndex | 0;
+    let excludeIndex = Array.isArray(x.excludeIndex) ? x.excludeIndex : [];
+    let printN = !!x.printN;
+    let rows: string[] = [];
 
-    currBlock.rows.forEach(row => {
-        row = un.clearEndComment(row).trim();
+    x.topBlock.rows.forEach(item => {
+        item = un.clearEndComment(item).trim();
 
-        if (!isRefLine(row)) {
-            return;
+        if (isRefLine(item)) {
+            item = item.replace('|', '>');
+            const arr = item.split('>').map(item => item.trim()).filter(item => item).map(item => `> ${item}`);
+            arr.forEach(item => rows.push(item));
+        } else {
+            rows.push(item);
         }
-
-        result.push(row.replace('>', '').trim());
     });
 
-    return result;
+    rows = rows.reduce((acc, item, i) => {
+        if (isRefLine(item)) {
+            partNio++;
+        }
+
+        if (!isRefLine(item) || i < nearestIndex || excludeIndex.includes(i)) {
+            return acc;
+        }
+
+        item = item.replace('>', '').trim();
+
+        if (!item) return acc;
+
+        let N = printN ? `№${partNio} ` : '';
+
+        return [...acc, `${N}${item}`];
+    }, <string[]>[]);
+
+    //console.log('getTopOutList' , rows);
+
+    return rows;
 }

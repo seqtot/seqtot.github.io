@@ -10,6 +10,7 @@ import { getMidiConfig, getTopOutList } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSettings';
 import { isPresent, parseInteger, TextBlock } from '../libs/muse/utils/utils-note';
+import { LineModel } from './line-model';
 import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
 
@@ -52,6 +53,12 @@ export class MBoxPage {
         tracks: { key: string; value: string; name: string }[];
         hideMetronome?: boolean;
         score: string;
+        dynamic: {[key: string]: {
+            [key: string]: {
+                    items: any[]
+                }
+            }
+        }
     } {
         return mboxes[this.songId];
     }
@@ -61,7 +68,7 @@ export class MBoxPage {
     }
 
     get outList(): string[] {
-        return  getTopOutList(this.outBlock);
+        return  getTopOutList({topBlock: this.outBlock});
     }
 
     getId(id: string): string {
@@ -455,15 +462,46 @@ export class MBoxPage {
 
         x.currBlock = x.blocks.find((item) => item.id === 'out');
         getMidiConfig(x);
+        const playBlock = x.playBlockOut as TextBlock;
 
         //console.log('getMidiConfig', x);
 
+        let blocks = [...x.blocks];
+
+        // DYNAMIC
+        if (this.pageData.dynamic?.['@drums']) {
+            const map = this.pageData.dynamic?.['@drums'];
+
+            playBlock.rows.forEach((row, i) => {
+                let rowPartNio = un.getNFromString(row);
+
+                if (!rowPartNio || !map[rowPartNio] || !map[rowPartNio].items && !map[rowPartNio].items.length) {
+                    return;
+                }
+
+                let rows = map[rowPartNio].items[0].rows;
+
+                if (Array.isArray(rows)) {
+                     rows = LineModel.CloneRows(rows);
+                     rows.forEach(row => (row.blockOffsetQ = 0));
+                } else {
+                    return;
+                }
+
+                const notes = LineModel.GetDrumNotes('temp' + ideService.guid.toString(), rows);
+
+                if (notes) {
+                    const block = un.getTextBlocks(notes)[0];
+                    blocks = [...blocks, block];
+                    playBlock.rows[i] = playBlock.rows[i] + ' ' + block.id;
+                }
+            });
+        }
+
         if (x.playBlockOut) {
-            //this.playingWithMidi = true;
-            //console.log('midiBlock', midiBlock);
             ideService.multiPlayer.tryPlayMidiBlock({
-                blocks: x.blocks,
-                playBlock: x.playBlockOut,
+                blocks,
+                playBlock,
                 cb: (type: string, data: any) => {
                     if (type === 'break' || type === 'finish') {
                         // this.playingWithMidi = false;

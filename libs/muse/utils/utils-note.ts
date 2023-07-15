@@ -104,6 +104,23 @@ export function getRepeatFromString(str: string, byDefault = 1) {
 }
 
 // b120
+export function getNFromString(str: string): string {
+    str = (str || '').trim();
+
+    const arr = str.split(' ');
+
+    for (let item of arr) {
+        if (item.startsWith('№')) {
+            item = item.replace('№', '');
+
+            return item;
+        }
+    }
+
+    return '';
+}
+
+// b120
 export function getBpmFromString(str: string, byDefault = 120) {
     str = getStringWithBlanks(str);
 
@@ -588,19 +605,51 @@ export function getNoteByOffset(
     return noteOrder[index + offset] || '';
 }
 
+function getPartNioAndRef(val: string): {
+    nio: number,
+    ref: string,
+} {
+    val = (val || '').trim();
+    const arr = val.split(' ').filter(item => item);
+
+    const nio = parseInteger((arr.find(item => item.startsWith('№')) || '').replace('№', ''), 0);
+    const ref = arr.find(item => !item.startsWith('№')) || ''
+
+    return {ref, nio};
+}
+
 export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
     const result: string[] = [];
 
-    rows.forEach(item => {
-        const block = blocks.find(block => block.id === item);
+    // строка может содержать номер части (№1 и т.п.)
+    rows.forEach(rowItem => {
+        const info = getPartNioAndRef(rowItem);
+        //console.log('rowInfo', info);
+
+        const block = blocks.find(block => block.id === info.ref);
+
         if (!block) {
             return;
         }
 
+        let rowInBlockNio = 0;
+
         if (block.type === 'tones' || block.type === 'drums') {
-            result.push(block.id);
+            rowInBlockNio++;
+
+            result.push(`${info.ref} [${info.nio}-${rowInBlockNio}]`);
         } else if (block.type === 'set') {
-            Array.prototype.push.apply(result, block.rows.slice(1));
+            let rows = block.rows.slice(1)
+                .map(item => clearEndComment(item))
+                .map(item => item.trim())
+                .filter(item => !!(item && !item.startsWith('#')))
+                .map(item => {
+                    rowInBlockNio++;
+
+                    return `${item} №${info.nio}-${rowInBlockNio}`;
+                });
+
+            Array.prototype.push.apply(result, rows);
         }
     });
 
