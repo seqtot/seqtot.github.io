@@ -10,6 +10,8 @@ import { standardTicks as ticks } from './ticks';
 import { DrumCtrl, DrumKeyboardType } from './drum-ctrl';
 import {BassSoloCtrl, ToneKeyboardType} from './tone-bass-solo-ctrl';
 import ideService from './ide/ide-service';
+import {Synthesizer} from '@muse/synthesizer';
+import {MultiPlayer} from '@muse/multi-player';
 
 type ViewType = ToneKeyboardType | DrumKeyboardType;
 
@@ -18,13 +20,18 @@ const ns = {
     setNote: 'set-note',
 };
 
-const defaultNote = 'da';
-
 interface Page {
+    bpmValue: number;
+    pageEl: HTMLElement;
     getMetronomeContent(): string;
+    stopTicker();
+    stop();
+    synthesizer: Synthesizer;
+    multiPlayer: MultiPlayer;
+    context: ComponentContext,
 }
 
-export class KeyboardPage {
+export class KeyboardPage implements Page {
     view: ViewType = 'drums'; // 'bassSolo';
     drumCtrl: DrumCtrl;
     toneCtrl: BassSoloCtrl;
@@ -32,11 +39,6 @@ export class KeyboardPage {
     bpmValue = 100;
     playingTick = '';
     bpmRange: Range.Range;
-    playingNote: { [key: string]: string } = {};
-
-    fixedRelativeNote = defaultNote;
-    lastRelativeNote = defaultNote;
-    fixedQuickNote = defaultNote;
     tickInfo = {
         quarterTime: 0,
         quarterNio: 0,
@@ -71,8 +73,10 @@ export class KeyboardPage {
         return this.pageId + '-' + id;
     }
 
-    constructor(public props: Props, public context: ComponentContext) {
-    }
+    constructor(
+        public props: Props,
+        public context: ComponentContext
+    ) {}
 
     onMounted() {
         //console.log(ideService.currentEdit);
@@ -82,22 +86,6 @@ export class KeyboardPage {
             this.subscribeRightPanelEvents();
         }, 100);
     }
-
-    // dyName('action-drums', dyName('panel-right-content')).addEventListener(
-    //     'click',
-    //     () => {
-    //         //console.log('action-info');
-    //         this.setViewDrums();
-    //     }
-    // );
-
-    // dyName('action-info', dyName('panel-right-content')).addEventListener(
-    //     'click',
-    //     () => {
-    //         //console.log('action-info');
-    //         this.setViewInfo();
-    //     }
-    // );
 
     setPageContent(view?: ViewType) {
         view = view ||  this.view;
@@ -200,7 +188,7 @@ export class KeyboardPage {
     }
 
     setToneContent(type: ToneKeyboardType) {
-        this.toneCtrl = new BassSoloCtrl(<ToneKeyboardType>this.view);
+        this.toneCtrl = new BassSoloCtrl(this, <ToneKeyboardType>this.view);
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
@@ -246,14 +234,13 @@ export class KeyboardPage {
 
     subscribePageEvents() {
         if (this.view === 'bassSolo' || this.view === 'bass') {
-            this.subscribeBassSoloEvents();
+            this.toneCtrl.subscribeEvents();
+            //this.toneCtrl.subscribeRelativeKeyboardEvents();
         }
         else if (this.view === 'drums') {
             this.subscribeMetronomeEvents();
             this.drumCtrl.subscribeEvents();
         }
-
-        //this.subscribeRelativeKeyboardEvents();
 
         // getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
         //     el.addEventListener('click', (evt: MouseEvent) => {
@@ -311,243 +298,6 @@ export class KeyboardPage {
         //         this.tryPlayTextLine({ text: `b60 ${note}-25` });
         //     });
         // });
-    }
-
-    setKeysColor() {
-        const bassNote = this.playingNote.bass;
-        const bassChar = (this.playingNote.bass || '')[0];
-        const soloChar = (this.playingNote.solo || '')[0];
-
-        getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-            el.style.backgroundColor = el.dataset['bgColor'] || 'white';
-            const data = (el?.dataset || {}) as {
-                keyboardId: string;
-                noteLat: string;
-            };
-            const note = data.noteLat || '';
-
-            if (data.keyboardId === 'solo') {
-                if (note[0] === bassChar) {
-                    el.style.backgroundColor = this.toneCtrl.lightBgColor;
-                }
-                if (note === bassNote) {
-                    el.style.backgroundColor = this.toneCtrl.darkBgColor;
-                }
-            }
-        });
-    }
-
-    subscribeBassSoloEvents() {
-        getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-            const keyboardId = el?.dataset?.keyboardId;
-            const keyOrNote = el?.dataset?.noteLat || '';
-
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                ideService.synthesizer.playSound({
-                    keyOrNote: this.playingNote[keyboardId],
-                    id: keyboardId,
-                    onlyStop: true,
-                });
-
-                this.playingNote[keyboardId] = keyOrNote;
-
-                ideService.synthesizer.playSound({
-                    keyOrNote,
-                    id: keyboardId,
-                    // instrCode: 366,
-                });
-
-                this.setKeysColor();
-            });
-
-            el.addEventListener('pointerup', (evt: MouseEvent) => {
-                ideService.synthesizer.playSound({
-                    keyOrNote,
-                    id: keyboardId,
-                    onlyStop: true,
-                });
-
-                this.playingNote[keyboardId] = undefined;
-            });
-        });
-
-        const clearColor = () => {
-            getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-                el.style.backgroundColor = el.dataset['bgColor'] || 'white';
-            });
-        };
-
-        // очистка цвета
-        let el = dyName('clear-keys-color', this.pageEl);
-        if (el) {
-            el.addEventListener('click', () => clearColor());
-        }
-
-        el = dyName('select-random-key', this.pageEl);
-        if (el) {
-            el.addEventListener('click', () => {
-                const val =
-                    un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
-
-                const key = dyName(
-                    `note-key-${val}`,
-                    dyName(`keyboard-solo`, this.pageEl)
-                );
-
-                if (key) {
-                    clearColor();
-                    key.style.backgroundColor = 'gray';
-                }
-            });
-        }
-    }
-
-    subscribeRelativeKeyboardEvents() {
-        const fixEl = dyName('relative-command-fix');
-        const zeroEl = dyName('relative-note-0');
-
-        dyName('relative-command-fixQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
-            this.fixedRelativeNote = this.lastRelativeNote;
-            this.fixedQuickNote = this.lastRelativeNote;
-            fixEl.innerText = this.fixedQuickNote;
-            const el = dyName('relative-command-setQuickNote');
-            el.innerText = this.fixedQuickNote;
-            zeroEl.innerText = this.fixedQuickNote;
-        });
-
-        dyName('relative-command-setQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
-            this.fixedRelativeNote = this.fixedQuickNote;
-            this.lastRelativeNote = this.fixedQuickNote;
-            fixEl.innerText = this.fixedQuickNote;
-            zeroEl.innerText = this.fixedQuickNote;
-        });
-
-        dyName('relative-command-setDa')?.addEventListener('pointerdown', (evt: MouseEvent) => {
-            this.fixedRelativeNote = defaultNote;
-            this.lastRelativeNote = defaultNote;
-            fixEl.innerText = defaultNote;
-            zeroEl.innerText = defaultNote;
-        });
-
-        fixEl?.addEventListener('pointerdown', (evt: MouseEvent) => {
-            const keyboardId = fixEl?.dataset?.keyboardId;
-
-            ideService.synthesizer.playSound({
-                keyOrNote: this.playingNote[keyboardId],
-                id: keyboardId,
-                onlyStop: true,
-            });
-
-            if (!this.lastRelativeNote) {
-                return;
-            }
-
-            this.fixedRelativeNote = this.lastRelativeNote;
-            this.playingNote[keyboardId] = this.lastRelativeNote;
-            zeroEl.innerText = this.lastRelativeNote;
-
-            ideService.synthesizer.playSound({
-                keyOrNote: this.lastRelativeNote,
-                id: keyboardId,
-            });
-
-        });
-
-        fixEl?.addEventListener('pointerup', (evt: MouseEvent) => {
-            const keyboardId = fixEl?.dataset?.keyboardId;
-
-            ideService.synthesizer.playSound({
-                keyOrNote: this.lastRelativeNote,
-                id: keyboardId,
-                onlyStop: true,
-            });
-
-            this.playingNote[keyboardId] = undefined;
-        });
-
-        getWithDataAttr('is-relative-note', this.pageEl)?.forEach((el: HTMLElement) => {
-            if (!el?.dataset?.pitchOffset) {
-                return;
-            }
-
-            const keyboardId = el?.dataset?.keyboardId;
-            const offset = parseInteger(el?.dataset?.pitchOffset, null);
-
-            if (offset === null) {
-                return;
-            }
-
-            //console.log(offset, keyboardId);
-
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                const note = getNoteByOffset(this.fixedRelativeNote, offset);
-
-                ideService.synthesizer.playSound({
-                    keyOrNote: this.playingNote[keyboardId],
-                    id: keyboardId,
-                    onlyStop: true,
-                });
-                this.playingNote[keyboardId] = note;
-                this.lastRelativeNote = note;
-
-                if (!note) {
-                    return;
-                }
-
-                if (fixEl) {
-                    fixEl.innerText = note;
-                }
-
-                ideService.synthesizer.playSound({
-                    keyOrNote: note,
-                    id: keyboardId,
-                });
-
-                //this.setKeysColor();
-            });
-
-            el.addEventListener('pointerup', (evt: MouseEvent) => {
-                const note = getNoteByOffset(this.fixedRelativeNote, offset);
-
-                ideService.synthesizer.playSound({
-                    keyOrNote: note,
-                    id: keyboardId,
-                    onlyStop: true,
-                });
-
-                this.playingNote[keyboardId] = undefined;
-            });
-        });
-
-        // const clearColor = () => {
-        //   getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
-        //     el.style.backgroundColor = 'white';
-        //   });
-        // };
-        //
-        // // очистка цвета
-        // let el = dyName('clear-keys-color', this.pageEl);
-        // if (el) {
-        //   el.addEventListener('click', () => clearColor());
-        // }
-        //
-        // el = dyName('select-random-key', this.pageEl);
-        // if (el) {
-        //   el.addEventListener('click', () => {
-        //     const val =
-        //         un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
-        //
-        //     const key = dyName(
-        //         `note-key-${val}`,
-        //         dyName(`keyboard-solo`, this.pageEl)
-        //     );
-        //
-        //     if (key) {
-        //       clearColor();
-        //       key.style.backgroundColor = 'lightgray';
-        //     }
-        //   });
-        // }
     }
 
     getTracksContent(): string {

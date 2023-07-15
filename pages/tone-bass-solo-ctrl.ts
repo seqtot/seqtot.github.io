@@ -1,6 +1,25 @@
 import { ToneCtrl } from './tone-ctrl';
+import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
+import ideService from './ide/ide-service';
+import * as un from '../libs/muse/utils/utils-note';
+import {Synthesizer} from '../libs/muse/synthesizer';
+import {MultiPlayer} from '../libs/muse/multi-player';
+import {ComponentContext} from 'framework7/modules/component/component';
+import {getNoteByOffset, parseInteger} from '../libs/muse/utils/utils-note';
 
 export type ToneKeyboardType = 'bass' | 'solo' | 'bassSolo';
+
+interface Page {
+    bpmValue: number;
+    pageEl: HTMLElement;
+    getMetronomeContent(): string;
+    stopTicker();
+    stop();
+    //getOut(bpm: number, seq: DrumCtrl['keySequence'] );
+    synthesizer: Synthesizer;
+    multiPlayer: MultiPlayer;
+    context: ComponentContext,
+}
 
 const lightBgColor = '#eee';
 const mainBgColor = '#ccc';
@@ -18,7 +37,7 @@ const mapNoteToChar = {
     z: 'z',
     l: 'A',
     k: 'k',
-    b: 'H'
+    b: 'B'
 }
 
 function getBassСellStyles(note: string, iRow: number, iCol: number): {
@@ -198,6 +217,8 @@ function getKeyFn(x: {
             data-name="note-key-${note}"
             data-note-lat="${note}"
             data-keyboard-id="${id}"
+            data-col="${iCol}"
+            data-row="${iRow}"
             data-bg-color="${cellStyles.bgColor}"
         >${cellStyles.text}</div>`
             .replace(/\n/g, ' ')
@@ -300,11 +321,16 @@ function getVerticalKeyboard(
 }
 
 export class BassSoloCtrl extends ToneCtrl {
+    playingNote: { [key: string]: string } = {};
+
     lightBgColor = lightBgColor;
     mainBgColor = mainBgColor;
     darkBgColor = darkBgColor;
 
-    constructor(public type: ToneKeyboardType) {
+    constructor(
+        public page: Page,
+        public type: ToneKeyboardType)
+    {
         super();
     }
 
@@ -391,9 +417,38 @@ export class BassSoloCtrl extends ToneCtrl {
     }
 
     getBassContent(): string {
-        let wrapper = `<div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-            ${getVerticalKeyboard('bass', 'bass', bassGuitarKeys)}            
-        </div>`.trim();
+        const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+
+        let wrapper = `
+            <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
+                ${getVerticalKeyboard('bass', 'bass', bassGuitarKeys)}
+                <div>
+                    <span style="${actionStyle}">memo</span><br/>
+                    <span style="${actionStyle}">clear</span><br/>
+                    <span style="${actionStyle}">rec</span><br/>
+                    <span style="${actionStyle}">stop</span><br/>
+                </div>
+            </div>
+            <div style="margin: .5rem;">            
+                <b>ДО</b> - С</br>
+                до диез - С# или <b>t</b> </br>
+                ре бемоль - Db или <b>t</b> </br>                
+                <b>РЕ</b> - D </br>                                
+                ре диез - D# или <b>n</b> </br>
+                ми бемоль - Eb или <b>n</b> </br>
+                <b>МИ</b> - E </br>
+                <b>ФА</b> - F </br>                            
+                фа диез - F# или <b>v</b> </br>
+                соль бемоль - Gb или <b>v</b> </br>
+                <b>СОЛЬ</b> - G </br>
+                соль диез - G# или <b>z</b> </br>
+                ля бемоль - Ab или <b>z</b> </br>
+                <b>ЛЯ</b> - A </br>
+                ля диез - A# или <b>k</b> </br>
+                си бемоль - Hb или B или <b>k</b> </br>
+                <b>СИ</b> - H или B </br>                
+            </div>
+        `.trim();
 
         return wrapper;
     }
@@ -405,6 +460,262 @@ export class BassSoloCtrl extends ToneCtrl {
         else if(type === 'bass') {
             return this.getBassContent();
         }
+    }
+
+    setKeysColor() {
+        const bassNote = this.playingNote.bass;
+        const bassChar = (this.playingNote.bass || '')[0];
+        const soloChar = (this.playingNote.solo || '')[0];
+
+        getWithDataAttr('note-key', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.style.backgroundColor = el.dataset['bgColor'] || 'white';
+
+            const data = (el?.dataset || {}) as {
+                keyboardId: string;
+                noteLat: string;
+                row: string;
+            };
+            const note = data.noteLat || '';
+
+            if (data.keyboardId === 'solo') {
+                if (note[0] === bassChar) {
+                    el.style.backgroundColor = this.lightBgColor;
+                }
+                if (note === bassNote) {
+                    el.style.backgroundColor = this.darkBgColor;
+                }
+            }
+
+            // BASS
+            if (data.keyboardId === 'bass' && this.type === 'bass') {
+                if (data.row !== '0' && data.row !== '12') {
+                    el.innerHTML = '&nbsp;';
+                }
+
+                if (note[0] === bassChar && data.row !== '0' && data.row !== '12') {
+                    //console.log(el.dataset);
+                    //el.style.backgroundColor = this.lightBgColor;
+                    el.innerText = mapNoteToChar[bassChar];
+                    el.style.color = 'dimgrey';
+                }
+            }
+        });
+    }
+
+    subscribeEvents() {
+        const pageEl = this.page.pageEl;
+
+        getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
+            const keyboardId = el?.dataset?.keyboardId;
+            const keyOrNote = el?.dataset?.noteLat || '';
+
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                ideService.synthesizer.playSound({
+                    keyOrNote: this.playingNote[keyboardId],
+                    id: keyboardId,
+                    onlyStop: true,
+                });
+
+                this.playingNote[keyboardId] = keyOrNote;
+
+                ideService.synthesizer.playSound({
+                    keyOrNote,
+                    id: keyboardId,
+                    // instrCode: 366,
+                });
+
+                this.setKeysColor();
+            });
+
+            el.addEventListener('pointerup', (evt: MouseEvent) => {
+                ideService.synthesizer.playSound({
+                    keyOrNote,
+                    id: keyboardId,
+                    onlyStop: true,
+                });
+
+                this.playingNote[keyboardId] = undefined;
+            });
+        });
+
+
+        const clearColor = () => {
+            getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
+                el.style.backgroundColor = el.dataset['bgColor'] || 'white';
+            });
+        };
+
+        // очистка цвета
+        let el = dyName('clear-keys-color', pageEl);
+        if (el) {
+            el.addEventListener('click', () => clearColor());
+        }
+
+        el = dyName('select-random-key', pageEl);
+        if (el) {
+            el.addEventListener('click', () => {
+                const val =
+                    un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
+
+                const key = dyName(
+                    `note-key-${val}`,
+                    dyName(`keyboard-solo`, pageEl)
+                );
+
+                if (key) {
+                    clearColor();
+                    key.style.backgroundColor = 'gray';
+                }
+            });
+        }
+    }
+
+    subscribeRelativeKeyboardEvents() {
+        // const fixEl = dyName('relative-command-fix');
+        // const zeroEl = dyName('relative-note-0');
+        //
+        // dyName('relative-command-fixQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
+        //     this.fixedRelativeNote = this.lastRelativeNote;
+        //     this.fixedQuickNote = this.lastRelativeNote;
+        //     fixEl.innerText = this.fixedQuickNote;
+        //     const el = dyName('relative-command-setQuickNote');
+        //     el.innerText = this.fixedQuickNote;
+        //     zeroEl.innerText = this.fixedQuickNote;
+        // });
+        //
+        // dyName('relative-command-setQuickNote')?.addEventListener('pointerdown', (evt: MouseEvent) => {
+        //     this.fixedRelativeNote = this.fixedQuickNote;
+        //     this.lastRelativeNote = this.fixedQuickNote;
+        //     fixEl.innerText = this.fixedQuickNote;
+        //     zeroEl.innerText = this.fixedQuickNote;
+        // });
+        //
+        // dyName('relative-command-setDa')?.addEventListener('pointerdown', (evt: MouseEvent) => {
+        //     this.fixedRelativeNote = defaultNote;
+        //     this.lastRelativeNote = defaultNote;
+        //     fixEl.innerText = defaultNote;
+        //     zeroEl.innerText = defaultNote;
+        // });
+        //
+        // fixEl?.addEventListener('pointerdown', (evt: MouseEvent) => {
+        //     const keyboardId = fixEl?.dataset?.keyboardId;
+        //
+        //     ideService.synthesizer.playSound({
+        //         keyOrNote: this.playingNote[keyboardId],
+        //         id: keyboardId,
+        //         onlyStop: true,
+        //     });
+        //
+        //     if (!this.lastRelativeNote) {
+        //         return;
+        //     }
+        //
+        //     this.fixedRelativeNote = this.lastRelativeNote;
+        //     this.playingNote[keyboardId] = this.lastRelativeNote;
+        //     zeroEl.innerText = this.lastRelativeNote;
+        //
+        //     ideService.synthesizer.playSound({
+        //         keyOrNote: this.lastRelativeNote,
+        //         id: keyboardId,
+        //     });
+        //
+        // });
+        //
+        // fixEl?.addEventListener('pointerup', (evt: MouseEvent) => {
+        //     const keyboardId = fixEl?.dataset?.keyboardId;
+        //
+        //     ideService.synthesizer.playSound({
+        //         keyOrNote: this.lastRelativeNote,
+        //         id: keyboardId,
+        //         onlyStop: true,
+        //     });
+        //
+        //     this.playingNote[keyboardId] = undefined;
+        // });
+        //
+        // getWithDataAttr('is-relative-note', this.pageEl)?.forEach((el: HTMLElement) => {
+        //     if (!el?.dataset?.pitchOffset) {
+        //         return;
+        //     }
+        //
+        //     const keyboardId = el?.dataset?.keyboardId;
+        //     const offset = parseInteger(el?.dataset?.pitchOffset, null);
+        //
+        //     if (offset === null) {
+        //         return;
+        //     }
+        //
+        //     //console.log(offset, keyboardId);
+        //
+        //     el.addEventListener('pointerdown', (evt: MouseEvent) => {
+        //         const note = getNoteByOffset(this.fixedRelativeNote, offset);
+        //
+        //         ideService.synthesizer.playSound({
+        //             keyOrNote: this.playingNote[keyboardId],
+        //             id: keyboardId,
+        //             onlyStop: true,
+        //         });
+        //         this.playingNote[keyboardId] = note;
+        //         this.lastRelativeNote = note;
+        //
+        //         if (!note) {
+        //             return;
+        //         }
+        //
+        //         if (fixEl) {
+        //             fixEl.innerText = note;
+        //         }
+        //
+        //         ideService.synthesizer.playSound({
+        //             keyOrNote: note,
+        //             id: keyboardId,
+        //         });
+        //
+        //         //this.setKeysColor();
+        //     });
+        //
+        //     el.addEventListener('pointerup', (evt: MouseEvent) => {
+        //         const note = getNoteByOffset(this.fixedRelativeNote, offset);
+        //
+        //         ideService.synthesizer.playSound({
+        //             keyOrNote: note,
+        //             id: keyboardId,
+        //             onlyStop: true,
+        //         });
+        //
+        //         this.playingNote[keyboardId] = undefined;
+        //     });
+        // });
+        //
+        // // const clearColor = () => {
+        // //   getWithDataAttr('note-key', this.pageEl)?.forEach((el: HTMLElement) => {
+        // //     el.style.backgroundColor = 'white';
+        // //   });
+        // // };
+        // //
+        // // // очистка цвета
+        // // let el = dyName('clear-keys-color', this.pageEl);
+        // // if (el) {
+        // //   el.addEventListener('click', () => clearColor());
+        // // }
+        // //
+        // // el = dyName('select-random-key', this.pageEl);
+        // // if (el) {
+        // //   el.addEventListener('click', () => {
+        // //     const val =
+        // //         un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
+        // //
+        // //     const key = dyName(
+        // //         `note-key-${val}`,
+        // //         dyName(`keyboard-solo`, this.pageEl)
+        // //     );
+        // //
+        // //     if (key) {
+        // //       clearColor();
+        // //       key.style.backgroundColor = 'lightgray';
+        // //     }
+        // //   });
+        // // }
     }
 }
 
@@ -421,4 +732,5 @@ export class BassSoloCtrl extends ToneCtrl {
 > ИНТРО: (A) лу... наОмаЩу <br/>
 > SOLO5: (A) луНаЩаСу луЛуСуЛу <!-- ACFE DCHA --><br/>
 > SOLO5: (D) щаОЛаО саМуСаЛа лаНаСуМу щаЩуСаЩу лаСаСаО зу <!-- DDEE FSDE VAJE AEFC DTEE A -->
+
 */
