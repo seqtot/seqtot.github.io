@@ -454,7 +454,7 @@ export class BassSoloCtrl extends ToneCtrl {
                 ${getVerticalKeyboard('bass', 'bass', bassGuitarKeys)}
                 <div>
                     <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
-                    <span data-action-tone="memo-clear" style="${actionStyle}">clear memo</span><br/><br/>
+                    <span data-action-tone="memo-clear" style="${actionStyle}">del memo</span><br/><br/>
                     <span
                         style="${actionStyle}"
                         data-action-type="tick"
