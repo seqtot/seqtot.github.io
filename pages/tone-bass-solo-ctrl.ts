@@ -6,8 +6,22 @@ import {Synthesizer} from '../libs/muse/synthesizer';
 import {MultiPlayer} from '../libs/muse/multi-player';
 import {ComponentContext} from 'framework7/modules/component/component';
 import {getNoteByOffset, parseInteger} from '../libs/muse/utils/utils-note';
+import {KeyData, Line, LineModel, NoteItem} from './line-model';
+import {drumNotesInfo} from './drum-board';
 
 export type ToneKeyboardType = 'bass' | 'solo' | 'bassSolo';
+
+type ChessCell = {
+    noteId: number,
+    cellId: number,
+    bgColor: string,
+    char: string,
+    startOffsetQ: number,
+    totalOffsetQ: number,
+    underline: boolean,
+
+    octave?: string,
+}
 
 interface Page {
     bpmValue: number;
@@ -320,12 +334,22 @@ function getVerticalKeyboard(
     return keyboard;
 }
 
+const DOWN = 1;
+const UP = 0;
+
 export class BassSoloCtrl extends ToneCtrl {
     playingNote: { [key: string]: string } = {};
 
     lightBgColor = lightBgColor;
     mainBgColor = mainBgColor;
     darkBgColor = darkBgColor;
+
+    isMemoMode = false;
+    memoBuffer: string[] = [];
+    memoBuffer2: string[] = [];
+    isRecMode = false;
+
+    liner = new LineModel();
 
     constructor(
         public page: Page,
@@ -394,60 +418,98 @@ export class BassSoloCtrl extends ToneCtrl {
     }
 
     getHarmonicaContent(): string {
-        let wrapper = `<div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-            ${getVerticalKeyboard('bass', 'bassSolo', bassKeys)}
-            ${getVerticalKeyboard('solo', 'bassSolo', soloKeys)}
-            <div 
-                style="font-size: 2rem;
-                font-family: monospace;
-                width: 100%;
-                position: absolute;
-                top: 0;
-                pointer-events: none;
-                user-select: none;
-                touch-action: none;
-                padding-left: .5rem;"
-                data-type="text-under-board"
-            >
-                ${this.getPatternsList()}
-            </div>            
-        </div>`.trim();
+        let wrapper = `
+            <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
+                ${getVerticalKeyboard('bass', 'bassSolo', bassKeys)}
+                ${getVerticalKeyboard('solo', 'bassSolo', soloKeys)}
+                <div 
+                    style="font-size: 2rem;
+                    font-family: monospace;
+                    width: 100%;
+                    position: absolute;
+                    top: 0;
+                    pointer-events: none;
+                    user-select: none;
+                    touch-action: none;
+                    padding-left: .5rem;"
+                    data-type="text-under-board"
+                >
+                    ${this.getPatternsList()}
+                </div>            
+            </div>
+            <div
+                data-name="chess-wrapper"
+                style="width: 90%; padding-left: 1rem;"
+            ></div>
+        `.trim();
 
         return wrapper;
     }
 
     getBassContent(): string {
-        const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
 
         let wrapper = `
             <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
                 ${getVerticalKeyboard('bass', 'bass', bassGuitarKeys)}
                 <div>
-                    <span style="${actionStyle}">memo</span><br/>
-                    <span style="${actionStyle}">clear</span><br/>
-                    <span style="${actionStyle}">rec</span><br/>
-                    <span style="${actionStyle}">stop</span><br/>
+                    <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
+                    <span data-action-tone="memo-clear" style="${actionStyle}">clear memo</span><br/><br/>
+                    <span
+                        style="${actionStyle}"
+                        data-action-type="tick"
+                    >1:4</span>
+                    &nbsp;&nbsp;
+                    <span
+                        style="${actionStyle}"
+                        data-action-type="stop"
+                    >stp</span><br/><br/>
+                    <span data-action-tone="record-mode" style="${actionStyle}">rec</span><br/><br/>
+                    <div 
+                        data-action-tone="record-beat" 
+                        style="${actionStyle} height: 3rem; background-color: whitesmoke; display: none; margin-bottom: 1rem;"
+                    >beat</div>
+                    <!--span 
+                        data-action-tone="record-stop"
+                        style="${actionStyle} height: 3rem; display: none; margin-bottom: 1rem;"
+                     >stop</span-->                    
                 </div>
             </div>
-            <div style="margin: .5rem;">            
-                <b>ДО</b> - С</br>
-                до диез - С# или <b>t</b> </br>
-                ре бемоль - Db или <b>t</b> </br>                
-                <b>РЕ</b> - D </br>                                
-                ре диез - D# или <b>n</b> </br>
-                ми бемоль - Eb или <b>n</b> </br>
-                <b>МИ</b> - E </br>
-                <b>ФА</b> - F </br>                            
-                фа диез - F# или <b>v</b> </br>
-                соль бемоль - Gb или <b>v</b> </br>
-                <b>СОЛЬ</b> - G </br>
-                соль диез - G# или <b>z</b> </br>
-                ля бемоль - Ab или <b>z</b> </br>
-                <b>ЛЯ</b> - A </br>
-                ля диез - A# или <b>k</b> </br>
-                си бемоль - Hb или B или <b>k</b> </br>
-                <b>СИ</b> - H или B </br>                
+            
+            <div style="margin: .5rem;">
+                ${this.page.getMetronomeContent()}            
             </div>
+                        
+            <br/>
+            <br/>
+                        
+            <div
+                data-name="chess-wrapper"
+                style="width: 90%; padding-left: 1rem;"
+            ></div>
+            
+            <br/>           
+           
+            <div style="margin: .5rem;">            
+                <b>ДО</b> - С<br/>
+                до диез - С# или <b>t</b> <br/>
+                ре бемоль - Db или <b>t</b> <br/>                
+                <b>РЕ</b> - D <br/>                                
+                ре диез - D# или <b>n</b> <br/>
+                ми бемоль - Eb или <b>n</b> <br/>
+                <b>МИ</b> - E <br/>
+                <b>ФА</b> - F <br/>                            
+                фа диез - F# или <b>v</b> <br/>
+                соль бемоль - Gb или <b>v</b> <br/>
+                <b>СОЛЬ</b> - G <br/>
+                соль диез - G# или <b>z</b> <br/>
+                ля бемоль - Ab или <b>z</b> <br/>
+                <b>ЛЯ</b> - A <br/>
+                ля диез - A# или <b>k</b> <br/>
+                си бемоль - Hb или B или <b>k</b> <br/>
+                <b>СИ</b> - H или B <br/>
+            </div>
+            
         `.trim();
 
         return wrapper;
@@ -502,8 +564,215 @@ export class BassSoloCtrl extends ToneCtrl {
         });
     }
 
+    toggleRecord() {
+        const pageEl = this.page.pageEl;
+
+        this.isRecMode = !this.isRecMode;
+
+        if (this.isRecMode) {
+            this.memoBuffer2 = [...this.memoBuffer];
+
+            getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
+                el.style.fontWeight = '700';
+            });
+            getWithDataAttrValue('action-tone', 'record-beat',pageEl)?.forEach((el: HTMLElement) => {
+                el.style.display = 'block';
+            });
+            // getWithDataAttrValue('action-tone', 'record-stop',pageEl)?.forEach((el: HTMLElement) => {
+            //     el.style.display = 'block';
+            // });
+        } else {
+            this.clearRecordData();
+
+            getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
+                el.style.fontWeight = '400';
+            });
+            getWithDataAttrValue('action-tone', 'record-beat',pageEl)?.forEach((el: HTMLElement) => {
+                el.style.display = 'none';
+            });
+            // getWithDataAttrValue('action-tone', 'record-stop',pageEl)?.forEach((el: HTMLElement) => {
+            //     el.style.display = 'none';
+            // });
+        }
+    }
+
+
+    getOut(bpm: number, seq: BassSoloCtrl['keySequence'] ) {
+        const rows = LineModel.GetLineModelFromRecord(bpm, this.tickStartMs, seq);
+        this.liner.setData(rows);
+        this.printChess(rows);
+    }
+
+    tickStartMs: number = 0;
+    keyData: KeyData | null = null;
+    keySequence: KeyData[] = [];
+
+    clearRecordData() {
+        this.keyData = null;
+        this.keySequence = [];
+    }
+
+    handleKeyRecord(time: number, type: 0 | 1) {
+        if (!this.isRecMode) {
+            return;
+        }
+
+        if (!this.memoBuffer2.length && this.keyData && !this.keyData.up) {
+            this.keyData.up = time;
+
+            ideService.synthesizer.playSound({
+                keyOrNote: this.keyData.note,
+                id: 'record',
+                onlyStop: true
+                // instrCode: 366,
+            });
+
+
+            return;
+
+            // this.keyData.next = Date.now();
+            // this.keySequence.push(this.keyData);
+            // this.getOut(page.bpmValue, this.keySequence);
+            // this.clearRecordData();
+            // this.page.stopTicker();
+            //
+            // return;
+        }
+
+        if (!this.memoBuffer2.length && !this.keyData.next) {
+            this.keyData.next = time;
+            this.keySequence.push(this.keyData);
+            this.keyData = null;
+
+            this.getOut(this.page.bpmValue, this.keySequence);
+            this.page.stopTicker();
+            this.toggleRecord();
+
+            return;
+        }
+
+        // ПЕРВОЕ НАЖАТИЕ
+        if (!this.keyData && type === DOWN && this.memoBuffer2.length) {
+            const note = this.memoBuffer2.shift();
+
+            this.keyData = {
+                note,
+                char: note[0],
+                code: note,
+                down: time,
+                up: 0,
+                next: 0,
+                //quarterTime: this.tickInfo.quarterTime,
+                //quarterNio: this.tickInfo.quarterNio,
+                quarterTime: 0,
+                quarterNio: 0,
+                color: 'gray',
+                color2: 'lightgray',
+            };
+
+            ideService.synthesizer.playSound({
+                keyOrNote: note,
+                id: 'record',
+            });
+
+            return;
+        }
+
+        if (this.keyData) {
+            if (type === UP) {
+                this.keyData.up = time;
+                ideService.synthesizer.playSound({
+                    keyOrNote: this.keyData.note,
+                    id: 'record',
+                    onlyStop: true,
+                });
+            }
+
+            if (type === DOWN) {
+                this.keyData.next = time;
+                this.keySequence.push(this.keyData);
+                const note = this.memoBuffer2.shift();
+
+                this.keyData = {
+                    note,
+                    char: note[0],
+                    code: note,
+                    down: time,
+                    up: 0,
+                    next: 0,
+                    quarterTime: 0,
+                    quarterNio: 0,
+                    color: 'gray',
+                    color2: 'lightgray',
+                };
+
+                ideService.synthesizer.playSound({
+                    keyOrNote: note,
+                    id: 'record',
+                });
+            }
+        }
+    }
+
+    pushNoteToMemo(note: string | null) {
+        if (note) {
+            this.memoBuffer.push(note);
+        } else {
+            this.memoBuffer = [];
+        }
+
+        getWithDataAttrValue('action-tone', 'memo-clear', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            el.style.fontWeight = this.memoBuffer.length ? '700' : '400';
+        });
+    }
+
+
+    toggleMemo() {
+        this.isMemoMode = !this.isMemoMode;
+
+        getWithDataAttrValue('action-tone', 'memo-mode', this.page.pageEl)?.forEach((el: HTMLElement) => {
+            if (this.isMemoMode) {
+                el.style.fontWeight = '700';
+            } else {
+                el.style.fontWeight = '400';
+            }
+        });
+    }
+
     subscribeEvents() {
         const pageEl = this.page.pageEl;
+
+        getWithDataAttrValue('action-tone', 'memo-mode', pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.toggleMemo());
+        });
+
+        getWithDataAttrValue('action-tone', 'memo-clear',pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.pushNoteToMemo(null));
+        });
+
+        // getWithDataAttrValue('action-tone', 'record-stop',pageEl)?.forEach((el: HTMLElement) => {
+        //     el.addEventListener('pointerdown', () => this.toggleRecord())
+        // });
+
+        getWithDataAttrValue('action-tone', 'record-beat',pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', (evt) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+                const time = Date.now();
+                this.handleKeyRecord(time, DOWN);
+            });
+
+            el.addEventListener('pointerup', (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+                const time = Date.now();
+                return this.handleKeyRecord(time, UP);
+            });
+        });
+
+        getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.toggleRecord())
+        });
 
         getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
             const keyboardId = el?.dataset?.keyboardId;
@@ -525,6 +794,10 @@ export class BassSoloCtrl extends ToneCtrl {
                 });
 
                 this.setKeysColor();
+
+                if (this.isMemoMode) {
+                    this.pushNoteToMemo(keyOrNote);
+                }
             });
 
             el.addEventListener('pointerup', (evt: MouseEvent) => {
@@ -537,7 +810,6 @@ export class BassSoloCtrl extends ToneCtrl {
                 this.playingNote[keyboardId] = undefined;
             });
         });
-
 
         const clearColor = () => {
             getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
@@ -716,6 +988,174 @@ export class BassSoloCtrl extends ToneCtrl {
         // //     }
         // //   });
         // // }
+    }
+
+    getChessCellFor(arr: NoteItem[]): ChessCell {
+        const result: ChessCell = {
+            noteId: 0,
+            cellId: 0,
+            char: '',
+            //color: 'white',
+            bgColor: 'lightgray',
+            underline: false,
+            startOffsetQ: 0,
+            totalOffsetQ: 0,
+        }
+
+        if (!arr[0]) {
+            return result;
+        }
+
+        const char = arr[0].note[0];
+        const octave = arr[0].note[1];
+
+        const octaveColor = {
+            u: 'black',
+            y: 'darkblue',
+            o: 'darkgreen',
+            a: 'lightblue',
+            e: 'lightgreen',
+            i: 'yellow',
+        }
+
+        result.cellId = arr[0].id;
+        result.char = mapNoteToChar[char] || '?';
+        result.bgColor = octaveColor[octave] || 'gray';
+
+        return result;
+    }
+
+    printChess(rows: Line[]) {
+        const rem = 'rem';
+        const getMask = (count: number): ChessCell[] => {
+            const arr = Array(count).fill(null);
+            return arr.map(() => ({
+                bgColor: 'whitesmoke',
+                noteId: 0,
+                cellId: 0,
+                char: '',
+                startOffsetQ: 0,
+                totalOffsetQ: 0,
+                underline: false,
+            }));
+        }
+
+        let totalOut = '';
+        let height = 1.26;
+        let padding = .07;
+        let rowHeight = 1.4;
+
+        rows.forEach((row, iRow) => {
+            const nextRow = rows[iRow + 1];
+            const offsets = this.liner.getOffsetsByRow(row);
+            const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
+            const rowBorderBottom = hasLine ? '1px solid gray;' : 'none;';
+
+            totalOut = totalOut +
+                `<div style="
+                    box-sizing: border-box;
+                    position: relative;
+                    margin: 0;
+                    padding: 0;
+                    font-size: 1.2rem;
+                    line-height: .9rem;
+                    color: white;                    
+                    user-select: none;
+                    padding-top: .07rem;
+                    height: 1.4rem;
+                    border-bottom: ${rowBorderBottom};
+                ">`;
+
+            const cellSizeQ = 10;
+            const cols = getMask(row.durQ / row.cellSizeQ);
+            cols.forEach((col, i) => {
+                col.startOffsetQ = row.startOffsetQ + (cellSizeQ * i);
+                col.totalOffsetQ = col.startOffsetQ + row.blockOffsetQ;
+            });
+
+            for (let offset of offsets) {
+                const iCell = (offset - row.startOffsetQ) / cellSizeQ;
+                const notes = this.liner.getNotesListByOffset(row, offset);
+
+                const col = cols[iCell];
+                const textAndColor = this.getChessCellFor(notes);
+
+                col.cellId = textAndColor.cellId;
+                col.noteId = textAndColor.noteId;
+                col.bgColor = textAndColor.bgColor;
+                col.char = textAndColor.char;
+                col.underline = textAndColor.underline;
+            }
+
+            cols.forEach((col, iCol) => {
+                totalOut = totalOut +
+                    `<span
+                        data-drum-cell-row="${iRow}"
+                        data-drum-cell-col="${iCol}"
+                        data-drum-cell-row-col="${iRow}-${iCol}"
+                        data-drum-cell-id=""
+                        data-total-offset="${col.totalOffsetQ}"                        
+                        style="
+                            box-sizing: border-box;
+                            border: 1px solid white;
+                            display: inline-block;
+                            z-index: 0;
+                            position: absolute;
+                            width: ${height}${rem};
+                            height: ${height}${rem};
+                            background-color: ${col.bgColor};
+                            user-select: none;
+                            touch-action: none;
+                            text-align: center;
+                            left: ${iCol * height}${rem};
+                        "
+                    ></span>`.trim();
+            });
+
+            cols.forEach((cell, iCell) => {
+                if (!cell.cellId) return;
+
+                const textDecoration = cell.underline ? 'underline' : 'none';
+                const rem = 'rem';
+
+                totalOut = totalOut +
+                    `<span
+                        data-drum-cell-row="${iRow}"
+                        data-drum-cell-col="${iCell}"
+                        data-drum-cell-row-col="${iRow}-${iCell}"                                                
+                        data-drum-cell-id="${cell.cellId}"
+                        data-total-offset="${cell.totalOffsetQ}"
+                        data-drum-cell-with-id-offset="${cell.totalOffsetQ}"
+                        data-drum-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
+                        style="
+                            box-sizing: border-box;
+                            border: 1px solid white;
+                            display: inline-block;
+                            position: absolute;
+                            width: ${height}${rem};
+                            height: ${height}${rem};
+                            background-color: ${cell.bgColor};
+                            user-select: none;
+                            touch-action: none;
+                            text-align: center;
+                            font-weight: 700;
+                            z-index: 0;
+                            text-decoration: ${textDecoration};
+                            left: ${iCell * height}${rem};
+                        "
+                    >${cell.char}</span>`.trim();
+            });
+
+            totalOut = totalOut + '</div>';
+        });
+
+        const el = dyName('chess-wrapper', this.page.pageEl);
+        if (el) {
+            el.innerHTML = totalOut;
+            el.style.height = `${rows.length * rowHeight}rem`;
+        }
+
+        //this.subscribeOutCells();
     }
 }
 

@@ -77,7 +77,7 @@ type EditedItem = {
     partIndex: number,
 }
 
-type PrintCell = {
+type ChessCell = {
     noteId: number,
     cellId: number,
     bgColor: string,
@@ -120,7 +120,6 @@ export class DrumCtrl {
     mode: 'record' | null = null;
     keyData: KeyData | null = null;
     keySequence: KeyData[] = [];
-    lastTickTime: number = 0;
     tickStartMs: number = 0;
     activeCell: {
         id: number,
@@ -335,7 +334,7 @@ export class DrumCtrl {
         });
 
         this.liner.setData(rows);
-        this.printModel(this.liner.rows);
+        this.printChess(this.liner.rows);
     }
 
     playBoth() {
@@ -419,7 +418,7 @@ export class DrumCtrl {
                     el.style.display = 'block';
                 });
                 this.liner.fillLinesStructure('480');
-                this.printModel(this.liner.rows);
+                this.printChess(this.liner.rows);
             });
         });
 
@@ -487,8 +486,7 @@ export class DrumCtrl {
     }
 
     chessCellClick(el: HTMLElement) {
-        console.log(el.dataset);
-
+        //console.log(el.dataset);
         const offset = parseInteger(el.dataset['totalOffset'], null);
 
         if (offset === null) {
@@ -545,11 +543,11 @@ export class DrumCtrl {
 
         if (!isDelete) {
             let info = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
-            this.printModel(this.liner.rows);
+            this.printChess(this.liner.rows);
             this.highlightCellByRowCol(rowCol);
             this.activeCell.id = info.note.id;
         } else {
-            this.printModel(this.liner.rows);
+            this.printChess(this.liner.rows);
             this.highlightCellByRowCol(rowCol);
         }
     }
@@ -558,7 +556,7 @@ export class DrumCtrl {
         const result = this.liner.moveCell(id, value);
 
         if (result) {
-            this.printModel(this.liner.rows);
+            this.printChess(this.liner.rows);
             this.highlightCellByRowCol(`${result.row}-${result.col}`);
             this.activeCell.id = id;
         }
@@ -574,7 +572,7 @@ export class DrumCtrl {
         if (totalOffset === null) return;
 
         this.liner.deleteCellByOffset(totalOffset);
-        this.printModel(this.liner.rows);
+        this.printChess(this.liner.rows);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
@@ -584,19 +582,19 @@ export class DrumCtrl {
         }
 
         this.liner.deleteRow(this.activeCell.row);
-        this.printModel(this.liner.rows);
+        this.printChess(this.liner.rows);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
     insertRow() {
         this.liner.addRowAfter(this.activeCell.row - 1);
-        this.printModel(this.liner.rows);
+        this.printChess(this.liner.rows);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
     addRow() {
         this.liner.addRowAfter(this.activeCell.row);
-        this.printModel(this.liner.rows);
+        this.printChess(this.liner.rows);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
@@ -809,7 +807,6 @@ export class DrumCtrl {
     clearRecordData() {
         this.keyData = null;
         this.keySequence = [];
-        this.lastTickTime = 0;
     }
 
     clearBpmInfo() {
@@ -1226,7 +1223,7 @@ export class DrumCtrl {
                 ${this.getTopCommandPanel()}
                 
                 <div
-                    data-name="drum-record-out"
+                    data-name="chess-wrapper"
                     style="width: 90%; padding-left: 1rem;"
                 ></div>
                 
@@ -1303,12 +1300,12 @@ export class DrumCtrl {
     getOut(bpm: number, seq: DrumCtrl['keySequence'] ) {
         const rows = LineModel.GetLineModelFromRecord(bpm, this.tickStartMs, seq);
         this.liner.setData(rows);
-        this.printModel(rows);
+        this.printChess(rows);
     }
 
-    printModel(rows: Line[]) {
+    printChess(rows: Line[]) {
         const rem = 'rem';
-        const getMask = (count: number): PrintCell[] => {
+        const getMask = (count: number): ChessCell[] => {
             const arr = Array(count).fill(null);
             return arr.map(() => ({
                 bgColor: 'whitesmoke',
@@ -1326,8 +1323,8 @@ export class DrumCtrl {
         let padding = .07;
         let rowHeight = 1.4;
 
-        const getTextAndColor = (arr: NoteItem[]): PrintCell => {
-            const result: PrintCell = {
+        const getTextAndColor = (arr: NoteItem[]): ChessCell => {
+            const result: ChessCell = {
                 noteId: 0,
                 cellId: 0,
                 char: '',
@@ -1490,7 +1487,7 @@ export class DrumCtrl {
             totalOut = totalOut + '</div>';
         });
 
-        const el = dyName('drum-record-out', this.page.pageEl);
+        const el = dyName('chess-wrapper', this.page.pageEl);
         if (el) {
             el.innerHTML = totalOut;
             el.style.height = `${rows.length * rowHeight}rem`;

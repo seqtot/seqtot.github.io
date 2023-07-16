@@ -108,7 +108,7 @@ export class KeyboardPage implements Page {
 
     setRightPanelContent() {
         dyName('panel-right-content').innerHTML = `
-            <p data-action-set-view="bass">Bass</p>
+            <p data-action-set-view="bass">Bass guitar</p>
             <p data-action-set-view="bassSolo">Harmonica</p>
             <p data-action-set-view="drums">Percussion</p>
             <p data-action-set-view="drums">Drums</p>
@@ -234,6 +234,7 @@ export class KeyboardPage implements Page {
 
     subscribePageEvents() {
         if (this.view === 'bassSolo' || this.view === 'bass') {
+            this.subscribeMetronomeEvents();
             this.toneCtrl.subscribeEvents();
             //this.toneCtrl.subscribeRelativeKeyboardEvents();
         }
@@ -344,11 +345,21 @@ export class KeyboardPage implements Page {
     }
 
     playTick3() {
+        console.log('playTick3');
+
         this.stopTicker();
 
         const cb = (x: {ab: AudioBufferSourceNode, startTimeMs: number}) => {
             this.tickNode = x.ab;
-            this.drumCtrl.tickStartMs = x.startTimeMs;
+
+            if (this.drumCtrl) {
+                this.drumCtrl.tickStartMs = x.startTimeMs;
+            }
+
+            if (this.toneCtrl) {
+                this.toneCtrl.tickStartMs = x.startTimeMs;
+            }
+
             //console.log('start');
             // setTimeout(() => {
             //     x.ab.stop(0);
