@@ -54,7 +54,7 @@ export function getMidiConfig(x: MidiConfig) {
         x.midiBlockOut = x.currBlock;
         x.playBlockOut = un.createOutBlock({
             currBlock: x.currBlock,
-            rows: [`${x.midiBlockOut.id}-${repeat}`],
+            rows: [`${x.midiBlockOut.id}:${repeat}`], // jjkl repeat
         });
     }
     else {
@@ -124,7 +124,14 @@ export function getTopOutList(x: {
 
         if (!item) return acc;
 
-        let N = printN ? `№${partNio} ` : '';
+        let N = '';
+
+        if (printN) {
+            const nio = un.getNFromString(item);
+            if (!nio.part) {
+                N = printN ? `${un.getNRowInPartId(partNio)} ` : '';
+            }
+        }
 
         return [...acc, `${N}${item}`];
     }, <string[]>[]);

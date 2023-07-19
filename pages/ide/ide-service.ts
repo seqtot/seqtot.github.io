@@ -25,7 +25,7 @@ class IdeService extends  EventEmitter {
         blocks: TextBlock[],
         outBlock: TextBlock,
         outList: string[],
-        editIndex: number,
+        editPartsNio?: number[],
         name: string,
         metaByLines: {[key: string]: string},
         freezeStructure: boolean,

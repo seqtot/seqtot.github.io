@@ -307,7 +307,7 @@ export class MBoxPage {
                 ideService.currentEdit.outList = this.outList;
                 ideService.currentEdit.blocks = this.blocks;
                 ideService.currentEdit.outBlock = this.outBlock;
-                ideService.currentEdit.editIndex = index;
+                ideService.currentEdit.editPartsNio = [index];
                 ideService.currentEdit.metaByLines = this.getMetaByLines();
                 ideService.currentEdit.freezeStructure = true;
 
@@ -473,7 +473,7 @@ export class MBoxPage {
             const map = this.pageData.dynamic?.['@drums'];
 
             playBlock.rows.forEach((row, i) => {
-                let rowPartNio = un.getNFromString(row);
+                let rowPartNio = un.getNFromString(row).text;
 
                 if (!rowPartNio || !map[rowPartNio] || !map[rowPartNio].items && !map[rowPartNio].items.length) {
                     return;

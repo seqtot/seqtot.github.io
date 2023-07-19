@@ -20,6 +20,7 @@ export const drumPrefix = 'drum_';
 export const PAUSE = 'pause';
 export const commentChar = '#';
 export const refChar = '>';
+export const nioChar = '№';
 
 type BlockType = 'text' | 'drums' | 'tones' | 'set';
 
@@ -103,21 +104,26 @@ export function getRepeatFromString(str: string, byDefault = 1) {
     return parseInteger(str, byDefault);
 }
 
-// b120
-export function getNFromString(str: string): string {
+// PartNio-rowNio
+export function getNFromString(str: string): {part: number, row: number, text: string} {
     str = (str || '').trim();
 
     const arr = str.split(' ');
+    let text = '';
 
     for (let item of arr) {
-        if (item.startsWith('№')) {
-            item = item.replace('№', '');
+        if (item.startsWith(nioChar)) {
+            text = item.replace(nioChar, '');
 
-            return item;
+            break;
         }
     }
 
-    return '';
+    return <any>{
+        text,
+        part: parseInteger(text.split('-')[0], 0),
+        row: parseInteger(text.split('-')[1], 0),
+    };
 }
 
 // b120
@@ -606,16 +612,27 @@ export function getNoteByOffset(
 }
 
 function getPartNioAndRef(val: string): {
-    nio: number,
+    partNio: number,
     ref: string,
 } {
     val = (val || '').trim();
     const arr = val.split(' ').filter(item => item);
 
-    const nio = parseInteger((arr.find(item => item.startsWith('№')) || '').replace('№', ''), 0);
-    const ref = arr.find(item => !item.startsWith('№')) || ''
+    const partNio = parseInteger(
+        (arr.find(item => item.startsWith(nioChar)) || '').replace(nioChar, '').split('-')[0], 0
+    );
 
-    return {ref, nio};
+    const ref = arr.find(item => !item.startsWith(nioChar) && !item.startsWith('[')) || ''
+
+    return {ref, partNio};
+}
+
+export function getNRowInPartId(part: number, row?: number): string {
+    if (!isPresent(row)) {
+        return `${nioChar}${part}`;
+    }
+
+    return `${nioChar}${part}-${row}`;
 }
 
 export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
@@ -636,8 +653,9 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
 
         if (block.type === 'tones' || block.type === 'drums') {
             rowInBlockNio++;
+            const N = getNRowInPartId(info.partNio, rowInBlockNio);
 
-            result.push(`${info.ref} [${info.nio}-${rowInBlockNio}]`);
+            result.push(`${info.ref} ${N}`);
         } else if (block.type === 'set') {
             let rows = block.rows.slice(1)
                 .map(item => clearEndComment(item))
@@ -645,8 +663,9 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
                 .filter(item => !!(item && !item.startsWith('#')))
                 .map(item => {
                     rowInBlockNio++;
+                    const N = getNRowInPartId(info.partNio, rowInBlockNio);
 
-                    return `${item} №${info.nio}-${rowInBlockNio}`;
+                    return `${item} ${N}`;
                 });
 
             Array.prototype.push.apply(result, rows);

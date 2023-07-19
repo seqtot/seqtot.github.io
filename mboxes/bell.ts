@@ -1,3 +1,5 @@
+import dynamic from '../mbox_dynamics/bells.dynamic';
+
 const score = `
 <settings>
 _ $bass: v20; $back: v10; $solo: v30;
@@ -225,5 +227,6 @@ const info = `
 export default {
   content: info,
   tracks: [],
-  score
+  score,
+  dynamic
 };

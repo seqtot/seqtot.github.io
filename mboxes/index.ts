@@ -8,6 +8,7 @@ import tiriTiri from './tiriTiri';
 import bell from './bell';
 import carcassiOp60n7 from './carcassiOp60n7';
 import partingGlass from './partingGlass';
+import billy from './billy';
 
 export default {
   set_e,
@@ -16,8 +17,10 @@ export default {
   set_blackNight,
   set_all,
   set_hardToHandle,
+  //
   tiriTiri,
   bell,
   carcassiOp60n7,
   partingGlass,
+  billy,
 };

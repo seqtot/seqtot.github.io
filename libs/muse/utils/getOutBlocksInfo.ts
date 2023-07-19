@@ -11,7 +11,7 @@ import {
     getNoteLnsByToneInstruments,
     parseInteger, getRepeatFromString,
     toneChar, drumChar, DEFAULT_VOLUME,
-    mergeVolume, clearEndComment,
+    mergeVolume, clearEndComment, nioChar,
 } from './utils-note';
 
 import {getNoteLineInfo, isNoteWithDurationOrPause} from './getNoteLineInfo';
@@ -25,17 +25,20 @@ type NoteLn = {
     colLoopDurationQ: number,
 }
 
+
+export type OutBlockRowInfo = {
+    noteLns: NoteLn[];
+    headLoopRepeat: number;
+    headLoopDurationQ: number;
+    rowDurationByHeadQ: number;
+    rowRepeat: number;
+    bpm?: number,
+    //mask?: string | number,
+    text?: string,
+};
+
 type OutBlocksInfo = {
-    rows: {
-        noteLns: NoteLn[];
-        headLoopRepeat: number;
-        headLoopDurationQ: number;
-        rowDurationByHeadQ: number;
-        rowRepeat: number;
-        bpm?: number,
-        //mask?: string | number,
-        text?: string,
-    }[],
+    rows: OutBlockRowInfo[],
     durationQ: number,
 }
 
@@ -136,7 +139,7 @@ export function getOutBlocksInfo(
     // цикл по строкам out - это не ссылки на другие блоки
     textRows.forEach((row, iRow) => {
         let metaByLine = '';
-        let partRowId = '';
+        let rowInPartId = '';
 
         const colArr = (row || '')
             .split(' ')
@@ -148,8 +151,8 @@ export function getOutBlocksInfo(
                     return acc;
                 }
 
-                if (item.startsWith('№')) {
-                    partRowId =  item;
+                if (item.startsWith(nioChar)) {
+                    rowInPartId =  item.replace(nioChar, '');
 
                     return acc;
                 }
