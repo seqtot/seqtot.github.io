@@ -13,7 +13,7 @@ import ideService from './ide/ide-service';
 import {Synthesizer} from '@muse/synthesizer';
 import {MultiPlayer} from '@muse/multi-player';
 
-type ViewType = ToneKeyboardType | DrumKeyboardType;
+type KeyboardType = ToneKeyboardType | DrumKeyboardType;
 
 const ns = {
     setBmpAction: 'set-bmp-action',
@@ -32,7 +32,7 @@ interface Page {
 }
 
 export class KeyboardPage implements Page {
-    view: ViewType = 'drums'; // 'bassSolo';
+    keyboardType: KeyboardType = 'drums';
     drumCtrl: DrumCtrl;
     toneCtrl: BassSoloCtrl;
 
@@ -87,12 +87,16 @@ export class KeyboardPage implements Page {
         }, 100);
     }
 
-    setPageContent(view?: ViewType) {
-        view = view ||  this.view;
-        this.view = view;
+    setPageContent(keyboardType?: KeyboardType) {
+        keyboardType = keyboardType ||  this.keyboardType;
+        this.keyboardType = keyboardType;
 
-        if (this.view === 'bassSolo' || this.view === 'bass') {
-            this.setToneContent(this.view);
+        if (
+            this.keyboardType === 'bassSoloHarmonica' ||
+            this.keyboardType === 'bassGuitar' ||
+            this.keyboardType === 'guitar'
+        ) {
+            this.setToneContent(this.keyboardType);
         }
         else
         {
@@ -108,10 +112,11 @@ export class KeyboardPage implements Page {
 
     setRightPanelContent() {
         dyName('panel-right-content').innerHTML = `
-            <p data-action-set-view="bass">Bass guitar</p>
-            <p data-action-set-view="bassSolo">Harmonica</p>
-            <p data-action-set-view="drums">Percussion</p>
-            <p data-action-set-view="drums">Drums</p>
+            <p data-action-set-keyboard-type="bassGuitar">Bass guitar</p>
+            <p data-action-set-keyboard-type="guitar">Guitar</p>                       
+            <p data-action-set-keyboard-type="bassSoloHarmonica">Harmonica</p>
+            <p data-action-set-keyboard-type="drums">Percussion</p>
+            <p data-action-set-keyboard-type="drums">Drums</p>
         `;
     }
 
@@ -166,7 +171,7 @@ export class KeyboardPage implements Page {
     setDrumsContent(type: DrumKeyboardType) {
         this.drumCtrl = new DrumCtrl(this);
 
-        this.view = 'drums';
+        this.keyboardType = 'drums';
         this.el$.html(this.drumCtrl.getContent('drums'));
 
         //console.log('setDrumContent', this.bpmValue);
@@ -188,7 +193,7 @@ export class KeyboardPage implements Page {
     }
 
     setToneContent(type: ToneKeyboardType) {
-        this.toneCtrl = new BassSoloCtrl(this, <ToneKeyboardType>this.view);
+        this.toneCtrl = new BassSoloCtrl(this, <ToneKeyboardType>this.keyboardType);
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
@@ -219,9 +224,9 @@ export class KeyboardPage implements Page {
     }
 
     subscribeRightPanelEvents() {
-        getWithDataAttr('action-set-view', dyName('panel-right-content'))?.forEach((el) => {
+        getWithDataAttr('action-set-keyboard-type', dyName('panel-right-content'))?.forEach((el) => {
             el.addEventListener('click', (evt: MouseEvent) => {
-                this.setPageContent(<any>el.dataset.actionSetView);
+                this.setPageContent(<any>el.dataset.actionSetKeyboardType);
             });
         });
     }
@@ -233,12 +238,15 @@ export class KeyboardPage implements Page {
     }
 
     subscribePageEvents() {
-        if (this.view === 'bassSolo' || this.view === 'bass') {
+        if (this.keyboardType === 'bassSoloHarmonica' ||
+            this.keyboardType === 'bassGuitar' ||
+            this.keyboardType === 'guitar'
+        ) {
             this.subscribeMetronomeEvents();
             this.toneCtrl.subscribeEvents();
             //this.toneCtrl.subscribeRelativeKeyboardEvents();
         }
-        else if (this.view === 'drums') {
+        else if (this.keyboardType === 'drums') {
             this.subscribeMetronomeEvents();
             this.drumCtrl.subscribeEvents();
         }

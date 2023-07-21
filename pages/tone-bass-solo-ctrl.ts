@@ -9,9 +9,11 @@ import {getNoteByOffset, parseInteger} from '../libs/muse/utils/utils-note';
 import {KeyData, Line, LineModel, NoteItem} from './line-model';
 import {drumNotesInfo} from './drum-board';
 
-export type ToneKeyboardType = 'bass' | 'solo' | 'bassSolo';
+export type ToneKeyboardType = 'bassGuitar' | 'soloHarmonica' | 'bassHarmonica' | 'bassSoloHarmonica' | 'guitar';
 
 const bassInstr = 374; // 388 - eMediator 375 - eFinger
+const cleanGuitarInstr = 276;
+const rockGuitarInstr = 327;
 const organInstr = 182; // 162
 
 type ChessCell = {
@@ -256,7 +258,32 @@ const bassGuitarKeys: string[][] = [
     ['zu', 'ty', 'vy', 'by', 'mo', 'lo'],
     ['lu', 'ry', 'sy', 'do', 'fo', 'ko'],
     ['ku', 'ny', 'zy', 'to', 'vo', 'bo'],
+
     ['bu', 'my', 'ly', 'ro', 'so', 'da'],
+    ['dy', 'fy', 'ky', 'no', 'zo', 'ta'],
+    ['ty', 'vy', 'by', 'mo', 'lo', 'ra'],
+    ['ry', 'sy', 'do', 'fo', 'ko', 'na'],
+    ['ny', 'zy', 'to', 'vo', 'bo', 'ma'],
+    ['my', 'ly', 'ro', 'so', 'da', 'fa'],
+    ['fy', 'ky', 'no', 'zo', 'ta', 'va'],
+    ['vy', 'by', 'mo', 'lo', 'ra', 'sa'],
+    ['sy', 'do', 'fo', 'ko', 'na', 'za'],
+    ['zy', 'to', 'vo', 'bo', 'ma', 'la'],
+    ['ly', 'ro', 'so', 'da', 'fa', 'ka'],
+    ['ky', 'no', 'zo', 'ta', 'va', 'ba'],
+
+    ['by', 'mo', 'lo', 'ra', 'sa', 'de'],
+    ['do', 'fo', 'ko', 'na', 'za', 'te'],
+    ['to', 'vo', 'bo', 'ma', 'la', 're'],
+    ['ro', 'so', 'da', 'fa', 'ka', 'ne'],
+    ['no', 'zo', 'ta', 'va', 'ba', 'me'],
+    ['mo', 'lo', 'ra', 'sa', 'de', 'fe'],
+    ['fo', 'ko', 'na', 'za', 'te', 've'],
+    ['vo', 'bo', 'ma', 'la', 're', 'se'],
+    ['so', 'da', 'fa', 'ka', 'ne', 'ze'],
+    ['zo', 'ta', 'va', 'ba', 'me', 'le'],
+    ['lo', 'ra', 'sa', 'de', 'fe', 'ke'],
+    ['ko', 'na', 'za', 'te', 've', 'be'],
 ];
 
 const bassKeys: string[][] = [
@@ -305,10 +332,12 @@ function getVerticalKeyboard(
 ): string {
     id = id || '';
 
+    const isHarmonica = type === 'bassSoloHarmonica' || type === 'bassHarmonica' || type === 'soloHarmonica';
+
     const getKey = getKeyFn({
         id, cellSize: '1.9rem',
         fontSize: '1.5rem',
-        cellStylesFn: type === 'bassSolo' ? getHarmonicaCellStyles: getBassСellStyles,
+        cellStylesFn: isHarmonica ? getHarmonicaCellStyles: getBassСellStyles,
     });
 
     let keyboard = `
@@ -343,6 +372,7 @@ const UP = 0;
 export class BassSoloCtrl extends ToneCtrl {
     instrCode = 162;
     playingNote: { [key: string]: string } = {};
+    offset = 0;
 
     lightBgColor = lightBgColor;
     mainBgColor = mainBgColor;
@@ -361,9 +391,15 @@ export class BassSoloCtrl extends ToneCtrl {
     {
         super();
 
-        if (type === 'bass') {
+        if (type === 'bassGuitar') {
+            this.offset = 0;
             this.instrCode = bassInstr;
-        } else {
+        }
+        else if (type === 'guitar') {
+            this.offset = 12;
+            this.instrCode = rockGuitarInstr;
+        }
+        else {
             this.instrCode = organInstr;
         }
     }
@@ -430,8 +466,8 @@ export class BassSoloCtrl extends ToneCtrl {
     getHarmonicaContent(): string {
         let wrapper = `
             <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                ${getVerticalKeyboard('bass', 'bassSolo', bassKeys)}
-                ${getVerticalKeyboard('solo', 'bassSolo', soloKeys)}
+                ${getVerticalKeyboard('bass', 'bassHarmonica', bassKeys)}
+                ${getVerticalKeyboard('solo', 'soloHarmonica', soloKeys)}
                 <div 
                     style="font-size: 2rem;
                     font-family: monospace;
@@ -456,12 +492,14 @@ export class BassSoloCtrl extends ToneCtrl {
         return wrapper;
     }
 
-    getBassContent(): string {
+    getGuitarContent(): string {
         const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
+        const boardKeys = bassGuitarKeys.slice(this.offset, this.offset + 13);
 
+        // jjkl
         let wrapper = `
             <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                ${getVerticalKeyboard('bass', 'bass', bassGuitarKeys)}
+                ${getVerticalKeyboard('bass', 'bassGuitar', boardKeys)} 
                 <div>
                     <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
                     <span data-action-tone="memo-clear" style="${actionStyle}">del memo</span><br/><br/>
@@ -526,11 +564,14 @@ export class BassSoloCtrl extends ToneCtrl {
     }
 
     getContent(type?: ToneKeyboardType): string {
-        if (type === 'bassSolo') {
+        if (type === 'bassSoloHarmonica') {
             return this.getHarmonicaContent();
         }
-        else if(type === 'bass') {
-            return this.getBassContent();
+        else if(type === 'bassGuitar') {
+            return this.getGuitarContent();
+        }
+        else if(type === 'guitar') {
+            return this.getGuitarContent();
         }
     }
 
@@ -542,7 +583,7 @@ export class BassSoloCtrl extends ToneCtrl {
         getWithDataAttr('note-key', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
 
-            if (this.type === 'bassSolo') {
+            if (this.type === 'bassSoloHarmonica') {
                 el.style.boxShadow = null;
             }
 
@@ -567,7 +608,7 @@ export class BassSoloCtrl extends ToneCtrl {
             }
 
             // BASS
-            if (data.keyboardId === 'bass' && this.type === 'bass') {
+            if (data.keyboardId === 'bass' && this.type === 'bassGuitar') {
                 if (data.row !== '0' && data.row !== '12') {
                     el.innerHTML = '&nbsp;';
                 }
