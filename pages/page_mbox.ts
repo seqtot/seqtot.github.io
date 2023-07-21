@@ -27,7 +27,7 @@ export class MBoxPage {
     blocks: un.TextBlock[] = [];
     settings: FileSettings = <any>{};
     pitchShift: number = 0;
-    excludeIndex: number [] = [];
+    excludePartNio: number [] = [];
     excludeInstrument: {[key: string]: any} = {};
 
     get pageId(): string {
@@ -67,7 +67,7 @@ export class MBoxPage {
         return  this.blocks.find((item) => item.id === 'out');
     }
 
-    get outList(): string[] {
+    get topOutParts(): string[] {
         return  getTopOutList({topBlock: this.outBlock});
     }
 
@@ -95,27 +95,25 @@ export class MBoxPage {
     }
 
     getMetronomeContent(): string {
-        let metronomeView = `
-          &emsp;
-          <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
-          <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
-          <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
-          <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
-          <a data-action-type="stop"><b>stop</b></a>&emsp;
-          <div 
-            class="range-slider"
-            data-name="slider"
-            data-label="true"
-            data-min="0"   
-            data-max="200"
-            data-step="1"
-            data-value="100"
-            data-scale="true"
-            data-scale-steps="10"
-            data-scale-sub-steps="5"
-          >
-          </div>
-    `;
+        let metronomeView = `&emsp;
+            <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
+            <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
+            <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
+            <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
+            <a data-action-type="stop"><b>stop</b></a>&emsp;
+            <div 
+                class="range-slider"
+                data-name="slider"
+                data-label="true"
+                data-min="0"   
+                data-max="200"
+                data-step="1"
+                data-value="100"
+                data-scale="true"
+                data-scale-steps="10"
+                data-scale-sub-steps="5"
+            ></div>
+        `.trim();
 
         if (this.pageData.hideMetronome) {
             metronomeView = '';
@@ -193,25 +191,29 @@ export class MBoxPage {
     }
 
     getTracksContent(): string {
-        let outList = this.outList;
+        let topOutParts = this.topOutParts;
 
         let stopAndPlayActions = `
             <div style="margin: .5rem 1rem;">
-                <a data-action-type="stop"><b>stop</b></a>&emsp;
-                <a data-action-type="play-all"><b>play</b></a>&emsp;                
+                <a data-action-type="select-all"><b>selectAll</b></a>&emsp;
+                <a data-action-type="unselect-all"><b>unselect</b></a>&emsp;
+                <a data-action-type="stop"><b>stop</b></a>&emsp;                                                
+                <a data-action-type="play-all"><b>play</b></a>&emsp;
+                <a data-action-type="edit-selected"><b>edit</b></a>&emsp;                
             </div>`.trim();
 
-        let tracks = outList.reduce((acc, item, i) => {
+        let tracks = topOutParts.reduce((acc, item, i) => {
             acc = acc + `
                 <div class="row">
                     <span
                         style="margin-left: 1rem; font-weight: 700; user-select: none;"
-                        data-track-item-index="${i+1}"
-                        data-track-item="${item}"                        
+                        data-part-nio="${i+1}"
+                        data-part-ref="${item}"                        
                     >${item}</span>
                     <span
                         style="margin-right: 1rem; user-select: none;"
-                        data-track-item-edit="${i+1}"                                           
+                        data-part-nio="${i+1}"
+                        data-edit-part-link="${i+1}"                                           
                     >edit</span>                    
                 </div>
             `.trim();
@@ -274,44 +276,60 @@ export class MBoxPage {
         });
     }
 
-    subscribeTrackEvents() {
-        getWithDataAttr('track-item', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => {
-                let el: HTMLElement = evt.target as any;
-                let index = parseInteger(el.dataset.trackItemIndex, null);
+    gotoEdit(partNio?: number) {
+        let editPartsNio: number[] = [];
 
-                if (!isPresent(index)) {
+        if (partNio) {
+            editPartsNio = [partNio];
+        } else {
+            editPartsNio = this.topOutParts
+                .map((item, i) => (i+1))
+                .filter(nio => !this.excludePartNio.includes(nio));
+        }
+
+        if (!editPartsNio.length) return;
+
+        ideService.currentEdit.name = this.songId;
+        ideService.currentEdit.topOutParts = this.topOutParts;
+        ideService.currentEdit.blocks = this.blocks;
+        ideService.currentEdit.outBlock = this.outBlock;
+        ideService.currentEdit.metaByLines = this.getMetaByLines();
+        ideService.currentEdit.freezeStructure = true;
+        ideService.currentEdit.editPartsNio = editPartsNio;
+
+        this.context.$f7router.navigate('/page/page_keyboard/');
+    }
+
+    subscribeTrackEvents() {
+        getWithDataAttr('part-ref', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', (evt ) => {
+                //let el: HTMLElement = evt.target as any;
+                let partNio = parseInteger(el.dataset.partNio, null);
+
+                if (!isPresent(partNio)) {
                     return;
                 }
 
-                if (this.excludeIndex.includes(index)) {
-                    this.excludeIndex = this.excludeIndex.filter(item => item !== index );
+                if (this.excludePartNio.includes(partNio)) {
+                    this.excludePartNio = this.excludePartNio.filter(item => item !== partNio );
                     el.style.fontWeight = '700';
                 }
                 else {
-                    this.excludeIndex.push(index);
+                    this.excludePartNio.push(partNio);
                     el.style.fontWeight = '400';
                 }
             });
         });
 
-        getWithDataAttr('track-item-edit', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => {
-                let index = parseInteger(el.dataset.trackItemEdit, null);
+        getWithDataAttr('edit-part-link', this.pageEl)?.forEach((el) => {
+            el.addEventListener('pointerdown', () => {
+                let partNio = parseInteger(el.dataset.partNio, null);
 
-                if (!isPresent(index)) {
+                if (!isPresent(partNio)) {
                     return;
                 }
 
-                ideService.currentEdit.name = this.songId;
-                ideService.currentEdit.outList = this.outList;
-                ideService.currentEdit.blocks = this.blocks;
-                ideService.currentEdit.outBlock = this.outBlock;
-                ideService.currentEdit.editPartsNio = [index];
-                ideService.currentEdit.metaByLines = this.getMetaByLines();
-                ideService.currentEdit.freezeStructure = true;
-
-                this.context.$f7router.navigate('/page/page_keyboard/');
+                this.gotoEdit(partNio);
             });
         });
 
@@ -351,7 +369,7 @@ export class MBoxPage {
         // );
 
         getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => {
+            el.addEventListener('pointerdown', () => {
                 this.tryPlayTextLine({
                     text: el?.dataset?.noteLine,
                 });
@@ -359,17 +377,43 @@ export class MBoxPage {
         });
 
         getWithDataAttrValue('action-type', 'stop', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => this.stop());
+            el.addEventListener('pointerdown', () => this.stop());
         });
 
         getWithDataAttrValue('action-type', 'play-all', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => this.playAll(0));
+            el.addEventListener('pointerdown', () => this.playAll(0));
+        });
+
+        getWithDataAttrValue('action-type', 'select-all', this.pageEl)?.forEach((el) => {
+            el.addEventListener('pointerdown', () => {
+                this.excludePartNio = [];
+
+                getWithDataAttr('part-ref', this.pageEl).forEach(el => {
+                    el.style.fontWeight = '700';
+                });
+            });
+        });
+
+        getWithDataAttrValue('action-type', 'unselect-all', this.pageEl)?.forEach((el) => {
+            el.addEventListener('pointerdown', () => {
+                const topOutParts = this.topOutParts;
+
+                getWithDataAttr('part-ref', this.pageEl).forEach(el => {
+                    el.style.fontWeight = '400';
+                });
+
+                this.excludePartNio = topOutParts.map((item, i) => i+1);
+            });
+        });
+
+        getWithDataAttrValue('action-type', 'edit-selected', this.pageEl)?.forEach((el) => {
+            el.addEventListener('pointerdown', () => this.gotoEdit());
         });
     }
 
     subscribeMetronomeEvents() {
         getWithDataAttr('tick-trigger', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => {
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 this.playTick(el?.dataset?.tickTrigger);
             });
         });
@@ -382,45 +426,6 @@ export class MBoxPage {
                 });
             }
         );
-    }
-
-    setViewDrums() {
-        this.view = 'drums';
-
-        const content = `
-      <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-        <div style="padding: 1rem .5rem 1rem .5rem;">
-          % ускорения
-          <div 
-            class="range-slider"
-            data-name="slider"
-            data-label="true"
-            data-min="0"   
-            data-max="200"
-            data-step="1"
-            data-value="100"
-            data-scale="true"
-            data-scale-steps="10"
-            data-scale-sub-steps="5"
-          >
-          </div>
-        </div>
-        ${this.getTracksContent()}
-      </div>
-    `;
-
-        this.el$.html(content);
-
-        this.bpmRange = (this.context.$f7 as any).range.create({
-            el: dyName('slider', this.pageEl),
-            on: {
-                changed: (range: any) => {
-                    this.bpmValue = range.value;
-                },
-            },
-        });
-
-        //this.subscribeViewDrumsEvents();
     }
 
     async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
@@ -454,7 +459,7 @@ export class MBoxPage {
             blocks: this.blocks,
             currBlock: null as un.TextBlock,
             currRowInfo: currRowInfo,
-            excludeIndex: this.excludeIndex,
+            excludeIndex: this.excludePartNio,
             midiBlockOut: null as un.TextBlock,
             playBlockOut: '' as string | un.TextBlock,
             topBlocksOut: [],

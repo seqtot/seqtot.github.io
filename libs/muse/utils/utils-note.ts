@@ -105,7 +105,7 @@ export function getRepeatFromString(str: string, byDefault = 1) {
 }
 
 // PartNio-rowNio
-export function getNFromString(str: string): {part: number, row: number, text: string} {
+export function getNFromString(str: string): {part: number, row: number, text: string, rowInPartId: string} {
     str = (str || '').trim();
 
     const arr = str.split(' ');
@@ -119,10 +119,14 @@ export function getNFromString(str: string): {part: number, row: number, text: s
         }
     }
 
+    const part = parseInteger(text.split('-')[0], 0);
+    const row = parseInteger(text.split('-')[1], 0);
+
     return <any>{
         text,
-        part: parseInteger(text.split('-')[0], 0),
-        row: parseInteger(text.split('-')[1], 0),
+        part,
+        row,
+        rowInPartId: `${part}-${row}`
     };
 }
 

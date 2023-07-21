@@ -11,6 +11,9 @@ import {drumNotesInfo} from './drum-board';
 
 export type ToneKeyboardType = 'bass' | 'solo' | 'bassSolo';
 
+const bassInstr = 374; // 388 - eMediator 375 - eFinger
+const organInstr = 182; // 162
+
 type ChessCell = {
     noteId: number,
     cellId: number,
@@ -338,6 +341,7 @@ const DOWN = 1;
 const UP = 0;
 
 export class BassSoloCtrl extends ToneCtrl {
+    instrCode = 162;
     playingNote: { [key: string]: string } = {};
 
     lightBgColor = lightBgColor;
@@ -356,6 +360,12 @@ export class BassSoloCtrl extends ToneCtrl {
         public type: ToneKeyboardType)
     {
         super();
+
+        if (type === 'bass') {
+            this.instrCode = bassInstr;
+        } else {
+            this.instrCode = organInstr;
+        }
     }
 
     getPatternsList(patterns?: string[]): string {
@@ -532,6 +542,10 @@ export class BassSoloCtrl extends ToneCtrl {
         getWithDataAttr('note-key', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
 
+            if (this.type === 'bassSolo') {
+                el.style.boxShadow = null;
+            }
+
             const data = (el?.dataset || {}) as {
                 keyboardId: string;
                 noteLat: string;
@@ -541,10 +555,14 @@ export class BassSoloCtrl extends ToneCtrl {
 
             if (data.keyboardId === 'solo') {
                 if (note[0] === bassChar) {
-                    el.style.backgroundColor = this.lightBgColor;
+                    el.style.boxShadow = 'inset 0px 0px 3px black';
+                    //el.style.backgroundColor = this.lightBgColor;
+                    //el.style.outline = `1px solid black`;
                 }
                 if (note === bassNote) {
-                    el.style.backgroundColor = this.darkBgColor;
+                    el.style.boxShadow = 'inset 0px 0px 3px blue';
+                    //el.style.backgroundColor = this.darkBgColor;
+                    //el.style.outline = `2px solid black`;
                 }
             }
 
@@ -613,6 +631,8 @@ export class BassSoloCtrl extends ToneCtrl {
     }
 
     handleKeyRecord(time: number, type: 0 | 1) {
+        const instrCode = this.instrCode;
+
         if (!this.isRecMode) {
             return;
         }
@@ -623,20 +643,12 @@ export class BassSoloCtrl extends ToneCtrl {
             ideService.synthesizer.playSound({
                 keyOrNote: this.keyData.note,
                 id: 'record',
-                onlyStop: true
-                // instrCode: 366,
+                onlyStop: true,
+                instrCode,
             });
 
 
             return;
-
-            // this.keyData.next = Date.now();
-            // this.keySequence.push(this.keyData);
-            // this.getOut(page.bpmValue, this.keySequence);
-            // this.clearRecordData();
-            // this.page.stopTicker();
-            //
-            // return;
         }
 
         if (!this.memoBuffer2.length && !this.keyData.next) {
@@ -673,6 +685,7 @@ export class BassSoloCtrl extends ToneCtrl {
             ideService.synthesizer.playSound({
                 keyOrNote: note,
                 id: 'record',
+                instrCode,
             });
 
             return;
@@ -709,6 +722,7 @@ export class BassSoloCtrl extends ToneCtrl {
                 ideService.synthesizer.playSound({
                     keyOrNote: note,
                     id: 'record',
+                    instrCode,
                 });
             }
         }
@@ -779,6 +793,8 @@ export class BassSoloCtrl extends ToneCtrl {
             const keyOrNote = el?.dataset?.noteLat || '';
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                const instrCode = this.instrCode;
+
                 ideService.synthesizer.playSound({
                     keyOrNote: this.playingNote[keyboardId],
                     id: keyboardId,
@@ -790,7 +806,7 @@ export class BassSoloCtrl extends ToneCtrl {
                 ideService.synthesizer.playSound({
                     keyOrNote,
                     id: keyboardId,
-                    // instrCode: 366,
+                    instrCode,
                 });
 
                 this.setKeysColor();

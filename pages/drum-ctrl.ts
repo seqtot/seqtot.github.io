@@ -191,7 +191,7 @@ export class DrumCtrl {
     get hasIdeItem(): boolean {
         const item = ideService.currentEdit;
 
-        return !!item && !!item.editPartsNio && !!item.outList &&  !!item.outBlock && !!item.blocks;
+        return !!item && !!item.editPartsNio && !!item.topOutParts &&  !!item.outBlock && !!item.blocks;
     }
 
     loadFile() {
@@ -271,9 +271,9 @@ export class DrumCtrl {
         localStorage.setItem(songName, JSON.stringify(songNode));
     }
 
-    addEditingItem(item: EditedItem, el: HTMLElement) {
-        if (this.editedItems.find(iItem => iItem.rowNio === item.rowNio)) {
-            this.editedItems = this.editedItems.filter(iItem => iItem.rowNio !== item.rowNio);
+    addAndSortEditingItem(item: EditedItem, el: HTMLElement) {
+        if (this.editedItems.find(iItem => iItem.rowInPartId === item.rowInPartId)) {
+            this.editedItems = this.editedItems.filter(iItem => iItem.rowInPartId !== item.rowInPartId);
             el.style.fontWeight = '400';
 
             return;
@@ -281,13 +281,16 @@ export class DrumCtrl {
 
         this.editedItems.push(item);
         el.style.fontWeight = '600';
-        this.liner.sortByField(this.editedItems, 'rowNio');
 
-        // let offsetFromStart = 0;
-        // this.editedItems.forEach(item => {
-        //     item.offsetFromStart = offsetFromStart;
-        //     offsetFromStart = offsetFromStart + item.duration;
-        // });
+        this.editedItems.sort((a, b) => {
+            if (a.partNio < b.partNio) return -1;
+            if (a.partNio > b.partNio) return 1;
+
+            if (a.rowNio < b.rowNio) return -1;
+            if (a.rowNio > b.rowNio) return 1;
+
+            return 0;
+        });
     }
 
     songRowClick(el: HTMLElement) {
@@ -299,7 +302,7 @@ export class DrumCtrl {
             duration: parseInteger(el.dataset['duration'], 0),
         };
 
-        this.addEditingItem(item, el);
+        this.addAndSortEditingItem(item, el);
 
         let rows = [];
         let blockOffsetQ = 0;
@@ -338,19 +341,23 @@ export class DrumCtrl {
     }
 
     playBoth() {
+        this.page.stop();
         if (!this.hasEditedItems) return;
 
-        let playRows: string[] = [];
+        let rowsForPlay: string[] = [];
 
         const midiConfig = this.getMidiConfig();
         let blocks = midiConfig.blocks;
         let playBlock = midiConfig.playBlockOut as TextBlock;
 
-        //console.log('playBlockOut', playBlock);
+        const playingRows = playBlock.rows.filter(item => {
+            const nio = un.getNFromString(item);
+            return !!this.editedItems.find(item => item.rowInPartId === nio.rowInPartId);
+        });
 
-        this.editedItems.forEach(item => {
-            let playRow = un.clearEndComment(playBlock.rows[item.rowNio + 1]); // jjkl
-            let rows = this.liner.rows.filter(row => row.rowInPartId === item.rowInPartId)
+        playingRows.forEach(playRow => {
+            const nio = un.getNFromString(playRow);
+            let rows = this.liner.rows.filter(row => row.rowInPartId === nio.rowInPartId)
             rows = this.liner.cloneRows(rows);
             rows.forEach(row => (row.blockOffsetQ = 0));
 
@@ -359,24 +366,53 @@ export class DrumCtrl {
             if (notes) {
                 const block = un.getTextBlocks(notes)[0];
 
-                playRows.push(`${playRow} ${block.id}`);
+                rowsForPlay.push(`${playRow} ${block.id}`);
                 blocks = [...blocks, block];
             } else {
-                playRows.push(`${playRow}`);
+                rowsForPlay.push(`${playRow}`);
             }
         });
 
         playBlock = createOutBlock({
             id: 'out',
             type: 'set',
-            rows: playRows,
+            rows: rowsForPlay,
             bpm: this.page.bpmValue
         });
 
-        this.page.stop();
         this.page.multiPlayer.tryPlayMidiBlock({
             blocks,
             playBlock,
+            bpm: this.page.bpmValue,
+            repeatCount: 1,
+            metaByLines: ideService.currentEdit.metaByLines,
+        });
+    }
+
+    playActive() {
+        if (!this.hasEditedItems) return;
+
+        const midiConfig = this.getMidiConfig();
+        const playBlock = midiConfig.playBlockOut as TextBlock;
+        const playingRows = playBlock.rows.filter(item => {
+            const nio = un.getNFromString(item);
+            return !!this.editedItems.find(item => item.rowInPartId === nio.rowInPartId);
+        });
+
+        this.page.stop();
+
+        if (!playingRows.length) return;
+
+        const newOutBlock = createOutBlock({
+            id: 'out',
+            type: 'set',
+            rows: playingRows,
+            bpm: this.page.bpmValue
+        });
+
+        this.page.multiPlayer.tryPlayMidiBlock({
+            blocks: midiConfig.blocks,
+            playBlock: newOutBlock,
             bpm: this.page.bpmValue,
             repeatCount: 1,
             metaByLines: ideService.currentEdit.metaByLines,
@@ -425,31 +461,7 @@ export class DrumCtrl {
         });
 
         getWithDataAttrValue(ids.ideAction, 'play-active', this.page.pageEl)?.forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => {
-                if (!this.hasEditedItems) return;
-
-                const midiConfig = this.getMidiConfig();
-                const playBlock = midiConfig.playBlockOut as TextBlock;
-                const playingRows = this.editedItems.map(item => {
-                    return playBlock.rows[item.rowNio + 1]
-                })
-
-                const newOutBlock = createOutBlock({
-                    id: 'out',
-                    type: 'set',
-                    rows: playingRows,
-                    bpm: this.page.bpmValue
-                });
-
-                this.page.stop();
-                this.page.multiPlayer.tryPlayMidiBlock({
-                    blocks: midiConfig.blocks,
-                    playBlock: newOutBlock,
-                    bpm: this.page.bpmValue,
-                    repeatCount: 1,
-                    metaByLines: ideService.currentEdit.metaByLines,
-                });
-            });
+            el.addEventListener('pointerdown', () => this.playActive());
         });
 
         getWithDataAttrValue(ids.ideAction, 'stop', this.page.pageEl)?.forEach((el: HTMLElement) => {
@@ -1101,7 +1113,7 @@ export class DrumCtrl {
         //console.log('getMidiConfig');
 
         const rows = currentEdit.editPartsNio.reduce((acc, partNio) => {
-            const part = currentEdit.outList[partNio - 1];
+            const part = currentEdit.topOutParts[partNio - 1];
             const nio = un.getNFromString(part);
             let N = '';
 
@@ -1113,6 +1125,8 @@ export class DrumCtrl {
 
             return acc;
         }, [] as string[] );
+
+        //console.log('rows', rows);
 
         const outBlock = un.createOutBlock({
             id: 'out',
@@ -1186,7 +1200,7 @@ export class DrumCtrl {
             innerContent += `
                 <div >
                     <span style="margin: .5rem;"
-                    >${currentEdit.outList[partNio - 1]}-${partNio}</span>
+                    >${currentEdit.topOutParts[partNio - 1]}-${partNio}</span>
             `.trim();
 
             rowsByPart.forEach(info => {

@@ -24,7 +24,7 @@ class IdeService extends  EventEmitter {
     currentEdit: {
         blocks: TextBlock[],
         outBlock: TextBlock,
-        outList: string[],
+        topOutParts: string[],
         editPartsNio?: number[],
         name: string,
         metaByLines: {[key: string]: string},

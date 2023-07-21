@@ -283,7 +283,7 @@ export class Synthesizer extends Sound {
         //console.log('keysAndNotes', keysAndNotes);
 
         Object.keys(keysAndNotes).forEach((key) => {
-            const item = keysAndNotes[key];
+           const item = keysAndNotes[key];
            item.freq = freqByNoteHash[item.noteLat];
 
             if (item && item.noteLat) {
