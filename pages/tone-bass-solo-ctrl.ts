@@ -11,7 +11,7 @@ import {drumNotesInfo} from './drum-board';
 
 export type ToneKeyboardType = 'bassGuitar' | 'soloHarmonica' | 'bassHarmonica' | 'bassSoloHarmonica' | 'guitar';
 
-const bassInstr = 374; // 388 - eMediator 375 - eFinger
+const bassGuitarInstr = 374; // 388 - eMediator 375 - eFinger
 const cleanGuitarInstr = 276;
 const rockGuitarInstr = 327;
 const organInstr = 182; // 162
@@ -393,7 +393,7 @@ export class BassSoloCtrl extends ToneCtrl {
 
         if (type === 'bassGuitar') {
             this.offset = 0;
-            this.instrCode = bassInstr;
+            this.instrCode = bassGuitarInstr; // bassGuitarInstr;
         }
         else if (type === 'guitar') {
             this.offset = 12;
