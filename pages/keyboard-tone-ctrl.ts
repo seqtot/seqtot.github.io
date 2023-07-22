@@ -625,17 +625,24 @@ export class ToneCtrl extends KeyboardCtrl {
                     <span
                         style="${actionStyle}"
                         data-action-type="stop"
-                    >stp</span><br/><br/>
+                    >stop</span><br/><br/>
                     <span data-action-tone="record-mode" style="${actionStyle}">rec</span><br/><br/>
-                    <div 
-                        data-action-tone="record-beat" 
-                        style="${actionStyle} height: 3rem; background-color: whitesmoke; display: none; margin-bottom: 1rem;"
-                    >beat</div>
-                    <!--span 
-                        data-action-tone="record-stop"
-                        style="${actionStyle} height: 3rem; display: none; margin-bottom: 1rem;"
-                     >stop</span-->                    
+                    
                 </div>
+            </div>
+
+            <div 
+                data-action-tone="record-beat-wrapper"
+                style="margin: .5rem; display: none; width: 90%;"
+            >
+                <div
+                    data-action-tone="record-beat" 
+                    style="${actionStyle} display: inline-block; height: 5rem; width: 45%; background-color: whitesmoke;  margin-bottom: .5rem;"
+                >beat me</div>
+                <div
+                    data-action-tone="record-beat" 
+                    style="${actionStyle} display: inline-block; height: 5rem; width: 45%; background-color: whitesmoke; margin-bottom: .5rem;"
+                >beat me</div>
             </div>
             
             <div style="margin: .5rem;">
@@ -747,24 +754,18 @@ export class ToneCtrl extends KeyboardCtrl {
             getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
                 el.style.fontWeight = '700';
             });
-            getWithDataAttrValue('action-tone', 'record-beat',pageEl)?.forEach((el: HTMLElement) => {
+            getWithDataAttrValue('action-tone', 'record-beat-wrapper',pageEl)?.forEach((el: HTMLElement) => {
                 el.style.display = 'block';
             });
-            // getWithDataAttrValue('action-tone', 'record-stop',pageEl)?.forEach((el: HTMLElement) => {
-            //     el.style.display = 'block';
-            // });
         } else {
             this.clearRecordData();
 
             getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
                 el.style.fontWeight = '400';
             });
-            getWithDataAttrValue('action-tone', 'record-beat',pageEl)?.forEach((el: HTMLElement) => {
+            getWithDataAttrValue('action-tone', 'record-beat-wrapper',pageEl)?.forEach((el: HTMLElement) => {
                 el.style.display = 'none';
             });
-            // getWithDataAttrValue('action-tone', 'record-stop',pageEl)?.forEach((el: HTMLElement) => {
-            //     el.style.display = 'none';
-            // });
         }
     }
 
