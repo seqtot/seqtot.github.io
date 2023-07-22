@@ -426,6 +426,7 @@ const UP = 0;
 export class ToneCtrl extends KeyboardCtrl {
     instrCode = 162;
     playingNote: { [key: string]: string } = {};
+    lastPlayingNote = '';
     offset = 0;
 
     lightBgColor = lightBgColor;
@@ -518,7 +519,7 @@ export class ToneCtrl extends KeyboardCtrl {
     getHarmonicaContent(): string {
         let wrapper = `
             <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                ${getVerticalKeyboard('bass', 'bassHarmonica', bassKeys)}
+                ${getVerticalKeyboard('base', 'bassHarmonica', bassKeys)}
                 ${getVerticalKeyboard('solo', 'soloHarmonica', soloKeys)}
                 <div 
                     style="font-size: 2rem;
@@ -564,7 +565,7 @@ export class ToneCtrl extends KeyboardCtrl {
            return row.slice(firstString, stringCount + firstString);
         });
 
-        return getVerticalKeyboard('bass', 'bassGuitar', boardKeys);
+        return getVerticalKeyboard('base', type, boardKeys);
     }
 
     getGuitarContent(type?: 'guitar' | 'bassGuitar', settings?: GuitarSettings): string {
@@ -690,9 +691,8 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     setKeysColor() {
-        const bassNote = this.playingNote.bass;
-        const bassChar = (this.playingNote.bass || '')[0];
-        const soloChar = (this.playingNote.solo || '')[0];
+        let baseNote = this.playingNote.base || '';
+        let baseChar = baseNote[0];
 
         getWithDataAttr('note-key', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
@@ -709,28 +709,27 @@ export class ToneCtrl extends KeyboardCtrl {
             const note = data.noteLat || '';
 
             if (data.keyboardId === 'solo') {
-                if (note[0] === bassChar) {
+                if (note[0] === baseChar) {
                     el.style.boxShadow = 'inset 0px 0px 3px black';
-                    //el.style.backgroundColor = this.lightBgColor;
-                    //el.style.outline = `1px solid black`;
                 }
-                if (note === bassNote) {
+                if (note === baseNote) {
                     el.style.boxShadow = 'inset 0px 0px 3px blue';
-                    //el.style.backgroundColor = this.darkBgColor;
-                    //el.style.outline = `2px solid black`;
                 }
             }
 
-            // BASS
-            if (data.keyboardId === 'bass' && (this.type === 'bassGuitar' || this.type === 'guitar')) {
+            // GUITAR
+            if (this.type === 'bassGuitar' || this.type === 'guitar') {
+                baseChar = this.lastPlayingNote[0];
+
                 if (data.row !== '0' && data.row !== '12') {
                     el.innerHTML = '&nbsp;';
+                } else {
+                    el.style.color = 'black';
                 }
 
-                if (note[0] === bassChar && data.row !== '0' && data.row !== '12') {
-                    //console.log(el.dataset);
+                if (note[0] === baseChar) {
                     const octaveChar = (el.dataset['noteLat'] || '')[1];
-                    el.innerText = mapNoteToChar[bassChar];
+                    el.innerText = mapNoteToChar[baseChar];
                     el.style.color = octaveColor[octaveChar] || 'dimgrey';
                 }
             }
@@ -1016,8 +1015,13 @@ export class ToneCtrl extends KeyboardCtrl {
         const pageEl = this.page.pageEl;
 
         getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
-            const keyboardId = el?.dataset?.keyboardId;
-            const keyOrNote = el?.dataset?.noteLat || '';
+            const keyboardId = el.dataset.keyboardId;
+            const keyOrNote = el.dataset.noteLat || '';
+            let keyId = keyboardId;
+
+            if (this.type === 'bassGuitar' || this.type === 'guitar') {
+                keyId = el.dataset.noteCellGuid;
+            }
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 evt.preventDefault();
@@ -1031,19 +1035,20 @@ export class ToneCtrl extends KeyboardCtrl {
                 }
 
                 const instrCode = this.instrCode;
-                this.lastNoteCellGuid = el?.dataset?.noteCellGuid || '';
 
                 ideService.synthesizer.playSound({
-                    keyOrNote: this.playingNote[keyboardId],
-                    id: keyboardId,
+                    keyOrNote: this.playingNote[keyId],
+                    id: keyId,
                     onlyStop: true,
                 });
 
-                this.playingNote[keyboardId] = keyOrNote;
+                this.playingNote[keyId] = keyOrNote;
+                this.lastPlayingNote = keyOrNote;
+                this.lastNoteCellGuid = el?.dataset?.noteCellGuid || '';
 
                 ideService.synthesizer.playSound({
                     keyOrNote,
-                    id: keyboardId,
+                    id: keyId,
                     instrCode,
                 });
 
@@ -1067,11 +1072,11 @@ export class ToneCtrl extends KeyboardCtrl {
 
                 ideService.synthesizer.playSound({
                     keyOrNote,
-                    id: keyboardId,
+                    id: keyId,
                     onlyStop: true,
                 });
 
-                this.playingNote[keyboardId] = undefined;
+                this.playingNote[keyId] = undefined;
             });
         });
     }

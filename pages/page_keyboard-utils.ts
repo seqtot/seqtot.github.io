@@ -165,7 +165,7 @@ const info = `
 <div style="margin: .5rem; user-select: none; touch-action: none;">
 <!--br/-->
 
-${getKeyboardBass('bass')}
+${getKeyboardBass('base')}
 
 <!-- br/ -->
 
