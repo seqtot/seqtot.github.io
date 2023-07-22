@@ -377,20 +377,29 @@ function getVerticalKeyboard(
     keyboardId = keyboardId || '';
 
     const isHarmonica = type === 'bassSoloHarmonica' || type === 'bassHarmonica' || type === 'soloHarmonica';
+    const size = 1.9;
+
 
     const getKey = getKeyFn({
         keyboardId,
-        cellSize: '1.9rem',
+        cellSize: `${size}rem`,
         fontSize: '1.5rem',
         cellStylesFn: isHarmonica ? getHarmonicaCellStyles: getBassСellStyles,
     });
+
+    let minWidth = '';
+
+    if (keys[0] && keys[0].length) {
+        minWidth = `min-width: ${size * keys[0].length + 0.1}rem;`;
+    }
 
     let keyboard = `
         <div style="
             font-family: monospace;
             user-select: none;
-            touch-action: none;    
-            padding: 0.5rem 0 0.5rem 0.5rem;"
+            touch-action: none;
+            ${minWidth}    
+            padding: 0.5rem 0 0.5rem 0.5rem;"            
             data-name="keyboard-${keyboardId}"
         >%tpl%</div>
     `.trim();
@@ -590,11 +599,11 @@ export class ToneCtrl extends KeyboardCtrl {
                     ${this.getGuitarBoardContent(type, settings)}                
                 </div>
 
-                <div>
+                <div style="padding-left: .5rem; padding-top: .5rem;">
                     ${stringCountCommands}<br/>
                     <span data-action-tone="set-offset-up" style="${actionStyle}">up</span>&emsp;
                     <span data-action-tone="set-offset-down" style="${actionStyle}">down</span>&emsp;
-                    <span data-action-tone="fix-board-cell" style="${actionStyle}">fix</span><br/><br/>
+                    <span data-action-tone="fix-board-cell" style="${actionStyle}">fix</span>&emsp;
                     <span data-action-tone="unfix-board-cell" style="${actionStyle}">unfix</span><br/><br/>                    
                     
                     <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
