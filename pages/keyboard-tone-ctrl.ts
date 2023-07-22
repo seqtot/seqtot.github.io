@@ -594,8 +594,16 @@ export class ToneCtrl extends KeyboardCtrl {
         }
 
         let wrapper = `
-            <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                <div data-guitar-board-wrapper>
+            <div style="
+                display: flex;
+                margin: .5rem;
+                justify-content: space-between;
+                position: relative;"
+            >
+                <div 
+                    data-guitar-board-wrapper
+                    style="user-select: none; touch-action: none;"
+                >
                     ${this.getGuitarBoardContent(type, settings)}                
                 </div>
 
