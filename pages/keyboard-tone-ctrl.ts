@@ -9,6 +9,11 @@ const cleanGuitarInstr = 276;
 const rockGuitarInstr = 327;
 const organInstr = 182; // 162
 
+type GuitarSettings = {
+    stringCount: number,
+    offset: number
+}
+
 const instrName = {
     374: '$cBass*f',
     276: '$guit*ec',
@@ -523,8 +528,10 @@ export class ToneCtrl extends KeyboardCtrl {
         return wrapper;
     }
 
-    getGuitarBoardContent(type?: 'guitar' | 'bassGuitar', stringCount?: number): string {
-        stringCount = stringCount || 6;
+    getGuitarBoardContent(type?: 'guitar' | 'bassGuitar', settings?: GuitarSettings): string {
+        settings = settings || this.getGuitarSettings();
+
+        let stringCount = settings.stringCount;
         let firstString = 0;
 
         if (type === 'bassGuitar' && stringCount === 4) {
@@ -544,7 +551,8 @@ export class ToneCtrl extends KeyboardCtrl {
         return getVerticalKeyboard('bass', 'bassGuitar', boardKeys);
     }
 
-    getGuitarContent(type?: 'guitar' | 'bassGuitar', stringCount?: number): string {
+    getGuitarContent(type?: 'guitar' | 'bassGuitar', settings?: GuitarSettings): string {
+        settings = settings || this.getGuitarSettings();
         type = type || <any>this.type;
 
         const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
@@ -572,7 +580,7 @@ export class ToneCtrl extends KeyboardCtrl {
         let wrapper = `
             <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
                 <div data-guitar-board-wrapper>
-                    ${this.getGuitarBoardContent(type, stringCount)}                
+                    ${this.getGuitarBoardContent(type, settings)}                
                 </div>
 
                 <div>
@@ -645,10 +653,10 @@ export class ToneCtrl extends KeyboardCtrl {
             return this.getHarmonicaContent();
         }
         else if(type === 'bassGuitar') {
-            return this.getGuitarContent('bassGuitar', this.getGuitarSettings().stringCount);
+            return this.getGuitarContent('bassGuitar');
         }
         else if(type === 'guitar') {
-            return this.getGuitarContent('guitar', this.getGuitarSettings().stringCount);
+            return this.getGuitarContent('guitar');
         }
     }
 
@@ -886,7 +894,7 @@ export class ToneCtrl extends KeyboardCtrl {
         }
     }
 
-    getGuitarSettings(): {stringCount: number, offset: number} {
+    getGuitarSettings(): GuitarSettings {
         if (!localStorage.getItem(`[settings]${this.type}`)) {
             this.setGuitarSettings({
                 stringCount: 6,
@@ -897,7 +905,7 @@ export class ToneCtrl extends KeyboardCtrl {
         return JSON.parse(localStorage.getItem(`[settings]${this.type}`));
     }
 
-    setGuitarSettings(settings: {stringCount: number, offset: number}) {
+    setGuitarSettings(settings: GuitarSettings) {
         localStorage.setItem(`[settings]${this.type}`, JSON.stringify(settings));
     }
 
@@ -911,7 +919,7 @@ export class ToneCtrl extends KeyboardCtrl {
             el.innerHTML = null;
         });
 
-        const boardContent = this.getGuitarBoardContent(<any>this.type, stringCount);
+        const boardContent = this.getGuitarBoardContent(<any>this.type, settings);
 
         getWithDataAttr('guitar-board-wrapper').forEach(el => {
             el.innerHTML = boardContent;
