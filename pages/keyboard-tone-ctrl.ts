@@ -9,6 +9,15 @@ const cleanGuitarInstr = 276;
 const rockGuitarInstr = 327;
 const organInstr = 182; // 162
 
+const octaveColor = {
+    u: 'black',
+    y: 'darkblue',
+    o: 'darkgreen',
+    a: 'lightblue',
+    e: 'lightgreen',
+    i: 'yellow',
+}
+
 type GuitarSettings = {
     stringCount: number,
     offset: number
@@ -230,7 +239,7 @@ function getKeyFn(x: {
             data-name="note-key-${note}"
             data-note-lat="${note}"
             data-keyboard-id="${keyboardId}"
-            data-guid="${guid++}"
+            data-note-cell-guid="${guid++}"
             data-col="${iCol}"
             data-row="${iRow}"
             data-bg-color="${cellStyles.bgColor}"
@@ -428,11 +437,9 @@ export class ToneCtrl extends KeyboardCtrl {
         super(page);
 
         if (type === 'bassGuitar') {
-            this.offset = 0;
             this.instrCode = bassGuitarInstr; // bassGuitarInstr;
         }
         else if (type === 'guitar') {
-            this.offset = 12;
             this.instrCode = rockGuitarInstr;
         }
         else {
@@ -542,7 +549,7 @@ export class ToneCtrl extends KeyboardCtrl {
             firstString = 1;
         }
 
-        let boardKeys = guitarKeys.slice(this.offset, this.offset + 13);
+        let boardKeys = guitarKeys.slice(settings.offset, settings.offset + 13);
 
         boardKeys = boardKeys.map(row => {
            return row.slice(firstString, stringCount + firstString);
@@ -585,6 +592,11 @@ export class ToneCtrl extends KeyboardCtrl {
 
                 <div>
                     ${stringCountCommands}<br/>
+                    <span data-action-tone="set-offset-up" style="${actionStyle}">up</span>&emsp;
+                    <span data-action-tone="set-offset-down" style="${actionStyle}">down</span>&emsp;
+                    <span data-action-tone="fix-board-cell" style="${actionStyle}">fix</span><br/><br/>
+                    <span data-action-tone="unfix-board-cell" style="${actionStyle}">unfix</span><br/><br/>                    
+                    
                     <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
                     <span data-action-tone="memo-clear" style="${actionStyle}">del mem</span><br/><br/>
                     <span
@@ -700,9 +712,9 @@ export class ToneCtrl extends KeyboardCtrl {
 
                 if (note[0] === bassChar && data.row !== '0' && data.row !== '12') {
                     //console.log(el.dataset);
-                    //el.style.backgroundColor = this.lightBgColor;
+                    const octaveChar = (el.dataset['noteLat'] || '')[1];
                     el.innerText = mapNoteToChar[bassChar];
-                    el.style.color = 'dimgrey';
+                    el.style.color = octaveColor[octaveChar] || 'dimgrey';
                 }
             }
         });
@@ -896,9 +908,15 @@ export class ToneCtrl extends KeyboardCtrl {
 
     getGuitarSettings(): GuitarSettings {
         if (!localStorage.getItem(`[settings]${this.type}`)) {
+            let offset = 0;
+
+            if (this.type === 'guitar') {
+                offset = 12;
+            }
+
             this.setGuitarSettings({
                 stringCount: 6,
-                offset: null,
+                offset,
             });
         }
 
@@ -907,6 +925,53 @@ export class ToneCtrl extends KeyboardCtrl {
 
     setGuitarSettings(settings: GuitarSettings) {
         localStorage.setItem(`[settings]${this.type}`, JSON.stringify(settings));
+    }
+
+    fixBoardCell(resetFix = false) {
+        if (resetFix) {
+            getWithDataAttrValue('fix-note-cell', 'true', this.page.pageEl).forEach(el => {
+                el.style.boxShadow = null;
+                el.dataset['fixCell'] = '';
+            });
+
+            return;
+        }
+
+        getWithDataAttrValue('note-cell-guid', this.lastNoteCellGuid, this.page.pageEl).forEach(el => {
+            if (el.dataset['fixNoteCell']) {
+                el.style.boxShadow = null;
+                el.dataset['fixNoteCell'] = '';
+            } else {
+                el.dataset['fixNoteCell'] = 'true';
+                el.style.boxShadow = 'inset 0px 0px 6px yellow';
+            }
+        });
+    }
+
+    setGuitarOffset(step: number) {
+        console.log('setGuitarOffset', step);
+
+        let settings = this.getGuitarSettings();
+        const offset = settings.offset + step;
+
+        if (offset < 0) {
+            return;
+        }
+
+        settings.offset = offset;
+        this.setGuitarSettings(settings);
+
+        getWithDataAttr('guitar-board-wrapper').forEach(el => {
+            el.innerHTML = null;
+        });
+
+        const boardContent = this.getGuitarBoardContent(<any>this.type, settings);
+
+        getWithDataAttr('guitar-board-wrapper').forEach(el => {
+            el.innerHTML = boardContent;
+        });
+
+        this.subscribeBoardEvents();
     }
 
     setStringCount(stringCount: number | string) {
@@ -928,6 +993,8 @@ export class ToneCtrl extends KeyboardCtrl {
         this.subscribeBoardEvents();
     }
 
+    lastNoteCellGuid = '';
+
     subscribeBoardEvents() {
         const pageEl = this.page.pageEl;
 
@@ -947,6 +1014,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 }
 
                 const instrCode = this.instrCode;
+                this.lastNoteCellGuid = el?.dataset?.noteCellGuid || '';
 
                 ideService.synthesizer.playSound({
                     keyOrNote: this.playingNote[keyboardId],
@@ -996,6 +1064,22 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('action-set-string-count', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.setStringCount(el.dataset['actionSetStringCount']));
+        });
+
+        getWithDataAttrValue('action-tone', 'set-offset-up', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.setGuitarOffset(1));
+        });
+
+        getWithDataAttrValue('action-tone', 'set-offset-down', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.setGuitarOffset(-1));
+        });
+
+        getWithDataAttrValue('action-tone', 'fix-board-cell', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.fixBoardCell());
+        });
+
+        getWithDataAttrValue('action-tone', 'unfix-board-cell', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.fixBoardCell(true));
         });
 
         getWithDataAttrValue('page-action', 'play-one', this.page.pageEl).forEach((el: HTMLElement) => {
