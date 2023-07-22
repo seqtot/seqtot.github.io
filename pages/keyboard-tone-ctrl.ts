@@ -1,20 +1,20 @@
-import { ToneCtrl } from './tone-ctrl';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import ideService from './ide/ide-service';
 import * as un from '../libs/muse/utils/utils-note';
-import {Synthesizer} from '../libs/muse/synthesizer';
-import {MultiPlayer} from '../libs/muse/multi-player';
-import {ComponentContext} from 'framework7/modules/component/component';
-import {getNoteByOffset, parseInteger} from '../libs/muse/utils/utils-note';
 import {KeyData, Line, LineModel, NoteItem} from './line-model';
-import {drumNotesInfo} from './drum-board';
-
-export type ToneKeyboardType = 'bassGuitar' | 'soloHarmonica' | 'bassHarmonica' | 'bassSoloHarmonica' | 'guitar';
+import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 
 const bassGuitarInstr = 374; // 388 - eMediator 375 - eFinger
 const cleanGuitarInstr = 276;
 const rockGuitarInstr = 327;
 const organInstr = 182; // 162
+
+const instrName = {
+    374: '$cBass*f',
+    276: '$guit*ec',
+    327: '$egit*drp',
+    182: '$organ*r',
+}
 
 type ChessCell = {
     noteId: number,
@@ -26,18 +26,6 @@ type ChessCell = {
     underline: boolean,
 
     octave?: string,
-}
-
-interface Page {
-    bpmValue: number;
-    pageEl: HTMLElement;
-    getMetronomeContent(): string;
-    stopTicker();
-    stop();
-    //getOut(bpm: number, seq: DrumCtrl['keySequence'] );
-    synthesizer: Synthesizer;
-    multiPlayer: MultiPlayer;
-    context: ComponentContext,
 }
 
 const lightBgColor = '#eee';
@@ -196,14 +184,15 @@ function getHarmonicaCellStyles(note: string): {
 }
 
 function getKeyFn(x: {
-    id: string | number;
+    keyboardId: string | number;
     cellSize?: string;
     fontSize?: string;
     cellStylesFn: (note: string, iRow?: number, iCell?: number) => {bgColor: string, borders: string, text: string}
 }): (note: string, symbol: string, iRow?: number, iCol?: number) => string {
-    const id = x.id || '';
+    const keyboardId = x.keyboardId || '';
     const fontSize = x.fontSize || '1.3rem';
     const cellSize = x.cellSize || '1.5rem';
+    let guid = 1;
 
     return (note: string, symbol: string, iRow?: number, iCol?: number): string => {
         let step = note[0];
@@ -235,7 +224,8 @@ function getKeyFn(x: {
             data-note-key="${note}"
             data-name="note-key-${note}"
             data-note-lat="${note}"
-            data-keyboard-id="${id}"
+            data-keyboard-id="${keyboardId}"
+            data-guid="${guid++}"
             data-col="${iCol}"
             data-row="${iRow}"
             data-bg-color="${cellStyles.bgColor}"
@@ -286,6 +276,48 @@ const bassGuitarKeys: string[][] = [
     ['ko', 'na', 'za', 'te', 've', 'be'],
 ];
 
+const guitarKeys: string[][] = [
+    ['bj', 'mu', 'lu', 'ry', 'sy', 'by', 'mo'],
+    ['du', 'fu', 'ku', 'ny', 'zy', 'do', 'fo'],
+    ['tu', 'vu', 'bu', 'my', 'ly', 'to', 'vo'],
+    ['ru', 'su', 'dy', 'fy', 'ky', 'ro', 'so'],
+    ['nu', 'zu', 'ty', 'vy', 'by', 'no', 'zo'],
+    ['mu', 'lu', 'ry', 'sy', 'do', 'mo', 'lo'],
+    ['fu', 'ku', 'ny', 'zy', 'to', 'fo', 'ko'],
+    ['vu', 'bu', 'my', 'ly', 'ro', 'vo', 'bo'],
+    ['su', 'dy', 'fy', 'ky', 'no', 'so', 'da'],
+    ['zu', 'ty', 'vy', 'by', 'mo', 'zo', 'ta'],
+    ['lu', 'ry', 'sy', 'do', 'fo', 'lo', 'ra'],
+    ['ku', 'ny', 'zy', 'to', 'vo', 'ko', 'na'],
+
+    ['bu', 'my', 'ly', 'ro', 'so', 'bo', 'ma'],
+    ['dy', 'fy', 'ky', 'no', 'zo', 'da', 'fa'],
+    ['ty', 'vy', 'by', 'mo', 'lo', 'ta', 'va'],
+    ['ry', 'sy', 'do', 'fo', 'ko', 'ra', 'sa'],
+    ['ny', 'zy', 'to', 'vo', 'bo', 'na', 'za'],
+    ['my', 'ly', 'ro', 'so', 'da', 'ma', 'la'],
+    ['fy', 'ky', 'no', 'zo', 'ta', 'fa', 'ka'],
+    ['vy', 'by', 'mo', 'lo', 'ra', 'va', 'ba'],
+    ['sy', 'do', 'fo', 'ko', 'na', 'sa', 'de'],
+    ['zy', 'to', 'vo', 'bo', 'ma', 'za', 'te'],
+    ['ly', 'ro', 'so', 'da', 'fa', 'la', 're'],
+    ['ky', 'no', 'zo', 'ta', 'va', 'ka', 'ne'],
+
+    ['by', 'mo', 'lo', 'ra', 'sa', 'ba', 'me',],
+    ['do', 'fo', 'ko', 'na', 'za', 'de', 'fe',],
+    ['to', 'vo', 'bo', 'ma', 'la', 'te', 've',],
+    ['ro', 'so', 'da', 'fa', 'ka', 're', 'se',],
+    ['no', 'zo', 'ta', 'va', 'ba', 'ne', 'ze',],
+    ['mo', 'lo', 'ra', 'sa', 'de', 'me', 'le',],
+    ['fo', 'ko', 'na', 'za', 'te', 'fe', 'ke',],
+    ['vo', 'bo', 'ma', 'la', 're', 've', 'be',],
+    ['so', 'da', 'fa', 'ka', 'ne', 'se', 'di',],
+    ['zo', 'ta', 'va', 'ba', 'me', 'ze', 'ti',],
+    ['lo', 'ra', 'sa', 'de', 'fe', 'le', 'ri',],
+    ['ko', 'na', 'za', 'te', 've', 'ke', 'ni',],
+];
+
+
 const bassKeys: string[][] = [
     ['za', 'la', 'ka', 'ba'],
     ['ma', 'fa', 'va', 'sa'],
@@ -323,19 +355,18 @@ const soloKeys: string[][] = [
     ['dy', 'ty', 'ry', 'ny'],
 ];
 
-
-
 function getVerticalKeyboard(
-    id: number | string,
+    keyboardId: number | string,
     type: ToneKeyboardType,
     keys: string[][],
 ): string {
-    id = id || '';
+    keyboardId = keyboardId || '';
 
     const isHarmonica = type === 'bassSoloHarmonica' || type === 'bassHarmonica' || type === 'soloHarmonica';
 
     const getKey = getKeyFn({
-        id, cellSize: '1.9rem',
+        keyboardId,
+        cellSize: '1.9rem',
         fontSize: '1.5rem',
         cellStylesFn: isHarmonica ? getHarmonicaCellStyles: getBassСellStyles,
     });
@@ -346,7 +377,7 @@ function getVerticalKeyboard(
             user-select: none;
             touch-action: none;    
             padding: 0.5rem 0 0.5rem 0.5rem;"
-            data-name="keyboard-${id}"
+            data-name="keyboard-${keyboardId}"
         >%tpl%</div>
     `.trim();
 
@@ -369,7 +400,7 @@ function getVerticalKeyboard(
 const DOWN = 1;
 const UP = 0;
 
-export class BassSoloCtrl extends ToneCtrl {
+export class ToneCtrl extends KeyboardCtrl {
     instrCode = 162;
     playingNote: { [key: string]: string } = {};
     offset = 0;
@@ -383,13 +414,13 @@ export class BassSoloCtrl extends ToneCtrl {
     memoBuffer2: string[] = [];
     isRecMode = false;
 
-    liner = new LineModel();
+
 
     constructor(
-        public page: Page,
-        public type: ToneKeyboardType)
-    {
-        super();
+        public page: KeyboardPage,
+        public type: ToneKeyboardType
+    ) {
+        super(page);
 
         if (type === 'bassGuitar') {
             this.offset = 0;
@@ -492,15 +523,60 @@ export class BassSoloCtrl extends ToneCtrl {
         return wrapper;
     }
 
-    getGuitarContent(): string {
-        const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
-        const boardKeys = bassGuitarKeys.slice(this.offset, this.offset + 13);
+    getGuitarBoardContent(type?: 'guitar' | 'bassGuitar', stringCount?: number): string {
+        stringCount = stringCount || 6;
+        let firstString = 0;
 
-        // jjkl
+        if (type === 'bassGuitar' && stringCount === 4) {
+            firstString = 1;
+        }
+
+        if (type === 'guitar' && stringCount === 6) {
+            firstString = 1;
+        }
+
+        let boardKeys = guitarKeys.slice(this.offset, this.offset + 13);
+
+        boardKeys = boardKeys.map(row => {
+           return row.slice(firstString, stringCount + firstString);
+        });
+
+        return getVerticalKeyboard('bass', 'bassGuitar', boardKeys);
+    }
+
+    getGuitarContent(type?: 'guitar' | 'bassGuitar', stringCount?: number): string {
+        type = type || <any>this.type;
+
+        const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
+        let stringCountCommands = '';
+
+        if (type === 'guitar') {
+            stringCountCommands = `
+                <div>
+                    <span data-action-set-string-count="6" style="${actionStyle}">6s</span>
+                    <span data-action-set-string-count="7" style="${actionStyle}">7s</span>                                    
+                </div>
+            `.trim();
+        }
+
+        if (type === 'bassGuitar') {
+            stringCountCommands = `
+                <div>
+                    <span data-action-set-string-count="4" style="${actionStyle}">4s</span>
+                    <span data-action-set-string-count="5" style="${actionStyle}">5s</span>                    
+                    <span data-action-set-string-count="6" style="${actionStyle}">6s</span>                                        
+                </div>
+            `.trim();
+        }
+
         let wrapper = `
             <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                ${getVerticalKeyboard('bass', 'bassGuitar', boardKeys)} 
+                <div data-guitar-board-wrapper>
+                    ${this.getGuitarBoardContent(type, stringCount)}                
+                </div>
+
                 <div>
+                    ${stringCountCommands}<br/>
                     <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
                     <span data-action-tone="memo-clear" style="${actionStyle}">del memo</span><br/><br/>
                     <span
@@ -529,6 +605,7 @@ export class BassSoloCtrl extends ToneCtrl {
             </div>
                         
             <br/>
+            ${this.getTopCommandPanel()}
             <br/>
                         
             <div
@@ -568,10 +645,10 @@ export class BassSoloCtrl extends ToneCtrl {
             return this.getHarmonicaContent();
         }
         else if(type === 'bassGuitar') {
-            return this.getGuitarContent();
+            return this.getGuitarContent('bassGuitar', this.getGuitarSettings().stringCount);
         }
         else if(type === 'guitar') {
-            return this.getGuitarContent();
+            return this.getGuitarContent('guitar', this.getGuitarSettings().stringCount);
         }
     }
 
@@ -608,7 +685,7 @@ export class BassSoloCtrl extends ToneCtrl {
             }
 
             // BASS
-            if (data.keyboardId === 'bass' && this.type === 'bassGuitar') {
+            if (data.keyboardId === 'bass' && (this.type === 'bassGuitar' || this.type === 'guitar')) {
                 if (data.row !== '0' && data.row !== '12') {
                     el.innerHTML = '&nbsp;';
                 }
@@ -656,8 +733,8 @@ export class BassSoloCtrl extends ToneCtrl {
     }
 
 
-    getOut(bpm: number, seq: BassSoloCtrl['keySequence'] ) {
-        const rows = LineModel.GetLineModelFromRecord(bpm, this.tickStartMs, seq);
+    getOut(bpm: number, seq: ToneCtrl['keySequence'] ) {
+        const rows = LineModel.GetToneLineModelFromRecord(bpm, this.tickStartMs, seq);
         this.liner.setData(rows);
         this.printChess(rows);
     }
@@ -794,8 +871,128 @@ export class BassSoloCtrl extends ToneCtrl {
         });
     }
 
-    subscribeEvents() {
+    subscribeEditCommands() {
         const pageEl = this.page.pageEl;
+
+    }
+
+    moveCell(id: number, value: number) {
+        const result = this.liner.moveCell(id, value);
+
+        if (result) {
+            this.printChess(this.liner.rows);
+            //this.highlightCellByRowCol(`${result.row}-${result.col}`);
+            this.activeCell.id = id;
+        }
+    }
+
+    getGuitarSettings(): {stringCount: number, offset: number} {
+        if (!localStorage.getItem(`[settings]${this.type}`)) {
+            this.setGuitarSettings({
+                stringCount: 6,
+                offset: null,
+            });
+        }
+
+        return JSON.parse(localStorage.getItem(`[settings]${this.type}`));
+    }
+
+    setGuitarSettings(settings: {stringCount: number, offset: number}) {
+        localStorage.setItem(`[settings]${this.type}`, JSON.stringify(settings));
+    }
+
+    setStringCount(stringCount: number | string) {
+        stringCount = un.parseInteger(stringCount, 6);
+        let settings = this.getGuitarSettings();
+        settings.stringCount = stringCount;
+        this.setGuitarSettings(settings);
+
+        getWithDataAttr('guitar-board-wrapper').forEach(el => {
+            el.innerHTML = null;
+        });
+
+        const boardContent = this.getGuitarBoardContent(<any>this.type, stringCount);
+
+        getWithDataAttr('guitar-board-wrapper').forEach(el => {
+            el.innerHTML = boardContent;
+        });
+
+        this.subscribeBoardEvents();
+    }
+
+    subscribeBoardEvents() {
+        const pageEl = this.page.pageEl;
+
+        getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
+            const keyboardId = el?.dataset?.keyboardId;
+            const keyOrNote = el?.dataset?.noteLat || '';
+
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+
+                if (this.isRecMode) {
+                    const time = Date.now();
+                    this.handleKeyRecord(time, DOWN);
+
+                    return;
+                }
+
+                const instrCode = this.instrCode;
+
+                ideService.synthesizer.playSound({
+                    keyOrNote: this.playingNote[keyboardId],
+                    id: keyboardId,
+                    onlyStop: true,
+                });
+
+                this.playingNote[keyboardId] = keyOrNote;
+
+                ideService.synthesizer.playSound({
+                    keyOrNote,
+                    id: keyboardId,
+                    instrCode,
+                });
+
+                this.setKeysColor();
+
+                if (this.isMemoMode) {
+                    this.pushNoteToMemo(keyOrNote);
+                }
+            });
+
+            el.addEventListener('pointerup', (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+
+                if (this.isRecMode) {
+                    const time = Date.now();
+                    this.handleKeyRecord(time, UP);
+
+                    return;
+                }
+
+                ideService.synthesizer.playSound({
+                    keyOrNote,
+                    id: keyboardId,
+                    onlyStop: true,
+                });
+
+                this.playingNote[keyboardId] = undefined;
+            });
+        });
+    }
+
+    subscribeCommonCommands() {
+        const pageEl = this.page.pageEl;
+
+        getWithDataAttr('action-set-string-count', pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.setStringCount(el.dataset['actionSetStringCount']));
+        });
+
+        getWithDataAttrValue('page-action', 'play-one', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.playOne());
+        });
 
         getWithDataAttrValue('action-tone', 'memo-mode', pageEl)?.forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.toggleMemo());
@@ -829,45 +1026,6 @@ export class BassSoloCtrl extends ToneCtrl {
             el.addEventListener('pointerdown', () => this.toggleRecord())
         });
 
-        getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
-            const keyboardId = el?.dataset?.keyboardId;
-            const keyOrNote = el?.dataset?.noteLat || '';
-
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                const instrCode = this.instrCode;
-
-                ideService.synthesizer.playSound({
-                    keyOrNote: this.playingNote[keyboardId],
-                    id: keyboardId,
-                    onlyStop: true,
-                });
-
-                this.playingNote[keyboardId] = keyOrNote;
-
-                ideService.synthesizer.playSound({
-                    keyOrNote,
-                    id: keyboardId,
-                    instrCode,
-                });
-
-                this.setKeysColor();
-
-                if (this.isMemoMode) {
-                    this.pushNoteToMemo(keyOrNote);
-                }
-            });
-
-            el.addEventListener('pointerup', (evt: MouseEvent) => {
-                ideService.synthesizer.playSound({
-                    keyOrNote,
-                    id: keyboardId,
-                    onlyStop: true,
-                });
-
-                this.playingNote[keyboardId] = undefined;
-            });
-        });
-
         const clearColor = () => {
             getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
                 el.style.backgroundColor = el.dataset['bgColor'] || 'white';
@@ -897,6 +1055,14 @@ export class BassSoloCtrl extends ToneCtrl {
                 }
             });
         }
+
+    }
+
+    subscribeEvents() {
+        this.subscribeCommonCommands();
+        this.subscribeMoveCommands();
+        this.subscribeEditCommands();
+        this.subscribeBoardEvents();
     }
 
     subscribeRelativeKeyboardEvents() {
@@ -1147,11 +1313,11 @@ export class BassSoloCtrl extends ToneCtrl {
             cols.forEach((col, iCol) => {
                 totalOut = totalOut +
                     `<span
-                        data-drum-cell-row="${iRow}"
-                        data-drum-cell-col="${iCol}"
-                        data-drum-cell-row-col="${iRow}-${iCol}"
-                        data-drum-cell-id=""
-                        data-total-offset="${col.totalOffsetQ}"                        
+                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-col="${iCol}"
+                        data-chess-cell-row-col="${iRow}-${iCol}"
+                        data-chess-cell-id=""
+                        data-chess-total-offset="${col.totalOffsetQ}"                        
                         style="
                             box-sizing: border-box;
                             border: 1px solid white;
@@ -1177,13 +1343,13 @@ export class BassSoloCtrl extends ToneCtrl {
 
                 totalOut = totalOut +
                     `<span
-                        data-drum-cell-row="${iRow}"
-                        data-drum-cell-col="${iCell}"
-                        data-drum-cell-row-col="${iRow}-${iCell}"                                                
-                        data-drum-cell-id="${cell.cellId}"
-                        data-total-offset="${cell.totalOffsetQ}"
-                        data-drum-cell-with-id-offset="${cell.totalOffsetQ}"
-                        data-drum-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
+                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-col="${iCell}"
+                        data-chess-cell-row-col="${iRow}-${iCell}"                                                
+                        data-chess-cell-id="${cell.cellId}"
+                        data-chess-total-offset="${cell.totalOffsetQ}"
+                        data-chess-cell-with-id-offset="${cell.totalOffsetQ}"
+                        data-chess-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
                         style="
                             box-sizing: border-box;
                             border: 1px solid white;
@@ -1212,7 +1378,34 @@ export class BassSoloCtrl extends ToneCtrl {
             el.style.height = `${rows.length * rowHeight}rem`;
         }
 
-        //this.subscribeOutCells();
+        this.subscribeChess();
+    }
+
+    // jjkl
+    playOne() {
+        this.page.stop();
+
+        const notes = LineModel.GetToneNotes({
+            blockName: 'temp',
+            instr: instrName[this.instrCode],
+            chnl: this.type === 'bassGuitar' ? '$bass' : '$guit',
+            rows: this.liner.rows,
+        });
+
+        console.log('notes', notes);
+
+        if (!notes) return;
+
+        let blocks = [
+            '<out r100>',
+            'temp',
+            notes
+        ].join('\n');
+
+        this.page.multiPlayer.tryPlayMidiBlock({
+            blocks,
+            bpm: this.page.bpmValue,
+        });
     }
 }
 

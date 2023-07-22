@@ -1,17 +1,17 @@
-import {Props} from 'framework7/modules/component/snabbdom/modules/props';
+import { Props } from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
 import { Range } from 'framework7/components/range/range';
 import { Dom7Array } from 'dom7';
+
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import * as un from '../libs/muse/utils/utils-note';
-import keyboardSet from './page_keyboard-utils';
-import { getNoteByOffset, parseInteger } from '../libs/muse/utils/utils-note';
+import { Synthesizer } from '../libs/muse/synthesizer';
+import { MultiPlayer } from '../libs/muse/multi-player';
 import { standardTicks as ticks } from './ticks';
-import { DrumCtrl, DrumKeyboardType } from './drum-ctrl';
-import {BassSoloCtrl, ToneKeyboardType} from './tone-bass-solo-ctrl';
+import { DrumCtrl } from './keyboard-drum-ctrl';
+import { ToneCtrl } from './keyboard-tone-ctrl';
+import { ToneKeyboardType, DrumKeyboardType } from './keyboard-ctrl';
 import ideService from './ide/ide-service';
-import {Synthesizer} from '@muse/synthesizer';
-import {MultiPlayer} from '@muse/multi-player';
+import keyboardSet from './page_keyboard-utils';
 
 type KeyboardType = ToneKeyboardType | DrumKeyboardType;
 
@@ -34,7 +34,7 @@ interface Page {
 export class KeyboardPage implements Page {
     keyboardType: KeyboardType = 'drums';
     drumCtrl: DrumCtrl;
-    toneCtrl: BassSoloCtrl;
+    toneCtrl: ToneCtrl;
 
     bpmValue = 100;
     playingTick = '';
@@ -193,7 +193,7 @@ export class KeyboardPage implements Page {
     }
 
     setToneContent(type: ToneKeyboardType) {
-        this.toneCtrl = new BassSoloCtrl(this, <ToneKeyboardType>this.keyboardType);
+        this.toneCtrl = new ToneCtrl(this, <ToneKeyboardType>this.keyboardType);
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">

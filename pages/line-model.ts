@@ -308,6 +308,106 @@ export class LineModel {
         return null;
     }
 
+    getLineModelFromRecord(bpm: number, startTimeMs, seq: KeyData[] ): Line[] {
+        return LineModel.GetToneLineModelFromRecord(bpm, startTimeMs, seq);
+    }
+
+    static GetToneLineModelFromRecord(bpm: number, startTimeMs, seq: KeyData[] ): Line[] {
+        let qms = Math.round(60000/ bpm); // ms в четверти
+        let rows: Line[] = [];
+
+        // начало и номер четверти
+        for (let i = 0; i<seq.length; i++) {
+            const item = seq[i];
+            const next = seq[i+1];
+            let diffMs = item.down - startTimeMs;
+            let quarterNio = Math.floor(diffMs/qms);
+            item.quarterTime = startTimeMs + (qms * quarterNio);
+            item.quarterNio = quarterNio;
+
+            if (next && ((next.down - item.down) < 20) ) {
+                next.down = item.down;
+            }
+        }
+
+        const lastInd = seq.length - 1;
+        const firstTime = seq[0].quarterTime;
+        const lastTime = seq[lastInd].next;
+
+        // количество четвертей
+        const rowCount = Math.ceil((lastTime - firstTime)/qms);
+
+        for (let ind = 0; ind < rowCount; ind++) {
+            rows.push({
+                durQ: 120,
+                startOffsetQ: ind * 120,
+                cellSizeQ: 10,
+                cells: [],
+                blockOffsetQ: 0,
+                rowInPartId: '',
+            })
+        }
+
+        //console.log('seq', seq);
+        //console.log('lines', lines);
+
+        const getLineByStartOffsetQ = (startOffsetQ: number): Line => {
+            return rows.find(item => {
+                return startOffsetQ >= item.startOffsetQ && startOffsetQ < (item.startOffsetQ + item.durQ);
+            });
+        }
+
+        const getCellByStartOffsetQ = (startOffsetQ: number, row: Line): Cell => {
+            return row.cells.find(item => startOffsetQ === item.startOffsetQ);
+        }
+
+        let cellId = 1;
+
+        seq.forEach((item, i) => {
+            let itemNew: NoteItem = {
+                id: i + 1,
+                bodyColor: '',
+                headColor: '',
+                note: '',
+                durQ: 0,
+                startOffsetQ: 0,
+                char: item.char,
+            }
+
+            const startOffsetQ = Math.floor((item.down - firstTime) / qms * un.NUM_120 / 10) * 10;
+
+            itemNew.startOffsetQ = startOffsetQ;
+            itemNew.durQ = Math.floor(
+                (item.up - item.down) / qms * un.NUM_120 / 10
+            ) * 10 || 10;
+            itemNew.headColor = item.color;
+            itemNew.note = item.note;
+
+            let row = getLineByStartOffsetQ(startOffsetQ);
+
+            if (row) {
+                //let cell = getCellByStartOffsetQ(startOffsetQ, row) as Cell;
+                let cell: Cell;
+
+                if (!cell) {
+                    cell = {
+                        id: cellId++,
+                        startOffsetQ: itemNew.startOffsetQ,
+                        notes: []
+                    }
+
+                    row.cells.push(cell);
+                }
+
+                cell.notes.push(itemNew);
+            }
+        });
+
+        console.log('rows', rows);
+
+        return rows;
+    }
+
     static GetLineModelFromRecord(bpm: number, startTimeMs, seq: KeyData[] ): Line[] {
         let qms = Math.round(60000/ bpm); // ms в четверти
         let rows: Line[] = [];
@@ -593,6 +693,50 @@ export class LineModel {
     //
     //     return Object.values(result);
     // }
+
+    static GetToneNotes(x:{
+        blockName: string,
+        chnl: string,
+        instr: string,
+        rows: Line[]
+    }): string {
+        let blockName = x.blockName || 'no_name';
+        let rows = this.CloneRows(x.rows);
+        rows = this.RecalcAndClearBlockOffset(rows);
+
+        const totalDurQ = this.GetDurationQByRows(rows);
+        const notes = this.GetSortedNotes(rows);
+        const noteNames = this.GetNoteNames(notes);
+
+        if (!totalDurQ || !notes.length || !noteNames.length) {
+            return '';
+        }
+
+        let result = `<${blockName} $>` + '\n';
+        result += `${x.chnl}: `;
+
+        notes.forEach((note, i) => {
+            const nextNote = notes[i+1];
+            let durationForNext = 0;
+            let pause = '';
+
+            if (nextNote) {
+                durationForNext = nextNote.startOffsetQ - note.startOffsetQ;
+            } else {
+                durationForNext = totalDurQ - note.startOffsetQ;
+            }
+
+            if (i === 0 && note.startOffsetQ) {
+                pause = `${note.startOffsetQ} `;
+            }
+
+            result += `${pause}${note.note}=${durationForNext}=${note.durQ} `;
+        });
+
+        result += x.instr;
+
+        return result;
+    }
 
     static GetDrumNotes(name: string, rows: Line[]): string {
         name = name || 'no_name';
