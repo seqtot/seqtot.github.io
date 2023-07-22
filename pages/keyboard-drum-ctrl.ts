@@ -475,47 +475,11 @@ export class DrumCtrl extends KeyboardCtrl {
         }
     }
 
-    deleteCell(el: HTMLElement) {
-        const cellEl = getWithDataAttrValue('chess-cell-row-col', this.activeCell.rowCol)[0];
-
-        if (!cellEl) return;
-
-        const totalOffset = parseInteger(cellEl.dataset['chessTotalOffset'], null);
-
-        if (totalOffset === null) return;
-
-        this.liner.deleteCellByOffset(totalOffset);
-        this.printChess(this.liner.rows);
-        this.highlightCellByRowCol(this.activeCell.rowCol);
-    }
-
-    deleteRow() {
-        if (!this.activeCell.rowCol) {
-            return null;
-        }
-
-        this.liner.deleteRow(this.activeCell.row);
-        this.printChess(this.liner.rows);
-        this.highlightCellByRowCol(this.activeCell.rowCol);
-    }
-
-    insertRow() {
-        this.liner.addRowAfter(this.activeCell.row - 1);
-        this.printChess(this.liner.rows);
-        this.highlightCellByRowCol(this.activeCell.rowCol);
-    }
-
-    addRow() {
-        this.liner.addRowAfter(this.activeCell.row);
-        this.printChess(this.liner.rows);
-        this.highlightCellByRowCol(this.activeCell.rowCol);
-    }
-
     subscribeCommonCommands() {
         const page = this.page;
-        const pageEl = page.pageEl;
+        const pageEl = this.page.pageEl;
 
-        getWithDataAttrValue('page-action', 'play-one', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('page-action', 'play-one', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.playOne());
         });
 
@@ -644,7 +608,7 @@ export class DrumCtrl extends KeyboardCtrl {
             });
         });
 
-        getWithDataAttrValue('action-out', 'test', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-out', 'test', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 // 3*(2*120+1*60)_2*60
                 //this.liner.fillLinesStructure('1*120_1*60_1*120_1*60');
@@ -655,8 +619,6 @@ export class DrumCtrl extends KeyboardCtrl {
     }
 
     subscribeEditCommands() {
-        this.subscribeMoveCommands();
-
         getWithDataAttrValue('edit-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.deleteCell(el));
         });
@@ -684,6 +646,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
     subscribeEvents() {
         this.subscribeCommonCommands();
+        this.subscribeMoveCommands();
         this.subscribeEditCommands();
         this.subscribeIdeEvents();
     }

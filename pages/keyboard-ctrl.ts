@@ -3,7 +3,7 @@ import {getWithDataAttr, getWithDataAttrValue} from '../src/utils';
 import { Synthesizer } from '../libs/muse/synthesizer';
 import { MultiPlayer } from '../libs/muse/multi-player';
 
-import { LineModel } from './line-model';
+import {Line, LineModel} from './line-model';
 import * as un from '../libs/muse/utils'
 import {parseInteger} from '../libs/common';
 
@@ -262,4 +262,44 @@ export class KeyboardCtrl {
 
         return result;
     }
+
+    deleteCell(el: HTMLElement) {
+        const cellEl = getWithDataAttrValue('chess-cell-row-col', this.activeCell.rowCol)[0];
+
+        if (!cellEl) return;
+
+        const totalOffset = parseInteger(cellEl.dataset['chessTotalOffset'], null);
+
+        if (totalOffset === null) return;
+
+        this.liner.deleteCellByOffset(totalOffset);
+        this.printChess(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    addRow() {
+        this.liner.addRowAfter(this.activeCell.row);
+        this.printChess(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    insertRow() {
+        this.liner.addRowAfter(this.activeCell.row - 1);
+        this.printChess(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    deleteRow() {
+        if (!this.activeCell.rowCol) {
+            return null;
+        }
+
+        this.liner.deleteRow(this.activeCell.row);
+        this.printChess(this.liner.rows);
+        this.highlightCellByRowCol(this.activeCell.rowCol);
+    }
+
+    printChess(rows: Line[]) {}
+
+    drumNoteClick(el: HTMLElement) {}
 }

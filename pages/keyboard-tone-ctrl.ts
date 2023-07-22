@@ -643,7 +643,7 @@ export class ToneCtrl extends KeyboardCtrl {
             </div>
                         
             <br/>
-            ${this.getTopCommandPanel()}
+                ${this.getTopCommandPanel()}
             <br/>
                         
             <div
@@ -910,6 +910,25 @@ export class ToneCtrl extends KeyboardCtrl {
     subscribeEditCommands() {
         const pageEl = this.page.pageEl;
 
+        getWithDataAttrValue('edit-action', 'delete-cell', pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.deleteCell(el));
+        });
+
+        getWithDataAttr('action-drum-note', pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
+        });
+
+        getWithDataAttrValue('edit-row-action', 'add-row', pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addRow());
+        });
+
+        getWithDataAttrValue('edit-row-action', 'insert-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.insertRow());
+        });
+
+        getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.deleteRow());
+        });
     }
 
     moveCell(id: number, value: number) {
@@ -1538,3 +1557,5 @@ export class ToneCtrl extends KeyboardCtrl {
 > SOLO5: (D) щаОЛаО саМуСаЛа лаНаСуМу щаЩуСаЩу лаСаСаО зу <!-- DDEE FSDE VAJE AEFC DTEE A -->
 
 */
+
+// keyboard-base
