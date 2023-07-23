@@ -559,7 +559,7 @@ export class ToneCtrl extends KeyboardCtrl {
             firstString = 1;
         }
 
-        let boardKeys = guitarKeys.slice(settings.offset, settings.offset + 13);
+        let boardKeys = bassGuitarKeys.slice(settings.offset, settings.offset + 13);
 
         boardKeys = boardKeys.map(row => {
            return row.slice(firstString, stringCount + firstString);
@@ -572,7 +572,19 @@ export class ToneCtrl extends KeyboardCtrl {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+
         let result = '';
+
+        // <span
+        //     style="${actionStyle}"
+        // data-action-type="tick"
+        //     >1:4</span>
+        // &nbsp;&nbsp;
+        // <span
+        //     style="${actionStyle}"
+        // data-action-type="stop"
+        // >stop</span><br/><br/>
+        // <span data-action-tone="record-mode" style="${actionStyle}">rec</span><br/><br/>
 
         result = `
             <div style="${rowStyle}">
@@ -582,7 +594,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 >clr&nbsp;&nbsp;</span-->                
                 <span
                     style="${style}"
-                    data-page-action="record"
+                    data-action-tone="record-mode"
                 >rec</span>
                 <span
                     style="${style}"
@@ -652,23 +664,12 @@ export class ToneCtrl extends KeyboardCtrl {
                 <div style="padding-left: .5rem; padding-top: .5rem;">
                     ${stringCountCommands}<br/>
                     <span data-action-tone="set-offset-up" style="${actionStyle}">up</span>&emsp;
-                    <span data-action-tone="set-offset-down" style="${actionStyle}">down</span>&emsp;
-                    <span data-action-tone="fix-board-cell" style="${actionStyle}">fix</span>&emsp;
+                    <span data-action-tone="set-offset-down" style="${actionStyle}">down</span><br/><br/>
+                    <span data-action-tone="fix-board-cell" style="${actionStyle} font-size: 1.4rem; background-color: yellow; ">fix</span><br/><br/>
                     <span data-action-tone="unfix-board-cell" style="${actionStyle}">unfix</span><br/><br/>                    
                     
                     <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
-                    <span data-action-tone="memo-clear" style="${actionStyle}">del mem</span><br/><br/>
-                    <span
-                        style="${actionStyle}"
-                        data-action-type="tick"
-                    >1:4</span>
-                    &nbsp;&nbsp;
-                    <span
-                        style="${actionStyle}"
-                        data-action-type="stop"
-                    >stop</span><br/><br/>
-                    <span data-action-tone="record-mode" style="${actionStyle}">rec</span><br/><br/>
-                    
+                    <span data-action-tone="memo-clear" style="${actionStyle} color: red;">&times;mem</span><br/><br/>                    
                 </div>
             </div>
 
