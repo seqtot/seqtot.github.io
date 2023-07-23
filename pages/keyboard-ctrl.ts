@@ -62,29 +62,31 @@ export class KeyboardCtrl {
         };
     }
 
-    getMoveButtons(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
+    getMoveButtons(size: number = 1): string {
+        const style1 = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
+        const style3 = `border-radius: 0.25rem; border: 1px solid black; font-size: ${size}rem; user-select: none; touch-action: none;`;
+
+        let delButton = '';
 
         return `
         <span
-            style="${style2}"
+            style="${style1}"
             data-action-move-cell="left"
         >&nbsp;&lt;&nbsp;</span>
         <span
-            style="${style2}"
+            style="${style1}"
             data-action-move-cell="top"
         >&nbsp;&uarr;&nbsp;</span>    
         <span
-            style="${style2}"
+            style="${style1}"
             data-action-move-cell="bottom"
         >&nbsp;&darr;&nbsp;</span>                                
         <span
-            style="${style2}"
+            style="${style1}"
             data-action-move-cell="right"
         >&nbsp;&gt;&nbsp;</span>                                        
         <span
-            style="${style}"
+            style="${style3}"
             data-action-type="empty"
         >&nbsp;&nbsp;&nbsp;</span>
     `.trim();
@@ -214,6 +216,29 @@ export class KeyboardCtrl {
         `.trim();
     }
 
+
+    getMoveCommandPanel(size: number = 1, hasDel = true) {
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
+
+        let delButton = '';
+        if (hasDel) {
+            delButton = `
+                <span
+                    style="${style} background-color: red; color: white;"
+                    data-edit-action="delete-cell"
+                >del</span>            
+            `;
+        }
+
+        return `
+            <div style="${rowStyle}">
+                ${this.getMoveButtons()}
+                ${delButton}
+            </div>
+        `.trim();
+    }
+
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
         const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
@@ -250,14 +275,7 @@ export class KeyboardCtrl {
                     data-page-action="play-one"
                 >play</span>
             </div>
-            <div style="${rowStyle}">
-                ${this.getMoveButtons()}                  
-                <span
-                    style="${style} background-color: red; color: white;"
-                    data-edit-action="delete-cell"
-                >del</span>                
-            </div>
-            ${this.getRowActionsCommands()}            
+            ${this.getRowActionsCommands()}
         `.trim();
 
         return result;

@@ -656,9 +656,11 @@ export class ToneCtrl extends KeyboardCtrl {
             <div
                 data-name="chess-wrapper"
                 style="width: 90%; padding-left: 1rem;"
-            ></div>
+            ></div>            
             
-            <br/>           
+            <br/>
+              
+            ${this.getMoveCommandPanel(1.5, false)}                     
            
             <div style="margin: .5rem;">            
                 <b>ДО</b> - С<br/>
