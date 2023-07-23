@@ -989,7 +989,8 @@ export class DrumCtrl extends KeyboardCtrl {
                 ${metronome}
                 ${this.getDrumBoardContent(keyboardId)}
                 ${this.getTopCommandPanel()}
-                ${this.getMoveCommandPanel(1.1)}
+                ${this.getRowActionsCommands()}                
+                ${this.getMoveCommandPanel()}
                 ${this.getDrumNotesPanel()}
                 
                 <div

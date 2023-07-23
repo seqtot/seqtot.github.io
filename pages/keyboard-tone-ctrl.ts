@@ -568,6 +568,47 @@ export class ToneCtrl extends KeyboardCtrl {
         return getVerticalKeyboard('base', type, boardKeys);
     }
 
+    getTopCommandPanel(): string {
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        let result = '';
+
+        result = `
+            <div style="${rowStyle}">
+                <!--span 
+                    style="font-size: 1.5rem; user-select: none; touch-action: none;"
+                    data-page-action="clear"
+                >clr&nbsp;&nbsp;</span-->                
+                <span
+                    style="${style}"
+                    data-page-action="record"
+                >rec</span>
+                <span
+                    style="${style}"
+                >&nbsp;&nbsp;&nbsp;</span>                    
+                <span
+                    style="${style}"
+                    data-action-type="stop"
+                >stop</span>                                        
+                <span
+                    style="${style}"
+                    data-action-type="tick"
+                >1:4</span>
+                <!--span
+                    style="${style}"
+                    data-action-type="tick"
+                >3:4&nbsp;</span-->                    
+                <span
+                    style="${style} color: blue;"
+                    data-page-action="play-one"
+                >play</span>
+            </div>
+        `.trim();
+
+        return result;
+    }
+
     getGuitarContent(type?: 'guitar' | 'bassGuitar', settings?: GuitarSettings): string {
         settings = settings || this.getGuitarSettings();
         type = type || <any>this.type;
@@ -645,22 +686,21 @@ export class ToneCtrl extends KeyboardCtrl {
                 >beat me</div>
             </div>
             
-            <div style="margin: .5rem;">
-                ${this.page.getMetronomeContent()}            
-            </div>
+            ${this.getTopCommandPanel()}
                         
-            <br/>
-                ${this.getTopCommandPanel()}
-            <br/>
+            <div style="margin: .5rem;">
+                ${this.page.getMetronomeContent()}
+                <br/>            
+            </div>
+            
+            ${this.getRowActionsCommands()}            
                         
             <div
                 data-name="chess-wrapper"
                 style="width: 90%; padding-left: 1rem;"
-            ></div>            
-            
-            <br/>
+            ></div>
               
-            ${this.getMoveCommandPanel(1.5, false)}                     
+            ${this.getMoveCommandPanel(1.2)}                     
            
             <div style="margin: .5rem;">            
                 <b>ДО</b> - С<br/>

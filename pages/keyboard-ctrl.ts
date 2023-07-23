@@ -233,7 +233,7 @@ export class KeyboardCtrl {
 
         return `
             <div style="${rowStyle}">
-                ${this.getMoveButtons()}
+                ${this.getMoveButtons(size)}
                 ${delButton}
             </div>
         `.trim();
@@ -275,7 +275,6 @@ export class KeyboardCtrl {
                     data-page-action="play-one"
                 >play</span>
             </div>
-            ${this.getRowActionsCommands()}
         `.trim();
 
         return result;
