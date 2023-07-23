@@ -1,3 +1,5 @@
+import dynamic from '../mbox_dynamics/billy.dynamic';
+
 const score = `
 <settings>
 # pitchShift: -1
@@ -131,4 +133,5 @@ export default {
   content: info,
   tracks: [],
   score,
+  dynamic,
 };
