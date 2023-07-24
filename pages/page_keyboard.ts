@@ -364,8 +364,8 @@ export class KeyboardPage implements Page {
                 this.drumCtrl.tickStartMs = x.startTimeMs;
             }
 
-            if (this.toneCtrl) {
-                this.toneCtrl.tickStartMs = x.startTimeMs;
+            if (this.toneCtrl?.recData) {
+                this.toneCtrl.recData.startTime = x.startTimeMs;
             }
 
             //console.log('start');
