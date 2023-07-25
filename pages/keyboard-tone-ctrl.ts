@@ -1,12 +1,13 @@
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import ideService from './ide/ide-service';
 import * as un from '../libs/muse/utils/utils-note';
-import {KeyData, Line, LineModel, NoteItem} from './line-model';
+import { KeyData, Line, LineModel, NoteItem, CELL_SIZE } from './line-model';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 
 const DOWN = 1;
 const UP = 0;
+const rem = 'rem';
 
 export class ToneCtrl extends KeyboardCtrl {
     instrCode = 162;
@@ -100,22 +101,10 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getTopCommandPanel(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none; touch-action: none;`;
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
 
         let result = '';
-
-        // <span
-        //     style="${actionStyle}"
-        // data-action-type="tick"
-        //     >1:4</span>
-        // &nbsp;&nbsp;
-        // <span
-        //     style="${actionStyle}"
-        // data-action-type="stop"
-        // >stop</span><br/><br/>
-        // <span data-action-tone="record-mode" style="${actionStyle}">rec</span><br/><br/>
 
         result = `
             <div style="${rowStyle}">
@@ -234,7 +223,8 @@ export class ToneCtrl extends KeyboardCtrl {
                 style="width: 90%; padding-left: 1rem;"
             ></div>
               
-            ${this.getMoveCommandPanel(1.2)}                     
+            ${this.getMoveCommandPanel(1.2)}
+            ${this.getDurationCommandPanel(1.2)}                                 
            
             <div style="margin: .5rem;">            
                 <b>ДО</b> - С<br/>
@@ -395,7 +385,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 quarterTime: 0,
                 quarterNio: 0,
                 color: 'gray',
-                color2: 'lightgray',
+                color2: '#eee',
             }
 
             this.recData.sequence.push(this.recData.keys[id]);
@@ -500,16 +490,6 @@ export class ToneCtrl extends KeyboardCtrl {
         getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.deleteRow());
         });
-    }
-
-    moveCell(id: number, value: number) {
-        const result = this.liner.moveCell(id, value);
-
-        if (result) {
-            this.printChess(this.liner.rows);
-            //this.highlightCellByRowCol(`${result.row}-${result.col}`);
-            this.activeCell.id = id;
-        }
     }
 
     getGuitarSettings(): hlp.GuitarSettings {
@@ -749,20 +729,23 @@ export class ToneCtrl extends KeyboardCtrl {
     subscribeEvents() {
         this.subscribeCommonCommands();
         this.subscribeMoveCommands();
+        this.subscribeDurationCommands();
         this.subscribeEditCommands();
         this.subscribeBoardEvents();
     }
 
     getChessCellFor(arr: NoteItem[]): hlp.ChessCell {
         const result: hlp.ChessCell = {
+            colInd: 0,
             noteId: 0,
             cellId: 0,
             char: '',
-            //color: 'white',
-            bgColor: 'lightgray',
+            octave: '',
+            bgColor: '#eee',
             underline: false,
             startOffsetQ: 0,
             totalOffsetQ: 0,
+            durQ: 0,
         }
 
         if (!arr[0]) {
@@ -784,142 +767,11 @@ export class ToneCtrl extends KeyboardCtrl {
         result.cellId = arr[0].id;
         result.char = hlp.mapNoteToChar[char] || '?';
         result.bgColor = octaveColor[octave] || 'gray';
+        result.durQ = arr[0].durQ;
 
         return result;
     }
 
-    printChess(rows: Line[]) {
-        const rem = 'rem';
-        const getMask = (count: number): hlp.ChessCell[] => {
-            const arr = Array(count).fill(null);
-            return arr.map(() => ({
-                bgColor: 'whitesmoke',
-                noteId: 0,
-                cellId: 0,
-                char: '',
-                startOffsetQ: 0,
-                totalOffsetQ: 0,
-                underline: false,
-            }));
-        }
-
-        let totalOut = '';
-        let height = 1.26;
-        let padding = .07;
-        let rowHeight = 1.4;
-
-        rows.forEach((row, iRow) => {
-            const nextRow = rows[iRow + 1];
-            const offsets = this.liner.getOffsetsByRow(row);
-            const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
-            const rowBorderBottom = hasLine ? '1px solid gray;' : 'none;';
-
-            totalOut = totalOut +
-                `<div style="
-                    box-sizing: border-box;
-                    position: relative;
-                    margin: 0;
-                    padding: 0;
-                    font-size: 1.2rem;
-                    line-height: .9rem;
-                    color: white;                    
-                    user-select: none;
-                    padding-top: .07rem;
-                    height: 1.4rem;
-                    border-bottom: ${rowBorderBottom};
-                ">`;
-
-            const cellSizeQ = 10;
-            const cols = getMask(row.durQ / row.cellSizeQ);
-            cols.forEach((col, i) => {
-                col.startOffsetQ = row.startOffsetQ + (cellSizeQ * i);
-                col.totalOffsetQ = col.startOffsetQ + row.blockOffsetQ;
-            });
-
-            for (let offset of offsets) {
-                const iCell = (offset - row.startOffsetQ) / cellSizeQ;
-                const notes = this.liner.getNotesListByOffset(row, offset);
-
-                const col = cols[iCell];
-                const textAndColor = this.getChessCellFor(notes);
-
-                col.cellId = textAndColor.cellId;
-                col.noteId = textAndColor.noteId;
-                col.bgColor = textAndColor.bgColor;
-                col.char = textAndColor.char;
-                col.underline = textAndColor.underline;
-            }
-
-            cols.forEach((col, iCol) => {
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-row="${iRow}"
-                        data-chess-cell-col="${iCol}"
-                        data-chess-cell-row-col="${iRow}-${iCol}"
-                        data-chess-cell-id=""
-                        data-chess-total-offset="${col.totalOffsetQ}"                        
-                        style="
-                            box-sizing: border-box;
-                            border: 1px solid white;
-                            display: inline-block;
-                            z-index: 0;
-                            position: absolute;
-                            width: ${height}${rem};
-                            height: ${height}${rem};
-                            background-color: ${col.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            left: ${iCol * height}${rem};
-                        "
-                    ></span>`.trim();
-            });
-
-            cols.forEach((cell, iCell) => {
-                if (!cell.cellId) return;
-
-                const textDecoration = cell.underline ? 'underline' : 'none';
-                const rem = 'rem';
-
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-row="${iRow}"
-                        data-chess-cell-col="${iCell}"
-                        data-chess-cell-row-col="${iRow}-${iCell}"                                                
-                        data-chess-cell-id="${cell.cellId}"
-                        data-chess-total-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
-                        style="
-                            box-sizing: border-box;
-                            border: 1px solid white;
-                            display: inline-block;
-                            position: absolute;
-                            width: ${height}${rem};
-                            height: ${height}${rem};
-                            background-color: ${cell.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            font-weight: 700;
-                            z-index: 0;
-                            text-decoration: ${textDecoration};
-                            left: ${iCell * height}${rem};
-                        "
-                    >${cell.char}</span>`.trim();
-            });
-
-            totalOut = totalOut + '</div>';
-        });
-
-        const el = dyName('chess-wrapper', this.page.pageEl);
-        if (el) {
-            el.innerHTML = totalOut;
-            el.style.height = `${rows.length * rowHeight}rem`;
-        }
-
-        this.subscribeChess();
-    }
 
     playOne() {
         this.page.stop();
@@ -945,5 +797,182 @@ export class ToneCtrl extends KeyboardCtrl {
             blocks,
             bpm: this.page.bpmValue,
         });
+    }
+
+    getChessLine(count: number): hlp.ChessCell[] {
+        const arr = Array(count).fill(null);
+
+        return arr.map((item ,colInd) => ({
+            colInd,
+            bgColor: 'whitesmoke',
+            noteId: 0,
+            cellId: 0,
+            char: '',
+            startOffsetQ: 0,
+            totalOffsetQ: 0,
+            underline: false,
+            durQ: 0,
+            octave: ''
+        }));
+    }
+
+    printChess(rows: Line[]) {
+        let totalOut = '';
+        let height = 1.26;
+        let width = 1.26;
+        let rowHeight = 1.4;
+
+        const boxedRows: {
+            row: Line,
+            cols: hlp.ChessCell[],
+            cells: hlp.ChessCell[],
+            rowBorderBottom: string,
+        }[] = rows.map((row, iRow) => {
+            const box = { row, cells: [] } as any;
+            const nextRow = rows[iRow + 1];
+            const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
+
+            box.rowBorderBottom = hasLine ? '1px solid gray;' : 'none;';
+
+            box.cols = this.getChessLine(row.durQ / row.cellSizeQ);
+            box.cols.forEach((col, i) => {
+                col.startOffsetQ = row.startOffsetQ + (CELL_SIZE * i);
+                col.totalOffsetQ = col.startOffsetQ + row.blockOffsetQ;
+            });
+
+            const offsets = this.liner.getOffsetsByRow(row);
+
+            for (let offset of offsets) {
+                const iCell = (offset - row.startOffsetQ) / CELL_SIZE;
+                const notes = this.liner.getNotesListByOffset(row, offset);
+
+                const col = box.cols[iCell];
+                const cell = this.getChessCellFor(notes);
+
+                cell.colInd = col.colInd;
+                cell.startOffsetQ = col.startOffsetQ;
+                cell.totalOffsetQ = col.totalOffsetQ;
+                cell.octave = col.octave;
+
+                box.cells.push(cell);
+            }
+
+            return box;
+        });
+
+        // COL - bgColor
+        boxedRows.forEach((box, iRow) => {
+            box.cells.forEach(cell => {
+                let colCount = cell.durQ ? Math.floor(cell.durQ / CELL_SIZE) : 1;
+                let colInd = cell.colInd;
+
+                for (let i = iRow; i < boxedRows.length; i++) {
+                    if (!colCount) break;
+
+                    const row = boxedRows[i];
+
+                    for (let j = colInd; j < row.cols.length; j++) {
+                        if (!colCount) break;
+
+                        const col = row.cols[j];
+                        col.bgColor = '#bbb';
+                        colCount--;
+
+                        if (j === (row.cols.length - 1) ) {
+                            colInd = 0;
+                        }
+                    }
+                }
+            });
+        });
+
+        boxedRows.forEach((box, iRow) => {
+            // ROW
+            totalOut = totalOut +
+                `<div style="
+                    box-sizing: border-box;
+                    position: relative;
+                    margin: 0;
+                    padding: 0;
+                    font-size: 1.2rem;
+                    line-height: .9rem;
+                    color: white;                    
+                    user-select: none;
+                    padding-top: .07rem;
+                    height: 1.4rem;
+                    border-bottom: ${box.rowBorderBottom};
+                ">`;
+
+            // COLS
+            box.cols.forEach(col => {
+                totalOut = totalOut +
+                    `<span
+                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-col="${col.colInd}"
+                        data-chess-cell-row-col="${iRow}-${col.colInd}"
+                        data-chess-cell-id=""
+                        data-chess-total-offset="${col.totalOffsetQ}"                        
+                        style="
+                            box-sizing: border-box;
+                            border: 1px solid white;
+                            display: inline-block;
+                            z-index: 0;
+                            position: absolute;
+                            width: ${width}${rem};
+                            height: ${height}${rem};
+                            background-color: ${col.bgColor};
+                            user-select: none;
+                            touch-action: none;
+                            text-align: center;
+                            left: ${col.colInd * width}${rem};
+                        "
+                    ></span>`.trim();
+            });
+
+            // CELLS
+            box.cells.forEach(cell => {
+                if (!cell.cellId) return;
+
+                const textDecoration = cell.underline ? 'underline' : 'none';
+
+                totalOut = totalOut +
+                    `<span
+                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-col="${cell.colInd}"
+                        data-chess-cell-row-col="${iRow}-${cell.colInd}"                                                
+                        data-chess-cell-id="${cell.cellId}"
+                        data-chess-total-offset="${cell.totalOffsetQ}"
+                        data-chess-cell-with-id-offset="${cell.totalOffsetQ}"
+                        data-chess-cell-with-id-row-col="${iRow}-${cell.colInd}"                                                                        
+                        style="
+                            box-sizing: border-box;
+                            border: 1px solid white;
+                            display: inline-block;
+                            position: absolute;
+                            width: ${width}${rem};
+                            height: ${height}${rem};
+                            background-color: ${cell.bgColor};
+                            user-select: none;
+                            touch-action: none;
+                            text-align: center;
+                            font-weight: 700;
+                            z-index: 0;
+                            text-decoration: ${textDecoration};
+                            left: ${cell.colInd * width}${rem};
+                        "
+                    >${cell.char}</span>`.trim();
+            });
+
+            totalOut = totalOut + '</div>';
+        });
+
+        // UPDATE CHESS
+        const el = dyName('chess-wrapper', this.page.pageEl);
+        if (el) {
+            el.innerHTML = totalOut;
+            el.style.height = `${rows.length * rowHeight}rem`;
+        }
+
+        this.subscribeChess();
     }
 }

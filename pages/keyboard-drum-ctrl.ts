@@ -465,16 +465,6 @@ export class DrumCtrl extends KeyboardCtrl {
         }
     }
 
-    moveCell(id: number, value: number) {
-        const result = this.liner.moveCell(id, value);
-
-        if (result) {
-            this.printChess(this.liner.rows);
-            this.highlightCellByRowCol(`${result.row}-${result.col}`);
-            this.activeCell.id = id;
-        }
-    }
-
     subscribeCommonCommands() {
         const page = this.page;
         const pageEl = this.page.pageEl;

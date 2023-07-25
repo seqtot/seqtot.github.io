@@ -3,7 +3,7 @@ import {getWithDataAttr, getWithDataAttrValue} from '../src/utils';
 import { Synthesizer } from '../libs/muse/synthesizer';
 import { MultiPlayer } from '../libs/muse/multi-player';
 
-import {Line, LineModel} from './line-model';
+import {Line, LineModel, CELL_SIZE} from './line-model';
 import * as un from '../libs/muse/utils'
 import {parseInteger} from '../libs/common';
 
@@ -92,7 +92,36 @@ export class KeyboardCtrl {
     `.trim();
     }
 
-    moveCell(id: number, value: number) {}
+
+    addCellDuration(id: number, value: number) {
+        const result = this.liner.addCellDuration(id, value);
+
+        if (result) {
+            this.printChess(this.liner.rows);
+            this.highlightCellByRowCol(`${result.row}-${result.col}`);
+            this.activeCell.id = id;
+        }
+    }
+
+    moveCell(id: number, value: number) {
+        const result = this.liner.moveCell(id, value);
+
+        if (result) {
+            this.printChess(this.liner.rows);
+            this.highlightCellByRowCol(`${result.row}-${result.col}`);
+            this.activeCell.id = id;
+        }
+    }
+
+    subscribeDurationCommands() {
+        getWithDataAttrValue('action-set-cell-duration', 'add', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, CELL_SIZE));
+        });
+
+        getWithDataAttrValue('action-set-cell-duration', 'sub', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, -CELL_SIZE));
+        });
+    }
 
     subscribeMoveCommands() {
         getWithDataAttrValue('action-move-cell', 'top', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -104,11 +133,11 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttrValue('action-move-cell', 'left', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, -10));
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, -CELL_SIZE));
         });
 
         getWithDataAttrValue('action-move-cell', 'right', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, 10));
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, CELL_SIZE));
         });
     }
 
@@ -192,7 +221,7 @@ export class KeyboardCtrl {
 
     getRowActionsCommands(): string {
         const display = `display: ${ideService.currentEdit?.freezeStructure ? 'none': 'block'};`;
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style = `font-size: 1.1rem; border-radius: 0.25rem; border: 1px solid lightgray; user-select: none; touch-action: none;`;
         const rowStyle = `${display} width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
 
         return `
@@ -216,7 +245,6 @@ export class KeyboardCtrl {
         `.trim();
     }
 
-
     getMoveCommandPanel(size: number = 1, hasDel = true) {
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
@@ -235,6 +263,35 @@ export class KeyboardCtrl {
             <div style="${rowStyle}">
                 ${this.getMoveButtons(size)}
                 ${delButton}
+            </div>
+        `.trim();
+    }
+
+    getDurationCommandPanel(size: number = 1) {
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
+
+        let additional = '';
+        // if (hasDel) {
+        //     delButton = `
+        //         <span
+        //             style="${style} background-color: red; color: white;"
+        //             data-edit-action="delete-cell"
+        //         >del</span>
+        //     `;
+        // }
+
+        return `
+            <div style="${rowStyle}">
+                <span
+                    style="${style}"
+                    data-action-set-cell-duration="add"
+                >&nbsp;+&nbsp;</span>
+                <span
+                    style="${style}"
+                    data-action-set-cell-duration="sub"
+                >&nbsp;-&nbsp;</span>
+                ${additional}
             </div>
         `.trim();
     }

@@ -27,6 +27,7 @@ export const instrName = {
 }
 
 export type ChessCell = {
+    colInd: number,
     noteId: number,
     cellId: number,
     bgColor: string,
@@ -34,8 +35,8 @@ export type ChessCell = {
     startOffsetQ: number,
     totalOffsetQ: number,
     underline: boolean,
-
-    octave?: string,
+    durQ: number,
+    octave: string,
 }
 
 export const lightBgColor = '#eee';

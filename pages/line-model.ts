@@ -3,7 +3,6 @@ import * as un from '../libs/muse/utils/utils-note';
 export type KeyData = {
     quarterTime: number;
     quarterNio: number;
-    //quarterInfo: string;
     code: string;
     note: string;
     down: number;
@@ -47,6 +46,8 @@ type CellCoord = {
     col: number,
 }
 
+export const CELL_SIZE = 10;
+
 export class LineModel {
     rows: Line[] = [];
 
@@ -73,6 +74,28 @@ export class LineModel {
         }
 
         return null as any;
+    }
+
+    addCellDuration(id: number, value: number): CellCoord | null {
+        const info = this.getRowAndCellIndexes(id);
+
+
+        if (!info) {
+            return null;
+        }
+
+        const rows = this.rows;
+        const cell = rows[info.row].cells[info.ind];
+
+        cell.notes.forEach(note => {
+            const newDurQ = note.durQ + value;
+
+            note.durQ = newDurQ > 0 ? newDurQ : 0;
+        });
+
+        //console.log('info', info, cell);
+
+        return info;
     }
 
     moveCell(id: number, value: number): CellCoord | null {
@@ -136,7 +159,7 @@ export class LineModel {
 
         row.cells = row.cells.filter(cell => !!cell.notes.length);
 
-        console.log(row, cells);
+        //console.log(row, cells);
     }
 
     deleteCellByOffset(offsetQ: number) {
@@ -232,7 +255,7 @@ export class LineModel {
             durQ: 120,
             startOffsetQ: 0,
             cells: [],
-            cellSizeQ: 10,
+            cellSizeQ: CELL_SIZE,
             blockOffsetQ: 0,
             rowInPartId: '',
         };
@@ -341,7 +364,7 @@ export class LineModel {
             rows.push({
                 durQ: 120,
                 startOffsetQ: ind * 120,
-                cellSizeQ: 10,
+                cellSizeQ: CELL_SIZE,
                 cells: [],
                 blockOffsetQ: 0,
                 rowInPartId: '',
@@ -403,7 +426,7 @@ export class LineModel {
             }
         });
 
-        console.log('rows', rows);
+        //console.log('rows', rows);
 
         return rows;
     }
@@ -437,7 +460,7 @@ export class LineModel {
             rows.push({
                 durQ: 120,
                 startOffsetQ: ind * 120,
-                cellSizeQ: 10,
+                cellSizeQ: CELL_SIZE,
                 cells: [],
                 blockOffsetQ: 0,
                 rowInPartId: '',
@@ -752,7 +775,7 @@ export class LineModel {
             return '';
         }
 
-        const cellCount = totalDurQ / 10;
+        const cellCount = totalDurQ / CELL_SIZE;
         const quarterCount = Math.floor(cellCount / 12);
 
         const emptyLine = new Array(cellCount).fill(' ');
@@ -843,7 +866,7 @@ export class LineModel {
                     durQ: 120,
                     cells: [],
                     startOffsetQ,
-                    cellSizeQ: 10,
+                    cellSizeQ: CELL_SIZE,
                     blockOffsetQ: 0,
                     rowInPartId: '',
                 });
@@ -855,7 +878,7 @@ export class LineModel {
                     durQ: endLineDurQ,
                     cells: [],
                     startOffsetQ,
-                    cellSizeQ: 10,
+                    cellSizeQ: CELL_SIZE,
                     blockOffsetQ: 0,
                     rowInPartId: '',
                 });
@@ -891,7 +914,7 @@ export class LineModel {
                         durQ: durQ,
                         cells: [],
                         startOffsetQ,
-                        cellSizeQ: 10,
+                        cellSizeQ: CELL_SIZE,
                         endLine: j === rowInBlock -1,
                         blockOffsetQ: 0,
                         rowInPartId: '',
