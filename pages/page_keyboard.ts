@@ -365,7 +365,7 @@ export class KeyboardPage implements Page {
             }
 
             if (this.toneCtrl?.recData) {
-                this.toneCtrl.recData.startTime = x.startTimeMs;
+                this.toneCtrl.recData.startTimeMs = x.startTimeMs;
             }
 
             //console.log('start');

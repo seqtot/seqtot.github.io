@@ -19,13 +19,15 @@ export class ToneCtrl extends KeyboardCtrl {
     memoBuffer: string[] = [];
     memoBuffer2: string[] = [];
     recData: {
-        startTime: number,
-        endTime: number,
+        startTimeMs: number,
+        endTimeMs: number,
         sequence: KeyData[],
+        keys: {[key: string]: KeyData}
     } | null = {
-        startTime: 0,
-        endTime: 0,
-        sequence: []
+        startTimeMs: 0,
+        endTimeMs: 0,
+        sequence: [],
+        keys: {}
     };
 
     constructor(
@@ -325,7 +327,7 @@ export class ToneCtrl extends KeyboardCtrl {
         if (this.isRecMode) {
             this.memoBuffer2 = [...this.memoBuffer];
             // может быть перезаписан при старте таймера
-            this.recData.startTime = Date.now();
+            this.recData.startTimeMs = Date.now();
 
             getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
                 el.style.fontWeight = '700';
@@ -348,17 +350,17 @@ export class ToneCtrl extends KeyboardCtrl {
 
     getOut(bpm: number, data: ToneCtrl['recData'] ) {
         data.sequence.forEach((item, i) => {
-            const next = data.sequence[i];
+            const next = data.sequence[i+1];
 
             if (next) {
                 item.next = next.down;
             } else {
-                item.next = data.endTime;
+                item.next = data.endTimeMs;
             }
         });
 
         const rows = LineModel.GetToneLineModelFromRecord(
-            bpm, data.startTime, data.sequence
+            bpm, data.startTimeMs, data.sequence
         );
         this.liner.setData(rows);
         this.printChess(rows);
@@ -366,9 +368,10 @@ export class ToneCtrl extends KeyboardCtrl {
 
     clearRecordData() {
         this.recData = {
-            startTime: 0,
-            endTime: 0,
-            sequence: []
+            startTimeMs: 0,
+            endTimeMs: 0,
+            sequence: [],
+            keys: {},
         };
     }
 
@@ -382,7 +385,7 @@ export class ToneCtrl extends KeyboardCtrl {
         if (type === DOWN && this.memoBuffer2.length) {
             const note = this.memoBuffer2.shift();
 
-            this.recData[id] = {
+            this.recData.keys[id] = {
                 note,
                 char: note[0],
                 code: note,
@@ -395,7 +398,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 color2: 'lightgray',
             }
 
-            this.recData.sequence.push(this.recData[id]);
+            this.recData.sequence.push(this.recData.keys[id]);
 
             ideService.synthesizer.playSound({
                 id,
@@ -406,26 +409,45 @@ export class ToneCtrl extends KeyboardCtrl {
             return;
         }
 
-        if (type === UP && this.recData[id]) {
-            this.recData[id].up = time;
+        if (type === UP && this.recData.keys[id]) {
+            this.recData.keys[id].up = time;
 
             ideService.synthesizer.playSound({
                 id,
-                keyOrNote: this.recData[id].note,
+                keyOrNote: this.recData.keys[id].note,
                 onlyStop: true,
             });
 
-            this.recData[id] = null;
+            this.recData.keys[id] = null;
 
             return;
         }
 
         if (!this.memoBuffer2.length && type === DOWN) {
-            this.recData.endTime = time;
+            this.recData.endTimeMs = time;
+
+            Object.keys(this.recData.keys).forEach(id => {
+                const item = this.recData.keys[id];
+
+                if (!item) {
+                    return;
+                }
+
+                item.next = time;
+
+                ideService.synthesizer.playSound({
+                    id,
+                    keyOrNote: this.recData.keys[id].note,
+                    onlyStop: true,
+                });
+
+                this.recData.keys[id] = null;
+            });
 
             this.getOut(this.page.bpmValue, this.recData);
             this.page.stopTicker();
-            this.toggleRecord();
+
+            setTimeout(() => this.toggleRecord(), 500);
 
             return;
         }
