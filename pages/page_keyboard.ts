@@ -197,22 +197,16 @@ export class KeyboardPage implements Page {
 
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-                ${this.getTracksContent()}                
-                <div data-name="setContent">
-                    ${this.toneCtrl.getContent(type)}
-                </div>
+                <!-- ${this.getTracksContent()} -->                
+                ${this.toneCtrl.getContent(type)}
             </div>`.trim();
-
-        //${this.setInfo.content}
 
         this.el$.html(content);
 
         this.bpmRange = (this.context.$f7 as any).range.create({
-            // jjkl
             el: dyName('slider', this.pageEl),
             on: {
                 changed: (range: any) => {
-                    //console.log('range.onChange', range); // jjkl
                     this.bpmValue = range.value;
 
                     if (this.playingTick) {

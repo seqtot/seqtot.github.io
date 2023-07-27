@@ -115,24 +115,25 @@ export class ToneCtrl extends KeyboardCtrl {
     getBeatContent(): string {
         const actionStyle = `border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
 
-        return `<div
+        return `
+        <div
             data-action-tone="record-beat-wrapper"
-            style="margin: .5rem; display: none; width: 90%;"
-            >
+            style="margin: .5rem; display: none; width: 80%;"
+        >
             <div
                 data-action-tone="record-beat"
                 data-id="beat1"
-                style="${actionStyle} height: 6rem; width: 100%; background-color: whitesmoke;  margin: 0;"
+                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke;  margin: 0;"
             >beat me</div>
             <div
                 data-action-tone="record-beat"
                 data-id="beat2"
-                style="${actionStyle} height: 6rem; width: 100%; background-color: whitesmoke; margin: 0;"
+                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin: 0;"
             >beat me</div>
             <div
                 data-action-tone="record-beat"
                 data-id="beat3"
-                style="${actionStyle} height: 6rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
+                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
             >beat me</div>                
         </div>`.trim();
     }
