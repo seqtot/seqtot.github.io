@@ -132,4 +132,5 @@ const content = `
 export default {
   content,
   tracks: [],
+  isSongList: true,
 };

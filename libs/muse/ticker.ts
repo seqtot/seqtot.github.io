@@ -172,7 +172,9 @@ export class Ticker {
 
     createTickSource(x: {
         qms: number,
-        preset: WavePreset,
+        signature?: string,
+        preset1: WavePreset,
+        preset2?: WavePreset,
         cb: (x: {
             ab: AudioBufferSourceNode,
             startTimeMs: number
@@ -188,11 +190,34 @@ export class Ticker {
         let offset = 0;
 
         for (let i=0; i<repeat; i++) {
-            const soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
-            soundSource.buffer = x.preset.zones[0].buffer;
-            soundSource.connect(offlineCtx.destination);
-            soundSource.start(currentTime + offset);
-            offset = offset + qmsSec;
+            if (x.signature !== '3:4') {
+                const soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+                soundSource.buffer = x.preset1.zones[0].buffer;
+                soundSource.connect(offlineCtx.destination);
+                soundSource.start(currentTime + offset);
+                offset = offset + qmsSec;
+            }
+            else if (x.signature === '3:4') {
+                const qmsHalfSec = qmsSec / 2;
+
+                let soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+                soundSource.buffer = x.preset1.zones[0].buffer;
+                soundSource.connect(offlineCtx.destination);
+                soundSource.start(currentTime + offset);
+                offset = offset + qmsHalfSec;
+
+                soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+                soundSource.buffer = x.preset2.zones[0].buffer;
+                soundSource.connect(offlineCtx.destination);
+                soundSource.start(currentTime + offset);
+                offset = offset + qmsHalfSec;
+
+                soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+                soundSource.buffer = x.preset2.zones[0].buffer;
+                soundSource.connect(offlineCtx.destination);
+                soundSource.start(currentTime + offset);
+                offset = offset + qmsHalfSec;
+            }
         }
 
         offlineCtx

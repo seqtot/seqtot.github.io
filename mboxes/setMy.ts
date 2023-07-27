@@ -132,5 +132,6 @@ const content = `
 export default {
   content: '',
   tracks: [],
-  source: 'my'
+  source: 'my',
+  isSongList: true,
 };

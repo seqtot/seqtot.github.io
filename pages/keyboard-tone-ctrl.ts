@@ -87,9 +87,7 @@ export class ToneCtrl extends KeyboardCtrl {
                     style="${style}"
                     data-action-tone="record-mode"
                 >rec</span>
-                <span
-                    style="${style}"
-                >&nbsp;&nbsp;&nbsp;</span>                    
+                &nbsp;&nbsp;
                 <span
                     style="${style}"
                     data-action-type="stop"
@@ -97,11 +95,13 @@ export class ToneCtrl extends KeyboardCtrl {
                 <span
                     style="${style}"
                     data-action-type="tick"
+                    data-signature="1:4"
                 >1:4</span>
-                <!--span
+                <span
                     style="${style}"
                     data-action-type="tick"
-                >3:4&nbsp;</span-->                    
+                    data-signature="3:4"                    
+                >3:4</span>                    
                 <span
                     style="${style} color: blue;"
                     data-page-action="play-one"
@@ -135,6 +135,11 @@ export class ToneCtrl extends KeyboardCtrl {
                 data-id="beat3"
                 style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
             >beat me</div>                
+            <div
+                data-action-tone="record-beat"
+                data-id="beat4"
+                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
+            >beat me</div>            
         </div>`.trim();
     }
 

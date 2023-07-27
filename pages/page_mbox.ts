@@ -16,29 +16,144 @@ import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
 import * as hlp from './keyboard-tone-ctrl-helper';
 
-
 const ns = {
     setBmpAction: 'set-bmp-action',
     setNote: 'set-note',
 };
 
+type SongPage = {
+    content: string,
+    break: string,
+    drums: string,
+    tracks: { key: string; value: string; name: string }[],
+    hideMetronome?: boolean,
+    score: string,
+    parts: {name: string, id: string}[],
+    dynamic: {
+        [key: string]: {
+            [key: string]: {
+                items: any[]
+            }
+        }
+    },
+    source: 'my' | 'band',
+    isSongList?: boolean,
+};
+
+
 class SongStore {
-    static getMySongs(): {id: string, name: string}[] {
+    static getSongs(): {id: string, name: string}[] {
         if (!localStorage.getItem(`my-songs`)) {
-            this.setMySongs([]);
+            this.setSongs([]);
         }
 
         return JSON.parse(localStorage.getItem(`my-songs`));
     }
 
-    static setMySongs(songs: {id: string, name: string}[]) {
+    static getSong(id: string, create = false): SongPage {
+        function normalize(song: SongPage) {
+            if (!song) return song;
+
+            song.parts = Array.isArray(song.parts) ? song.parts : [];
+            song.dynamic = song.dynamic ? song.dynamic : {};
+
+            return song;
+        }
+
+        let song: SongPage = normalize(JSON.parse(localStorage.getItem(`[my-song]${id}`)));
+
+        if (song || !create) {
+            return song;
+        }
+
+        SongStore.setSong(id, SongStore.getEmptySong());
+
+        return normalize(JSON.parse(localStorage.getItem(`[my-song]${id}`)));
+    }
+
+    static setSong(id: string, data: SongPage) {
+        localStorage.setItem(`[my-song]${id}`, JSON.stringify(data));
+    }
+
+    static getEmptySong(): SongPage {
+        return {
+            content: '',
+            break: '',
+            drums: '',
+            tracks: [],
+            hideMetronome: false,
+            parts: [],
+            score: `
+            <settings>
+            $bass: v30; $organ: v50; $guit: v50;
+            <out b100>
+            `.trim(),
+            dynamic: {},
+            source: 'my'
+        };
+    }
+
+    static setSongs(songs: {id: string, name: string}[]) {
         localStorage.setItem(`my-songs`, JSON.stringify(songs));
+    }
+
+    static addPart(songId: string, name: string): {name: string, id: string} {
+        name = (name || '').trim();
+
+        if (!name) return;
+
+        let id = '';
+        let song = SongStore.getSong(songId, true);
+        song.parts = Array.isArray(song.parts) ? song.parts : [];
+
+        while (!id) {
+            const guid = un.guid(2);
+
+            let parts = song.parts.filter(item => item.id === guid);
+
+            if (!parts.length) {
+                id = guid;
+            }
+        }
+
+        const part = {name, id};
+        song.parts.push(part);
+
+        SongStore.setSong(songId, song);
+
+        return part;
+    }
+
+    static addSong(name: string): {name: string, id: string} {
+        name = (name || '').trim();
+
+        if (!name) return;
+
+        let id = '';
+        let items = SongStore.getSongs();
+
+        while (!id) {
+            const guid = un.guid(2);
+
+            let songs = items.filter(item => item.id === guid);
+
+            if (!songs.length) {
+                id = guid;
+            }
+        }
+
+        const song = {name, id};
+        items.push(song);
+
+        SongStore.setSongs(items);
+
+        return song;
     }
 }
 
 
 export class MBoxPage {
-    view: 'info' | 'drums' = 'info';
+    view: 'list' | 'song' = 'list';
     bpmValue = 100;
     playingTick = '';
     bpmRange: Range.Range;
@@ -64,22 +179,13 @@ export class MBoxPage {
         return this.context.$el.value;
     }
 
-    get pageData(): {
-        content: string;
-        break: string;
-        drums: string;
-        tracks: { key: string; value: string; name: string }[];
-        hideMetronome?: boolean;
-        score: string;
-        dynamic: {[key: string]: {
-            [key: string]: {
-                    items: any[]
-                }
-            }
+    get pageData(): SongPage {
+
+        if (mboxes[this.songId]) {
+            return mboxes[this.songId];
         }
-        source: 'my' | 'band'
-    } {
-        return mboxes[this.songId];
+
+        return SongStore.getSong(this.songId, true);
     }
 
     get outBlock(): TextBlock {
@@ -87,11 +193,21 @@ export class MBoxPage {
     }
 
     get topOutParts(): string[] {
+        if (this.pageData.source === 'my') {
+            const song = SongStore.getSong(this.songId, true);
+
+            console.log('SONG', this.songId, song);
+
+            return song.parts.map((item, i) => {
+                return `${item.name} %${item.id} №${i+1}`;
+            });
+        }
+
         if (!Array.isArray(this.blocks) || !this.blocks.length) {
             return [];
         }
 
-        return  getTopOutList({topBlock: this.outBlock});
+        return  getTopOutList({topBlock: this.outBlock, printN: true});
     }
 
     getId(id: string): string {
@@ -145,30 +261,48 @@ export class MBoxPage {
         return metronomeView;
     }
 
-    getMyPageContent(): string {
-        return `
-            <div style="padding: 1rem .5rem 1rem .5rem;">
-                ${this.getMetronomeContent()}
-            </div>
-            
-            <div style="margin: .5rem 1rem;">
+    getListPageContent(): string {
+        let content = this.pageData.content;
+
+        function getInnerLink(name: string, href: string): string {
+            return `<a class="link" href="${href}">${name}</a>`;
+        }
+
+        if (this.pageData.source === 'my') {
+            content = '';
+            const songs = SongStore.getSongs();
+
+            songs.forEach(song => {
+                const link = getInnerLink(song.name, `/mbox/${song.id}/`);
+                content += `<div style="margin: .5rem;">${link} (${song.id})</div>`;
+            });
+        }
+
+        let addSong = this.pageData.source === 'my'
+            ? `<div style="margin: .5rem 1rem;">
                 <a data-action-type="add-song"><b>add song</b></a>&emsp;                
-            </div>
-                        
-            <div data-name="pageContent">
-                ${this.pageData.content}
-            </div>
+            </div>`.trim()
+        : '';
+
+        let metronome = `
+            <div style="padding: 1rem .5rem 1rem .5rem;">${this.getMetronomeContent()}</div>        
+        `.trim();
+
+        return `
+            ${metronome}
+            ${addSong}                        
+            <div data-name="pageContent">${content}</div>
         `.trim();
     }
 
-    getBandPageContent(): string {
+    getSongPageContent(): string {
         return `
             <div style="padding: 1rem .5rem 1rem .5rem;">
                 ${this.getMetronomeContent()}
             </div>
             
             ${this.getInstrumentsContent()}                
-            ${this.getTracksContent()}
+            ${this.getSongPartsContent()}
             
             <div data-name="pageContent">
                 ${this.pageData.content}
@@ -177,7 +311,8 @@ export class MBoxPage {
     }
 
     setPageContent() {
-        this.view = 'info';
+        this.view = this.pageData.isSongList ? 'list' : 'song';
+
         this.blocks = un.getTextBlocks(this.pageData.score) || [];
         this.settings = getFileSettings(this.blocks);
         this.pitchShift = un.parseInteger(this.settings.pitchShift[0]);
@@ -191,10 +326,11 @@ export class MBoxPage {
         `.trim();
         let content = '';
 
-        if (this.pageData.source === 'my') {
-            content = wrapper.replace('%content%', this.getMyPageContent());
-        } else {
-            content = wrapper.replace('%content%', this.getBandPageContent());
+        if (this.pageData.isSongList) {
+            content = wrapper.replace('%content%', this.getListPageContent());
+        }
+        else {
+            content = wrapper.replace('%content%', this.getSongPageContent());
         }
 
         this.el$.html(content);
@@ -214,7 +350,7 @@ export class MBoxPage {
         });
 
         setTimeout(() => {
-            this.subscribeViewInfoEvents();
+            this.subscribeEvents();
             this.bpmValue = this.outBlock?.bpm || 100;
             this.bpmRange.setValue(this.bpmValue);
         }, 100);
@@ -243,30 +379,45 @@ export class MBoxPage {
         return result;
     }
 
-    getTracksContent(): string {
+
+    getSongPartsContent(): string {
         let topOutParts = this.topOutParts;
+        const isMy = this.pageData.source === 'my';
+
+        let addPart = `<a data-action-type="add-part"><b>add part</b></a>&emsp;`;
+        addPart = isMy ? addPart : '';
+
+        const commandsWrapper = `
+            <div style="margin: .5rem 1rem;">
+                %content%
+            </div>        
+        `.trim();
+
+        let commands = `
+            <a data-action-type="select-all"><b>selectAll</b></a>&emsp;
+            <a data-action-type="unselect-all"><b>unselect</b></a>&emsp;
+            <a data-action-type="stop"><b>stop</b></a>&emsp;                                                
+            <a data-action-type="play-all"><b>play</b></a>&emsp;
+            <a data-action-type="edit-selected"><b>edit</b></a>&emsp;
+            ${addPart}                                
+        `.trim();
 
         if (!topOutParts.length) {
-            return '';
+            commands = addPart;
         }
 
-        let stopAndPlayActions = `
-            <div style="margin: .5rem 1rem;">
-                <a data-action-type="select-all"><b>selectAll</b></a>&emsp;
-                <a data-action-type="unselect-all"><b>unselect</b></a>&emsp;
-                <a data-action-type="stop"><b>stop</b></a>&emsp;                                                
-                <a data-action-type="play-all"><b>play</b></a>&emsp;
-                <a data-action-type="edit-selected"><b>edit</b></a>&emsp;                
-            </div>`.trim();
+        commands = commandsWrapper.replace('%content%', commands);
 
         let tracks = topOutParts.reduce((acc, item, i) => {
+            const info = un.getPartInfo(item);
+
             acc = acc + `
                 <div class="row">
                     <span
                         style="margin-left: 1rem; font-weight: 700; user-select: none;"
                         data-part-nio="${i+1}"
-                        data-part-ref="${item}"                        
-                    >${item}</span>
+                        data-part-ref="${info.ref}"                        
+                    >${info.nio}&nbsp;&nbsp;${info.ref}</span>
                     <span
                         style="margin-right: 1rem; user-select: none;"
                         data-part-nio="${i+1}"
@@ -278,7 +429,7 @@ export class MBoxPage {
                 return acc;
             }, '');
 
-        return stopAndPlayActions + tracks  + stopAndPlayActions;
+        return commands + tracks  + (topOutParts.length > 5 ? commands : '');
     }
 
     playTick(name?: string) {
@@ -308,7 +459,7 @@ export class MBoxPage {
         });
     }
 
-    subscribeViewInfoEvents() {
+    subscribeEvents() {
         this.subscribePageEvents();
         this.subscribeMetronomeEvents();
         this.subscribeTrackEvents();
@@ -394,11 +545,40 @@ export class MBoxPage {
     dialog: Dialog.Dialog;
     prompt: Dialog.Dialog;
 
-    addMySong(name: string) {
-        console.log('addMySong', name);
+    addSong(name: string) {
+        const song = SongStore.addSong(name);
+        this.setPageContent();
+    }
+
+    addPart(name: string) {
+        const part = SongStore.addPart(this.songId, name);
+        this.setPageContent();
     }
 
     subscribePageEvents() {
+        getWithDataAttrValue('action-type', 'add-part', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => {
+                // this.dialog = (this.context.$f7 as any).dialog.create({
+                //     text: 'Hello World',
+                //     on: {
+                //         opened: function () {
+                //             console.log('Dialog opened')
+                //         }
+                //     }
+                // });
+
+                this.prompt = (this.context.$f7 as any).dialog.prompt(
+                    'Название только буквами, цифрами, знаками - или _ (без пробелов)',
+                    'Наименование',
+                    (name) => this.addPart(name),
+                    () => {}, // cancel
+                    ''
+                );
+
+                this.prompt.open();
+            });
+        });
+
         getWithDataAttrValue('action-type', 'add-song', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => {
                 // this.dialog = (this.context.$f7 as any).dialog.create({
@@ -412,8 +592,8 @@ export class MBoxPage {
 
                 this.prompt = (this.context.$f7 as any).dialog.prompt(
                     'Название только буквами, цифрами, знаками - или _ (без пробелов)',
-                    'Новая композиция',
-                    (name) => this.addMySong(name),
+                    'Наименование',
+                    (name) => this.addSong(name),
                     () => {}, // cancel
                     ''
                 );
@@ -594,6 +774,6 @@ export class MBoxPage {
 }
 
 // action-type:
-// add-song
+// add-song  add-part
 // stop
 // select-all  unselect-all  play-all  edit-selected

@@ -322,11 +322,13 @@ export class KeyboardCtrl {
                 <span
                     style="${style}"
                     data-action-type="tick"
+                    data-signature="1:4"
                 >1:4</span>
-                <!--span
+                <span
                     style="${style}"
                     data-action-type="tick"
-                >3:4&nbsp;</span-->                    
+                    data-signature="3:4"                    
+                >3:4</span>                    
                 <span
                     style="${style} color: blue;"
                     data-page-action="play-one"

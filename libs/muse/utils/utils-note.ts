@@ -615,20 +615,54 @@ export function getNoteByOffset(
     return noteOrder[index + offset] || '';
 }
 
-function getPartNioAndRef(val: string): {
-    partNio: number,
+export function getPartInfo(val: string): {
+    nio: number,
     ref: string,
+    id: string,
+    info: string,
 } {
     val = (val || '').trim();
     const arr = val.split(' ').filter(item => item);
 
-    const partNio = parseInteger(
-        (arr.find(item => item.startsWith(nioChar)) || '').replace(nioChar, '').split('-')[0], 0
-    );
+    let id = '';
+    let ref = '';
+    let nio = 0;
+    let info = '';
 
-    const ref = arr.find(item => !item.startsWith(nioChar) && !item.startsWith('[')) || ''
+    arr.forEach(item => {
+        // id
+        if (item.startsWith('%')) {
+            if (!id) {
+                id = item.replace('%', '');
+            }
 
-    return {ref, partNio};
+            return;
+        }
+
+        // partNio
+        if (item.startsWith(nioChar)) {
+            if (!nio) {
+                nio = parseInteger(item.replace(nioChar, '').split('-')[0], 0);
+            }
+
+            return;
+        }
+
+        // info
+        if (item.startsWith('[')) {
+            if (!info) {
+               info  = item.replace(/[\[\]]/g, '');
+            }
+
+            return;
+        }
+
+        ref = item;
+    });
+
+    id = id || ref;
+
+    return {id, ref, nio, info};
 }
 
 export function getNRowInPartId(part: number, row?: number): string {
@@ -644,7 +678,7 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
 
     // строка может содержать номер части (№1 и т.п.)
     rows.forEach(rowItem => {
-        const info = getPartNioAndRef(rowItem);
+        const info = getPartInfo(rowItem);
         //console.log('rowInfo', info);
 
         const block = blocks.find(block => block.id === info.ref);
@@ -657,7 +691,7 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
 
         if (block.type === 'tones' || block.type === 'drums') {
             rowInBlockNio++;
-            const N = getNRowInPartId(info.partNio, rowInBlockNio);
+            const N = getNRowInPartId(info.nio, rowInBlockNio);
 
             result.push(`${info.ref} ${N}`);
         } else if (block.type === 'set') {
@@ -667,7 +701,7 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
                 .filter(item => !!(item && !item.startsWith('#')))
                 .map(item => {
                     rowInBlockNio++;
-                    const N = getNRowInPartId(info.partNio, rowInBlockNio);
+                    const N = getNRowInPartId(info.nio, rowInBlockNio);
 
                     return `${item} ${N}`;
                 });
@@ -721,6 +755,20 @@ export function createOutBlock({bpm, volume, currBlock, rows, id, type}: {
             ...rows,
         ],
     };
+}
+
+export function guid(length: number = 10) {
+    let value = '';
+
+    while(value.length < length) {
+        value =
+            Math.random().toString(36).slice(2).replace(/\d/g, '') +
+            Math.random().toString(36).slice(2).replace(/\d/g, '') +
+            Math.random().toString(36).slice(2).replace(/\d/g, '')
+        ;
+    }
+
+    return value.slice(0, length);
 }
 
 

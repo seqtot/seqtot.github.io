@@ -151,7 +151,7 @@ export class KeyboardPage implements Page {
         });
 
         getWithDataAttrValue('action-type', 'tick', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => this.playTick3());
+            el.addEventListener('click', () => this.playTick3(el.dataset['signature']));
         });
 
         getWithDataAttrValue('action-type', 'test', this.pageEl)?.forEach((el) => {
@@ -346,9 +346,7 @@ export class KeyboardPage implements Page {
         }
     }
 
-    playTick3() {
-        console.log('playTick3');
-
+    playTick3(signature?: string) {
         this.stopTicker();
 
         const cb = (x: {ab: AudioBufferSourceNode, startTimeMs: number}) => {
@@ -371,8 +369,10 @@ export class KeyboardPage implements Page {
 
         ideService.ticker.createTickSource({
             qms: Math.round(60000/ this.bpmValue),
-            preset: ideService.synthesizer.instruments['drum_56'],
+            preset1: ideService.synthesizer.instruments['drum_56'],
+            preset2: ideService.synthesizer.instruments['drum_80'],
             repeat: 100,
+            signature,
             cb,
         });
     }

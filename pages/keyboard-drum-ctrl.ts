@@ -892,11 +892,12 @@ export class DrumCtrl extends KeyboardCtrl {
 
         rowsByParts.forEach(rowsByPart => {
             const partNio = rowsByPart[0].partNio;
+            const partInfo = un.getPartInfo(currentEdit.topOutParts[partNio - 1]);
 
             editingPartsContent += `
                 <div >
                     <span style="margin: .5rem; font-weight: 600;"
-                    >${currentEdit.topOutParts[partNio - 1]}-${partNio}</span>
+                    >${partInfo.nio}-${partInfo.ref}</span>
             `.trim();
 
             rowsByPart.forEach(info => {
