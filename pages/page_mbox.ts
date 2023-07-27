@@ -1,6 +1,7 @@
 import { Props } from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
 import { Range } from 'framework7/components/range/range';
+import { Dialog } from 'framework7/components/dialog/dialog';
 import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
@@ -13,11 +14,28 @@ import { isPresent, parseInteger, TextBlock } from '../libs/muse/utils/utils-not
 import { LineModel } from './line-model';
 import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
+import * as hlp from './keyboard-tone-ctrl-helper';
+
 
 const ns = {
     setBmpAction: 'set-bmp-action',
     setNote: 'set-note',
 };
+
+class SongStore {
+    static getMySongs(): {id: string, name: string}[] {
+        if (!localStorage.getItem(`my-songs`)) {
+            this.setMySongs([]);
+        }
+
+        return JSON.parse(localStorage.getItem(`my-songs`));
+    }
+
+    static setMySongs(songs: {id: string, name: string}[]) {
+        localStorage.setItem(`my-songs`, JSON.stringify(songs));
+    }
+}
+
 
 export class MBoxPage {
     view: 'info' | 'drums' = 'info';
@@ -59,6 +77,7 @@ export class MBoxPage {
                 }
             }
         }
+        source: 'my' | 'band'
     } {
         return mboxes[this.songId];
     }
@@ -68,6 +87,10 @@ export class MBoxPage {
     }
 
     get topOutParts(): string[] {
+        if (!Array.isArray(this.blocks) || !this.blocks.length) {
+            return [];
+        }
+
         return  getTopOutList({topBlock: this.outBlock});
     }
 
@@ -122,29 +145,57 @@ export class MBoxPage {
         return metronomeView;
     }
 
+    getMyPageContent(): string {
+        return `
+            <div style="padding: 1rem .5rem 1rem .5rem;">
+                ${this.getMetronomeContent()}
+            </div>
+            
+            <div style="margin: .5rem 1rem;">
+                <a data-action-type="add-song"><b>add song</b></a>&emsp;                
+            </div>
+                        
+            <div data-name="pageContent">
+                ${this.pageData.content}
+            </div>
+        `.trim();
+    }
+
+    getBandPageContent(): string {
+        return `
+            <div style="padding: 1rem .5rem 1rem .5rem;">
+                ${this.getMetronomeContent()}
+            </div>
+            
+            ${this.getInstrumentsContent()}                
+            ${this.getTracksContent()}
+            
+            <div data-name="pageContent">
+                ${this.pageData.content}
+            </div>
+        `.trim();
+    }
+
     setPageContent() {
         this.view = 'info';
         this.blocks = un.getTextBlocks(this.pageData.score) || [];
         this.settings = getFileSettings(this.blocks);
         this.pitchShift = un.parseInteger(this.settings.pitchShift[0]);
 
-        //console.log('settings', this.settings);
-        //console.log('this.blocks', this.blocks);
-
-        const content = `
-            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-                <div style="padding: 1rem .5rem 1rem .5rem;">
-                    ${this.getMetronomeContent()}
-                </div>
-                
-                ${this.getInstrumentsContent()}                
-                ${this.getTracksContent()}
-                
-                <div data-name="pageContent">
-                    ${this.pageData.content}
-                </div>
-            </div>
+        const wrapper = `
+            <div
+                class="page-content"
+                style="padding-top: 0;
+                padding-bottom: 2rem;"
+            >%content%</div>
         `.trim();
+        let content = '';
+
+        if (this.pageData.source === 'my') {
+            content = wrapper.replace('%content%', this.getMyPageContent());
+        } else {
+            content = wrapper.replace('%content%', this.getBandPageContent());
+        }
 
         this.el$.html(content);
 
@@ -164,7 +215,7 @@ export class MBoxPage {
 
         setTimeout(() => {
             this.subscribeViewInfoEvents();
-            this.bpmValue = this.outBlock.bpm;
+            this.bpmValue = this.outBlock?.bpm || 100;
             this.bpmRange.setValue(this.bpmValue);
         }, 100);
     }
@@ -183,15 +234,21 @@ export class MBoxPage {
             `.trim();
         })
 
-        return `
+        const result =  `
             <div style="margin: .5rem 1rem;">
                 ${items}                
             </div>        
         `.trim();
+
+        return result;
     }
 
     getTracksContent(): string {
         let topOutParts = this.topOutParts;
+
+        if (!topOutParts.length) {
+            return '';
+        }
 
         let stopAndPlayActions = `
             <div style="margin: .5rem 1rem;">
@@ -332,41 +389,38 @@ export class MBoxPage {
                 this.gotoEdit(partNio);
             });
         });
+    }
 
-        // this.pageData.tracks.forEach((item) => {
-        //     byId(`${this.getId('action-play-' + item.key)}`).addEventListener(
-        //         'click',
-        //         (evt: MouseEvent) => {
-        //             //console.log('subscribViewDrumsEvents', item.key);
-        //
-        //             const track = this.pageData.tracks.find(
-        //                 (track) => track.key === item.key
-        //             );
-        //
-        //             if (!track) return;
-        //
-        //             this.play(track.value);
-        //         }
-        //     );
-        // });
+    dialog: Dialog.Dialog;
+    prompt: Dialog.Dialog;
+
+    addMySong(name: string) {
+        console.log('addMySong', name);
     }
 
     subscribePageEvents() {
-        // dyName('action-drums', dyName('panel-right-content')).addEventListener(
-        //     'click',
-        //     () => {
-        //         //console.log('action-info');
-        //         this.setViewDrums();
-        //     }
-        // );
+        getWithDataAttrValue('action-type', 'add-song', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => {
+                // this.dialog = (this.context.$f7 as any).dialog.create({
+                //     text: 'Hello World',
+                //     on: {
+                //         opened: function () {
+                //             console.log('Dialog opened')
+                //         }
+                //     }
+                // });
 
-        // dyName('action-info', dyName('panel-right-content')).addEventListener(
-        //     'click',
-        //     () => {
-        //         //console.log('action-info');
-        //         this.setPageContent();
-        //     }
-        // );
+                this.prompt = (this.context.$f7 as any).dialog.prompt(
+                    'Название только буквами, цифрами, знаками - или _ (без пробелов)',
+                    'Новая композиция',
+                    (name) => this.addMySong(name),
+                    () => {}, // cancel
+                    ''
+                );
+
+                this.prompt.open();
+            });
+        });
 
         getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
             el.addEventListener('pointerdown', () => {
@@ -538,3 +592,8 @@ export class MBoxPage {
         });
     }
 }
+
+// action-type:
+// add-song
+// stop
+// select-all  unselect-all  play-all  edit-selected

@@ -12,7 +12,6 @@ import Framework7 from 'framework7/bundle';
 // import 'framework7/components/panel/css';
 // Framework7.use([Range, Panel]);
 
-import { mboxOldRc } from './mbox-old-rc';
 import { pageRc } from './page-rc';
 
 const appEl = document.getElementById('app');
@@ -30,8 +29,8 @@ const defRoute = isDev ? '/page/page_keyboard/' : '/set/set_all/';
 //const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
 const linksToPage = [
-  { href: '/set/set_all/', name: 'Список' },
-  { href: '/set/page_my/', name: 'Мои вещи' },
+  { href: '/mbox/setBand/', name: 'Список' },
+  { href: '/mbox/setMy/', name: 'Мои вещи' },
   { href: '/page/page_roll/', name: 'roll', isDev: true },
   { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
   { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
@@ -147,10 +146,10 @@ const app = new Framework7({
     // swipe: true,
   },
   routes: [
-    {
-      path: '/set/:id',
-      component: mboxOldRc,
-    },
+    // {
+    //   path: '/set/:id',
+    //   component: mboxOldRc,
+    // },
     {
       path: '/page/:id',
       component: pageRc,

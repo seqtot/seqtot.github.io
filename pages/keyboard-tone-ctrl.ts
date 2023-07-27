@@ -48,35 +48,6 @@ export class ToneCtrl extends KeyboardCtrl {
         }
     }
 
-    getHarmonicaContent(): string {
-        let wrapper = `
-            <div style="margin: .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                ${hlp.getVerticalKeyboard('base', 'bassHarmonica', hlp.bassKeys)}
-                ${hlp.getVerticalKeyboard('solo', 'soloHarmonica', hlp.soloKeys)}
-                <div 
-                    style="font-size: 2rem;
-                    font-family: monospace;
-                    width: 100%;
-                    position: absolute;
-                    top: 0;
-                    pointer-events: none;
-                    user-select: none;
-                    touch-action: none;
-                    padding-left: .5rem;"
-                    data-type="text-under-board"
-                >
-                    ${hlp.getPatternsList()}
-                </div>            
-            </div>
-            <div
-                data-name="chess-wrapper"
-                style="width: 90%; padding-left: 1rem;"
-            ></div>
-        `.trim();
-
-        return wrapper;
-    }
-
     getGuitarBoardContent(type?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
         settings = settings || this.getGuitarSettings();
 
@@ -141,18 +112,62 @@ export class ToneCtrl extends KeyboardCtrl {
         return result;
     }
 
-    getGuitarContent(type?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
-        settings = settings || this.getGuitarSettings();
-        type = type || <any>this.type;
+    getBeatContent(): string {
+        const actionStyle = `border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
 
-        const actionStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
+        return `<div
+            data-action-tone="record-beat-wrapper"
+            style="margin: .5rem; display: none; width: 90%;"
+            >
+            <div
+                data-action-tone="record-beat"
+                data-id="beat1"
+                style="${actionStyle} height: 6rem; width: 100%; background-color: whitesmoke;  margin: 0;"
+            >beat me</div>
+            <div
+                data-action-tone="record-beat"
+                data-id="beat2"
+                style="${actionStyle} height: 6rem; width: 100%; background-color: whitesmoke; margin: 0;"
+            >beat me</div>
+            <div
+                data-action-tone="record-beat"
+                data-id="beat3"
+                style="${actionStyle} height: 6rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
+            >beat me</div>                
+        </div>`.trim();
+    }
+
+    getGuitarInfoContent(): string {
+        return `<div style="margin: .5rem;">
+            <b>ДО</b> - С<br/>
+                до диез - С# или <b>t</b> <br/>
+                ре бемоль - Db или <b>t</b> <br/>
+            <b>РЕ</b> - D <br/>
+                ре диез - D# или <b>n</b> <br/>
+                ми бемоль - Eb или <b>n</b> <br/>
+            <b>МИ</b> - E <br/>
+            <b>ФА</b> - F <br/>
+                фа диез - F# или <b>v</b> <br/>
+                соль бемоль - Gb или <b>v</b> <br/>
+            <b>СОЛЬ</b> - G <br/>
+                соль диез - G# или <b>z</b> <br/>
+                ля бемоль - Ab или <b>z</b> <br/>
+            <b>ЛЯ</b> - A <br/>
+                ля диез - A# или <b>k</b> <br/>
+                си бемоль - Hb или B или <b>k</b> <br/>
+            <b>СИ</b> - H или B <br/>
+        </div>`.trim();
+    }
+
+    getGuitarRightSideContent(type: 'guitar' | 'bassGuitar', settings: hlp.GuitarSettings): string {
+        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
         let stringCountCommands = '';
 
         if (type === 'guitar') {
             stringCountCommands = `
                 <div>
-                    <span data-action-set-string-count="6" style="${actionStyle}">6s</span>
-                    <span data-action-set-string-count="7" style="${actionStyle}">7s</span>                                    
+                    <span data-action-set-string-count="6" style="${btnStl}">6s</span>
+                    <span data-action-set-string-count="7" style="${btnStl}">7s</span>                                    
                 </div>
             `.trim();
         }
@@ -160,95 +175,90 @@ export class ToneCtrl extends KeyboardCtrl {
         if (type === 'bassGuitar') {
             stringCountCommands = `
                 <div>
-                    <span data-action-set-string-count="4" style="${actionStyle}">4s</span>
-                    <span data-action-set-string-count="5" style="${actionStyle}">5s</span>                    
-                    <span data-action-set-string-count="6" style="${actionStyle}">6s</span>                                        
+                    <span data-action-set-string-count="4" style="${btnStl}">4s</span>
+                    <span data-action-set-string-count="5" style="${btnStl}">5s</span>                    
+                    <span data-action-set-string-count="6" style="${btnStl}">6s</span>                                        
                 </div>
             `.trim();
         }
 
-        let wrapper = `
-            <div style="
-                display: flex;
-                margin: .5rem;
-                justify-content: space-between;
-                position: relative;"
-            >
+        return `
+            ${stringCountCommands}<br/>
+            <span data-action-tone="set-offset-up" style="${btnStl}">up</span>&emsp;
+            <span data-action-tone="set-offset-down" style="${btnStl}">down</span><br/><br/>
+            <span data-action-tone="fix-board-cell" style="${btnStl} font-size: 1.4rem; background-color: yellow; ">fix</span><br/><br/>
+            <span data-action-tone="unfix-board-cell" style="${btnStl}">unfix</span><br/><br/>
+            <span data-action-tone="memo-mode" style="${btnStl}">memo</span><br/><br/>
+            <span data-action-tone="memo-clear" style="${btnStl} color: red;">&times;mem</span><br/><br/>
+        `.trim();
+    }
+
+    getHarmonicaContent(): string {
+        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
+
+        let result = `
+            <div style="margin: 0; padding: 1rem .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
+                ${hlp.getVerticalKeyboard('base', 'bassHarmonica', hlp.bassKeys)}
+                ${hlp.getVerticalKeyboard('solo', 'soloHarmonica', hlp.soloKeys)}
                 <div 
-                    data-guitar-board-wrapper
-                    style="user-select: none; touch-action: none;"
+                    style="font-size: 2rem;
+                    font-family: monospace;
+                    width: 100%;
+                    position: absolute;
+                    top: 0;
+                    pointer-events: none;
+                    user-select: none;
+                    touch-action: none;
+                    padding-left: .5rem;"
+                    data-type="text-under-board"
                 >
-                    ${this.getGuitarBoardContent(type, settings)}                
-                </div>
-
-                <div style="padding-left: .5rem; padding-top: .5rem;">
-                    ${stringCountCommands}<br/>
-                    <span data-action-tone="set-offset-up" style="${actionStyle}">up</span>&emsp;
-                    <span data-action-tone="set-offset-down" style="${actionStyle}">down</span><br/><br/>
-                    <span data-action-tone="fix-board-cell" style="${actionStyle} font-size: 1.4rem; background-color: yellow; ">fix</span><br/><br/>
-                    <span data-action-tone="unfix-board-cell" style="${actionStyle}">unfix</span><br/><br/>                    
-                    
-                    <span data-action-tone="memo-mode" style="${actionStyle}">memo</span><br/><br/>
-                    <span data-action-tone="memo-clear" style="${actionStyle} color: red;">&times;mem</span><br/><br/>                    
-                </div>
-            </div>
-
-            <div 
-                data-action-tone="record-beat-wrapper"
-                style="margin: .5rem; display: none; width: 90%;"
-            >
-                <div
-                    data-action-tone="record-beat"
-                    data-id="beat1"                     
-                    style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke;  margin: 0;"
-                >beat me</div>
-                <div
-                    data-action-tone="record-beat"
-                    data-id="beat2" 
-                    style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
-                >beat me</div>
+                    <!-- ${hlp.getPatternsList()} -->
+                </div>            
             </div>
             
+            <div style="widht: 90%; margin: 0; padding: .5rem; padding-left: 1rem; user-select: none; touch-action: none;">
+                <span data-action-tone="memo-mode" style="${btnStl}">memo</span>&emsp;
+                <span data-action-tone="memo-clear" style="${btnStl} color: red;">&times;mem</span>
+            </div>
+            
+            ${this.getBeatContent()}
             ${this.getTopCommandPanel()}
-                        
-            <div style="margin: .5rem;">
-                ${this.page.getMetronomeContent()}
-                <br/>            
+            <div style="margin: .5rem;">${this.page.getMetronomeContent()}<br/></div>
+            ${this.getRowActionsCommands()}                                    
+            <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
+            ${this.getMoveCommandPanel(1.2)}
+            ${this.getDurationCommandPanel(1.2)}
+        `.trim();
+
+        return result;
+    }
+
+    getGuitarContent(type?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
+        settings = settings || this.getGuitarSettings();
+        type = type || <any>this.type;
+
+        let result = `
+            <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
+                <div data-guitar-board-wrapper style="user-select: none; touch-action: none;">
+                    ${this.getGuitarBoardContent(type, settings)}
+                </div>
+                <div style="padding-left: .5rem; padding-top: .5rem;">
+                    ${this.getGuitarRightSideContent(type, settings)}                                        
+                </div>
             </div>
             
+            ${this.getBeatContent()}
+            ${this.getTopCommandPanel()}
+            <div style="margin: .5rem;">${this.page.getMetronomeContent()}<br/></div>
             ${this.getRowActionsCommands()}            
-                        
-            <div
-                data-name="chess-wrapper"
-                style="width: 90%; padding-left: 1rem;"
-            ></div>
-              
+            <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
             ${this.getMoveCommandPanel(1.2)}
-            ${this.getDurationCommandPanel(1.2)}                                 
-           
-            <div style="margin: .5rem;">            
-                <b>ДО</b> - С<br/>
-                до диез - С# или <b>t</b> <br/>
-                ре бемоль - Db или <b>t</b> <br/>                
-                <b>РЕ</b> - D <br/>                                
-                ре диез - D# или <b>n</b> <br/>
-                ми бемоль - Eb или <b>n</b> <br/>
-                <b>МИ</b> - E <br/>
-                <b>ФА</b> - F <br/>                            
-                фа диез - F# или <b>v</b> <br/>
-                соль бемоль - Gb или <b>v</b> <br/>
-                <b>СОЛЬ</b> - G <br/>
-                соль диез - G# или <b>z</b> <br/>
-                ля бемоль - Ab или <b>z</b> <br/>
-                <b>ЛЯ</b> - A <br/>
-                ля диез - A# или <b>k</b> <br/>
-                си бемоль - Hb или B или <b>k</b> <br/>
-                <b>СИ</b> - H или B <br/>
-            </div>
+            ${this.getDurationCommandPanel(1.2)}
+            ${this.getGuitarInfoContent()}
             
         `.trim();
 
-        return wrapper;
+        return result;
     }
 
     getContent(type?: ToneKeyboardType): string {
