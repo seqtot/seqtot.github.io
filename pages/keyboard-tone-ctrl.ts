@@ -113,7 +113,16 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getBeatContent(): string {
-        const actionStyle = `border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
+        const actionStyle = `
+            border: 1px solid lightgray;
+            font-size: 1.1rem;
+            margin: 0;
+            width: 100%;
+            background-color: whitesmoke;
+            height: 5rem;            
+            user-select: none;
+            touch-action: none;
+        `.trim();
 
         return `
         <div
@@ -123,23 +132,24 @@ export class ToneCtrl extends KeyboardCtrl {
             <div
                 data-action-tone="record-beat"
                 data-id="beat1"
-                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke;  margin: 0;"
+                style="${actionStyle}"
             >beat me</div>
             <div
                 data-action-tone="record-beat"
                 data-id="beat2"
-                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin: 0;"
+                style="${actionStyle}"
             >beat me</div>
             <div
                 data-action-tone="record-beat"
                 data-id="beat3"
-                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
+                style="${actionStyle}"
             >beat me</div>                
             <div
                 data-action-tone="record-beat"
                 data-id="beat4"
-                style="${actionStyle} height: 5rem; width: 100%; background-color: whitesmoke; margin-bottom: .5rem;"
-            >beat me</div>            
+                style="${actionStyle}"
+            >beat me</div>
+            <br/>
         </div>`.trim();
     }
 
@@ -453,7 +463,7 @@ export class ToneCtrl extends KeyboardCtrl {
             this.getOut(this.page.bpmValue, this.recData);
             this.page.stopTicker();
 
-            setTimeout(() => this.toggleRecord(), 500);
+            setTimeout(() => this.toggleRecord(), 300);
 
             return;
         }
