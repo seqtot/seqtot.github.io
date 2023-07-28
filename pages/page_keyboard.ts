@@ -196,7 +196,7 @@ export class KeyboardPage implements Page {
         this.toneCtrl = new ToneCtrl(this, <ToneKeyboardType>this.keyboardType);
 
         const content = `
-            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
+            <div class="page-content" style="padding-top: 0; padding-bottom: 10rem;">
                 <!-- ${this.getTracksContent()} -->                
                 ${this.toneCtrl.getContent(type)}
             </div>`.trim();
