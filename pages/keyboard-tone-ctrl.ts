@@ -119,7 +119,7 @@ export class ToneCtrl extends KeyboardCtrl {
             margin: 0;
             width: 100%;
             background-color: whitesmoke;
-            height: 6rem;            
+            height: 5rem;            
             user-select: none;
             touch-action: none;
         `.trim();
@@ -147,7 +147,7 @@ export class ToneCtrl extends KeyboardCtrl {
             <div
                 data-action-tone="record-beat"
                 data-id="beat4"
-                style="${actionStyle} height: 8rem;"
+                style="${actionStyle} height: 7rem;"
             >beat me</div>
             <br/>
         </div>`.trim();
