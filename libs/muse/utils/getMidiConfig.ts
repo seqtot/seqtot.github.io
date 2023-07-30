@@ -127,8 +127,9 @@ export function getTopOutList(x: {
         let N = '';
 
         if (printN) {
-            const nio = un.getNFromString(item);
-            if (!nio.part) {
+            const part = un.getPartInfo(item);
+
+            if (!part.partNio) {
                 N = printN ? `${un.getNRowInPartId(partNio)} ` : '';
             }
         }

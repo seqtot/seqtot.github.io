@@ -12,14 +12,14 @@ _ $bass: v20;  $guit: v50; $____: v25; # pitchShift: 1
 # 1560 1680 1800 1920 2040 2160 2280 2400
 
 <out b150>
-> ИНТРО # A #a
-> SOLO1 # ACFE DCBA D#DEF EEEE
-> SOLO2 # ACFE DCBA D#DEF A
-> ИНТРО # A #a
-> SOLO3 # CEAG FEDD GGAB CDEC
-> SOLO4 # FED#F GFE#G AAD#F EEEE EEDcBa EEEE EEDcBa #Gf E#d Ed Cb
-> ИНТРО # A #a
-> SOLO5 # ACFE DCBA DDEE F#CDE #FA#GE AEFC D#DEE A
+> ИНТРО  %A  # A #a
+> SOLO1  %B  # ACFE DCBA D#DEF EEEE
+> SOLO2  %C  # ACFE DCBA D#DEF A
+> ИНТРО  %D  # A #a
+> SOLO3  %E  # CEAG FEDD GGAB CDEC
+> SOLO4  %F  # FED#F GFE#G AAD#F EEEE EEDcBa EEEE EEDcBa #Gf E#d Ed Cb
+> ИНТРО  %G  # A #a
+> SOLO5  %H  # ACFE DCBA DDEE F#CDE #FA#GE AEFC D#DEE A
 
 <ИНТРО b150 set>
 интро_бас интро_гит

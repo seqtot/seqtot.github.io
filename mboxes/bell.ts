@@ -7,14 +7,13 @@ volume: 100,
 # pitchShift: -12
 
 <out b120>
-> ИНТРО # EGDAd EGAD EGDAd EADAd              #
-> МЯСО_1
-> СОЛО_1
-> МЯСО_1
-> СОЛО_2 
-> МЯСО_3
-> ИНТРО # EGDAd EGAD EGDAd EADAd              #
-#################################################
+> ИНТРО  %A # EGDAd EGAD EGDAd EADAd
+> МЯСО_1 %B
+> СОЛО_1 %C
+> МЯСО_1 %D
+> СОЛО_2 %E 
+> МЯСО_3 %F
+> ИНТРО  %G # EGDAd EGAD EGDAd EADAd
 
 <СОЛО_2 b120 set>
   соло2_1

@@ -47,13 +47,18 @@ export class KeyboardCtrl {
         offset: 0
     };
 
+    get hasIdeItem(): boolean {
+        const item = ideService.currentEdit;
+
+        return !!item && !!item.editPartsNio && !!item.topOutParts && !!item.outBlock && !!item.blocks;
+    }
+
     constructor(
         public page: KeyboardPage
     ) {
     }
 
     getEmptyBpmInfo (): BpmInfo  {
-        //console.log('getEmptyBpm');
         return {
             bpm: 0,
             lastDownTime: 0,
@@ -97,7 +102,7 @@ export class KeyboardCtrl {
         const result = this.liner.addCellDuration(id, value);
 
         if (result) {
-            this.printChess(this.liner.rows);
+            this.printChess(this.liner.lines);
             this.highlightCellByRowCol(`${result.row}-${result.col}`);
             this.activeCell.id = id;
         }
@@ -107,7 +112,7 @@ export class KeyboardCtrl {
         const result = this.liner.moveCell(id, value);
 
         if (result) {
-            this.printChess(this.liner.rows);
+            this.printChess(this.liner.lines);
             this.highlightCellByRowCol(`${result.row}-${result.col}`);
             this.activeCell.id = id;
         }
@@ -197,7 +202,6 @@ export class KeyboardCtrl {
     }
 
     chessCellClick(el: HTMLElement) {
-        //console.log(el.dataset);
         const offset = parseInteger(el.dataset['chessTotalOffset'], null);
 
         if (offset === null) {
@@ -349,33 +353,89 @@ export class KeyboardCtrl {
         if (totalOffset === null) return;
 
         this.liner.deleteCellByOffset(totalOffset);
-        this.printChess(this.liner.rows);
+        this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
-    addRow() {
-        this.liner.addRowAfter(this.activeCell.row);
-        this.printChess(this.liner.rows);
+    addLine() {
+        const line = this.liner.lines[this.activeCell.row];
+
+        this.liner.addLineAfter(this.activeCell.row, line?.rowInPartId || '');
+        this.setEditingItemDurationAndBlockOffsetByLines();
+
+        this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
-    insertRow() {
-        this.liner.addRowAfter(this.activeCell.row - 1);
-        this.printChess(this.liner.rows);
+    insertLine() {
+        const line = this.liner.lines[this.activeCell.row];
+
+        this.liner.addLineAfter(this.activeCell.row - 1, line?.rowInPartId || '');
+        this.setEditingItemDurationAndBlockOffsetByLines();
+
+        this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
-    deleteRow() {
+    deleteLine() {
         if (!this.activeCell.rowCol) {
             return null;
         }
 
-        this.liner.deleteRow(this.activeCell.row);
-        this.printChess(this.liner.rows);
+        const line = this.liner.lines[this.activeCell.row];
+
+        this.liner.deleteLine(this.activeCell.row, line.rowInPartId);
+        this.setEditingItemDurationAndBlockOffsetByLines();
+        this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
     printChess(rows: Line[]) {}
 
     drumNoteClick(el: HTMLElement) {}
+
+    getBottomCommandPanel(): string {
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        let result = '';
+
+        result = `
+            <div data-bottom-command-panel>
+                <div style="${rowStyle}">
+                    <!--span 
+                        style="${style}"
+                        data-ide-action="ready"
+                    >ready</span-->
+                    <span
+                        style="${style}"
+                        data-ide-action="save"
+                    >save</span>
+                    &nbsp;
+                    <span
+                        style="${style}"
+                        data-ide-action="load"
+                    >load</span>
+                    <!--span
+                        style="${style}"
+                        data-ide-action="clear"
+                    >clear</span-->
+                    <span
+                        style="${style}"
+                        data-ide-action="stop"
+                    >stop</span>
+                    <span
+                        style="${style} color: blue;"
+                        data-ide-action="play-both"
+                    >play2</span>
+                </div>
+            </div>
+        `.trim();
+
+        return result;
+    }
+
+    setEditingItemDurationAndBlockOffsetByLines() {
+
+    }
 }

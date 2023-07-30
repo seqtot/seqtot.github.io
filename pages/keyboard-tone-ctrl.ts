@@ -270,6 +270,9 @@ export class ToneCtrl extends KeyboardCtrl {
             <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
             ${this.getMoveCommandPanel(1.2)}
             ${this.getDurationCommandPanel(1.2)}
+            
+            ${this.hasIdeItem ? this.getBottomCommandPanel() : ''}
+                        
             ${this.getGuitarInfoContent()}
             
         `.trim();
@@ -506,15 +509,15 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttrValue('edit-row-action', 'add-row', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addRow());
+            el.addEventListener('pointerdown', () => this.addLine());
         });
 
         getWithDataAttrValue('edit-row-action', 'insert-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.insertRow());
+            el.addEventListener('pointerdown', () => this.insertLine());
         });
 
         getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteRow());
+            el.addEventListener('pointerdown', () => this.deleteLine());
         });
     }
 
@@ -806,7 +809,7 @@ export class ToneCtrl extends KeyboardCtrl {
             blockName: 'temp',
             instr: hlp.instrName[this.instrCode],
             chnl: this.type === 'bassGuitar' ? '$bass' : '$guit',
-            rows: this.liner.rows,
+            rows: this.liner.lines,
         });
 
         //console.log('notes', notes);

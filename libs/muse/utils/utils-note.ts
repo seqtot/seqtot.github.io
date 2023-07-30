@@ -21,6 +21,8 @@ export const PAUSE = 'pause';
 export const commentChar = '#';
 export const refChar = '>';
 export const nioChar = '№';
+export const partIdChar = '%';
+
 
 type BlockType = 'text' | 'drums' | 'tones' | 'set';
 
@@ -102,32 +104,6 @@ export function getRepeatFromString(str: string, byDefault = 1) {
     str = str.match(regExp)[0].trim().replace('r', '');
 
     return parseInteger(str, byDefault);
-}
-
-// PartNio-rowNio
-export function getNFromString(str: string): {part: number, row: number, text: string, rowInPartId: string} {
-    str = (str || '').trim();
-
-    const arr = str.split(' ');
-    let text = '';
-
-    for (let item of arr) {
-        if (item.startsWith(nioChar)) {
-            text = item.replace(nioChar, '');
-
-            break;
-        }
-    }
-
-    const part = parseInteger(text.split('-')[0], 0);
-    const row = parseInteger(text.split('-')[1], 0);
-
-    return <any>{
-        text,
-        part,
-        row,
-        rowInPartId: `${part}-${row}`
-    };
 }
 
 // b120
@@ -615,25 +591,30 @@ export function getNoteByOffset(
     return noteOrder[index + offset] || '';
 }
 
-export function getPartInfo(val: string): {
-    nio: number,
-    ref: string,
-    id: string,
+export type SongPartInfo = {
+    partNio: number,
+    rowNio: number,
+    partId: string,
     info: string,
-} {
+    ref: string,
+    rowInPartId: string,
+};
+
+export function getPartInfo(val: string): SongPartInfo {
     val = (val || '').trim();
     const arr = val.split(' ').filter(item => item);
 
-    let id = '';
-    let ref = '';
-    let nio = 0;
+    let partId = '';
+    let partNio = 0;
+    let rowNio = 0;
     let info = '';
+    let ref = '';
 
     arr.forEach(item => {
         // id
-        if (item.startsWith('%')) {
-            if (!id) {
-                id = item.replace('%', '');
+        if (item.startsWith(partIdChar)) {
+            if (!partId) {
+                partId = item.replace(partIdChar, '');
             }
 
             return;
@@ -641,8 +622,9 @@ export function getPartInfo(val: string): {
 
         // partNio
         if (item.startsWith(nioChar)) {
-            if (!nio) {
-                nio = parseInteger(item.replace(nioChar, '').split('-')[0], 0);
+            if (!partNio) {
+                partNio = parseInteger(item.replace(nioChar, '').split('-')[0], 0);
+                rowNio = parseInteger(item.replace(nioChar, '').split('-')[1], 0);
             }
 
             return;
@@ -651,18 +633,23 @@ export function getPartInfo(val: string): {
         // info
         if (item.startsWith('[')) {
             if (!info) {
-               info  = item.replace(/[\[\]]/g, '');
+               info = item.replace(/[\[\]]/g, '');
             }
 
             return;
         }
 
-        ref = item;
+        ref = ref + item + ' ';
     });
 
-    id = id || ref;
+    ref = ref.trim();
 
-    return {id, ref, nio, info};
+    const result = {
+        partId, partNio, rowNio, ref, info,
+        rowInPartId: `${partNio}-${rowNio}`
+    };
+
+    return result;
 }
 
 export function getNRowInPartId(part: number, row?: number): string {
@@ -678,10 +665,9 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
 
     // строка может содержать номер части (№1 и т.п.)
     rows.forEach(rowItem => {
-        const info = getPartInfo(rowItem);
-        //console.log('rowInfo', info);
+        const part = getPartInfo(rowItem);
 
-        const block = blocks.find(block => block.id === info.ref);
+        const block = blocks.find(block => block.id === part.partId) || blocks.find(block => block.id === part.ref);
 
         if (!block) {
             return;
@@ -691,9 +677,9 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
 
         if (block.type === 'tones' || block.type === 'drums') {
             rowInBlockNio++;
-            const N = getNRowInPartId(info.nio, rowInBlockNio);
+            const N = getNRowInPartId(part.partNio, rowInBlockNio);
 
-            result.push(`${info.ref} ${N}`);
+            result.push(`${part.ref} ${N} %${part.partId}`);
         } else if (block.type === 'set') {
             let rows = block.rows.slice(1)
                 .map(item => clearEndComment(item))
@@ -701,9 +687,9 @@ export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
                 .filter(item => !!(item && !item.startsWith('#')))
                 .map(item => {
                     rowInBlockNio++;
-                    const N = getNRowInPartId(info.nio, rowInBlockNio);
+                    const N = getNRowInPartId(part.partNio, rowInBlockNio);
 
-                    return `${item} ${N}`;
+                    return `${item} ${N} %${part.partId}`;
                 });
 
             Array.prototype.push.apply(result, rows);

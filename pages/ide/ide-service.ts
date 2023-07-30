@@ -22,13 +22,14 @@ class IdeService extends  EventEmitter {
     private _guid = 1;
     useToneInstrument: number = DEFAULT_TONE_INSTR;
     currentEdit: {
+        songId: string,
         blocks: TextBlock[],
         outBlock: TextBlock,
         topOutParts: string[],
         editPartsNio?: number[],
-        name: string,
         metaByLines: {[key: string]: string},
         freezeStructure: boolean,
+        source?: 'my' | 'band' | null | undefined,
     } = { } as any;
 
     get guid(): number {

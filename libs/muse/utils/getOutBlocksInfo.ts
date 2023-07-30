@@ -140,6 +140,7 @@ export function getOutBlocksInfo(
     textRows.forEach((row, iRow) => {
         let metaByLine = '';
         let rowInPartId = '';
+        let partId = '';
 
         const colArr = (row || '')
             .split(' ')
@@ -153,6 +154,12 @@ export function getOutBlocksInfo(
 
                 if (item.startsWith(nioChar)) {
                     rowInPartId =  item.replace(nioChar, '');
+
+                    return acc;
+                }
+
+                if (item.startsWith('%')) {
+                    partId =  item.replace('%', '');
 
                     return acc;
                 }

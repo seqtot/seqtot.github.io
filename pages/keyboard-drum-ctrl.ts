@@ -5,11 +5,12 @@ import { parseInteger } from '../libs/common';
 import { LineModel, Line, NoteItem, KeyData, Cell } from './line-model';
 import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 import { getOutBlocksInfo, OutBlockRowInfo } from '../libs/muse/utils/getOutBlocksInfo';
-import { createOutBlock, TextBlock } from '../libs/muse/utils/utils-note';
+import {createOutBlock, SongPartInfo, TextBlock} from '../libs/muse/utils/utils-note';
 
 import ideService from './ide/ide-service';
 import { DrumBoard, drumNotesInfo } from './drum-board';
 import { KeyboardCtrl, BpmInfo, KeyboardPage } from './keyboard-ctrl';
+import { SongStore, StoredRow, SongPage } from './song-store';
 
 const ids = {
     rowInPartId: 'row-in-part-id',
@@ -52,6 +53,7 @@ type EditedItem = {
     rowInPartId: string, // partNio-rowNio
     songName: string,
     duration: number,
+    partId: string,
     partNio: number, // номер части
     rowNio: number,  // номер строки внутри части
 }
@@ -70,7 +72,8 @@ type StoredItem = {
     rowInPartId: string,
     type: string,
     status: string,
-    rows: Line[]
+    rows: Line[],
+    lines: Line[]
 }
 
 type StoredSongNode ={
@@ -118,15 +121,9 @@ export class DrumCtrl extends KeyboardCtrl {
         return !!this.editedItems.length;
     }
 
-    get hasIdeItem(): boolean {
-        const item = ideService.currentEdit;
-
-        return !!item && !!item.editPartsNio && !!item.topOutParts &&  !!item.outBlock && !!item.blocks;
-    }
-
     loadFile() {
         // https://webtips.dev/download-any-file-with-javascript
-        let songName = ideService.currentEdit?.name || '';
+        let songName = ideService.currentEdit?.songId || '';
 
         if (!songName) return;
 
@@ -160,8 +157,45 @@ export class DrumCtrl extends KeyboardCtrl {
         }
     }
 
+    saveEditingItemsMy() {
+        if (!this.hasEditedItems) return;
+
+        let songName = this.editedItems[0].songName;
+        let song = SongStore.getSong(songName);
+
+        const savedItems = this.editedItems.map(item => item.rowInPartId);
+
+        const dynamic = song.dynamic.filter(item => {
+            return !savedItems.includes(item.rowInPartId) && item.type !== 'drums';
+        });
+
+        this.editedItems.forEach(item => {
+            const lines = this.liner.lines.filter(line => line.rowInPartId === item.rowInPartId);
+            if (!lines.length) return;
+
+            dynamic.push({
+                type: 'drums',
+                rowInPartId: item.rowInPartId,
+                lines,
+                partId: item.partId,
+                rowNio: item.rowNio,
+                status: 'unknown',
+            });
+        });
+
+        song.dynamic = dynamic;
+
+        SongStore.setSong(songName, song);
+    }
+
     saveEditingItems() {
         if (!this.hasEditedItems) return;
+
+        if (ideService.currentEdit.source === 'my') {
+            this.saveEditingItemsMy();
+
+            return;
+        }
 
         let songName = this.editedItems[0].songName;
         let songNode: StoredSongNode;
@@ -173,7 +207,7 @@ export class DrumCtrl extends KeyboardCtrl {
         }
 
         this.editedItems.forEach(item => {
-            const rows = this.liner.rows.filter(row => row.rowInPartId === item.rowInPartId);
+            const rows = this.liner.lines.filter(row => row.rowInPartId === item.rowInPartId);
             if (!rows.length) return;
 
             let itemsNode = songNode[item.rowInPartId];
@@ -190,7 +224,8 @@ export class DrumCtrl extends KeyboardCtrl {
                     rowInPartId: item.rowInPartId,
                     type: 'drums',
                     status: 'draft',
-                    rows: []
+                    rows: [],
+                    lines: [],
                 };
                 itemsNode.items.push(drumsNode);
             }
@@ -201,17 +236,7 @@ export class DrumCtrl extends KeyboardCtrl {
         localStorage.setItem(songName, JSON.stringify(songNode));
     }
 
-    addAndSortEditingItem(item: EditedItem, el: HTMLElement) {
-        if (this.editedItems.find(iItem => iItem.rowInPartId === item.rowInPartId)) {
-            this.editedItems = this.editedItems.filter(iItem => iItem.rowInPartId !== item.rowInPartId);
-            el.style.fontWeight = '400';
-
-            return;
-        }
-
-        this.editedItems.push(item);
-        el.style.fontWeight = '600';
-
+    sortEditingItems() {
         this.editedItems.sort((a, b) => {
             if (a.partNio < b.partNio) return -1;
             if (a.partNio > b.partNio) return 1;
@@ -223,51 +248,98 @@ export class DrumCtrl extends KeyboardCtrl {
         });
     }
 
+    addOrRemoveEditingItem(item: EditedItem, el: HTMLElement) {
+        if (this.editedItems.find(iItem => iItem.rowInPartId === item.rowInPartId)) {
+            this.editedItems = this.editedItems.filter(iItem => iItem.rowInPartId !== item.rowInPartId);
+            el.style.fontWeight = '400';
+
+            return;
+        }
+
+        this.editedItems.push(item);
+        el.style.fontWeight = '600';
+    }
+
+    setEditingItemDurationAndBlockOffsetByLines() {
+        this.sortEditingItems();
+
+        let blockOffsetQ = 0;
+
+        this.editedItems.forEach(editedItem => {
+            let lines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
+            let duration = LineModel.GetDurationQByLines(lines);
+            editedItem.duration = duration;
+
+            lines.forEach(row => {
+                row.rowInPartId = editedItem.rowInPartId;
+                row.blockOffsetQ = blockOffsetQ;
+            });
+
+            blockOffsetQ = blockOffsetQ + duration;
+        });
+    }
+
     songRowClick(el: HTMLElement) {
         const item: EditedItem = {
             rowInPartId: el.dataset['rowInPartId'],
             songName: el.dataset['songName'],
             partNio: parseInteger(el.dataset['partNio'], 0),
             rowNio: parseInteger(el.dataset['rowNio'], 0),
-            duration: parseInteger(el.dataset['duration'], 0),
+            duration: parseInteger(el.dataset['initDuration'], 0),
+            partId: el.dataset['partId'] || '',
         };
 
-        this.addAndSortEditingItem(item, el);
+        this.addOrRemoveEditingItem(item, el);
+        this.sortEditingItems();
 
-        let rows = [];
+        let lines = [];
         let blockOffsetQ = 0;
+        const songId = ideService.currentEdit.songId;
+        const isMy = ideService.currentEdit.source === 'my';
 
         this.editedItems.forEach(editedItem => {
-            let iRows: Line[] = this.liner.rows.filter(row => row.rowInPartId === editedItem.rowInPartId);
+            let iLines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
 
-            let songNode: StoredSongNode = localStorage.getItem(editedItem.songName) as any;
-            if (!iRows.length && songNode) {
-                songNode = JSON.parse(songNode as any as string);
+            if (!isMy) {
+                let songNode: StoredSongNode = localStorage.getItem(songId) as any;
+                if (!iLines.length && songNode) {
+                    songNode = JSON.parse(songNode as any as string);
 
-                if (songNode[editedItem.rowInPartId]) {
-                    let items = songNode[editedItem.rowInPartId].items;
-                    let node = items.find(item => item.rowInPartId === editedItem.rowInPartId && item.type === 'drums');
-                    if (node) {
-                        iRows = node.rows;
+                    if (songNode[editedItem.rowInPartId]) {
+                        let items = songNode[editedItem.rowInPartId].items;
+                        let node = items.find(item => item.rowInPartId === editedItem.rowInPartId && item.type === 'drums');
+                        if (node) {
+                            iLines = node.rows;
+                        }
                     }
+                }
+
+            } else {
+                const song = (isMy ? SongStore.getSong(songId, true) : null) as SongPage;
+                if (!iLines.length && song) {
+                    song.dynamic.forEach(item => {
+                        if (item.rowInPartId === editedItem.rowInPartId && item.type === 'drums') {
+                            iLines = [...iLines, ...item.lines];
+                        }
+                    });
                 }
             }
 
-            if (!iRows.length) {
-                iRows = this.liner.getLinesByMask(editedItem.duration);
+            if (!iLines.length) {
+                iLines = this.liner.getLinesByMask(editedItem.duration);
             }
 
-            iRows.forEach(row => {
+            iLines.forEach(row => {
                 row.rowInPartId = editedItem.rowInPartId;
                 row.blockOffsetQ = blockOffsetQ;
             });
 
-            rows = [...rows, ...iRows];
+            lines = [...lines, ...iLines];
             blockOffsetQ = blockOffsetQ + editedItem.duration;
         });
 
-        this.liner.setData(rows);
-        this.printChess(this.liner.rows);
+        this.liner.setData(lines);
+        this.printChess(this.liner.lines);
     }
 
     playOne() {
@@ -289,6 +361,130 @@ export class DrumCtrl extends KeyboardCtrl {
         });
     }
 
+    buildBlocksForMySong(blocks: TextBlock[], withCurrent = true): TextBlock[] {
+        const song = SongStore.getSong(ideService.currentEdit.songId);
+
+        const editingParts: SongPartInfo[] = [];
+
+        ideService.currentEdit.editPartsNio.sort();
+        ideService.currentEdit.editPartsNio.forEach((partNio, i) => {
+            editingParts.push(un.getPartInfo(ideService.currentEdit.topOutParts[partNio - 1]));
+        });
+
+        const hash = {};
+        const list: {id: string, rows: StoredRow[][]}[] = [];
+
+        editingParts.forEach(part => {
+            const partRows = song.dynamic.filter(row => {
+                const iPartId = (row.partId || '').trim();
+                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
+
+                if (part.partId && iPartId) {
+                    return part.partId === iPartId;
+                }
+
+                return part.partNio === iPartNio;
+            });
+
+            partRows.sort((a, b) => {
+                const iRowNioA = un.parseInteger(a.rowInPartId.split('-')[1], 0);
+                const iRowNioB = un.parseInteger(b.rowInPartId.split('-')[1], 0);
+
+                if (iRowNioA < iRowNioB) return -1;
+                if (iRowNioA > iRowNioB) return 1;
+
+                return 0;
+            });
+
+            partRows.forEach(row => {
+                const iPartId = (row.partId || '').trim();
+                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
+                const iRowNio = un.parseInteger(row.rowInPartId.split('-')[1], 0);
+
+                if (!hash[iPartNio]) {
+                    hash[iPartNio] = {
+                        id: part.partId,
+                        rows: [],
+                    };
+                    list.push(hash[iPartNio]);
+                }
+
+                if (!hash[iPartNio][iRowNio]) {
+                    hash[iPartNio][iRowNio] = [];
+                    hash[iPartNio].rows.push(hash[iPartNio][iRowNio]);
+                }
+
+                hash[iPartNio][iRowNio].push(row);
+            });
+        });
+
+        let topOutBlocks: string[][] = [];
+
+        list.forEach(part => {
+            let partSetRows: string[] = [`<${part.id} set>`];
+
+            part.rows.forEach(row => {
+                let maxDurQ = 0;
+                let targetDurQ = 0;
+                let headGuid = `head_${ideService.guid.toString()}`;
+                let rowRefs: string[] = [headGuid];
+
+                row.forEach(item => {
+                    const guid = `temp_${ideService.guid.toString()}`;
+                    const durQ = LineModel.GetDurationQByLines(item.lines);
+
+                    let notes = this.getNotes(guid, item);
+
+                    if(!notes) {
+                       notes = `<${guid} $>\n$organ: ${durQ}`;
+                    }
+
+                    const block = un.getTextBlocks(notes)[0];
+
+                    blocks = [...blocks, block];
+
+                    maxDurQ = durQ > maxDurQ ? durQ: maxDurQ;
+
+                    rowRefs.push(guid);
+                });
+
+                const headBlock = un.getTextBlocks(`<${headGuid} $>\n$organ: ${maxDurQ}`)[0];
+
+                blocks = [...blocks, headBlock];
+
+                partSetRows.push(rowRefs.join(' '));
+            });
+
+            topOutBlocks.push(partSetRows);
+        });
+
+        topOutBlocks.forEach(part => {
+            const partBlock = un.getTextBlocks(part.join('\n'))[0];
+            blocks = [...blocks, partBlock];
+        })
+
+        //jjkl
+        //console.log('hash', hash);
+        //console.log('list', list);
+        //console.log('topOutBlocks', topOutBlocks);
+        //console.log('buildBlocksForMySong', blocks);
+
+        return blocks;
+    };
+
+    getNotes(id: string, item: StoredRow): string {
+        if (item.type === 'drums') {
+            return LineModel.GetDrumNotes(id, item.lines);
+        }
+
+        return LineModel.GetToneNotes({
+            blockName: id,
+            rows: item.lines,
+            instr: '$organ',
+            chnl: '$organ',
+        });
+    }
+
     playBoth() {
         this.page.stop();
         if (!this.hasEditedItems) return;
@@ -300,13 +496,13 @@ export class DrumCtrl extends KeyboardCtrl {
         let playBlock = midiConfig.playBlockOut as TextBlock;
 
         const playingRows = playBlock.rows.filter(item => {
-            const nio = un.getNFromString(item);
-            return !!this.editedItems.find(item => item.rowInPartId === nio.rowInPartId);
+            const part = un.getPartInfo(item);
+            return !!this.editedItems.find(item => item.rowInPartId === part.rowInPartId);
         });
 
         playingRows.forEach(playRow => {
-            const nio = un.getNFromString(playRow);
-            let rows = this.liner.rows.filter(row => row.rowInPartId === nio.rowInPartId)
+            const part = un.getPartInfo(playRow);
+            let rows = this.liner.lines.filter(row => row.rowInPartId === part.rowInPartId)
             rows = this.liner.cloneRows(rows);
             rows.forEach(row => (row.blockOffsetQ = 0));
 
@@ -344,8 +540,8 @@ export class DrumCtrl extends KeyboardCtrl {
         const midiConfig = this.getMidiConfig();
         const playBlock = midiConfig.playBlockOut as TextBlock;
         const playingRows = playBlock.rows.filter(item => {
-            const nio = un.getNFromString(item);
-            return !!this.editedItems.find(item => item.rowInPartId === nio.rowInPartId);
+            const part = un.getPartInfo(item);
+            return !!this.editedItems.find(item => item.rowInPartId === part.rowInPartId);
         });
 
         this.page.stop();
@@ -368,7 +564,6 @@ export class DrumCtrl extends KeyboardCtrl {
         });
     }
 
-
     subscribeIdeEvents() {
         getWithDataAttrValue(ids.ideAction, 'play-both', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => this.playBoth());
@@ -384,7 +579,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
         getWithDataAttrValue(ids.ideAction, 'back', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', evt => {
-                this.page.context.$f7router.navigate(`/mbox/${ideService.currentEdit.name}/`);
+                this.page.context.$f7router.navigate(`/mbox/${ideService.currentEdit.songId}/`);
             });
         });
 
@@ -406,7 +601,7 @@ export class DrumCtrl extends KeyboardCtrl {
                     el.style.display = 'block';
                 });
                 this.liner.fillLinesStructure('480');
-                this.printChess(this.liner.rows);
+                this.printChess(this.liner.lines);
             });
         });
 
@@ -418,6 +613,61 @@ export class DrumCtrl extends KeyboardCtrl {
             el.addEventListener('pointerdown', evt => {
                 this.page.stop();
             });
+        });
+
+        getWithDataAttrValue(ids.ideAction, 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addRowInPart(el.dataset['partId'], el.dataset['partNio']));
+        });
+    }
+
+    addRowInPart(partId: string, partNio: number | string) {
+        partNio = un.parseInteger(partNio, 0);
+        partId = (partId || '').trim();
+
+        if (!partId && !partNio) return;
+
+        const songName = ideService.currentEdit.songId;
+        const song = SongStore.getSong(songName);
+
+        const rowNios = song.dynamic.reduce((acc, item) => {
+            const iPartId = (item.partId || '').trim();
+            const iPartNio = un.parseInteger(item.rowInPartId.split('-')[0], 0);
+            const iRowNio = un.parseInteger(item.rowInPartId.split('-')[1], 0);
+
+            if (partId && iPartId && partId !== iPartId) {
+                return acc;
+            }
+            else if(partNio && iPartNio && partNio !== iPartNio) {
+                return acc;
+            }
+
+            if (!iRowNio) {
+                return acc;
+            }
+
+            acc.push(iRowNio);
+
+            return acc;
+        }, []);
+
+        const rowNio = (rowNios.length ? Math.max(...rowNios) : 0) + 1;
+        const rowInPartId = `${partNio}-${rowNio}`;
+
+        song.dynamic.push({
+            partId,
+            rowInPartId: `${partNio}-${rowNio}`,
+            type: 'drums',
+            status: 'draft',
+            lines: [
+                this.liner.getEmptyLine(rowInPartId),
+            ]
+        });
+
+        SongStore.setSong(ideService.currentEdit.songId, song);
+
+        getWithDataAttr('edit-parts-wrapper').forEach(el => {
+            el.innerHTML = this.getIdeContent();
+            this.subscribeIdeEvents();
         });
     }
 
@@ -456,11 +706,11 @@ export class DrumCtrl extends KeyboardCtrl {
 
         if (!isDelete) {
             let info = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
-            this.printChess(this.liner.rows);
+            this.printChess(this.liner.lines);
             this.highlightCellByRowCol(rowCol);
             this.activeCell.id = info.note.id;
         } else {
-            this.printChess(this.liner.rows);
+            this.printChess(this.liner.lines);
             this.highlightCellByRowCol(rowCol);
         }
     }
@@ -529,8 +779,6 @@ export class DrumCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttr('action-drum-key', pageEl).forEach((el: HTMLElement) => {
-            //console.log(el, el.dataset['actionDrum']);
-
             const note1 = (el.dataset['actionDrumKey'] || '').split('+')[0];
 
             if (!note1) {
@@ -555,8 +803,6 @@ export class DrumCtrl extends KeyboardCtrl {
                 }
 
                 notes.forEach(keyOrNote => {
-                    //console.log(keyOrNote);
-
                     page.synthesizer.playSound({
                         keyOrNote,
                         volume,
@@ -618,15 +864,15 @@ export class DrumCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttrValue('edit-row-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addRow());
+            el.addEventListener('pointerdown', () => this.addLine());
         });
 
         getWithDataAttrValue('edit-row-action', 'insert-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.insertRow());
+            el.addEventListener('pointerdown', () => this.insertLine());
         });
 
         getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteRow());
+            el.addEventListener('pointerdown', () => this.deleteLine());
         });
     }
 
@@ -648,47 +894,6 @@ export class DrumCtrl extends KeyboardCtrl {
 
     clearBpmInfo() {
         this.bpmInfo = this.getEmptyBpmInfo();
-    }
-
-    getBottomCommandPanel(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
-        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
-        let result = '';
-
-        result = `
-            <div data-bottom-command-panel>
-                <div style="${rowStyle}">
-                    <!--span 
-                        style="${style}"
-                        data-ide-action="ready"
-                    >ready</span-->
-                    <span
-                        style="${style}"
-                        data-ide-action="save"
-                    >save</span>
-                    &nbsp;
-                    <span
-                        style="${style}"
-                        data-ide-action="load"
-                    >load</span>
-                    <!--span
-                        style="${style}"
-                        data-ide-action="clear"
-                    >clear</span-->
-                    <span
-                        style="${style}"
-                        data-ide-action="stop"
-                    >stop</span>
-                    <span
-                        style="${style} color: blue;"
-                        data-ide-action="play-both"
-                    >play2</span>
-                </div>
-            </div>
-        `.trim();
-
-        return result;
     }
 
     getDrumNotesPanel(): string {
@@ -809,17 +1014,20 @@ export class DrumCtrl extends KeyboardCtrl {
         return content;
     }
 
-    getMidiConfig(): MidiConfig {
+    getMidiConfig(withCurrent = true): MidiConfig {
         const currentEdit = ideService.currentEdit;
+        let blocks = [...currentEdit.blocks];
 
-        //console.log('getMidiConfig');
+        if (currentEdit.source === 'my') {
+            blocks = this.buildBlocksForMySong(blocks, withCurrent);
+        }
 
         const rows = currentEdit.editPartsNio.reduce((acc, partNio) => {
             const part = currentEdit.topOutParts[partNio - 1];
-            const nio = un.getNFromString(part);
+            const info = un.getPartInfo(part);
             let N = '';
 
-            if (!nio.part) {
+            if (!info.partNio) {
                 N = ` ${un.getNRowInPartId(partNio)}`;
             }
 
@@ -827,8 +1035,6 @@ export class DrumCtrl extends KeyboardCtrl {
 
             return acc;
         }, [] as string[] );
-
-        //console.log('rows', rows);
 
         const outBlock = un.createOutBlock({
             id: 'out',
@@ -838,10 +1044,8 @@ export class DrumCtrl extends KeyboardCtrl {
             type: 'text'
         });
 
-        //console.log('outBlock', outBlock);
-
         const midiConfig: MidiConfig = {
-            blocks: currentEdit.blocks,
+            blocks,
             excludeIndex: [],
             currRowInfo: {first: 0, last: 0},
             currBlock: outBlock,
@@ -864,43 +1068,64 @@ export class DrumCtrl extends KeyboardCtrl {
         this.page.bpmValue = currentEdit.outBlock.bpm;
 
         const midiConfig = this.getMidiConfig();
+
         const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
-        const rowsByParts: {row: OutBlockRowInfo, partNio: number, rowNio: number}[][] = [];
 
-        outBlocksInfo.rows.reduce((acc, row, i) => {
-            const n = un.getNFromString(row.text);
+        const partHash: {
+            [key: string]: {
+                part: un.SongPartInfo,
+                rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+            }
+        } = {};
 
-            if (!n.part || !n.row ) {
-                return acc;
+        const rowsByParts: {
+                part: un.SongPartInfo,
+                rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+        }[] = [];
+
+        // ЗАПОЛНЯЕМ ЧАСТИ
+        ideService.currentEdit.editPartsNio.sort();
+        ideService.currentEdit.editPartsNio.forEach(partNio => {
+            const part = un.getPartInfo(currentEdit.topOutParts[partNio - 1]);
+
+            if (!partHash[part.partNio]) {
+                partHash[part.partNio] = {
+                    part,
+                    rows: []
+                };
+
+                rowsByParts.push(partHash[part.partNio]);
+            }
+        });
+
+        // ДОБАВЛЯЕМ СТРОКИ В ЧАСТИ
+        outBlocksInfo.rows.forEach(row => {
+            const info = un.getPartInfo(row.text);
+
+            if (!info.partNio || !info.rowNio || !partHash[info.partNio]) {
+                return;
             }
 
-            if (!acc[n.part]) {
-                acc[n.part] = [];
-                rowsByParts.push(acc[n.part]);
-            }
-
-            acc[n.part].push({
-                partNio: n.part,
-                rowNio: n.row,
+            partHash[info.partNio].rows.push({
+                partNio: info.partNio,
+                rowNio: info.rowNio,
                 row,
-            })
-
-            return acc;
-        }, <{[key: string]: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]}>{});
+            });
+        });
 
         let editingPartsContent = '';
 
-        rowsByParts.forEach(rowsByPart => {
-            const partNio = rowsByPart[0].partNio;
-            const partInfo = un.getPartInfo(currentEdit.topOutParts[partNio - 1]);
+        // ФОРМИРУЕМ СПИСОК ЧАСТЕЙ
+        rowsByParts.forEach(item => {
+            const part = item.part;
 
             editingPartsContent += `
                 <div >
                     <span style="margin: .5rem; font-weight: 600;"
-                    >${partInfo.nio}-${partInfo.ref}</span>
+                    >${part.partNio}-${part.ref}</span>
             `.trim();
 
-            rowsByPart.forEach(info => {
+            item.rows.forEach(info => {
                 const row = info.row;
                 const rowCount = Math.ceil(row.rowDurationByHeadQ / un.NUM_120);
                 let cellCount = 0;
@@ -912,46 +1137,53 @@ export class DrumCtrl extends KeyboardCtrl {
                 editingPartsContent += `<span
                     style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0;"
                     data-${ids.rowInPartId}="${info.partNio}-${info.rowNio}"
-                    data-duration="${row.rowDurationByHeadQ}"
-                    data-song-name="${currentEdit.name}"
+                    data-song-name="${currentEdit.songId}"
                     data-part-nio="${info.partNio}"                    
                     data-row-nio="${info.rowNio}"
+                    data-part-id="${part.partId}"
+                    data-init-duration="${row.rowDurationByHeadQ}"                                                            
                 >${info.rowNio}:${rowCount + (cellCount ? '.' + cellCount : '')}</span>`;
             });
+
+            if (!ideService.currentEdit.freezeStructure) {
+                editingPartsContent += `&emsp;<span
+                    style="${cmdStyle}"
+                    data-ide-action="add-row"
+                    data-part-nio="${part.partNio}"
+                    data-part-id="${part.partId}"                    
+                >add-row</span>`.trim();
+            }
 
             editingPartsContent += '</div>';
         });
 
         return `
-            <div data-${ids.ideContent}>
-                <div style="padding-left: 1rem;">
-                    <span
-                        style="${cmdStyle}"
-                        data-ide-action="back"
-                    >back</span>
-                    <!--span
-                        style="${cmdStyle}"
-                        data-ide-action="play-all"
-                    >playAll</span-->                
-                    <span
-                        style="${cmdStyle} color: blue;"
-                        data-ide-action="play-active"
-                    >playActive</span>  
-                    <span
-                        style="${cmdStyle}"
-                        data-ide-action="stop"
-                    >stop</span>
-                    &nbsp;&nbsp;
-                    <span
-                        style="${cmdStyle}"
-                        data-ide-action="clear"
-                    >clear</span>                    
-                </div>
-                
-                <div style="margin-top: .5rem;">
-                    ${editingPartsContent}
-                </div>
-
+            <div style="padding-left: 1rem;">
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="back"
+                >back</span>
+                <!--span
+                    style="${cmdStyle}"
+                    data-ide-action="play-all"
+                >playAll</span-->                
+                <span
+                    style="${cmdStyle} color: blue;"
+                    data-ide-action="play-active"
+                >playActive</span>
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="stop"
+                >stop</span>
+                &nbsp;&nbsp;
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="clear"
+                >clear</span>
+            </div>
+            
+            <div style="margin-top: .5rem;">
+                ${editingPartsContent}
             </div>
         `.trim();
     }
@@ -973,8 +1205,6 @@ export class DrumCtrl extends KeyboardCtrl {
             return acc;
         }, '');
 
-        //console.log(drums);
-
         const content = `
             <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
@@ -990,7 +1220,10 @@ export class DrumCtrl extends KeyboardCtrl {
                 ></div>
                 
                 ${this.hasIdeItem ? this.getBottomCommandPanel() : ''}
-                ${this.getIdeContent()}                
+                
+                <div data-edit-parts-wrapper>
+                    ${this.getIdeContent()}                
+                </div>                                
                 
                 <div style="font-size: 1.5rem;">
                     ${drums}
@@ -1008,8 +1241,6 @@ export class DrumCtrl extends KeyboardCtrl {
     }
 
     handleKeyRecord(note: string, time: number, color: string, char: string, type: 0 | 1) {
-        //console.log(code, time, type);
-
         if (this.mode !== 'record') {
             return;
         }

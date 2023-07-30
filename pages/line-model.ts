@@ -49,21 +49,21 @@ type CellCoord = {
 export const CELL_SIZE = 10;
 
 export class LineModel {
-    rows: Line[] = [];
+    lines: Line[] = [];
 
     findRowIndByOffset(offsetQ: number): number {
-        return this.rows.findIndex(row => {
+        return this.lines.findIndex(row => {
             const rowOffsetQ  = row.startOffsetQ + row.blockOffsetQ;
             return offsetQ >= rowOffsetQ && offsetQ < (rowOffsetQ + row.durQ)
         });
     }
 
     getRowByOffset(offsetQ: number): Line {
-        return this.rows[this.findRowIndByOffset(offsetQ)];
+        return this.lines[this.findRowIndByOffset(offsetQ)];
     }
 
     getCellByNoteId(id: number): Cell {
-        for (let row of this.rows) {
+        for (let row of this.lines) {
             for (let cell of row.cells) {
                 for (let note of cell.notes) {
                     if (note.id === id) {
@@ -84,7 +84,7 @@ export class LineModel {
             return null;
         }
 
-        const rows = this.rows;
+        const rows = this.lines;
         const cell = rows[info.row].cells[info.ind];
 
         cell.notes.forEach(note => {
@@ -92,8 +92,6 @@ export class LineModel {
 
             note.durQ = newDurQ > 0 ? newDurQ : 0;
         });
-
-        //console.log('info', info, cell);
 
         return info;
     }
@@ -105,7 +103,7 @@ export class LineModel {
             return null;
         }
 
-        const rows = this.rows;
+        const rows = this.lines;
         const row = rows[info.row];
         const cell = rows[info.row].cells[info.ind];
 
@@ -120,7 +118,7 @@ export class LineModel {
             const ind = this.findRowIndByOffset(newTotalOffsetQ);
 
             if (ind > -1) {
-                const newRow = this.rows[ind];
+                const newRow = this.lines[ind];
                 row.cells = row.cells.filter(item => item != cell);
                 cell.startOffsetQ = newTotalOffsetQ - newRow.blockOffsetQ;
                 newRow.cells.push(cell);
@@ -145,7 +143,7 @@ export class LineModel {
             })
         });
 
-        this.rows = rows;
+        this.lines = rows;
     }
 
     deleteNoteByNoteAndOffset(offset: number, note: string) {
@@ -158,12 +156,10 @@ export class LineModel {
         });
 
         row.cells = row.cells.filter(cell => !!cell.notes.length);
-
-        //console.log(row, cells);
     }
 
     deleteCellByOffset(offsetQ: number) {
-        const row = this.rows[this.findRowIndByOffset(offsetQ)];
+        const row = this.lines[this.findRowIndByOffset(offsetQ)];
 
         if (!row) return;
 
@@ -177,7 +173,7 @@ export class LineModel {
     getAllCells(): Cell[] {
         const result: Cell[] = [];
 
-        this.rows.forEach(row => {
+        this.lines.forEach(row => {
             row.cells.forEach(cell => {
                 result.push(cell);
             })
@@ -235,50 +231,66 @@ export class LineModel {
         };
     }
 
-    deleteRow(i: number) {
-        if (this.rows.length === 1) {
-            this.rows = [];
+    deleteLine(i: number, rowInPartId = '') {
+        if (this.lines.length === 1) {
+            this.lines = [];
 
             return;
         }
 
-        const topArr = this.rows.slice(0, i+1);
-        const botArr = this.rows.slice(i+1);
+        const topArr = this.lines.slice(0, i+1);
+        const botArr = this.lines.slice(i+1);
         const delRow = topArr.pop();
-        this.addOffset(botArr, -delRow.durQ);
+        this.addOffset(botArr, -delRow.durQ, rowInPartId);
 
-        this.rows = [...topArr, ...botArr];
+        this.lines = [...topArr, ...botArr];
     }
 
-    addRowAfter(i: number) {
-        const newRow: Line = {
+    static GetEmptyLine(rowInPartId: string = ''): Line {
+        return  {
             durQ: 120,
             startOffsetQ: 0,
             cells: [],
             cellSizeQ: CELL_SIZE,
             blockOffsetQ: 0,
-            rowInPartId: '',
+            rowInPartId,
         };
 
-        if (!this.rows.length) {
-            this.rows.push(newRow);
+    }
+
+    getEmptyLine(rowInPartId: string = ''): Line {
+        return LineModel.GetEmptyLine(rowInPartId);
+    }
+
+    addLineAfter(i: number, rowInPartId: string = '') {
+        const newLine = LineModel.GetEmptyLine();
+
+        newLine.rowInPartId = rowInPartId;
+
+        if (!this.lines.length) {
+            this.lines.push(newLine);
 
             return;
         }
 
-        const topArr = this.rows.slice(0, i+1);
+        const topArr = this.lines.slice(0, i+1);
         const lastEl = topArr[topArr.length-1];
-        const botArr = this.rows.slice(i+1);
+        const botArr = this.lines.slice(i+1);
 
-        this.addOffset(botArr, 120);
-        newRow.startOffsetQ = lastEl ? lastEl.startOffsetQ + lastEl.durQ : 0;
-        topArr.push(newRow);
-        this.rows = [...topArr, ...botArr];
+        this.addOffset(botArr, 120, rowInPartId);
+
+        newLine.startOffsetQ = lastEl ? lastEl.startOffsetQ + lastEl.durQ : 0;
+        topArr.push(newLine);
+        this.lines = [...topArr, ...botArr];
     }
 
-    addOffset(arr: Line[], offsetQ: number) {
+    addOffset(arr: Line[], offsetQ: number, rowInPartId= '') {
         for (let i = 0; i < arr.length; i++) {
             const row = arr[i];
+
+            if (rowInPartId && row.rowInPartId !== rowInPartId) {
+                continue;
+            }
 
             row.startOffsetQ = row.startOffsetQ + offsetQ;
             row.cells.forEach(cell => {
@@ -292,11 +304,11 @@ export class LineModel {
     }
 
     getRowAndCellIndexes(id: number): CellCoord | null {
-        if (!id || !this.rows) {
+        if (!id || !this.lines) {
             return null;
         }
 
-        const rows = this.rows;
+        const rows = this.lines;
 
         for (let i = 0; i < rows.length; i++) {
             for (let j = 0; j < rows[i].cells.length; j++) {
@@ -320,7 +332,7 @@ export class LineModel {
             return null;
         }
 
-        for (let row of this.rows) {
+        for (let row of this.lines) {
             for (let item of row.cells) {
                 if (item.id === id) {
                     return item;
@@ -370,9 +382,6 @@ export class LineModel {
                 rowInPartId: '',
             })
         }
-
-        //console.log('seq', seq);
-        //console.log('lines', lines);
 
         const getLineByStartOffsetQ = (startOffsetQ: number): Line => {
             return rows.find(item => {
@@ -426,8 +435,6 @@ export class LineModel {
             }
         });
 
-        //console.log('rows', rows);
-
         return rows;
     }
 
@@ -466,9 +473,6 @@ export class LineModel {
                 rowInPartId: '',
             })
         }
-
-        //console.log('seq', seq);
-        //console.log('lines', lines);
 
         const getLineByStartOffsetQ = (startOffsetQ: number): Line => {
             return rows.find(item => {
@@ -544,7 +548,7 @@ export class LineModel {
     }
 
     getSortedNotes(rows: Line[]): NoteItem[] {
-        return LineModel.GetSortedNotes(Array.isArray(rows) ? rows : this.rows);
+        return LineModel.GetSortedNotes(Array.isArray(rows) ? rows : this.lines);
     }
 
     sortByField(arr: any[], field: string) {
@@ -593,18 +597,18 @@ export class LineModel {
         return LineModel.GetNoteNames(arr);
     }
 
-    static GetDurationQByRows(rows: Line[]) {
-        rows = Array.isArray(rows) ? rows : [];
+    static GetDurationQByLines(lines: Line[]) {
+        lines = Array.isArray(lines) ? lines : [];
 
-        if (rows.length) {
-            return rows[rows.length-1].startOffsetQ + rows[rows.length-1].durQ;
+        if (lines.length) {
+            return lines[lines.length-1].startOffsetQ + lines[lines.length-1].durQ;
         }
 
         return 0;
     }
 
-    getDurationQByRows(rows?: Line[]) {
-        return LineModel.GetDurationQByRows(Array.isArray(rows) ? rows : this.rows);
+    getDurationQByLines(lines?: Line[]) {
+        return LineModel.GetDurationQByLines(Array.isArray(lines) ? lines : this.lines);
     }
 
     getOffsetsByRow(row: Line): number[] {
@@ -727,7 +731,7 @@ export class LineModel {
         let rows = this.CloneRows(x.rows);
         rows = this.RecalcAndClearBlockOffset(rows);
 
-        const totalDurQ = this.GetDurationQByRows(rows);
+        const totalDurQ = this.GetDurationQByLines(rows);
         const notes = this.GetSortedNotes(rows);
         const noteNames = this.GetNoteNames(notes);
 
@@ -766,7 +770,7 @@ export class LineModel {
         rows = this.CloneRows(rows);
         rows = this.RecalcAndClearBlockOffset(rows);
 
-        const totalDurQ = this.GetDurationQByRows(rows);
+        const totalDurQ = this.GetDurationQByLines(rows);
         const notes = this.GetSortedNotes(rows);
         const noteNames = this.GetNoteNames(notes);
         const map: {[key: string]: string[]} = {};
@@ -821,7 +825,7 @@ export class LineModel {
 
     getDrumNotes(name?: string, rows?: Line[]): string {
         name = name || 'no_name';
-        rows = Array.isArray(rows) ? rows : this.rows;
+        rows = Array.isArray(rows) ? rows : this.lines;
 
         return LineModel.GetDrumNotes(name, rows);
     }
@@ -847,7 +851,7 @@ export class LineModel {
     }
 
     cloneRows(rows?: Line[]): Line[] {
-        rows = Array.isArray(rows) ? rows : this.rows;
+        rows = Array.isArray(rows) ? rows : this.lines;
 
         return LineModel.CloneRows(rows);
     }
@@ -930,6 +934,6 @@ export class LineModel {
     }
 
     fillLinesStructure(mask: string | number) {
-        this.rows = this.getLinesByMask(mask);
+        this.lines = this.getLinesByMask(mask);
     }
 }

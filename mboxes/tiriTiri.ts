@@ -11,12 +11,12 @@ _ $back: v5; $mark: v0;
 # 1560 1680 1800 1920 2040 2160 2280 2400 2520 2640 2760 2880
 
 <out b84>
-> ТЕМА   %a # a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C
-> СОЛО1  %b # a#a BDAB #fa BDAB de D#FAB     BDAB de #F#ABG #FED#C
-> ТЕМА   %c # -
-> СОЛО2  %d # b#A  B#CDE  D#CD#F  B#CDE  D#F#B
-> ТЕМА   %e # -
-> КОДА   %f # a#ab
+> ТЕМА   %A  # a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C
+> СОЛО1  %B  # a#a BDAB #fa BDAB de D#FAB     BDAB de #F#ABG #FED#C
+> ТЕМА   %C  # -
+> СОЛО2  %D  # b#A  B#CDE  D#CD#F  B#CDE  D#F#B
+> ТЕМА   %E  # -
+> КОДА   %F  # a#ab
 
 # ---------------------------------------------------------
 # a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C 

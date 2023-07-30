@@ -14,143 +14,12 @@ import { isPresent, parseInteger, TextBlock } from '../libs/muse/utils/utils-not
 import { LineModel } from './line-model';
 import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
-import * as hlp from './keyboard-tone-ctrl-helper';
+import { SongStore, SongPage } from './song-store';
 
 const ns = {
     setBmpAction: 'set-bmp-action',
     setNote: 'set-note',
 };
-
-type SongPage = {
-    content: string,
-    break: string,
-    drums: string,
-    tracks: { key: string; value: string; name: string }[],
-    hideMetronome?: boolean,
-    score: string,
-    parts: {name: string, id: string}[],
-    dynamic: {
-        [key: string]: {
-            [key: string]: {
-                items: any[]
-            }
-        }
-    },
-    source: 'my' | 'band',
-    isSongList?: boolean,
-};
-
-
-class SongStore {
-    static getSongs(): {id: string, name: string}[] {
-        if (!localStorage.getItem(`my-songs`)) {
-            this.setSongs([]);
-        }
-
-        return JSON.parse(localStorage.getItem(`my-songs`));
-    }
-
-    static getSong(id: string, create = false): SongPage {
-        function normalize(song: SongPage) {
-            if (!song) return song;
-
-            song.parts = Array.isArray(song.parts) ? song.parts : [];
-            song.dynamic = song.dynamic ? song.dynamic : {};
-
-            return song;
-        }
-
-        let song: SongPage = normalize(JSON.parse(localStorage.getItem(`[my-song]${id}`)));
-
-        if (song || !create) {
-            return song;
-        }
-
-        SongStore.setSong(id, SongStore.getEmptySong());
-
-        return normalize(JSON.parse(localStorage.getItem(`[my-song]${id}`)));
-    }
-
-    static setSong(id: string, data: SongPage) {
-        localStorage.setItem(`[my-song]${id}`, JSON.stringify(data));
-    }
-
-    static getEmptySong(): SongPage {
-        return {
-            content: '',
-            break: '',
-            drums: '',
-            tracks: [],
-            hideMetronome: false,
-            parts: [],
-            score: `
-            <settings>
-            $bass: v30; $organ: v50; $guit: v50;
-            <out b100>
-            `.trim(),
-            dynamic: {},
-            source: 'my'
-        };
-    }
-
-    static setSongs(songs: {id: string, name: string}[]) {
-        localStorage.setItem(`my-songs`, JSON.stringify(songs));
-    }
-
-    static addPart(songId: string, name: string): {name: string, id: string} {
-        name = (name || '').trim();
-
-        if (!name) return;
-
-        let id = '';
-        let song = SongStore.getSong(songId, true);
-        song.parts = Array.isArray(song.parts) ? song.parts : [];
-
-        while (!id) {
-            const guid = un.guid(2);
-
-            let parts = song.parts.filter(item => item.id === guid);
-
-            if (!parts.length) {
-                id = guid;
-            }
-        }
-
-        const part = {name, id};
-        song.parts.push(part);
-
-        SongStore.setSong(songId, song);
-
-        return part;
-    }
-
-    static addSong(name: string): {name: string, id: string} {
-        name = (name || '').trim();
-
-        if (!name) return;
-
-        let id = '';
-        let items = SongStore.getSongs();
-
-        while (!id) {
-            const guid = un.guid(2);
-
-            let songs = items.filter(item => item.id === guid);
-
-            if (!songs.length) {
-                id = guid;
-            }
-        }
-
-        const song = {name, id};
-        items.push(song);
-
-        SongStore.setSongs(items);
-
-        return song;
-    }
-}
-
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -417,7 +286,7 @@ export class MBoxPage {
                         style="margin-left: 1rem; font-weight: 700; user-select: none;"
                         data-part-nio="${i+1}"
                         data-part-ref="${info.ref}"                        
-                    >${info.nio}&nbsp;&nbsp;${info.ref}</span>
+                    >${info.partNio}&nbsp;&nbsp;${info.ref}</span>
                     <span
                         style="margin-right: 1rem; user-select: none;"
                         data-part-nio="${i+1}"
@@ -487,6 +356,8 @@ export class MBoxPage {
     gotoEdit(partNio?: number) {
         let editPartsNio: number[] = [];
 
+        const isMy = this.pageData.source === 'my';
+
         if (partNio) {
             editPartsNio = [partNio];
         } else {
@@ -497,13 +368,16 @@ export class MBoxPage {
 
         if (!editPartsNio.length) return;
 
-        ideService.currentEdit.name = this.songId;
+        ideService.currentEdit.songId = this.songId;
         ideService.currentEdit.topOutParts = this.topOutParts;
         ideService.currentEdit.blocks = this.blocks;
         ideService.currentEdit.outBlock = this.outBlock;
         ideService.currentEdit.metaByLines = this.getMetaByLines();
-        ideService.currentEdit.freezeStructure = true;
         ideService.currentEdit.editPartsNio = editPartsNio;
+        ideService.currentEdit.source = this.pageData.source;
+        ideService.currentEdit.freezeStructure = !isMy;
+
+        console.log('currentEdit', ideService.currentEdit);
 
         this.context.$f7router.navigate('/page/page_keyboard/');
     }
@@ -712,13 +586,13 @@ export class MBoxPage {
             const map = this.pageData.dynamic?.['@drums'];
 
             playBlock.rows.forEach((row, i) => {
-                let rowPartNio = un.getNFromString(row).text;
+                let rowInPartId = un.getPartInfo(row).rowInPartId;
 
-                if (!rowPartNio || !map[rowPartNio] || !map[rowPartNio].items && !map[rowPartNio].items.length) {
+                if (!rowInPartId || !map[rowInPartId] || !map[rowInPartId].items && !map[rowInPartId].items.length) {
                     return;
                 }
 
-                let rows = map[rowPartNio].items[0].rows;
+                let rows = map[rowInPartId].items[0].rows;
 
                 if (Array.isArray(rows)) {
                      rows = LineModel.CloneRows(rows);

@@ -15,11 +15,6 @@ function getBpmLink(bpm: number): string {
   >${bpm}</a>`;
 }
 
-const setAll = `<div style="margin: .5rem;">
-    ${getInnerLink('SetAll', '/mbox/set_all/')} (SetAll)
-</div>
-`.trim();
-
 const billy = `<div style="margin: .5rem;">
     ${getInnerLink('Billy', '/mbox/billy/')} (Билли)
 </div>
@@ -115,8 +110,7 @@ const content = `
   ${carcassiOp60n7}
   ${bell}
   ${partingGlass}
-  ${tiriTiri}  
-  ${setAll}  
+  ${tiriTiri}
   <div style="margin-bottom: 3rem;"></div>
 `.trim();
 
