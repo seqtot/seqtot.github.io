@@ -166,11 +166,12 @@ export class DrumCtrl extends KeyboardCtrl {
         const savedItems = this.editedItems.map(item => item.rowInPartId);
 
         const dynamic = song.dynamic.filter(item => {
-            return !savedItems.includes(item.rowInPartId) && item.type !== 'drums';
+            return !savedItems.includes(item.rowInPartId) || (savedItems.includes(item.rowInPartId) && item.type !== 'drums');
         });
 
         this.editedItems.forEach(item => {
             const lines = this.liner.lines.filter(line => line.rowInPartId === item.rowInPartId);
+
             if (!lines.length) return;
 
             dynamic.push({
@@ -1151,13 +1152,14 @@ export class DrumCtrl extends KeyboardCtrl {
                     data-ide-action="add-row"
                     data-part-nio="${part.partNio}"
                     data-part-id="${part.partId}"                    
-                >add-row</span>`.trim();
+                >add</span>`.trim();
             }
 
             editingPartsContent += '</div>';
         });
 
         return `
+            ${this.getBottomCommandPanel()}
             <div style="padding-left: 1rem;">
                 <span
                     style="${cmdStyle}"
@@ -1218,8 +1220,6 @@ export class DrumCtrl extends KeyboardCtrl {
                     data-name="chess-wrapper"
                     style="width: 90%; padding-left: 1rem;"
                 ></div>
-                
-                ${this.hasIdeItem ? this.getBottomCommandPanel() : ''}
                 
                 <div data-edit-parts-wrapper>
                     ${this.getIdeContent()}                
