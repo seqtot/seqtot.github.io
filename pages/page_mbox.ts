@@ -16,6 +16,14 @@ import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
 import { SongStore, SongPage } from './song-store';
 
+const playSign = '&nbsp;&#9654;&nbsp;';
+const stopSign = '&nbsp;&#9632;&nbsp;';
+const editSign = '&nbsp;&#9998;&nbsp;';
+const selectSign = '&nbsp;&#9745;&nbsp;';
+const unselSign = '&nbsp;&#9744;&nbsp;';
+const addSign = '&nbsp;&#10010;&nbsp;';
+const delSign = '&nbsp;&#9746&nbsp;';
+
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
     bpmValue = 100;
@@ -150,17 +158,13 @@ export class MBoxPage {
                             style="${btnStl}"
                             data-song-id="${song.id}"
                             data-edit-song-action="${song.id}"
-                        >&nbsp;&#9998;&nbsp;</span>                                           
+                        >${editSign}</span>                                           
                     </div>
                 </div>`;
             });
 
             commands = `
             <div style="margin: .5rem; margin-top: 1rem;">
-                <span 
-                    style="${btnStl} margin-right: .5rem;"
-                    data-add-song-action="add-song"
-                >add</span>
                 <span
                     style="${btnStl} margin-right: .5rem;"
                     data-move-song-up-action
@@ -172,11 +176,15 @@ export class MBoxPage {
                 <span
                     style="${btnStl} margin-right: 1rem;"
                     data-rename-song-action
-                >name</span>                    
+                >name</span>
+                <span 
+                    style="${btnStl} margin-right: 1rem;"
+                    data-add-song-action="add-song"
+                >${addSign}</span>                                    
                 <span
                     style="${btnStl} color: red;"
                     data-delete-song-action
-                >&nbsp;&#9746&nbsp;</span>
+                >${delSign}</span>
             </div>
         `.trim();
         }
@@ -285,7 +293,7 @@ export class MBoxPage {
         const isMy = this.pageData.source === 'my';
 
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
-        let addPart = `<span style="${btnStl}" data-action-type="add-part">add</span>&emsp;`;
+        let addPart = `<span style="${btnStl}" data-action-type="add-part">${addSign}</span>&emsp;`;
         addPart = isMy ? addPart : '';
 
         const commandsWrapper = `
@@ -296,12 +304,12 @@ export class MBoxPage {
 
         let commands = `
             <div>
-                <span style="${btnStl}" data-action-type="unselect-all">&nbsp;&#9744;&nbsp;</span>&emsp;            
-                <span style="${btnStl}" data-action-type="select-all">&nbsp;&#9745;&nbsp;</span>&emsp;
-                <span style="${btnStl}" data-action-type="edit-selected">&nbsp;&#9998;&nbsp;</span>&emsp;
+                <span style="${btnStl}" data-action-type="unselect-all">${unselSign}</span>&emsp;            
+                <span style="${btnStl}" data-action-type="select-all">${selectSign}</span>&emsp;
+                <span style="${btnStl}" data-action-type="edit-selected">${editSign}</span>&emsp;
                 ${addPart}                                
-                <span style="${btnStl}" data-action-type="stop">stop</span>&emsp;                                                
-                <span style="${btnStl}" data-action-type="play-all">play</span>&emsp;
+                <span style="${btnStl}" data-action-type="stop">${stopSign}</span>&emsp;                                                
+                <span style="${btnStl}" data-action-type="play-all">${playSign}</span>&emsp;
             </div>
             <div style="margin-top: 1rem;">
                 <span
@@ -319,7 +327,7 @@ export class MBoxPage {
                 <span
                     style="${btnStl} color: red;"
                     data-delete-part-action                                          
-                >&nbsp;&#9746&nbsp;</span>
+                >${delSign}</span>
             </div>
         `.trim();
 
@@ -345,7 +353,7 @@ export class MBoxPage {
                             data-part-nio="${i+1}"
                             data-part-id="${info.partId}"
                             data-edit-part-action="${i+1}"                                           
-                        >&nbsp;&#9998;&nbsp;</span>
+                        >${editSign}</span>
                     </div>                    
                 </div>
             `.trim();
