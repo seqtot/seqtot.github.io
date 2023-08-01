@@ -150,7 +150,7 @@ export class MBoxPage {
                             style="${btnStl}"
                             data-song-id="${song.id}"
                             data-edit-song-action="${song.id}"
-                        >edit</span>                                           
+                        >&nbsp;&#9998;&nbsp;</span>                                           
                     </div>
                 </div>`;
             });
@@ -160,7 +160,7 @@ export class MBoxPage {
                 <span 
                     style="${btnStl} margin-right: .5rem;"
                     data-add-song-action="add-song"
-                >add song</span>
+                >add</span>
                 <span
                     style="${btnStl} margin-right: .5rem;"
                     data-move-song-up-action
@@ -176,7 +176,7 @@ export class MBoxPage {
                 <span
                     style="${btnStl} color: red;"
                     data-delete-song-action
-                >del</span>
+                >&nbsp;&#9746&nbsp;</span>
             </div>
         `.trim();
         }
@@ -284,9 +284,9 @@ export class MBoxPage {
         let topOutParts = this.topOutParts;
         const isMy = this.pageData.source === 'my';
 
-        let addPart = `<a data-action-type="add-part"><b>add part</b></a>&emsp;`;
+        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
+        let addPart = `<span style="${btnStl}" data-action-type="add-part">add</span>&emsp;`;
         addPart = isMy ? addPart : '';
-        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
 
         const commandsWrapper = `
             <div style="margin: .5rem 1rem;">
@@ -296,14 +296,14 @@ export class MBoxPage {
 
         let commands = `
             <div>
-                <a data-action-type="select-all"><b>selectAll</b></a>&emsp;
-                <a data-action-type="unselect-all"><b>unselect</b></a>&emsp;
-                <a data-action-type="stop"><b>stop</b></a>&emsp;                                                
-                <a data-action-type="play-all"><b>play</b></a>&emsp;
-                <a data-action-type="edit-selected"><b>edit</b></a>&emsp;
-                ${addPart}
+                <span style="${btnStl}" data-action-type="unselect-all">&nbsp;&#9744;&nbsp;</span>&emsp;            
+                <span style="${btnStl}" data-action-type="select-all">&nbsp;&#9745;&nbsp;</span>&emsp;
+                <span style="${btnStl}" data-action-type="edit-selected">&nbsp;&#9998;&nbsp;</span>&emsp;
+                ${addPart}                                
+                <span style="${btnStl}" data-action-type="stop">stop</span>&emsp;                                                
+                <span style="${btnStl}" data-action-type="play-all">play</span>&emsp;
             </div>
-            <div style="margin: .5rem; margin-top: 1rem;">
+            <div style="margin-top: 1rem;">
                 <span
                     style="${btnStl} margin-right: .5rem;"
                     data-move-part-up-action
@@ -319,7 +319,7 @@ export class MBoxPage {
                 <span
                     style="${btnStl} color: red;"
                     data-delete-part-action                                          
-                >del</span>
+                >&nbsp;&#9746&nbsp;</span>
             </div>
         `.trim();
 
@@ -345,7 +345,7 @@ export class MBoxPage {
                             data-part-nio="${i+1}"
                             data-part-id="${info.partId}"
                             data-edit-part-action="${i+1}"                                           
-                        >edit</span>
+                        >&nbsp;&#9998;&nbsp;</span>
                     </div>                    
                 </div>
             `.trim();
@@ -420,11 +420,7 @@ export class MBoxPage {
 
     gotoEditPart(pPartNio?: number | string) {
         let partNio = parseInteger(pPartNio, null);
-
-        if (!isPresent(partNio)) return;
-
         let editPartsNio: number[] = [];
-
         const isMy = this.pageData.source === 'my';
 
         if (partNio) {
