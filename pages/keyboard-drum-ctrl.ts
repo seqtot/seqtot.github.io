@@ -1208,7 +1208,7 @@ export class DrumCtrl extends KeyboardCtrl {
         }, '');
 
         const content = `
-            <div class="page-content" style="padding-top: 0; padding-bottom: 2rem;">
+            <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 2rem;">
                 ${metronome}
                 ${this.getDrumBoardContent(keyboardId)}
                 ${this.getTopCommandPanel()}

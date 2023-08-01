@@ -10,16 +10,11 @@ import { standardTicks as ticks } from './ticks';
 import { getMidiConfig, getTopOutList } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSettings';
-import { isPresent, parseInteger, TextBlock } from '../libs/muse/utils/utils-note';
+import {isPresent, parseInteger, SongPartInfo, TextBlock} from '../libs/muse/utils/utils-note';
 import { LineModel } from './line-model';
 import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
 import { SongStore, SongPage } from './song-store';
-
-const ns = {
-    setBmpAction: 'set-bmp-action',
-    setNote: 'set-note',
-};
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -31,6 +26,8 @@ export class MBoxPage {
     pitchShift: number = 0;
     excludePartNio: number [] = [];
     excludeInstrument: {[key: string]: any} = {};
+
+    selectedSong = '';
 
     get pageId(): string {
         return this.props.id;
@@ -64,8 +61,6 @@ export class MBoxPage {
     get topOutParts(): string[] {
         if (this.pageData.source === 'my') {
             const song = SongStore.getSong(this.songId, true);
-
-            console.log('SONG', this.songId, song);
 
             return song.parts.map((item, i) => {
                 return `${item.name} %${item.id} №${i+1}`;
@@ -132,26 +127,59 @@ export class MBoxPage {
 
     getListPageContent(): string {
         let content = this.pageData.content;
+        let songListContent = '';
+        let commands = '';
+        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const isMy = this.pageData.source === 'my';
 
-        function getInnerLink(name: string, href: string): string {
-            return `<a class="link" href="${href}">${name}</a>`;
-        }
-
-        if (this.pageData.source === 'my') {
-            content = '';
+        if (isMy) {
+            songListContent = '';
             const songs = SongStore.getSongs();
 
             songs.forEach(song => {
-                const link = getInnerLink(song.name, `/mbox/${song.id}/`);
-                content += `<div style="margin: .5rem;">${link} (${song.id})</div>`;
+                content += `<div class="row" style="margin: .5rem;">
+                    <div>
+                        <span
+                            style="font-weight: 400; user-select: none;"
+                            data-song-id="${song.id}"
+                            data-song-item="${song.id}"                        
+                        >${song.name}</span>
+                    </div>
+                    <div>
+                        <span
+                            style="${btnStl}"
+                            data-song-id="${song.id}"
+                            data-edit-song-action="${song.id}"
+                        >edit</span>                                           
+                    </div>
+                </div>`;
             });
-        }
 
-        let addSong = this.pageData.source === 'my'
-            ? `<div style="margin: .5rem 1rem;">
-                <a data-action-type="add-song"><b>add song</b></a>&emsp;                
-            </div>`.trim()
-        : '';
+            commands = `
+            <div style="margin: .5rem; margin-top: 1rem;">
+                <span 
+                    style="${btnStl} margin-right: .5rem;"
+                    data-add-song-action="add-song"
+                >add song</span>
+                <span
+                    style="${btnStl} margin-right: .5rem;"
+                    data-move-song-up-action
+                >&nbsp;&uarr;&nbsp;</span>
+                <span
+                    style="${btnStl} margin-right: .5rem;"
+                    data-move-song-down-action
+                >&nbsp;&darr;&nbsp;</span>                        
+                <span
+                    style="${btnStl} margin-right: 1rem;"
+                    data-rename-song-action
+                >name</span>                    
+                <span
+                    style="${btnStl} color: red;"
+                    data-delete-song-action
+                >del</span>
+            </div>
+        `.trim();
+        }
 
         let metronome = `
             <div style="padding: 1rem .5rem 1rem .5rem;">${this.getMetronomeContent()}</div>        
@@ -159,7 +187,8 @@ export class MBoxPage {
 
         return `
             ${metronome}
-            ${addSong}                        
+            ${commands}
+            ${songListContent}
             <div data-name="pageContent">${content}</div>
         `.trim();
     }
@@ -189,6 +218,7 @@ export class MBoxPage {
         const wrapper = `
             <div
                 class="page-content"
+                data="page-content"
                 style="padding-top: 0;
                 padding-bottom: 2rem;"
             >%content%</div>
@@ -197,18 +227,19 @@ export class MBoxPage {
 
         if (this.pageData.isSongList) {
             content = wrapper.replace('%content%', this.getListPageContent());
+            this.el$.html(content);
+            this.updateSongListView();
         }
         else {
             content = wrapper.replace('%content%', this.getSongPageContent());
+            this.el$.html(content);
+            this.updatePartListView();
         }
 
-        this.el$.html(content);
-
-        this.bpmRange = (this.context.$f7 as any).range.create({ // jjkl
+        this.bpmRange = (this.context.$f7 as any).range.create({
             el: dyName('slider', this.pageEl),
             on: {
                 changed: (range: any) => {
-                    //console.log('range.onChange', range); // jjkl
                     this.bpmValue = range.value;
 
                     if (this.playingTick) {
@@ -255,6 +286,7 @@ export class MBoxPage {
 
         let addPart = `<a data-action-type="add-part"><b>add part</b></a>&emsp;`;
         addPart = isMy ? addPart : '';
+        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
 
         const commandsWrapper = `
             <div style="margin: .5rem 1rem;">
@@ -263,12 +295,32 @@ export class MBoxPage {
         `.trim();
 
         let commands = `
-            <a data-action-type="select-all"><b>selectAll</b></a>&emsp;
-            <a data-action-type="unselect-all"><b>unselect</b></a>&emsp;
-            <a data-action-type="stop"><b>stop</b></a>&emsp;                                                
-            <a data-action-type="play-all"><b>play</b></a>&emsp;
-            <a data-action-type="edit-selected"><b>edit</b></a>&emsp;
-            ${addPart}                                
+            <div>
+                <a data-action-type="select-all"><b>selectAll</b></a>&emsp;
+                <a data-action-type="unselect-all"><b>unselect</b></a>&emsp;
+                <a data-action-type="stop"><b>stop</b></a>&emsp;                                                
+                <a data-action-type="play-all"><b>play</b></a>&emsp;
+                <a data-action-type="edit-selected"><b>edit</b></a>&emsp;
+                ${addPart}
+            </div>
+            <div style="margin: .5rem; margin-top: 1rem;">
+                <span
+                    style="${btnStl} margin-right: .5rem;"
+                    data-move-part-up-action
+                >&nbsp;&uarr;&nbsp;</span>
+                <span
+                    style="${btnStl} margin-right: .5rem;"
+                    data-move-part-down-action
+                >&nbsp;&darr;&nbsp;</span>
+                <span
+                    style="${btnStl} margin-right: 1rem;"
+                    data-rename-part-action                                           
+                >name</span>                                    
+                <span
+                    style="${btnStl} color: red;"
+                    data-delete-part-action                                          
+                >del</span>
+            </div>
         `.trim();
 
         if (!topOutParts.length) {
@@ -281,17 +333,20 @@ export class MBoxPage {
             const info = un.getPartInfo(item);
 
             acc = acc + `
-                <div class="row">
+                <div class="row" style="margin: .5rem;">
                     <span
-                        style="margin-left: 1rem; font-weight: 700; user-select: none;"
+                        style="font-weight: 700; user-select: none;"
                         data-part-nio="${i+1}"
-                        data-part-ref="${info.ref}"                        
+                        data-part-item="${info.ref}"                        
                     >${info.partNio}&nbsp;&nbsp;${info.ref}</span>
-                    <span
-                        style="margin-right: 1rem; user-select: none;"
-                        data-part-nio="${i+1}"
-                        data-edit-part-link="${i+1}"                                           
-                    >edit</span>                    
+                    <div>                                            
+                        <span
+                            style="${btnStl}"
+                            data-part-nio="${i+1}"
+                            data-part-id="${info.partId}"
+                            data-edit-part-action="${i+1}"                                           
+                        >edit</span>
+                    </div>                    
                 </div>
             `.trim();
 
@@ -331,7 +386,7 @@ export class MBoxPage {
     subscribeEvents() {
         this.subscribePageEvents();
         this.subscribeMetronomeEvents();
-        this.subscribeTrackEvents();
+        this.subscribeSongsAndPartsActions();
         this.subscribeInstrumentEvents();
     }
 
@@ -353,7 +408,21 @@ export class MBoxPage {
         });
     }
 
-    gotoEdit(partNio?: number) {
+    gotoEditSong(songId?: string) {
+        songId = (songId || '').trim();
+
+        if(!songId) return;
+
+        console.log('songId', songId); // jjkl
+
+        this.context.$f7router.navigate(`/mbox/${songId}/`);
+    }
+
+    gotoEditPart(pPartNio?: number | string) {
+        let partNio = parseInteger(pPartNio, null);
+
+        if (!isPresent(partNio)) return;
+
         let editPartsNio: number[] = [];
 
         const isMy = this.pageData.source === 'my';
@@ -377,47 +446,245 @@ export class MBoxPage {
         ideService.currentEdit.source = this.pageData.source;
         ideService.currentEdit.freezeStructure = !isMy;
 
-        console.log('currentEdit', ideService.currentEdit);
+        //console.log('currentEdit', ideService.currentEdit);
 
         this.context.$f7router.navigate('/page/page_keyboard/');
     }
 
-    subscribeTrackEvents() {
-        getWithDataAttr('part-ref', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', (evt ) => {
-                //let el: HTMLElement = evt.target as any;
-                let partNio = parseInteger(el.dataset.partNio, null);
-
-                if (!isPresent(partNio)) {
-                    return;
-                }
-
-                if (this.excludePartNio.includes(partNio)) {
-                    this.excludePartNio = this.excludePartNio.filter(item => item !== partNio );
-                    el.style.fontWeight = '700';
-                }
-                else {
-                    this.excludePartNio.push(partNio);
-                    el.style.fontWeight = '400';
-                }
-            });
+    subscribeSongsAndPartsActions() {
+        // SONG ACTIONS
+        getWithDataAttr('delete-song-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.deleteSong(this.selectedSong));
         });
 
-        getWithDataAttr('edit-part-link', this.pageEl)?.forEach((el) => {
-            el.addEventListener('pointerdown', () => {
-                let partNio = parseInteger(el.dataset.partNio, null);
-
-                if (!isPresent(partNio)) {
-                    return;
-                }
-
-                this.gotoEdit(partNio);
-            });
+        getWithDataAttr('edit-song-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.gotoEditSong(el.dataset.songId));
         });
+
+        getWithDataAttr('rename-song-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.renameSong(this.selectedSong));
+        });
+
+        getWithDataAttr('move-song-up-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.moveSong(this.selectedSong, -1));
+        });
+
+        getWithDataAttr('move-song-down-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.moveSong(this.selectedSong, 1));
+        });
+
+        getWithDataAttr('song-item', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.selectSong(el.dataset.songId));
+        });
+
+        // PART ACTIONS
+        getWithDataAttr('part-item', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.selectPart(el.dataset.partNio));
+        });
+
+        getWithDataAttr('edit-part-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.gotoEditPart(el.dataset.partNio));
+        });
+
+        getWithDataAttr('delete-part-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.deletePart());
+        });
+
+        getWithDataAttr('rename-part-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.renamePart());
+        });
+
+        getWithDataAttr('move-part-up-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.movePart(-1));
+        });
+
+        getWithDataAttr('move-part-down-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.movePart(1));
+        });
+    }
+
+    getOneSelectedPartNio(parts?: string[]): number {
+        const topOutParts = Array.isArray(parts) ? parts : this.topOutParts;
+
+        if ((topOutParts.length - this.excludePartNio.length) !== 1 ){
+            return 0;
+        } else {
+            for (let i = 0; i < topOutParts.length; i++) {
+                if (!this.excludePartNio.includes(i+1)) {
+                    return i+1;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    getOneSelectedPartInfo(topOutParts?: string[]): SongPartInfo {
+        topOutParts = Array.isArray(topOutParts) ? topOutParts: this.topOutParts;
+        const partNio = this.getOneSelectedPartNio(topOutParts);
+
+        if (!partNio) return null;
+
+        return un.getPartInfo(topOutParts[partNio - 1]);
+    }
+
+    selectAllParts() {
+        this.excludePartNio = [];
+        this.updatePartListView();
+    }
+
+    unselectAllParts() {
+        const topOutParts = this.topOutParts;
+
+        this.excludePartNio = topOutParts.map((item, i) => i+1);
+        this.updatePartListView();
+    }
+
+    selectPart(partNio: number | string) {
+        partNio = parseInteger(partNio, null);
+
+        if (!partNio) return;
+
+        if (this.excludePartNio.includes(partNio)) {
+            this.excludePartNio = this.excludePartNio.filter(item => item !== partNio );
+        }
+        else {
+            this.excludePartNio.push(partNio);
+        }
+
+        this.updatePartListView();
+    }
+
+    movePart(offset: number) {
+        const songId = (this.songId || '').trim();
+        const part = this.getOneSelectedPartInfo();
+
+        if (!songId || !part) return;
+
+        if (SongStore.movePart(songId, part.partId, offset)) {
+            const topOutParts = this.topOutParts;
+            this.excludePartNio = [];
+
+            topOutParts.forEach((item, i) => {
+                if (un.getPartInfo(item).partId !== part.partId) {
+                    this.excludePartNio.push(i + 1);
+                }
+            });
+        }
+
+        this.setPageContent();
+    }
+
+    updatePartListView() {
+        getWithDataAttr('part-item', this.pageEl).forEach(el => {
+            const partNio = parseInteger(el.dataset.partNio, 0);
+
+            if (this.excludePartNio.includes(partNio)) {
+                el.style.fontWeight = '400';
+            } else {
+                el.style.fontWeight = '700';
+            }
+        });
+    }
+
+    updateSongListView() {
+        getWithDataAttr('song-item', this.pageEl).forEach(el => {
+           el.style.fontWeight = '400';
+           if (el.dataset.songId === this.selectedSong) {
+               el.style.fontWeight = '700';
+           }
+        });
+    }
+
+    selectSong(songId: string) {
+        this.selectedSong = this.selectedSong === songId ? '' : songId;
+        this.updateSongListView();
+    }
+
+    moveSong(songId: string, offset: number) {
+        SongStore.moveSong(songId, offset);
+        this.setPageContent();
+    }
+
+    renameSong(songId: string) {
+        songId = (songId || '').trim();
+
+        if (!songId) return;
+
+        this.prompt = (this.context.$f7 as any).dialog.prompt(
+            'Название',
+            'Наименование',
+            (newName: string) => {
+                SongStore.renameSong(songId, newName.trim());
+                this.setPageContent();
+            },
+        );
+
+        this.prompt.open();
+    }
+
+    deleteSong(songId: string) {
+        songId = (songId || '').trim();
+
+        if (!songId) return;
+
+        this.confirm = (this.context.$f7 as any).dialog.confirm(
+            '',
+            'Удалить?',
+            () => {
+                SongStore.deleteSong(songId);
+                this.setPageContent();
+            },
+            () => {}, // cancel
+        );
+
+        this.confirm.open();
+    }
+
+    renamePart() {
+        const songId = (this.songId || '').trim();
+        const part = this.getOneSelectedPartInfo();
+
+        if (!songId || !part) return;
+
+        this.prompt = (this.context.$f7 as any).dialog.prompt(
+            'Название только буквами, цифрами, знаками - или _ (без пробелов)',
+            'Наименование',
+            (newName: string) => {
+                SongStore.renamePart(songId, part.partId, newName.trim());
+                this.setPageContent();
+            },
+        );
+
+        this.prompt.open();
+    }
+
+    deletePart() {
+        const part = this.getOneSelectedPartInfo();
+
+        if (!part) return;
+
+        const partId = part.partId;
+        const partNio = part.partNio;
+
+        // https://framework7.io/docs/dialog
+        // app.dialog.confirm(text, title, callbackOk, callbackCancel)- create Confirm Dialog and open it
+        this.confirm = (this.context.$f7 as any).dialog.confirm(
+            '',
+            'Удалить?',
+            () => {
+                SongStore.deletePart(this.songId, partId);
+                this.setPageContent();
+            },
+            () => {}, // cancel
+        );
+
+        this.confirm.open();
     }
 
     dialog: Dialog.Dialog;
     prompt: Dialog.Dialog;
+    confirm: Dialog.Dialog;
 
     addSong(name: string) {
         const song = SongStore.addSong(name);
@@ -453,7 +720,7 @@ export class MBoxPage {
             });
         });
 
-        getWithDataAttrValue('action-type', 'add-song', this.pageEl).forEach((el) => {
+        getWithDataAttr('add-song-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => {
                 // this.dialog = (this.context.$f7 as any).dialog.create({
                 //     text: 'Hello World',
@@ -493,29 +760,15 @@ export class MBoxPage {
         });
 
         getWithDataAttrValue('action-type', 'select-all', this.pageEl)?.forEach((el) => {
-            el.addEventListener('pointerdown', () => {
-                this.excludePartNio = [];
-
-                getWithDataAttr('part-ref', this.pageEl).forEach(el => {
-                    el.style.fontWeight = '700';
-                });
-            });
+            el.addEventListener('pointerdown', () => this.selectAllParts());
         });
 
-        getWithDataAttrValue('action-type', 'unselect-all', this.pageEl)?.forEach((el) => {
-            el.addEventListener('pointerdown', () => {
-                const topOutParts = this.topOutParts;
-
-                getWithDataAttr('part-ref', this.pageEl).forEach(el => {
-                    el.style.fontWeight = '400';
-                });
-
-                this.excludePartNio = topOutParts.map((item, i) => i+1);
-            });
+        getWithDataAttrValue('action-type', 'unselect-all', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.unselectAllParts());
         });
 
         getWithDataAttrValue('action-type', 'edit-selected', this.pageEl)?.forEach((el) => {
-            el.addEventListener('pointerdown', () => this.gotoEdit());
+            el.addEventListener('pointerdown', () => this.gotoEditPart());
         });
     }
 
@@ -526,7 +779,7 @@ export class MBoxPage {
             });
         });
 
-        getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
+        getWithDataAttr('set-bmp-action', this.pageEl)?.forEach(
             (el: HTMLElement) => {
                 el.addEventListener('pointerdown', () => {
                     this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);
