@@ -1165,11 +1165,7 @@ export class DrumCtrl extends KeyboardCtrl {
                 <span
                     style="${cmdStyle}"
                     data-ide-action="back"
-                >back</span>
-                <!--span
-                    style="${cmdStyle}"
-                    data-ide-action="play-all"
-                >playAll</span-->                
+                >back</span>&nbsp;&nbsp;
                 <span
                     style="${cmdStyle} color: blue;"
                     data-ide-action="play-active"
@@ -1177,8 +1173,7 @@ export class DrumCtrl extends KeyboardCtrl {
                 <span
                     style="${cmdStyle} color: gray;"
                     data-ide-action="stop"
-                >${sings.stop}</span>
-                &nbsp;&nbsp;
+                >${sings.stop}</span>&nbsp;&nbsp;                
                 <span
                     style="${cmdStyle}"
                     data-ide-action="clear"

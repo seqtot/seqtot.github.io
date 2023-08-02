@@ -400,24 +400,23 @@ export class KeyboardCtrl {
                     <span
                         style="${style}"
                         data-ide-action="save"
-                    >save</span>
-                    &nbsp;
+                    >save</span>&nbsp;
                     <span
                         style="${style}"
                         data-ide-action="load"
-                    >load</span>
+                    >load</span>&nbsp;
                     <!--span
                         style="${style}"
                         data-ide-action="clear"
                     >clear</span-->
                     <span
-                        style="${style}"
+                        style="${style} color: gray;"
                         data-ide-action="stop"
-                    >stop</span>
+                    >${sings.stop}</span>
                     <span
-                        style="${style} color: blue;"
+                        style="${style} color: blue; padding-left: .25rem; padding-right: .25rem;"
                         data-ide-action="play-both"
-                    >play2</span>
+                    >${sings.play1}2</span>
                 </div>
             </div>
         `.trim();
