@@ -900,7 +900,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
     getDrumNotesPanel(): string {
         const rowStyle = `width: 100%; font-family: monospace; margin-top: .5rem; margin-bottom: .5rem; user-select: none;`;
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none; touch-action: none;`;
 
         let wrapper = `
             <div style="display: flex; width: 90%; justify-content: space-between; user-select: none; margin-bottom: .5rem;">

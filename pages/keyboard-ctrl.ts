@@ -70,34 +70,26 @@ export class KeyboardCtrl {
 
     getMoveButtons(size: number = 1): string {
         const style1 = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
-        const style3 = `border-radius: 0.25rem; border: 1px solid black; font-size: ${size}rem; user-select: none; touch-action: none;`;
-
-        let delButton = '';
 
         return `
-        <span
-            style="${style1}"
-            data-action-move-cell="left"
-        >&nbsp;&lt;&nbsp;</span>
-        <span
-            style="${style1}"
-            data-action-move-cell="top"
-        >&nbsp;&uarr;&nbsp;</span>    
-        <span
-            style="${style1}"
-            data-action-move-cell="bottom"
-        >&nbsp;&darr;&nbsp;</span>                                
-        <span
-            style="${style1}"
-            data-action-move-cell="right"
-        >&nbsp;&gt;&nbsp;</span>                                        
-        <span
-            style="${style3}"
-            data-action-type="empty"
-        >&nbsp;&nbsp;&nbsp;</span>
-    `.trim();
+            <span
+                style="${style1}"
+                data-action-move-cell="left"
+            >&nbsp;&lt;&nbsp;</span>
+            <span
+                style="${style1}"
+                data-action-move-cell="top"
+            >&nbsp;&uarr;&nbsp;</span>
+            <span
+                style="${style1}"
+                data-action-move-cell="bottom"
+            >&nbsp;&darr;&nbsp;</span>
+            <span
+                style="${style1}"
+                data-action-move-cell="right"
+            >&nbsp;&gt;&nbsp;</span>
+        `.trim();
     }
-
 
     addCellDuration(id: number, value: number) {
         const result = this.liner.addCellDuration(id, value);
@@ -237,11 +229,11 @@ export class KeyboardCtrl {
                 <span
                     style="${style}"
                     data-edit-row-action="add-row"
-                >addR</span>  
+                >addR</span>
                 <span
                     style="${style}"
                     data-edit-row-action="insert-row"
-                >insR</span>                                  
+                >insR</span>&nbsp;&nbsp;
                 <span
                     style="${style} color: red;"
                     data-edit-row-action="delete-row"
@@ -257,7 +249,7 @@ export class KeyboardCtrl {
         let delButton = '';
         if (hasDel) {
             delButton = `
-                <span
+                &nbsp;&nbsp;<span
                     style="${style} background-color: red; color: white;"
                     data-edit-action="delete-cell"
                 >del</span>            
