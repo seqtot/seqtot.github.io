@@ -5,6 +5,8 @@ import { KeyData, Line, LineModel, NoteItem, CELL_SIZE } from './line-model';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 
+import { sings } from './sings';
+
 const DOWN = 1;
 const UP = 0;
 const rem = 'rem';
@@ -90,10 +92,6 @@ export class ToneCtrl extends KeyboardCtrl {
                 &nbsp;&nbsp;
                 <span
                     style="${style}"
-                    data-action-type="stop"
-                >stop</span>                                        
-                <span
-                    style="${style}"
                     data-action-type="tick"
                     data-signature="1:4"
                 >1:4</span>
@@ -101,11 +99,15 @@ export class ToneCtrl extends KeyboardCtrl {
                     style="${style}"
                     data-action-type="tick"
                     data-signature="3:4"                    
-                >3:4</span>                    
+                >3:4</span>  
+                <span
+                    style="${style} color: gray;"
+                    data-action-type="stop"
+                >${sings.stop}</span>                                  
                 <span
                     style="${style} color: blue;"
                     data-page-action="play-one"
-                >play</span>
+                >${sings.play}</span>
             </div>
         `.trim();
 

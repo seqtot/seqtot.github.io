@@ -7,22 +7,15 @@ import { Dom7Array } from 'dom7';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
-import { getMidiConfig, getTopOutList } from '../libs/muse/utils/getMidiConfig';
+import {getMidiConfig, getTopOutList, MidiConfig} from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSettings';
 import {isPresent, parseInteger, SongPartInfo, TextBlock} from '../libs/muse/utils/utils-note';
 import { LineModel } from './line-model';
 import mboxes from '../mboxes';
 import ideService from './ide/ide-service';
-import { SongStore, SongPage } from './song-store';
-
-const playSign = '&nbsp;&#9654;&nbsp;';
-const stopSign = '&nbsp;&#9632;&nbsp;';
-const editSign = '&nbsp;&#9998;&nbsp;';
-const selectSign = '&nbsp;&#9745;&nbsp;';
-const unselSign = '&nbsp;&#9744;&nbsp;';
-const addSign = '&nbsp;&#10010;&nbsp;';
-const delSign = '&nbsp;&#9746&nbsp;';
+import {SongStore, SongPage, StoredRow} from './song-store';
+import { sings } from './sings';
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -158,7 +151,7 @@ export class MBoxPage {
                             style="${btnStl}"
                             data-song-id="${song.id}"
                             data-edit-song-action="${song.id}"
-                        >${editSign}</span>                                           
+                        >${sings.edit}</span>                                           
                     </div>
                 </div>`;
             });
@@ -180,11 +173,11 @@ export class MBoxPage {
                 <span 
                     style="${btnStl} margin-right: 1rem;"
                     data-add-song-action="add-song"
-                >${addSign}</span>                                    
+                >${sings.add}</span>                                    
                 <span
                     style="${btnStl} color: red;"
                     data-delete-song-action
-                >${delSign}</span>
+                >${sings.delete}</span>
             </div>
         `.trim();
         }
@@ -293,7 +286,7 @@ export class MBoxPage {
         const isMy = this.pageData.source === 'my';
 
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
-        let addPart = `<span style="${btnStl}" data-action-type="add-part">${addSign}</span>&emsp;`;
+        let addPart = `<span style="${btnStl}" data-action-type="add-part">${sings.add}</span>&emsp;`;
         addPart = isMy ? addPart : '';
 
         const commandsWrapper = `
@@ -304,12 +297,12 @@ export class MBoxPage {
 
         let commands = `
             <div>
-                <span style="${btnStl}" data-action-type="unselect-all">${unselSign}</span>&emsp;            
-                <span style="${btnStl}" data-action-type="select-all">${selectSign}</span>&emsp;
-                <span style="${btnStl}" data-action-type="edit-selected">${editSign}</span>&emsp;
+                <span style="${btnStl}" data-action-type="unselect-all">${sings.unselect}</span>&emsp;            
+                <span style="${btnStl}" data-action-type="select-all">${sings.select}</span>&emsp;
+                <span style="${btnStl}" data-action-type="edit-selected">${sings.edit}</span>&emsp;
                 ${addPart}                                
-                <span style="${btnStl}" data-action-type="stop">${stopSign}</span>&emsp;                                                
-                <span style="${btnStl}" data-action-type="play-all">${playSign}</span>&emsp;
+                <span style="${btnStl} color: gray;" data-action-type="stop">${sings.stop}</span>&emsp;                                                
+                <span style="${btnStl} color: blue;" data-action-type="play-all">${sings.play}</span>&emsp;
             </div>
             <div style="margin-top: 1rem;">
                 <span
@@ -327,7 +320,7 @@ export class MBoxPage {
                 <span
                     style="${btnStl} color: red;"
                     data-delete-part-action                                          
-                >${delSign}</span>
+                >${sings.delete}</span>
             </div>
         `.trim();
 
@@ -353,7 +346,7 @@ export class MBoxPage {
                             data-part-nio="${i+1}"
                             data-part-id="${info.partId}"
                             data-edit-part-action="${i+1}"                                           
-                        >${editSign}</span>
+                        >${sings.edit}</span>
                     </div>                    
                 </div>
             `.trim();
@@ -426,6 +419,17 @@ export class MBoxPage {
         this.context.$f7router.navigate(`/mbox/${songId}/`);
     }
 
+    getSelectedParts(): string[] {
+        return this.topOutParts
+            .filter((nio, i) => !this.excludePartNio.includes(i + 1));
+    }
+
+    getSelectedPartsNio(): number[] {
+        return this.topOutParts
+            .map((item, i) => (i+1))
+            .filter(nio => !this.excludePartNio.includes(nio));
+    }
+
     gotoEditPart(pPartNio?: number | string) {
         let partNio = parseInteger(pPartNio, null);
         let editPartsNio: number[] = [];
@@ -434,9 +438,7 @@ export class MBoxPage {
         if (partNio) {
             editPartsNio = [partNio];
         } else {
-            editPartsNio = this.topOutParts
-                .map((item, i) => (i+1))
-                .filter(nio => !this.excludePartNio.includes(nio));
+            editPartsNio = this.getSelectedPartsNio();
         }
 
         if (!editPartsNio.length) return;
@@ -813,15 +815,133 @@ export class MBoxPage {
         return metaByLines;
     }
 
+
+    buildBlocksForMySong(blocks: TextBlock[]): TextBlock[] {
+        const songId = this.songId;
+        const song = SongStore.getSong(songId);
+        const hash = {};
+        const list: {id: string, rows: StoredRow[][]}[] = [];
+        const selectedParts = this.getSelectedParts();
+
+        selectedParts.forEach(partStr => {
+            const part = un.getPartInfo(partStr);
+            const partRows = song.dynamic.filter(row => {
+                const iPartId = (row.partId || '').trim();
+                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
+
+                if (part.partId && iPartId) {
+                    return part.partId === iPartId;
+                }
+
+                return part.partNio === iPartNio;
+            });
+
+            partRows.sort((a, b) => {
+                const iRowNioA = un.parseInteger(a.rowInPartId.split('-')[1], 0);
+                const iRowNioB = un.parseInteger(b.rowInPartId.split('-')[1], 0);
+
+                if (iRowNioA < iRowNioB) return -1;
+                if (iRowNioA > iRowNioB) return 1;
+
+                return 0;
+            });
+
+            partRows.forEach(row => {
+                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
+                const iRowNio = un.parseInteger(row.rowInPartId.split('-')[1], 0);
+
+                if (!hash[iPartNio]) {
+                    hash[iPartNio] = {
+                        id: part.partId,
+                        rows: [],
+                    };
+                    list.push(hash[iPartNio]);
+                }
+
+                if (!hash[iPartNio][iRowNio]) {
+                    hash[iPartNio][iRowNio] = [];
+                    hash[iPartNio].rows.push(hash[iPartNio][iRowNio]);
+                }
+
+                hash[iPartNio][iRowNio].push(row);
+            });
+
+        });
+
+        let topOutBlocks: string[][] = [];
+
+        list.forEach(part => {
+            let partSetRows: string[] = [`<${part.id} set>`];
+
+            part.rows.forEach(row => {
+                let maxDurQ = 0;
+                let targetDurQ = 0;
+                let headGuid = `head_${ideService.guid.toString()}`;
+                let rowRefs: string[] = [headGuid];
+
+                row.forEach(item => {
+                    const guid = `temp_${ideService.guid.toString()}`;
+                    const durQ = LineModel.GetDurationQByLines(item.lines);
+
+                    let notes = this.getNotes(guid, item);
+
+                    if(!notes) {
+                        notes = `<${guid} $>\n$organ: ${durQ}`;
+                    }
+
+                    const block = un.getTextBlocks(notes)[0];
+
+                    blocks = [...blocks, block];
+
+                    maxDurQ = durQ > maxDurQ ? durQ: maxDurQ;
+
+                    rowRefs.push(guid);
+                });
+
+                const headBlock = un.getTextBlocks(`<${headGuid} $>\n$organ: ${maxDurQ}`)[0];
+
+                blocks = [...blocks, headBlock];
+
+                partSetRows.push(rowRefs.join(' '));
+            });
+
+            topOutBlocks.push(partSetRows);
+        });
+
+        topOutBlocks.forEach(part => {
+            const partBlock = un.getTextBlocks(part.join('\n'))[0];
+            blocks = [...blocks, partBlock];
+        });
+
+        return blocks;
+    }
+
+    getNotes(id: string, item: StoredRow): string {
+        if (item.type === 'drums') {
+            return LineModel.GetDrumNotes(id, item.lines);
+        }
+
+        return LineModel.GetToneNotes({
+            blockName: id,
+            rows: item.lines,
+            instr: '$organ',
+            chnl: '$organ',
+        });
+    }
+
     playAll(index: number | string = 0) {
+        const isMy = this.pageData.source === 'my';
+
         this.stop();
-
         index = parseInteger(index, 0);
-
         let currRowInfo: RowInfo = { first: index, last: index}; // индекс в текущем блоке
 
+        let blocks = isMy ? this.buildBlocksForMySong(this.blocks) : [...this.blocks];
+
+        console.log('BLOCK', blocks);
+
         const x = {
-            blocks: this.blocks,
+            blocks,
             currBlock: null as un.TextBlock,
             currRowInfo: currRowInfo,
             excludeIndex: this.excludePartNio,
@@ -836,10 +956,10 @@ export class MBoxPage {
 
         //console.log('getMidiConfig', x);
 
-        let blocks = [...x.blocks];
+        blocks = [...x.blocks];
 
         // DYNAMIC
-        if (this.pageData.dynamic?.['@drums']) {
+        if (!isMy && this.pageData.dynamic?.['@drums']) {
             const map = this.pageData.dynamic?.['@drums'];
 
             playBlock.rows.forEach((row, i) => {

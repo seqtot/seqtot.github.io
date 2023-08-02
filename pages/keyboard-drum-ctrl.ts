@@ -11,6 +11,7 @@ import ideService from './ide/ide-service';
 import { DrumBoard, drumNotesInfo } from './drum-board';
 import { KeyboardCtrl, BpmInfo, KeyboardPage } from './keyboard-ctrl';
 import { SongStore, StoredRow, SongPage } from './song-store';
+import {sings} from './sings';
 
 const ids = {
     rowInPartId: 'row-in-part-id',
@@ -462,7 +463,7 @@ export class DrumCtrl extends KeyboardCtrl {
         topOutBlocks.forEach(part => {
             const partBlock = un.getTextBlocks(part.join('\n'))[0];
             blocks = [...blocks, partBlock];
-        })
+        });
 
         //jjkl
         //console.log('hash', hash);
@@ -950,14 +951,14 @@ export class DrumCtrl extends KeyboardCtrl {
 
         let actions = `
             <span
-                style="${style}"
+                style="${style} color: gray;"
                 data-action-type="stop"
-            >stop</span>
+            >${sings.stop}</span>
             &nbsp;
             <span
                 style="${style} color: blue;"
                 data-page-action="play-one"
-            >play</span>        
+            >${sings.play}</span>        
         `.trim();
 
         wrapper = wrapper.replace('%instruments%', topRow + midRow + botRow);
@@ -1172,11 +1173,11 @@ export class DrumCtrl extends KeyboardCtrl {
                 <span
                     style="${cmdStyle} color: blue;"
                     data-ide-action="play-active"
-                >playActive</span>
+                >${sings.play}</span>
                 <span
-                    style="${cmdStyle}"
+                    style="${cmdStyle} color: gray;"
                     data-ide-action="stop"
-                >stop</span>
+                >${sings.stop}</span>
                 &nbsp;&nbsp;
                 <span
                     style="${cmdStyle}"

@@ -8,6 +8,7 @@ import * as un from '../libs/muse/utils'
 import {parseInteger} from '../libs/common';
 
 import ideService from './ide/ide-service';
+import { sings } from './sings';
 
 export type BpmInfo = {
     bpm: number;
@@ -321,10 +322,6 @@ export class KeyboardCtrl {
                 >&nbsp;&nbsp;&nbsp;</span>                    
                 <span
                     style="${style}"
-                    data-action-type="stop"
-                >stop</span>                                        
-                <span
-                    style="${style}"
                     data-action-type="tick"
                     data-signature="1:4"
                 >1:4</span>
@@ -332,11 +329,15 @@ export class KeyboardCtrl {
                     style="${style}"
                     data-action-type="tick"
                     data-signature="3:4"                    
-                >3:4</span>                    
+                >3:4</span>
+                <span
+                    style="${style} color: gray;"
+                    data-action-type="stop"
+                >${sings.stop}</span>                                                    
                 <span
                     style="${style} color: blue;"
                     data-page-action="play-one"
-                >play</span>
+                >${sings.play}</span>
             </div>
         `.trim();
 
