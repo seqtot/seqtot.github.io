@@ -59,7 +59,7 @@ export class MBoxPage {
         return  this.blocks.find((item) => item.id === 'out');
     }
 
-    get topOutParts(): string[] {
+    get allSongParts(): string[] {
         if (this.pageData.source === 'my') {
             const song = SongStore.getSong(this.songId, true);
 
@@ -72,7 +72,7 @@ export class MBoxPage {
             return [];
         }
 
-        return  getTopOutList({topBlock: this.outBlock, printN: true});
+        return getTopOutList({topBlock: this.outBlock, printN: true});
     }
 
     getId(id: string): string {
@@ -282,7 +282,7 @@ export class MBoxPage {
 
 
     getSongPartsContent(): string {
-        let topOutParts = this.topOutParts;
+        let allSongParts = this.allSongParts;
         const isMy = this.pageData.source === 'my';
 
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
@@ -324,13 +324,13 @@ export class MBoxPage {
             </div>
         `.trim();
 
-        if (!topOutParts.length) {
+        if (!allSongParts.length) {
             commands = addPart;
         }
 
         commands = commandsWrapper.replace('%content%', commands);
 
-        let tracks = topOutParts.reduce((acc, item, i) => {
+        let tracks = allSongParts.reduce((acc, item, i) => {
             const info = un.getPartInfo(item);
 
             acc = acc + `
@@ -354,7 +354,7 @@ export class MBoxPage {
                 return acc;
             }, '');
 
-        return commands + tracks  + (topOutParts.length > 5 ? commands : '');
+        return commands + tracks  + (allSongParts.length > 5 ? commands : '');
     }
 
     playTick(name?: string) {
@@ -420,12 +420,14 @@ export class MBoxPage {
     }
 
     getSelectedParts(): string[] {
-        return this.topOutParts
+        const parts =  this.allSongParts
             .filter((nio, i) => !this.excludePartNio.includes(i + 1));
+
+        return parts;
     }
 
     getSelectedPartsNio(): number[] {
-        return this.topOutParts
+        return this.allSongParts
             .map((item, i) => (i+1))
             .filter(nio => !this.excludePartNio.includes(nio));
     }
@@ -444,7 +446,7 @@ export class MBoxPage {
         if (!editPartsNio.length) return;
 
         ideService.currentEdit.songId = this.songId;
-        ideService.currentEdit.topOutParts = this.topOutParts;
+        ideService.currentEdit.topOutParts = this.allSongParts;
         ideService.currentEdit.blocks = this.blocks;
         ideService.currentEdit.outBlock = this.outBlock;
         ideService.currentEdit.metaByLines = this.getMetaByLines();
@@ -510,12 +512,12 @@ export class MBoxPage {
     }
 
     getOneSelectedPartNio(parts?: string[]): number {
-        const topOutParts = Array.isArray(parts) ? parts : this.topOutParts;
+        const allSongParts = Array.isArray(parts) ? parts : this.allSongParts;
 
-        if ((topOutParts.length - this.excludePartNio.length) !== 1 ){
+        if ((allSongParts.length - this.excludePartNio.length) !== 1 ){
             return 0;
         } else {
-            for (let i = 0; i < topOutParts.length; i++) {
+            for (let i = 0; i < allSongParts.length; i++) {
                 if (!this.excludePartNio.includes(i+1)) {
                     return i+1;
                 }
@@ -525,13 +527,13 @@ export class MBoxPage {
         return 0;
     }
 
-    getOneSelectedPartInfo(topOutParts?: string[]): SongPartInfo {
-        topOutParts = Array.isArray(topOutParts) ? topOutParts: this.topOutParts;
-        const partNio = this.getOneSelectedPartNio(topOutParts);
+    getOneSelectedPartInfo(parts?: string[]): SongPartInfo {
+        parts = Array.isArray(parts) ? parts: this.allSongParts;
+        const partNio = this.getOneSelectedPartNio(parts);
 
         if (!partNio) return null;
 
-        return un.getPartInfo(topOutParts[partNio - 1]);
+        return un.getPartInfo(parts[partNio - 1]);
     }
 
     selectAllParts() {
@@ -540,9 +542,9 @@ export class MBoxPage {
     }
 
     unselectAllParts() {
-        const topOutParts = this.topOutParts;
+        const allSongParts = this.allSongParts;
 
-        this.excludePartNio = topOutParts.map((item, i) => i+1);
+        this.excludePartNio = allSongParts.map((item, i) => i+1);
         this.updatePartListView();
     }
 
@@ -568,10 +570,10 @@ export class MBoxPage {
         if (!songId || !part) return;
 
         if (SongStore.movePart(songId, part.partId, offset)) {
-            const topOutParts = this.topOutParts;
+            const allSongParts = this.allSongParts;
             this.excludePartNio = [];
 
-            topOutParts.forEach((item, i) => {
+            allSongParts.forEach((item, i) => {
                 if (un.getPartInfo(item).partId !== part.partId) {
                     this.excludePartNio.push(i + 1);
                 }
@@ -955,6 +957,7 @@ export class MBoxPage {
         if (isMy) {
             const rows = this.getSelectedParts().map(row => `> ${row}`);
 
+            x.excludeIndex = []; // либо надо билдить ВСЕ части
             x.currBlock = un.createOutBlock({
                 id: 'out',
                 bpm: this.bpmValue,
@@ -966,13 +969,13 @@ export class MBoxPage {
             x.currBlock = x.blocks.find((item) => item.id === 'out');
         }
 
-        console.log('BLOCK', blocks);
+        //console.log('BLOCK', blocks);
 
         getMidiConfig(x);
 
         const playBlock = x.playBlockOut as TextBlock;
 
-        //console.log('getMidiConfig', x);
+        console.log('getMidiConfig', x);
 
         blocks = [...x.blocks];
 
