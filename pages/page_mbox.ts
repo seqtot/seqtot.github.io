@@ -917,6 +917,10 @@ export class MBoxPage {
     }
 
     getNotes(id: string, item: StoredRow): string {
+        item.lines.forEach(line => {
+            line.blockOffsetQ = 0;
+        });
+
         if (item.type === 'drums') {
             return LineModel.GetDrumNotes(id, item.lines);
         }
@@ -938,8 +942,6 @@ export class MBoxPage {
 
         let blocks = isMy ? this.buildBlocksForMySong(this.blocks) : [...this.blocks];
 
-        console.log('BLOCK', blocks);
-
         const x = {
             blocks,
             currBlock: null as un.TextBlock,
@@ -950,8 +952,24 @@ export class MBoxPage {
             topBlocksOut: [],
         };
 
-        x.currBlock = x.blocks.find((item) => item.id === 'out');
+        if (isMy) {
+            const rows = this.getSelectedParts().map(row => `> ${row}`);
+
+            x.currBlock = un.createOutBlock({
+                id: 'out',
+                bpm: this.bpmValue,
+                rows,
+                volume: 50,
+                type: 'text'
+            });
+        } else {
+            x.currBlock = x.blocks.find((item) => item.id === 'out');
+        }
+
+        console.log('BLOCK', blocks);
+
         getMidiConfig(x);
+
         const playBlock = x.playBlockOut as TextBlock;
 
         //console.log('getMidiConfig', x);
