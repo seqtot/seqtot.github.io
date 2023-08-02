@@ -88,8 +88,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 <span
                     style="${style}"
                     data-action-tone="record-mode"
-                >rec</span>
-                &nbsp;&nbsp;
+                >rec</span>&nbsp;
                 <span
                     style="${style}"
                     data-action-type="tick"
@@ -99,7 +98,7 @@ export class ToneCtrl extends KeyboardCtrl {
                     style="${style}"
                     data-action-type="tick"
                     data-signature="3:4"                    
-                >3:4</span>  
+                >3:4</span>&nbsp;
                 <span
                     style="${style} color: gray;"
                     data-action-type="stop"

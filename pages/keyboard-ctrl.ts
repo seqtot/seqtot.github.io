@@ -316,10 +316,7 @@ export class KeyboardCtrl {
                 <span
                     style="${style}"
                     data-page-action="record"
-                >rec</span>
-                <span
-                    style="${style}"
-                >&nbsp;&nbsp;&nbsp;</span>                    
+                >rec</span>&nbsp;
                 <span
                     style="${style}"
                     data-action-type="tick"
@@ -329,7 +326,7 @@ export class KeyboardCtrl {
                     style="${style}"
                     data-action-type="tick"
                     data-signature="3:4"                    
-                >3:4</span>
+                >3:4</span>&nbsp;
                 <span
                     style="${style} color: gray;"
                     data-action-type="stop"
