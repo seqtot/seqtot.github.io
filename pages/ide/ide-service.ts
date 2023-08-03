@@ -24,8 +24,8 @@ class IdeService extends  EventEmitter {
     currentEdit: {
         songId: string,
         blocks: TextBlock[],
-        outBlock: TextBlock,
-        topOutParts: string[],
+        bpmValue: number,
+        allSongParts: string[],
         editPartsNio?: number[],
         metaByLines: {[key: string]: string},
         freezeStructure: boolean,

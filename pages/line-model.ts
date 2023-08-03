@@ -699,6 +699,14 @@ export class LineModel {
         return result;
     }
 
+    static ClearBlockOffset(rows: Line[]): Line[] {
+        rows.forEach(row => {
+            row.blockOffsetQ = 0;
+        });
+
+        return rows;
+    }
+
     static RecalcAndClearBlockOffset(rows: Line[]): Line[] {
         rows.forEach(row => {
             row.startOffsetQ = row.startOffsetQ + row.blockOffsetQ;

@@ -1,14 +1,16 @@
 import { ComponentContext } from 'framework7/modules/component/component';
-import {getWithDataAttr, getWithDataAttrValue} from '../src/utils';
+import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Synthesizer } from '../libs/muse/synthesizer';
 import { MultiPlayer } from '../libs/muse/multi-player';
 
-import {Line, LineModel, CELL_SIZE} from './line-model';
+import { Line, LineModel, CELL_SIZE } from './line-model';
 import * as un from '../libs/muse/utils'
-import {parseInteger} from '../libs/common';
+import { parseInteger } from '../libs/common';
 
 import ideService from './ide/ide-service';
 import { sings } from './sings';
+import { SongPage, StoredRow } from './song-store';
+import { SongPartInfo } from '../libs/muse/utils';
 
 export type BpmInfo = {
     bpm: number;
@@ -29,8 +31,22 @@ export interface KeyboardPage {
     context: ComponentContext,
 }
 
-export type ToneKeyboardType = 'bassGuitar' | 'soloHarmonica' | 'bassHarmonica' | 'bassSoloHarmonica' | 'guitar';
-export type DrumKeyboardType = 'drums' | 'perc';
+export const toneBoards = {
+    bassGuitar: 'bassGuitar',
+    solo34: 'solo34',
+    bass34: 'bass34',
+    bassSolo34: 'bassSolo34',
+    guitar: 'guitar',
+    piano: 'guitar',
+}
+
+export const drumBoards = {
+    drums: 'drums',
+    percussion: 'percussion'
+}
+
+export type ToneKeyboardType = 'bassGuitar' | 'solo34' | 'bass34' | 'bassSolo34' | 'guitar';
+export type DrumKeyboardType = 'drums' | 'percussion';
 
 export class KeyboardCtrl {
     liner = new LineModel();
@@ -51,7 +67,7 @@ export class KeyboardCtrl {
     get hasIdeItem(): boolean {
         const item = ideService.currentEdit;
 
-        return !!item && !!item.editPartsNio && !!item.topOutParts && !!item.outBlock && !!item.blocks;
+        return !!item && !!item.editPartsNio && !!item.allSongParts; //  && !!item.outBlock && !!item.blocks
     }
 
     constructor(
@@ -69,25 +85,29 @@ export class KeyboardCtrl {
     }
 
     getMoveButtons(size: number = 1): string {
-        const style1 = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
+        const style = [
+            `user-select: none; touch-action: none;`,
+            `font-size: ${size}rem; padding-left: .25rem; padding-right: .25rem;`,
+            `border-radius: 0.25rem; border: 1px solid lightgray;`,
+        ].join('');
 
         return `
             <span
-                style="${style1}"
+                style="${style}"
                 data-action-move-cell="left"
-            >&nbsp;&lt;&nbsp;</span>
+            >&lt;</span>&emsp;
             <span
-                style="${style1}"
+                style="${style}"
                 data-action-move-cell="top"
-            >&nbsp;&uarr;&nbsp;</span>
+            >&uarr;</span>&emsp;
             <span
-                style="${style1}"
+                style="${style}"
                 data-action-move-cell="bottom"
-            >&nbsp;&darr;&nbsp;</span>
+            >&darr;</span>&emsp;
             <span
-                style="${style1}"
+                style="${style}"
                 data-action-move-cell="right"
-            >&nbsp;&gt;&nbsp;</span>
+            >&gt;</span>
         `.trim();
     }
 
@@ -426,5 +446,73 @@ export class KeyboardCtrl {
 
     setEditingItemDurationAndBlockOffsetByLines() {
 
+    }
+
+    getRowsForPart(song: SongPage, part: SongPartInfo): StoredRow[] {
+        const partRows = song.dynamic.filter(row => {
+            const iPartId = (row.partId || '').trim();
+            const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
+
+            if (part.partId && iPartId) {
+                return part.partId === iPartId;
+            }
+
+            return part.partNio === iPartNio;
+        });
+
+        partRows.sort((a, b) => {
+            const iRowNioA = un.parseInteger(a.rowInPartId.split('-')[1], 0);
+            const iRowNioB = un.parseInteger(b.rowInPartId.split('-')[1], 0);
+
+            if (iRowNioA < iRowNioB) return -1;
+            if (iRowNioA > iRowNioB) return 1;
+
+            return 0;
+        });
+
+        return partRows;
+    }
+
+    resetBlockOffset(rows: StoredRow[]) {
+        rows.forEach(row => {
+            LineModel.ClearBlockOffset(row.lines);
+        });
+    }
+
+    getPartsWithRows(
+        song: SongPage,
+        parts: SongPartInfo[],
+        resetBlockOffset = false
+    ): {partId: string, rows: StoredRow[][]}[] {
+        const hash = {};
+        const list: {partId: string, rows: StoredRow[][]}[] = [];
+
+        parts.forEach(part => {
+            const partRows = this.getRowsForPart(song, part);
+
+            if (resetBlockOffset) this.resetBlockOffset(partRows);
+
+            partRows.forEach(row => {
+                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
+                const iRowNio = un.parseInteger(row.rowInPartId.split('-')[1], 0);
+
+                if (!hash[iPartNio]) {
+                    hash[iPartNio] = {
+                        partId: part.partId,
+                        rows: [],
+                    };
+                    list.push(hash[iPartNio]);
+                }
+
+                if (!hash[iPartNio][iRowNio]) {
+                    hash[iPartNio][iRowNio] = [];
+                    hash[iPartNio].rows.push(hash[iPartNio][iRowNio]);
+                }
+
+                hash[iPartNio][iRowNio].push(row);
+            });
+        });
+
+        return list;
     }
 }

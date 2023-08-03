@@ -215,8 +215,8 @@ export class ToneCtrl extends KeyboardCtrl {
 
         let result = `
             <div style="margin: 0; padding: 1rem .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                ${hlp.getVerticalKeyboard('base', 'bassHarmonica', hlp.bassKeys)}
-                ${hlp.getVerticalKeyboard('solo', 'soloHarmonica', hlp.soloKeys)}
+                ${hlp.getVerticalKeyboard('base', 'bass34', hlp.bassKeys)}
+                ${hlp.getVerticalKeyboard('solo', 'solo34', hlp.soloKeys)}
                 <div 
                     style="font-size: 2rem;
                     font-family: monospace;
@@ -282,7 +282,7 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getContent(type?: ToneKeyboardType): string {
-        if (type === 'bassSoloHarmonica') {
+        if (type === 'bassSolo34') {
             return this.getHarmonicaContent();
         }
         else if(type === 'bassGuitar') {
@@ -300,7 +300,7 @@ export class ToneCtrl extends KeyboardCtrl {
         getWithDataAttr('note-key', this.page.pageEl)?.forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
 
-            if (this.type === 'bassSoloHarmonica') {
+            if (this.type === 'bassSolo34') {
                 el.style.boxShadow = null;
             }
 

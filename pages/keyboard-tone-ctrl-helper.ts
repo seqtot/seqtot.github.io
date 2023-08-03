@@ -373,7 +373,7 @@ export function getVerticalKeyboard(
 ): string {
     keyboardId = keyboardId || '';
 
-    const isHarmonica = type === 'bassSoloHarmonica' || type === 'bassHarmonica' || type === 'soloHarmonica';
+    const isHarmonica = type === 'bassSolo34' || type === 'bass34' || type === 'solo34';
     const size = 1.9;
 
 

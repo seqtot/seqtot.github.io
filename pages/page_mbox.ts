@@ -148,7 +148,7 @@ export class MBoxPage {
                     </div>
                     <div>
                         <span
-                            style="${btnStl}"
+                            style="${btnStl} margin-right: .5rem;"
                             data-song-id="${song.id}"
                             data-edit-song-action="${song.id}"
                         >${sings.edit}</span>                                           
@@ -342,7 +342,7 @@ export class MBoxPage {
                     >${info.partNio}&nbsp;&nbsp;${info.ref}</span>
                     <div>                                            
                         <span
-                            style="${btnStl}"
+                            style="${btnStl} margin-right: .5rem;"
                             data-part-nio="${i+1}"
                             data-part-id="${info.partId}"
                             data-edit-part-action="${i+1}"                                           
@@ -446,9 +446,9 @@ export class MBoxPage {
         if (!editPartsNio.length) return;
 
         ideService.currentEdit.songId = this.songId;
-        ideService.currentEdit.topOutParts = this.allSongParts;
+        ideService.currentEdit.allSongParts = this.allSongParts;
         ideService.currentEdit.blocks = this.blocks;
-        ideService.currentEdit.outBlock = this.outBlock;
+        ideService.currentEdit.bpmValue = this.bpmValue;
         ideService.currentEdit.metaByLines = this.getMetaByLines();
         ideService.currentEdit.editPartsNio = editPartsNio;
         ideService.currentEdit.source = this.pageData.source;

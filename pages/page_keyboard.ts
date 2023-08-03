@@ -95,7 +95,7 @@ export class KeyboardPage implements Page {
         this.keyboardType = keyboardType;
 
         if (
-            this.keyboardType === 'bassSoloHarmonica' ||
+            this.keyboardType === 'bassSolo34' ||
             this.keyboardType === 'bassGuitar' ||
             this.keyboardType === 'guitar'
         ) {
@@ -117,7 +117,7 @@ export class KeyboardPage implements Page {
         dyName('panel-right-content').innerHTML = `
             <p data-action-set-keyboard-type="bassGuitar">Bass guitar</p>
             <p data-action-set-keyboard-type="guitar">Guitar</p>                       
-            <p data-action-set-keyboard-type="bassSoloHarmonica">Harmonica</p>
+            <p data-action-set-keyboard-type="bassSolo34">Harmonica</p>
             <p data-action-set-keyboard-type="drums">Percussion</p>
             <p data-action-set-keyboard-type="drums">Drums</p>
         `;
@@ -235,7 +235,7 @@ export class KeyboardPage implements Page {
     }
 
     subscribePageEvents() {
-        if (this.keyboardType === 'bassSoloHarmonica' ||
+        if (this.keyboardType === 'bassSolo34' ||
             this.keyboardType === 'bassGuitar' ||
             this.keyboardType === 'guitar'
         ) {

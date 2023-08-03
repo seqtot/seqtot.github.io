@@ -363,67 +363,22 @@ export class DrumCtrl extends KeyboardCtrl {
         });
     }
 
-    buildBlocksForMySong(blocks: TextBlock[], withCurrent = true): TextBlock[] {
+    buildBlocksForMySong(blocks: TextBlock[], resetBlockOffset = false, useEditing = false): TextBlock[] {
         const song = SongStore.getSong(ideService.currentEdit.songId);
-
         const editingParts: SongPartInfo[] = [];
 
         ideService.currentEdit.editPartsNio.sort();
-        ideService.currentEdit.editPartsNio.forEach((partNio, i) => {
-            editingParts.push(un.getPartInfo(ideService.currentEdit.topOutParts[partNio - 1]));
+        ideService.currentEdit.editPartsNio.forEach(partNio => {
+            editingParts.push(
+                un.getPartInfo(ideService.currentEdit.allSongParts[partNio - 1])
+            );
         });
 
-        const hash = {};
-        const list: {id: string, rows: StoredRow[][]}[] = [];
-
-        editingParts.forEach(part => {
-            const partRows = song.dynamic.filter(row => {
-                const iPartId = (row.partId || '').trim();
-                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
-
-                if (part.partId && iPartId) {
-                    return part.partId === iPartId;
-                }
-
-                return part.partNio === iPartNio;
-            });
-
-            partRows.sort((a, b) => {
-                const iRowNioA = un.parseInteger(a.rowInPartId.split('-')[1], 0);
-                const iRowNioB = un.parseInteger(b.rowInPartId.split('-')[1], 0);
-
-                if (iRowNioA < iRowNioB) return -1;
-                if (iRowNioA > iRowNioB) return 1;
-
-                return 0;
-            });
-
-            partRows.forEach(row => {
-                const iPartId = (row.partId || '').trim();
-                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
-                const iRowNio = un.parseInteger(row.rowInPartId.split('-')[1], 0);
-
-                if (!hash[iPartNio]) {
-                    hash[iPartNio] = {
-                        id: part.partId,
-                        rows: [],
-                    };
-                    list.push(hash[iPartNio]);
-                }
-
-                if (!hash[iPartNio][iRowNio]) {
-                    hash[iPartNio][iRowNio] = [];
-                    hash[iPartNio].rows.push(hash[iPartNio][iRowNio]);
-                }
-
-                hash[iPartNio][iRowNio].push(row);
-            });
-        });
-
+        const partsWithRows = this.getPartsWithRows(song, editingParts, resetBlockOffset);
         let topOutBlocks: string[][] = [];
 
-        list.forEach(part => {
-            let partSetRows: string[] = [`<${part.id} set>`];
+        partsWithRows.forEach(part => {
+            let partSetRows: string[] = [`<${part.partId} set>`];
 
             part.rows.forEach(row => {
                 let maxDurQ = 0;
@@ -462,6 +417,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
         topOutBlocks.forEach(part => {
             const partBlock = un.getTextBlocks(part.join('\n'))[0];
+
             blocks = [...blocks, partBlock];
         });
 
@@ -493,7 +449,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
         let rowsForPlay: string[] = [];
 
-        const midiConfig = this.getMidiConfig();
+        const midiConfig = this.getMidiConfig({ resetBlockOffset: true, useEditing: true });
         let blocks = midiConfig.blocks;
         let playBlock = midiConfig.playBlockOut as TextBlock;
 
@@ -539,7 +495,7 @@ export class DrumCtrl extends KeyboardCtrl {
     playActive() {
         if (!this.hasEditedItems) return;
 
-        const midiConfig = this.getMidiConfig();
+        const midiConfig = this.getMidiConfig({ resetBlockOffset: true });
         const playBlock = midiConfig.playBlockOut as TextBlock;
         const playingRows = playBlock.rows.filter(item => {
             const part = un.getPartInfo(item);
@@ -1016,16 +972,19 @@ export class DrumCtrl extends KeyboardCtrl {
         return content;
     }
 
-    getMidiConfig(withCurrent = true): MidiConfig {
+    getMidiConfig(x: {
+        resetBlockOffset?: boolean,
+        useEditing?: boolean
+    } = {}): MidiConfig {
         const currentEdit = ideService.currentEdit;
         let blocks = [...currentEdit.blocks];
 
         if (currentEdit.source === 'my') {
-            blocks = this.buildBlocksForMySong(blocks, withCurrent);
+            blocks = this.buildBlocksForMySong(blocks, x.resetBlockOffset, x.useEditing);
         }
 
         const rows = currentEdit.editPartsNio.reduce((acc, partNio) => {
-            const part = currentEdit.topOutParts[partNio - 1];
+            const part = currentEdit.allSongParts[partNio - 1];
             const info = un.getPartInfo(part);
             let N = '';
 
@@ -1067,7 +1026,7 @@ export class DrumCtrl extends KeyboardCtrl {
         const currentEdit = ideService.currentEdit;
         const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
 
-        this.page.bpmValue = currentEdit.outBlock.bpm;
+        this.page.bpmValue = currentEdit.bpmValue || 90;
 
         const midiConfig = this.getMidiConfig();
 
@@ -1088,7 +1047,7 @@ export class DrumCtrl extends KeyboardCtrl {
         // ЗАПОЛНЯЕМ ЧАСТИ
         ideService.currentEdit.editPartsNio.sort();
         ideService.currentEdit.editPartsNio.forEach(partNio => {
-            const part = un.getPartInfo(currentEdit.topOutParts[partNio - 1]);
+            const part = un.getPartInfo(currentEdit.allSongParts[partNio - 1]);
 
             if (!partHash[part.partNio]) {
                 partHash[part.partNio] = {
