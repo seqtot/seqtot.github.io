@@ -859,11 +859,11 @@ export class DrumCtrl extends KeyboardCtrl {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none; touch-action: none;`;
 
         let wrapper = `
-            <div style="display: flex; width: 90%; justify-content: space-between; user-select: none; margin-bottom: .5rem;">
+            <div style="display: flex; width: 90%; justify-content: flex-start; user-select: none; margin-bottom: .5rem;">
                 <div style="border-radius: .5rem; margin-left: .5rem; padding-left: .5rem; padding-right: .5rem; border: 1px solid lightgray;">
                     %instruments%
                 </div>
-                <div style="padding: .5rem;">
+                <div style="margin-left: 1rem;">
                     %actions%
                 </div>                
             </div>
@@ -906,15 +906,26 @@ export class DrumCtrl extends KeyboardCtrl {
         botRow = `<div style="${rowStyle}">${botRow}</div>`;
 
         let actions = `
-            <span
-                style="${style} color: gray;"
-                data-action-type="stop"
-            >${sings.stop}</span>
-            &nbsp;
-            <span
-                style="${style} color: blue;"
-                data-page-action="play-one"
-            >${sings.play}</span>        
+            <div style="padding-top: .5rem;">
+                ${this.getMoveButtons()}
+            </div>
+            <div style="padding-top: .5rem;">
+                <span
+                    style="${style} color: gray;"
+                    data-action-type="stop"
+                >${sings.stop}</span>
+                &nbsp;
+                <span
+                    style="${style} color: blue;"
+                    data-page-action="play-one"
+                >${sings.play}</span>
+            </div>     
+            <div style="display: flex; justify-content: flex-end; padding-top: .5rem;">
+               <span
+                    style="${style} background-color: red; color: white;"
+                    data-edit-action="delete-cell"
+                >del</span>
+            </div>               
         `.trim();
 
         wrapper = wrapper.replace('%instruments%', topRow + midRow + botRow);
@@ -1168,7 +1179,7 @@ export class DrumCtrl extends KeyboardCtrl {
                 ${this.getDrumBoardContent(keyboardId)}
                 ${this.getTopCommandPanel()}
                 ${this.getRowActionsCommands()}                
-                ${this.getMoveCommandPanel()}
+                <!--${this.getMoveCommandPanel()} -->
                 ${this.getDrumNotesPanel()}
                 
                 <div

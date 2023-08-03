@@ -87,7 +87,8 @@ export class KeyboardCtrl {
     getMoveButtons(size: number = 1): string {
         const style = [
             `user-select: none; touch-action: none;`,
-            `font-size: ${size}rem; padding-left: .25rem; padding-right: .25rem;`,
+            `padding-left: .25rem; padding-right: .25rem;`,
+            `font-size: ${size}rem; font-weight: 800;`,
             `border-radius: 0.25rem; border: 1px solid lightgray;`,
         ].join('');
 
