@@ -906,23 +906,22 @@ export class DrumCtrl extends KeyboardCtrl {
         botRow = `<div style="${rowStyle}">${botRow}</div>`;
 
         let actions = `
-            <div style="padding-top: .5rem;">
+            <div style="${rowStyle}">
                 ${this.getMoveButtons()}
             </div>
-            <div style="padding-top: .5rem;">
+            <div style="${rowStyle}">
                 <span
                     style="${style} color: gray;"
                     data-action-type="stop"
                 >${sings.stop}</span>
-                &nbsp;
                 <span
                     style="${style} color: blue;"
                     data-page-action="play-one"
                 >${sings.play}</span>
             </div>     
-            <div style="display: flex; justify-content: flex-end; padding-top: .5rem;">
+            <div style="${rowStyle} display: flex; justify-content: flex-end; padding-right: 1rem;">
                <span
-                    style="${style} background-color: red; color: white;"
+                    style="${style} background-color: red; color: white; font-size: 1rem;"
                     data-edit-action="delete-cell"
                 >del</span>
             </div>               
