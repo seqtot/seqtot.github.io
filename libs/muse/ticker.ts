@@ -190,14 +190,7 @@ export class Ticker {
         let offset = 0;
 
         for (let i=0; i<repeat; i++) {
-            if (x.signature !== '3:4') {
-                const soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
-                soundSource.buffer = x.preset1.zones[0].buffer;
-                soundSource.connect(offlineCtx.destination);
-                soundSource.start(currentTime + offset);
-                offset = offset + qmsSec;
-            }
-            else if (x.signature === '3:4') {
+            if (x.signature === '3:8') {
                 const qmsHalfSec = qmsSec / 2;
 
                 let soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
@@ -218,6 +211,14 @@ export class Ticker {
                 soundSource.start(currentTime + offset);
                 offset = offset + qmsHalfSec;
             }
+            else { // 1:4
+                const soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+                soundSource.buffer = x.preset1.zones[0].buffer;
+                soundSource.connect(offlineCtx.destination);
+                soundSource.start(currentTime + offset);
+                offset = offset + qmsSec;
+            }
+
         }
 
         offlineCtx

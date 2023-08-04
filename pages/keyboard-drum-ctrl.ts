@@ -2,42 +2,27 @@ import { drumInfo } from '../libs/muse/drums';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils/utils-note';
 import { parseInteger } from '../libs/common';
-import { LineModel, Line, NoteItem, KeyData, Cell } from './line-model';
-import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
-import { getOutBlocksInfo, OutBlockRowInfo } from '../libs/muse/utils/getOutBlocksInfo';
-import {createOutBlock, SongPartInfo, TextBlock} from '../libs/muse/utils/utils-note';
+import { LineModel, Line, NoteItem, KeyData } from './line-model';
+import { createOutBlock, TextBlock } from '../libs/muse/utils/utils-note';
 
-import ideService from './ide/ide-service';
+import { ideService } from './ide/ide-service';
 import { DrumBoard, drumNotesInfo } from './drum-board';
-import { KeyboardCtrl, BpmInfo, KeyboardPage } from './keyboard-ctrl';
-import { SongStore, StoredRow, SongPage } from './song-store';
-import {sings} from './sings';
+import { KeyboardCtrl, BpmInfo, KeyboardPage, DrumKeyboardType } from './keyboard-ctrl';
+import { sings } from './sings';
 
-const ids = {
-    rowInPartId: 'row-in-part-id',
-    duration: 'duration',
-    rowNio: 'row-nio',
-    partNio: 'part-nio',
-    songName: 'song-name',
-    ideAction: 'ide-action',
-    ideContent: 'ide-content',
-    bottomCommandPanel: 'bottom-command-panel',
-    actionDrumNote: 'action-drum-note',
-};
-
-const drumKodesTop = [
+const drumCodesTop = [
     {note: 'ho', alias: 'ча'},
     {note: 'cc', alias: 'щи'},
     {note: 'rc', alias: 'ци'},
 ];
 
-const drumKodesMid = [
+const drumCodesMid = [
     {note: 'th', alias: 'та'},
     {note: 'tm', alias: 'тo'},
     {note: 'tl', alias: 'ту'},
 ];
 
-const drumKodesBot = [
+const drumCodesBot = [
     {note: 'hc', alias: 'чи'},
     {note: 'sn', alias: 'ба'},
     {note: 'bd', alias: 'пы'},
@@ -50,15 +35,6 @@ const someDrum = {
     char: '?',
 }
 
-type EditedItem = {
-    rowInPartId: string, // partNio-rowNio
-    songName: string,
-    duration: number,
-    partId: string,
-    partNio: number, // номер части
-    rowNio: number,  // номер строки внутри части
-}
-
 type ChessCell = {
     noteId: number,
     cellId: number,
@@ -69,20 +45,6 @@ type ChessCell = {
     underline: boolean,
 }
 
-type StoredItem = {
-    rowInPartId: string,
-    type: string,
-    status: string,
-    rows: Line[],
-    lines: Line[]
-}
-
-type StoredSongNode ={
-    [key: string]: {
-        items: StoredItem[]
-    }
-};
-
 const DOWN = 1;
 const UP = 0;
 
@@ -92,18 +54,20 @@ export class DrumCtrl extends KeyboardCtrl {
     keyData: KeyData | null = null;
     keySequence: KeyData[] = [];
     tickStartMs: number = 0;
-
-    editedItems: EditedItem[] = [];
     board: DrumBoard;
 
-    constructor(public page: KeyboardPage) {
-        super(page);
+    get hasEditedItems(): boolean {
+        return !!ideService.editedItems.length;
+    }
+
+    constructor(public page: KeyboardPage, public type: DrumKeyboardType) {
+        super(page, type);
 
         this.board = new DrumBoard();
     }
 
     highlightInstruments() {
-        getWithDataAttr(ids.actionDrumNote, this.page.pageEl).forEach(el => {
+        getWithDataAttr('action-drum-note', this.page.pageEl).forEach(el => {
             el.style.fontWeight = '400';
             el.style.backgroundColor = 'white';
         });
@@ -111,237 +75,25 @@ export class DrumCtrl extends KeyboardCtrl {
         const notes = this.liner.getNotesByOffset(this.activeCell.offset);
 
         notes.forEach(note => {
-            getWithDataAttrValue(ids.actionDrumNote, note.note, this.page.pageEl).forEach(el => {
+            getWithDataAttrValue('action-drum-note', note.note, this.page.pageEl).forEach(el => {
                 el.style.fontWeight = '700';
                 el.style.backgroundColor = 'lightgray';
             });
         });
     }
 
-    get hasEditedItems(): boolean {
-        return !!this.editedItems.length;
-    }
+    updateView() {
+        getWithDataAttr('row-in-part-item', this.page.pageEl).forEach(el => {
+            const rowInPartId = el.dataset['rowInPartId'];
 
-    loadFile() {
-        // https://webtips.dev/download-any-file-with-javascript
-        let songName = ideService.currentEdit?.songId || '';
-
-        if (!songName) return;
-
-        let songNode: StoredSongNode;
-
-        if (!localStorage.getItem(songName)) {
-            songNode = {};
-        } else {
-            songNode = JSON.parse(localStorage.getItem(songName));
-        }
-
-        let data = JSON.stringify(songNode);
-        //let type = 'application/json';
-        let type = 'application/text';
-        let name = `${songName}.txt`;
-
-        downloader(data, type, name)
-
-        function downloader(data, type, name) {
-            let blob = new Blob([data], {type});
-            let url = (window as any).URL.createObjectURL(blob);
-            downloadURI(url, name);
-            (window as any).URL.revokeObjectURL(url);
-        }
-
-        function downloadURI(uri, name) {
-            let link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            link.click();
-        }
-    }
-
-    saveEditingItemsMy() {
-        if (!this.hasEditedItems) return;
-
-        let songName = this.editedItems[0].songName;
-        let song = SongStore.getSong(songName);
-
-        const savedItems = this.editedItems.map(item => item.rowInPartId);
-
-        const dynamic = song.dynamic.filter(item => {
-            return !savedItems.includes(item.rowInPartId) || (savedItems.includes(item.rowInPartId) && item.type !== 'drums');
-        });
-
-        this.editedItems.forEach(item => {
-            const lines = this.liner.lines.filter(line => line.rowInPartId === item.rowInPartId);
-
-            if (!lines.length) return;
-
-            dynamic.push({
-                type: 'drums',
-                rowInPartId: item.rowInPartId,
-                lines,
-                partId: item.partId,
-                rowNio: item.rowNio,
-                status: 'unknown',
-            });
-        });
-
-        song.dynamic = dynamic;
-
-        SongStore.setSong(songName, song);
-    }
-
-    saveEditingItems() {
-        if (!this.hasEditedItems) return;
-
-        if (ideService.currentEdit.source === 'my') {
-            this.saveEditingItemsMy();
-
-            return;
-        }
-
-        let songName = this.editedItems[0].songName;
-        let songNode: StoredSongNode;
-
-        if (!localStorage.getItem(songName)) {
-            songNode = {};
-        } else {
-            songNode = JSON.parse(localStorage.getItem(songName));
-        }
-
-        this.editedItems.forEach(item => {
-            const rows = this.liner.lines.filter(row => row.rowInPartId === item.rowInPartId);
-            if (!rows.length) return;
-
-            let itemsNode = songNode[item.rowInPartId];
-            if (!itemsNode) {
-                itemsNode = {
-                    items: []
-                };
-                songNode[item.rowInPartId] = itemsNode;
-            }
-
-            let drumsNode = itemsNode.items.find(iItem => iItem.rowInPartId === item.rowInPartId && iItem.type === 'drums');
-            if (!drumsNode) {
-                drumsNode = {
-                    rowInPartId: item.rowInPartId,
-                    type: 'drums',
-                    status: 'draft',
-                    rows: [],
-                    lines: [],
-                };
-                itemsNode.items.push(drumsNode);
-            }
-
-            drumsNode.rows = rows;
-        });
-
-        localStorage.setItem(songName, JSON.stringify(songNode));
-    }
-
-    sortEditingItems() {
-        this.editedItems.sort((a, b) => {
-            if (a.partNio < b.partNio) return -1;
-            if (a.partNio > b.partNio) return 1;
-
-            if (a.rowNio < b.rowNio) return -1;
-            if (a.rowNio > b.rowNio) return 1;
-
-            return 0;
-        });
-    }
-
-    addOrRemoveEditingItem(item: EditedItem, el: HTMLElement) {
-        if (this.editedItems.find(iItem => iItem.rowInPartId === item.rowInPartId)) {
-            this.editedItems = this.editedItems.filter(iItem => iItem.rowInPartId !== item.rowInPartId);
-            el.style.fontWeight = '400';
-
-            return;
-        }
-
-        this.editedItems.push(item);
-        el.style.fontWeight = '600';
-    }
-
-    setEditingItemDurationAndBlockOffsetByLines() {
-        this.sortEditingItems();
-
-        let blockOffsetQ = 0;
-
-        this.editedItems.forEach(editedItem => {
-            let lines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
-            let duration = LineModel.GetDurationQByLines(lines);
-            editedItem.duration = duration;
-
-            lines.forEach(row => {
-                row.rowInPartId = editedItem.rowInPartId;
-                row.blockOffsetQ = blockOffsetQ;
-            });
-
-            blockOffsetQ = blockOffsetQ + duration;
-        });
-    }
-
-    songRowClick(el: HTMLElement) {
-        const item: EditedItem = {
-            rowInPartId: el.dataset['rowInPartId'],
-            songName: el.dataset['songName'],
-            partNio: parseInteger(el.dataset['partNio'], 0),
-            rowNio: parseInteger(el.dataset['rowNio'], 0),
-            duration: parseInteger(el.dataset['initDuration'], 0),
-            partId: el.dataset['partId'] || '',
-        };
-
-        this.addOrRemoveEditingItem(item, el);
-        this.sortEditingItems();
-
-        let lines = [];
-        let blockOffsetQ = 0;
-        const songId = ideService.currentEdit.songId;
-        const isMy = ideService.currentEdit.source === 'my';
-
-        this.editedItems.forEach(editedItem => {
-            let iLines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
-
-            if (!isMy) {
-                let songNode: StoredSongNode = localStorage.getItem(songId) as any;
-                if (!iLines.length && songNode) {
-                    songNode = JSON.parse(songNode as any as string);
-
-                    if (songNode[editedItem.rowInPartId]) {
-                        let items = songNode[editedItem.rowInPartId].items;
-                        let node = items.find(item => item.rowInPartId === editedItem.rowInPartId && item.type === 'drums');
-                        if (node) {
-                            iLines = node.rows;
-                        }
-                    }
-                }
-
+            if (ideService.editedItems.find(item => item.rowInPartId === rowInPartId)) {
+                el.style.fontWeight = '600';
             } else {
-                const song = (isMy ? SongStore.getSong(songId, true) : null) as SongPage;
-                if (!iLines.length && song) {
-                    song.dynamic.forEach(item => {
-                        if (item.rowInPartId === editedItem.rowInPartId && item.type === 'drums') {
-                            iLines = [...iLines, ...item.lines];
-                        }
-                    });
-                }
+                el.style.fontWeight = '400';
             }
-
-            if (!iLines.length) {
-                iLines = this.liner.getLinesByMask(editedItem.duration);
-            }
-
-            iLines.forEach(row => {
-                row.rowInPartId = editedItem.rowInPartId;
-                row.blockOffsetQ = blockOffsetQ;
-            });
-
-            lines = [...lines, ...iLines];
-            blockOffsetQ = blockOffsetQ + editedItem.duration;
         });
 
-        this.liner.setData(lines);
-        this.printChess(this.liner.lines);
+        this.updateChess();
     }
 
     playOne() {
@@ -363,86 +115,6 @@ export class DrumCtrl extends KeyboardCtrl {
         });
     }
 
-    buildBlocksForMySong(blocks: TextBlock[], resetBlockOffset = false, useEditing = false): TextBlock[] {
-        const song = SongStore.getSong(ideService.currentEdit.songId);
-        const editingParts: SongPartInfo[] = [];
-
-        ideService.currentEdit.editPartsNio.sort();
-        ideService.currentEdit.editPartsNio.forEach(partNio => {
-            editingParts.push(
-                un.getPartInfo(ideService.currentEdit.allSongParts[partNio - 1])
-            );
-        });
-
-        const partsWithRows = this.getPartsWithRows(song, editingParts, resetBlockOffset);
-        let topOutBlocks: string[][] = [];
-
-        partsWithRows.forEach(part => {
-            let partSetRows: string[] = [`<${part.partId} set>`];
-
-            part.rows.forEach(row => {
-                let maxDurQ = 0;
-                let targetDurQ = 0;
-                let headGuid = `head_${ideService.guid.toString()}`;
-                let rowRefs: string[] = [headGuid];
-
-                row.forEach(item => {
-                    const guid = `temp_${ideService.guid.toString()}`;
-                    const durQ = LineModel.GetDurationQByLines(item.lines);
-
-                    let notes = this.getNotes(guid, item);
-
-                    if(!notes) {
-                       notes = `<${guid} $>\n$organ: ${durQ}`;
-                    }
-
-                    const block = un.getTextBlocks(notes)[0];
-
-                    blocks = [...blocks, block];
-
-                    maxDurQ = durQ > maxDurQ ? durQ: maxDurQ;
-
-                    rowRefs.push(guid);
-                });
-
-                const headBlock = un.getTextBlocks(`<${headGuid} $>\n$organ: ${maxDurQ}`)[0];
-
-                blocks = [...blocks, headBlock];
-
-                partSetRows.push(rowRefs.join(' '));
-            });
-
-            topOutBlocks.push(partSetRows);
-        });
-
-        topOutBlocks.forEach(part => {
-            const partBlock = un.getTextBlocks(part.join('\n'))[0];
-
-            blocks = [...blocks, partBlock];
-        });
-
-        //jjkl
-        //console.log('hash', hash);
-        //console.log('list', list);
-        //console.log('topOutBlocks', topOutBlocks);
-        //console.log('buildBlocksForMySong', blocks);
-
-        return blocks;
-    };
-
-    getNotes(id: string, item: StoredRow): string {
-        if (item.type === 'drums') {
-            return LineModel.GetDrumNotes(id, item.lines);
-        }
-
-        return LineModel.GetToneNotes({
-            blockName: id,
-            rows: item.lines,
-            instr: '$organ',
-            chnl: '$organ',
-        });
-    }
-
     playBoth() {
         this.page.stop();
         if (!this.hasEditedItems) return;
@@ -455,7 +127,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
         const playingRows = playBlock.rows.filter(item => {
             const part = un.getPartInfo(item);
-            return !!this.editedItems.find(item => item.rowInPartId === part.rowInPartId);
+            return !!ideService.editedItems.find(item => item.rowInPartId === part.rowInPartId);
         });
 
         playingRows.forEach(playRow => {
@@ -499,7 +171,7 @@ export class DrumCtrl extends KeyboardCtrl {
         const playBlock = midiConfig.playBlockOut as TextBlock;
         const playingRows = playBlock.rows.filter(item => {
             const part = un.getPartInfo(item);
-            return !!this.editedItems.find(item => item.rowInPartId === part.rowInPartId);
+            return !!ideService.editedItems.find(item => item.rowInPartId === part.rowInPartId);
         });
 
         this.page.stop();
@@ -519,113 +191,6 @@ export class DrumCtrl extends KeyboardCtrl {
             bpm: this.page.bpmValue,
             repeatCount: 1,
             metaByLines: ideService.currentEdit.metaByLines,
-        });
-    }
-
-    subscribeIdeEvents() {
-        getWithDataAttrValue(ids.ideAction, 'play-both', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => this.playBoth());
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'save', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.saveEditingItems());
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'load', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.loadFile());
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'back', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => {
-                this.page.context.$f7router.navigate(`/mbox/${ideService.currentEdit.songId}/`);
-            });
-        });
-
-        getWithDataAttr(ids.rowInPartId, this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => this.songRowClick(el));
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'clear', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => {
-                ideService.currentEdit = {} as any;
-                this.editedItems = [];
-                getWithDataAttr(ids.ideContent, this.page.pageEl).forEach((el: HTMLElement) => {
-                    el.innerHTML = null;
-                });
-                getWithDataAttr('bottom-command-panel', this.page.pageEl).forEach((el: HTMLElement) => {
-                    el.innerHTML = null;
-                });
-                getWithDataAttr('edit-row-actions', this.page.pageEl).forEach((el: HTMLElement) => {
-                    el.style.display = 'block';
-                });
-                this.liner.fillLinesStructure('480');
-                this.printChess(this.liner.lines);
-            });
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'play-active', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.playActive());
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'stop', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', evt => {
-                this.page.stop();
-            });
-        });
-
-        getWithDataAttrValue(ids.ideAction, 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addRowInPart(el.dataset['partId'], el.dataset['partNio']));
-        });
-    }
-
-    addRowInPart(partId: string, partNio: number | string) {
-        partNio = un.parseInteger(partNio, 0);
-        partId = (partId || '').trim();
-
-        if (!partId && !partNio) return;
-
-        const songName = ideService.currentEdit.songId;
-        const song = SongStore.getSong(songName);
-
-        const rowNios = song.dynamic.reduce((acc, item) => {
-            const iPartId = (item.partId || '').trim();
-            const iPartNio = un.parseInteger(item.rowInPartId.split('-')[0], 0);
-            const iRowNio = un.parseInteger(item.rowInPartId.split('-')[1], 0);
-
-            if (partId && iPartId && partId !== iPartId) {
-                return acc;
-            }
-            else if(partNio && iPartNio && partNio !== iPartNio) {
-                return acc;
-            }
-
-            if (!iRowNio) {
-                return acc;
-            }
-
-            acc.push(iRowNio);
-
-            return acc;
-        }, []);
-
-        const rowNio = (rowNios.length ? Math.max(...rowNios) : 0) + 1;
-        const rowInPartId = `${partNio}-${rowNio}`;
-
-        song.dynamic.push({
-            partId,
-            rowInPartId: `${partNio}-${rowNio}`,
-            type: 'drums',
-            status: 'draft',
-            lines: [
-                this.liner.getEmptyLine(rowInPartId),
-            ]
-        });
-
-        SongStore.setSong(ideService.currentEdit.songId, song);
-
-        getWithDataAttr('edit-parts-wrapper').forEach(el => {
-            el.innerHTML = this.getIdeContent();
-            this.subscribeIdeEvents();
         });
     }
 
@@ -801,24 +366,11 @@ export class DrumCtrl extends KeyboardCtrl {
                 }
             });
         });
-
-        getWithDataAttrValue('action-out', 'test', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
-                // 3*(2*120+1*60)_2*60
-                //this.liner.fillLinesStructure('1*120_1*60_1*120_1*60');
-                //this.liner.fillLinesStructure('480');
-                //this.printModel(this.liner.rows);
-            });
-        });
     }
 
     subscribeEditCommands() {
         getWithDataAttrValue('edit-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.deleteCell(el));
-        });
-
-        getWithDataAttr(ids.actionDrumNote, this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
         });
 
         getWithDataAttrValue('edit-row-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -832,10 +384,10 @@ export class DrumCtrl extends KeyboardCtrl {
         getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.deleteLine());
         });
-    }
 
-    drumInstrumentClick(el: HTMLElement) {
-
+        getWithDataAttr('action-drum-note', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
+        });
     }
 
     subscribeEvents() {
@@ -870,36 +422,36 @@ export class DrumCtrl extends KeyboardCtrl {
         `.trim();
 
         let topRow = ''
-        drumKodesTop.forEach(item => {
+        drumCodesTop.forEach(item => {
             const info = drumNotesInfo[item.note];
             topRow += `
                 <span
                     style="${style}"
-                    data-${ids.actionDrumNote}="${info.note}"
+                    data-action-drum-note="${info.note}"
                 >${info.vocalism}</span>
             `;
         });
         topRow = `<div style="${rowStyle}">${topRow}</div>`;
 
         let midRow = ''
-        drumKodesMid.forEach(item => {
+        drumCodesMid.forEach(item => {
             const info = drumNotesInfo[item.note];
             midRow += `
                 <span
                     style="${style}"
-                    data-${ids.actionDrumNote}="${info.note}"
+                    data-action-drum-note="${info.note}"
                 >${info.vocalism}</span>
             `;
         });
         midRow = `<div style="${rowStyle}">${midRow}</div>`;
 
         let botRow = ''
-        drumKodesBot.forEach(item => {
+        drumCodesBot.forEach(item => {
             const info = drumNotesInfo[item.note];
             botRow += `
                 <span
                     style="${style}"
-                    data-${ids.actionDrumNote}="${info.note}"
+                    data-action-drum-note="${info.note}"
                 >${info.vocalism}</span>
             `;
         });
@@ -982,185 +534,7 @@ export class DrumCtrl extends KeyboardCtrl {
         return content;
     }
 
-    getMidiConfig(x: {
-        resetBlockOffset?: boolean,
-        useEditing?: boolean
-    } = {}): MidiConfig {
-        const currentEdit = ideService.currentEdit;
-        let blocks = [...currentEdit.blocks];
-
-        if (currentEdit.source === 'my') {
-            blocks = this.buildBlocksForMySong(blocks, x.resetBlockOffset, x.useEditing);
-        }
-
-        const rows = currentEdit.editPartsNio.reduce((acc, partNio) => {
-            const part = currentEdit.allSongParts[partNio - 1];
-            const info = un.getPartInfo(part);
-            let N = '';
-
-            if (!info.partNio) {
-                N = ` ${un.getNRowInPartId(partNio)}`;
-            }
-
-            acc.push(`> ${part}${N}`);
-
-            return acc;
-        }, [] as string[] );
-
-        const outBlock = un.createOutBlock({
-            id: 'out',
-            bpm: this.page.bpmValue,
-            rows,
-            volume: 50,
-            type: 'text'
-        });
-
-        const midiConfig: MidiConfig = {
-            blocks,
-            excludeIndex: [],
-            currRowInfo: {first: 0, last: 0},
-            currBlock: outBlock,
-            midiBlockOut: null as any,
-            playBlockOut: null as any,
-            topBlocksOut: [],
-        };
-
-        getMidiConfig(midiConfig);
-
-        return midiConfig;
-    }
-
-    getIdeContent(): string {
-        if (!this.hasIdeItem) return '';
-
-        const currentEdit = ideService.currentEdit;
-        const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-
-        this.page.bpmValue = currentEdit.bpmValue || 90;
-
-        const midiConfig = this.getMidiConfig();
-
-        const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
-
-        const partHash: {
-            [key: string]: {
-                part: un.SongPartInfo,
-                rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
-            }
-        } = {};
-
-        const rowsByParts: {
-                part: un.SongPartInfo,
-                rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
-        }[] = [];
-
-        // ЗАПОЛНЯЕМ ЧАСТИ
-        ideService.currentEdit.editPartsNio.sort();
-        ideService.currentEdit.editPartsNio.forEach(partNio => {
-            const part = un.getPartInfo(currentEdit.allSongParts[partNio - 1]);
-
-            if (!partHash[part.partNio]) {
-                partHash[part.partNio] = {
-                    part,
-                    rows: []
-                };
-
-                rowsByParts.push(partHash[part.partNio]);
-            }
-        });
-
-        // ДОБАВЛЯЕМ СТРОКИ В ЧАСТИ
-        outBlocksInfo.rows.forEach(row => {
-            const info = un.getPartInfo(row.text);
-
-            if (!info.partNio || !info.rowNio || !partHash[info.partNio]) {
-                return;
-            }
-
-            partHash[info.partNio].rows.push({
-                partNio: info.partNio,
-                rowNio: info.rowNio,
-                row,
-            });
-        });
-
-        let editingPartsContent = '';
-
-        // ФОРМИРУЕМ СПИСОК ЧАСТЕЙ
-        rowsByParts.forEach(item => {
-            const part = item.part;
-
-            editingPartsContent += `
-                <div >
-                    <span style="margin: .5rem; font-weight: 600;"
-                    >${part.partNio}-${part.ref}</span>
-            `.trim();
-
-            item.rows.forEach(info => {
-                const row = info.row;
-                const rowCount = Math.ceil(row.rowDurationByHeadQ / un.NUM_120);
-                let cellCount = 0;
-
-                if (row.rowDurationByHeadQ % un.NUM_120) {
-                    cellCount = Math.floor((row.rowDurationByHeadQ % un.NUM_120) / 10);
-                }
-
-                editingPartsContent += `<span
-                    style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0;"
-                    data-${ids.rowInPartId}="${info.partNio}-${info.rowNio}"
-                    data-song-name="${currentEdit.songId}"
-                    data-part-nio="${info.partNio}"                    
-                    data-row-nio="${info.rowNio}"
-                    data-part-id="${part.partId}"
-                    data-init-duration="${row.rowDurationByHeadQ}"                                                            
-                >${info.rowNio}:${rowCount + (cellCount ? '.' + cellCount : '')}</span>`;
-            });
-
-            if (!ideService.currentEdit.freezeStructure) {
-                editingPartsContent += `&emsp;<span
-                    style="${cmdStyle}"
-                    data-ide-action="add-row"
-                    data-part-nio="${part.partNio}"
-                    data-part-id="${part.partId}"                    
-                >add</span>`.trim();
-            }
-
-            editingPartsContent += '</div>';
-        });
-
-        return `
-            ${this.getBottomCommandPanel()}
-            <div style="padding-left: 1rem;">
-                <span
-                    style="${cmdStyle}"
-                    data-ide-action="back"
-                >back</span>&nbsp;&nbsp;
-                <span
-                    style="${cmdStyle} color: blue;"
-                    data-ide-action="play-active"
-                >${sings.play}</span>
-                <span
-                    style="${cmdStyle} color: gray;"
-                    data-ide-action="stop"
-                >${sings.stop}</span>&nbsp;&nbsp;                
-                <span
-                    style="${cmdStyle}"
-                    data-ide-action="clear"
-                >clear</span>
-            </div>
-            
-            <div style="margin-top: .5rem;">
-                ${editingPartsContent}
-            </div>
-        `.trim();
-    }
-
     getContent(keyboardId: string): string {
-        let metronome = `
-            <div style="padding: 1rem .5rem 1rem .5rem;">
-                &emsp;${this.page.getMetronomeContent()}
-            </div>`.trim();
-
         let drums = Object.keys(drumInfo).reduce((acc, key) => {
             const info = drumInfo[key];
             const label = key === info.noteLat ? key: `${key}:${info.noteLat}`;
@@ -1174,9 +548,9 @@ export class DrumCtrl extends KeyboardCtrl {
 
         const content = `
             <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-                ${metronome}
                 ${this.getDrumBoardContent(keyboardId)}
                 ${this.getTopCommandPanel()}
+                ${this.getMetronomeContent()}                
                 ${this.getRowActionsCommands()}                
                 <!--${this.getMoveCommandPanel()} -->
                 ${this.getDrumNotesPanel()}

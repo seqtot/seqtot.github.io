@@ -1,6 +1,6 @@
 import { ComponentContainer as GlComponentContainer } from '../../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../../libs/gl/ts/config/resolved-config';
-import ideService, {ideEvents} from './ide-service';
+import { ideService, ideEvents } from './ide-service';
 import Fs from '../../libs/common/file-service';
 
 import { WebAudioFontLoader } from '../../libs/waf-player/loader';

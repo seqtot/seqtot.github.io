@@ -14,7 +14,7 @@ import {
     skipEvent,
 } from './line-player-utils';
 import {NoteInfo} from '../../libs/muse/types';
-import ideService from './ide-service';
+import { ideService } from './ide-service';
 
 import {getMidiConfig} from '../../libs/muse/utils/getMidiConfig';
 import {getFileSettings, FileSettings} from '../../libs/muse/utils/getFileSettings';

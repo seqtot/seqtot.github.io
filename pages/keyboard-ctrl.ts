@@ -7,10 +7,11 @@ import { Line, LineModel, CELL_SIZE } from './line-model';
 import * as un from '../libs/muse/utils'
 import { parseInteger } from '../libs/common';
 
-import ideService from './ide/ide-service';
+import {EditedItem, ideService} from './ide/ide-service';
 import { sings } from './sings';
-import { SongPage, StoredRow } from './song-store';
-import { SongPartInfo } from '../libs/muse/utils';
+import { SongPage, SongStore, StoredRow, StoredSongNode } from './song-store';
+import { getOutBlocksInfo, OutBlockRowInfo, SongPartInfo, TextBlock } from '../libs/muse/utils';
+import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 
 export type BpmInfo = {
     bpm: number;
@@ -71,7 +72,8 @@ export class KeyboardCtrl {
     }
 
     constructor(
-        public page: KeyboardPage
+        public page: KeyboardPage,
+        public type: DrumKeyboardType | ToneKeyboardType,
     ) {
     }
 
@@ -316,7 +318,6 @@ export class KeyboardCtrl {
 
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
         let result = '';
 
@@ -338,8 +339,8 @@ export class KeyboardCtrl {
                 <span
                     style="${style}"
                     data-action-type="tick"
-                    data-signature="3:4"                    
-                >3:4</span>&nbsp;
+                    data-signature="3:8"                    
+                >3:8</span>&nbsp;
                 <span
                     style="${style} color: gray;"
                     data-action-type="stop"
@@ -446,7 +447,22 @@ export class KeyboardCtrl {
     }
 
     setEditingItemDurationAndBlockOffsetByLines() {
+        this.sortEditingItems();
 
+        let blockOffsetQ = 0;
+
+        ideService.editedItems.forEach(editedItem => {
+            let lines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
+            let duration = LineModel.GetDurationQByLines(lines);
+            editedItem.duration = duration;
+
+            lines.forEach(row => {
+                row.rowInPartId = editedItem.rowInPartId;
+                row.blockOffsetQ = blockOffsetQ;
+            });
+
+            blockOffsetQ = blockOffsetQ + duration;
+        });
     }
 
     getRowsForPart(song: SongPage, part: SongPartInfo): StoredRow[] {
@@ -516,4 +532,585 @@ export class KeyboardCtrl {
 
         return list;
     }
+
+    updateView() {
+
+    }
+
+    getNotes(id: string, item: StoredRow): string {
+        if (item.type === 'drums') {
+            return LineModel.GetDrumNotes(id, item.lines);
+        }
+
+        return LineModel.GetToneNotes({
+            blockName: id,
+            rows: item.lines,
+            instr: '$organ',
+            chnl: '$organ',
+        });
+    }
+
+    buildBlocksForMySong(blocks: TextBlock[], resetBlockOffset = false, useEditing = false): TextBlock[] {
+        const song = SongStore.getSong(ideService.currentEdit.songId);
+        const editingParts: SongPartInfo[] = [];
+
+        ideService.currentEdit.editPartsNio.sort();
+        ideService.currentEdit.editPartsNio.forEach(partNio => {
+            editingParts.push(
+                un.getPartInfo(ideService.currentEdit.allSongParts[partNio - 1])
+            );
+        });
+
+        const partsWithRows = this.getPartsWithRows(song, editingParts, resetBlockOffset);
+        let topOutBlocks: string[][] = [];
+
+        partsWithRows.forEach(part => {
+            let partSetRows: string[] = [`<${part.partId} set>`];
+
+            part.rows.forEach(row => {
+                let maxDurQ = 0;
+                let targetDurQ = 0;
+                let headGuid = `head_${ideService.guid.toString()}`;
+                let rowRefs: string[] = [headGuid];
+
+                row.forEach(item => {
+                    const guid = `temp_${ideService.guid.toString()}`;
+                    const durQ = LineModel.GetDurationQByLines(item.lines);
+
+                    let notes = this.getNotes(guid, item);
+
+                    if(!notes) {
+                        notes = `<${guid} $>\n$organ: ${durQ}`;
+                    }
+
+                    const block = un.getTextBlocks(notes)[0];
+
+                    blocks = [...blocks, block];
+
+                    maxDurQ = durQ > maxDurQ ? durQ: maxDurQ;
+
+                    rowRefs.push(guid);
+                });
+
+                const headBlock = un.getTextBlocks(`<${headGuid} $>\n$organ: ${maxDurQ}`)[0];
+
+                blocks = [...blocks, headBlock];
+
+                partSetRows.push(rowRefs.join(' '));
+            });
+
+            topOutBlocks.push(partSetRows);
+        });
+
+        topOutBlocks.forEach(part => {
+            const partBlock = un.getTextBlocks(part.join('\n'))[0];
+
+            blocks = [...blocks, partBlock];
+        });
+
+        //jjkl
+        //console.log('hash', hash);
+        //console.log('list', list);
+        //console.log('topOutBlocks', topOutBlocks);
+        //console.log('buildBlocksForMySong', blocks);
+
+        return blocks;
+    };
+
+    updateChess() {
+        let lines = [];
+        let blockOffsetQ = 0;
+        const songId = ideService.currentEdit.songId;
+        const isMy = ideService.currentEdit.source === 'my';
+
+        ideService.editedItems.forEach(editedItem => {
+            let iLines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
+
+            if (!isMy) {
+                let songNode: StoredSongNode = localStorage.getItem(songId) as any;
+                if (!iLines.length && songNode) {
+                    songNode = JSON.parse(songNode as any as string);
+
+                    if (songNode[editedItem.rowInPartId]) {
+                        let items = songNode[editedItem.rowInPartId].items;
+                        let node = items.find(item => item.rowInPartId === editedItem.rowInPartId && item.type === this.type);
+                        if (node) {
+                            iLines = node.rows;
+                        }
+                    }
+                }
+
+            } else {
+                const song = (isMy ? SongStore.getSong(songId, true) : null) as SongPage;
+                if (!iLines.length && song) {
+                    song.dynamic.forEach(item => {
+                        if (item.rowInPartId === editedItem.rowInPartId && item.type === this.type) {
+                            iLines = [...iLines, ...item.lines];
+                        }
+                    });
+                }
+            }
+
+            if (!iLines.length) {
+                iLines = this.liner.getLinesByMask(editedItem.duration);
+            }
+
+            iLines.forEach(row => {
+                row.rowInPartId = editedItem.rowInPartId;
+                row.blockOffsetQ = blockOffsetQ;
+            });
+
+            lines = [...lines, ...iLines];
+            blockOffsetQ = blockOffsetQ + editedItem.duration;
+        });
+
+        this.liner.setData(lines);
+        this.printChess(this.liner.lines);
+    }
+
+    getMidiConfig(x: {
+        resetBlockOffset?: boolean,
+        useEditing?: boolean
+    } = {}): MidiConfig {
+        const currentEdit = ideService.currentEdit;
+        let blocks = [...currentEdit.blocks];
+
+        if (currentEdit.source === 'my') {
+            blocks = this.buildBlocksForMySong(blocks, x.resetBlockOffset, x.useEditing);
+        }
+
+        const rows = currentEdit.editPartsNio.reduce((acc, partNio) => {
+            const part = currentEdit.allSongParts[partNio - 1];
+            const info = un.getPartInfo(part);
+            let N = '';
+
+            if (!info.partNio) {
+                N = ` ${un.getNRowInPartId(partNio)}`;
+            }
+
+            acc.push(`> ${part}${N}`);
+
+            return acc;
+        }, [] as string[] );
+
+        const outBlock = un.createOutBlock({
+            id: 'out',
+            bpm: this.page.bpmValue,
+            rows,
+            volume: 50,
+            type: 'text'
+        });
+
+        const midiConfig: MidiConfig = {
+            blocks,
+            excludeIndex: [],
+            currRowInfo: {first: 0, last: 0},
+            currBlock: outBlock,
+            midiBlockOut: null as any,
+            playBlockOut: null as any,
+            topBlocksOut: [],
+        };
+
+        getMidiConfig(midiConfig);
+
+        return midiConfig;
+    }
+
+    getIdeContent(): string {
+        if (!this.hasIdeItem) return '';
+
+        const currentEdit = ideService.currentEdit;
+        const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+
+        this.page.bpmValue = currentEdit.bpmValue || 90;
+
+        const midiConfig = this.getMidiConfig();
+        const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
+
+        const partHash: {
+            [key: string]: {
+                part: un.SongPartInfo,
+                rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+            }
+        } = {};
+
+        const rowsByParts: {
+            part: un.SongPartInfo,
+            rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+        }[] = [];
+
+        // ЗАПОЛНЯЕМ ЧАСТИ
+        ideService.currentEdit.editPartsNio.sort();
+        ideService.currentEdit.editPartsNio.forEach(partNio => {
+            const part = un.getPartInfo(currentEdit.allSongParts[partNio - 1]);
+
+            if (!partHash[part.partNio]) {
+                partHash[part.partNio] = {
+                    part,
+                    rows: []
+                };
+
+                rowsByParts.push(partHash[part.partNio]);
+            }
+        });
+
+        // ДОБАВЛЯЕМ СТРОКИ В ЧАСТИ
+        outBlocksInfo.rows.forEach(row => {
+            const info = un.getPartInfo(row.text);
+
+            if (!info.partNio || !info.rowNio || !partHash[info.partNio]) {
+                return;
+            }
+
+            partHash[info.partNio].rows.push({
+                partNio: info.partNio,
+                rowNio: info.rowNio,
+                row,
+            });
+        });
+
+        let editingPartsContent = '';
+
+        // ФОРМИРУЕМ СПИСОК ЧАСТЕЙ
+        rowsByParts.forEach(item => {
+            const part = item.part;
+
+            editingPartsContent += `
+                <div >
+                    <span style="margin: .5rem; font-weight: 600;"
+                    >${part.partNio}-${part.ref}</span>
+            `.trim();
+
+            item.rows.forEach(info => {
+                const row = info.row;
+                const rowCount = Math.ceil(row.rowDurationByHeadQ / un.NUM_120);
+                let cellCount = 0;
+
+                if (row.rowDurationByHeadQ % un.NUM_120) {
+                    cellCount = Math.floor((row.rowDurationByHeadQ % un.NUM_120) / 10);
+                }
+
+                editingPartsContent += `<span
+                    style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0;"
+                    data-row-in-part-item
+                    data-row-in-part-id="${info.partNio}-${info.rowNio}"                    
+                    data-song-name="${currentEdit.songId}"
+                    data-part-nio="${info.partNio}"                    
+                    data-row-nio="${info.rowNio}"
+                    data-part-id="${part.partId}"
+                    data-init-duration="${row.rowDurationByHeadQ}"                                                            
+                >${info.rowNio}:${rowCount + (cellCount ? '.' + cellCount : '')}</span>`;
+            });
+
+            if (!ideService.currentEdit.freezeStructure) {
+                editingPartsContent += `&emsp;<span
+                    style="${cmdStyle}"
+                    data-ide-action="add-row"
+                    data-part-nio="${part.partNio}"
+                    data-part-id="${part.partId}"                    
+                >add</span>`.trim();
+            }
+
+            editingPartsContent += '</div>';
+        });
+
+        return `
+            ${this.getBottomCommandPanel()}
+            <div style="padding-left: 1rem;">
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="back"
+                >back</span>&nbsp;&nbsp;
+                <span
+                    style="${cmdStyle} color: blue;"
+                    data-ide-action="play-active"
+                >${sings.play}</span>
+                <span
+                    style="${cmdStyle} color: gray;"
+                    data-ide-action="stop"
+                >${sings.stop}</span>&nbsp;&nbsp;                
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="clear"
+                >clear</span>
+            </div>
+            
+            <div style="margin-top: .5rem;">
+                ${editingPartsContent}
+            </div>
+        `.trim();
+    }
+
+    addOrRemoveEditingItem(item: EditedItem, el: HTMLElement) {
+        if (ideService.editedItems.find(iItem => iItem.rowInPartId === item.rowInPartId)) {
+            ideService.editedItems = ideService.editedItems.filter(iItem => iItem.rowInPartId !== item.rowInPartId);
+        } else {
+            ideService.editedItems.push(item);
+        }
+    }
+
+    sortEditingItems() {
+        ideService.editedItems.sort((a, b) => {
+            if (a.partNio < b.partNio) return -1;
+            if (a.partNio > b.partNio) return 1;
+
+            if (a.rowNio < b.rowNio) return -1;
+            if (a.rowNio > b.rowNio) return 1;
+
+            return 0;
+        });
+    }
+
+    songRowClick(el: HTMLElement) {
+        const item: EditedItem = {
+            rowInPartId: el.dataset['rowInPartId'],
+            songName: el.dataset['songName'],
+            partNio: parseInteger(el.dataset['partNio'], 0),
+            rowNio: parseInteger(el.dataset['rowNio'], 0),
+            duration: parseInteger(el.dataset['initDuration'], 0),
+            partId: el.dataset['partId'] || '',
+        };
+
+        this.addOrRemoveEditingItem(item, el);
+        this.sortEditingItems();
+        this.updateView();
+    }
+
+    resetEditingParts() {
+        ideService.currentEdit = {} as any;
+        ideService.editedItems = [];
+        getWithDataAttr('ide-content', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.innerHTML = null;
+        });
+        getWithDataAttr('bottom-command-panel', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.innerHTML = null;
+        });
+        getWithDataAttr('edit-row-actions', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.style.display = 'block';
+        });
+        this.liner.fillLinesStructure('480');
+        this.printChess(this.liner.lines);
+    }
+
+    subscribeIdeEvents() {
+        getWithDataAttrValue('ide-action', 'play-both', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.playBoth());
+        });
+
+        getWithDataAttrValue('ide-action', 'save', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.saveEditingItems());
+        });
+
+        getWithDataAttrValue('ide-action', 'load', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.loadFile());
+        });
+
+        getWithDataAttrValue('ide-action', 'back', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.gotoSong());
+        });
+
+        getWithDataAttr('row-in-part-item', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.songRowClick(el));
+        });
+
+        getWithDataAttrValue('ide-action', 'clear', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.resetEditingParts());
+        });
+
+        getWithDataAttrValue('ide-action', 'play-active', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.playActive());
+        });
+
+        getWithDataAttrValue('ide-action', 'stop', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.page.stop());
+        });
+
+        getWithDataAttrValue('ide-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addRowInPart(el.dataset['partId'], el.dataset['partNio']));
+        });
+    }
+
+    gotoSong() {
+        this.page.context.$f7router.navigate(`/mbox/${ideService.currentEdit.songId}/`);
+    }
+
+    addRowInPart(partId: string, partNio: number | string) {
+        partNio = un.parseInteger(partNio, 0);
+        partId = (partId || '').trim();
+
+        if (!partId && !partNio) return;
+
+        const songName = ideService.currentEdit.songId;
+        const song = SongStore.getSong(songName);
+
+        const rowNios = song.dynamic.reduce((acc, item) => {
+            const iPartId = (item.partId || '').trim();
+            const iPartNio = un.parseInteger(item.rowInPartId.split('-')[0], 0);
+            const iRowNio = un.parseInteger(item.rowInPartId.split('-')[1], 0);
+
+            if (partId && iPartId && partId !== iPartId) {
+                return acc;
+            }
+            else if(partNio && iPartNio && partNio !== iPartNio) {
+                return acc;
+            }
+
+            if (!iRowNio) {
+                return acc;
+            }
+
+            acc.push(iRowNio);
+
+            return acc;
+        }, []);
+
+        const rowNio = (rowNios.length ? Math.max(...rowNios) : 0) + 1;
+        const rowInPartId = `${partNio}-${rowNio}`;
+
+        song.dynamic.push({
+            partId,
+            rowInPartId: `${partNio}-${rowNio}`,
+            type: this.type,
+            status: 'draft',
+            lines: [
+                this.liner.getEmptyLine(rowInPartId),
+            ]
+        });
+
+        SongStore.setSong(ideService.currentEdit.songId, song);
+
+        getWithDataAttr('edit-parts-wrapper').forEach(el => {
+            el.innerHTML = this.getIdeContent();
+            this.subscribeIdeEvents();
+        });
+
+        this.updateView();
+    }
+
+    loadFile() {
+        // https://webtips.dev/download-any-file-with-javascript
+        let songName = ideService.currentEdit?.songId || '';
+
+        if (!songName) return;
+
+        let songNode: StoredSongNode;
+
+        if (!localStorage.getItem(songName)) {
+            songNode = {};
+        } else {
+            songNode = JSON.parse(localStorage.getItem(songName));
+        }
+
+        let data = JSON.stringify(songNode);
+        //let type = 'application/json';
+        let type = 'application/text';
+        let name = `${songName}.txt`;
+
+        downloader(data, type, name)
+
+        function downloader(data, type, name) {
+            let blob = new Blob([data], {type});
+            let url = (window as any).URL.createObjectURL(blob);
+            downloadURI(url, name);
+            (window as any).URL.revokeObjectURL(url);
+        }
+
+        function downloadURI(uri, name) {
+            let link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            link.click();
+        }
+    }
+
+    saveEditingItemsMy() {
+        if (!ideService.editedItems.length) return;
+
+        let songName = ideService.editedItems[0].songName;
+        let song = SongStore.getSong(songName);
+
+        const savedItems = ideService.editedItems.map(item => item.rowInPartId);
+
+        const dynamic = song.dynamic.filter(item => {
+            return !savedItems.includes(item.rowInPartId) || (savedItems.includes(item.rowInPartId) && item.type !== this.type);
+        });
+
+        ideService.editedItems.forEach(item => {
+            const lines = this.liner.lines.filter(line => line.rowInPartId === item.rowInPartId);
+
+            if (!lines.length) return;
+
+            dynamic.push({
+                type: this.type,
+                rowInPartId: item.rowInPartId,
+                lines,
+                partId: item.partId,
+                rowNio: item.rowNio,
+                status: 'unknown',
+            });
+        });
+
+        song.dynamic = dynamic;
+
+        SongStore.setSong(songName, song);
+    }
+
+    saveEditingItems() {
+        if (!ideService.editedItems.length) return;
+
+        if (ideService.currentEdit.source === 'my') {
+            this.saveEditingItemsMy();
+
+            return;
+        }
+
+        let songName = ideService.editedItems[0].songName;
+        let songNode: StoredSongNode;
+
+        if (!localStorage.getItem(songName)) {
+            songNode = {};
+        } else {
+            songNode = JSON.parse(localStorage.getItem(songName));
+        }
+
+        ideService.editedItems.forEach(item => {
+            const rows = this.liner.lines.filter(row => row.rowInPartId === item.rowInPartId);
+            if (!rows.length) return;
+
+            let itemsNode = songNode[item.rowInPartId];
+            if (!itemsNode) {
+                itemsNode = {
+                    items: []
+                };
+                songNode[item.rowInPartId] = itemsNode;
+            }
+
+            let drumsNode = itemsNode.items.find(iItem => iItem.rowInPartId === item.rowInPartId && iItem.type === this.type);
+            if (!drumsNode) {
+                drumsNode = {
+                    rowInPartId: item.rowInPartId,
+                    type: this.type,
+                    status: 'draft',
+                    rows: [],
+                    lines: [],
+                };
+                itemsNode.items.push(drumsNode);
+            }
+
+            drumsNode.rows = rows;
+        });
+
+        localStorage.setItem(songName, JSON.stringify(songNode));
+    }
+
+
+    getMetronomeContent() {
+        return `
+            <div style="margin: 0 0 1.5rem 1rem; width: 80%;">
+                ${this.page.getMetronomeContent()}
+            </div>`.trim();
+    }
+
+    playBoth(){}
+    playActive(){}
 }

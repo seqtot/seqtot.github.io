@@ -10,7 +10,7 @@ import { standardTicks as ticks } from './ticks';
 import { DrumCtrl } from './keyboard-drum-ctrl';
 import { ToneCtrl } from './keyboard-tone-ctrl';
 import { ToneKeyboardType, DrumKeyboardType } from './keyboard-ctrl';
-import ideService from './ide/ide-service';
+import { ideService } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
 
 type KeyboardType = ToneKeyboardType | DrumKeyboardType;
@@ -124,18 +124,32 @@ export class KeyboardPage implements Page {
     }
 
     getMetronomeContent(): string {
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
+        // <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
+        // <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
+        // <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
+        // <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
+        // <a data-action-type="stop"><b>stop</b></a>&emsp;
+
         return `
-            <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
-            <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
-            <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
-            <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
-            <a data-action-type="stop"><b>stop</b></a>&emsp;
+            <!--div style="margin-bottom: .5rem;">
+                <span
+                    style="${style}"
+                    data-action-type="tick"
+                    data-signature="1:4"
+                >1:4</span>&emsp;
+                <span
+                    style="${style}"
+                    data-action-type="tick"
+                    data-signature="3:8"                    
+                >3:8</span>&emsp;                
+            </div-->
             <div 
                 class="range-slider"
                 data-name="slider"
                 data-label="true"
-                data-min="0"   
-                data-max="200"
+                data-min="30"   
+                data-max="230"
                 data-step="1"
                 data-value="100"
                 data-scale="true"
@@ -172,10 +186,11 @@ export class KeyboardPage implements Page {
     }
 
     setDrumsContent(type: DrumKeyboardType) {
-        this.drumCtrl = new DrumCtrl(this);
+        this.drumCtrl = new DrumCtrl(this, type);
 
-        this.keyboardType = 'drums';
+        this.keyboardType = type;
         this.el$.html(this.drumCtrl.getContent('drums'));
+        this.drumCtrl.updateView();
 
         //console.log('setDrumContent', this.bpmValue);
 
@@ -205,6 +220,7 @@ export class KeyboardPage implements Page {
             </div>`.trim();
 
         this.el$.html(content);
+        this.toneCtrl.updateView();
 
         this.bpmRange = (this.context.$f7 as any).range.create({
             el: dyName('slider', this.pageEl),

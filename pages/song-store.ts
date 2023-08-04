@@ -24,6 +24,19 @@ export type SongPage = {
     isSongList?: boolean,
 };
 
+export type StoredItem = {
+    rowInPartId: string,
+    type: string,
+    status: string,
+    rows: Line[],
+    lines: Line[]
+}
+
+export type StoredSongNode = {
+    [key: string]: {
+        items: StoredItem[]
+    }
+};
 
 export class SongStore {
     static deletePart(songId: string, partId = '') {

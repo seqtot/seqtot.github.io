@@ -13,7 +13,7 @@ import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSetting
 import {isPresent, parseInteger, SongPartInfo, TextBlock} from '../libs/muse/utils/utils-note';
 import { LineModel } from './line-model';
 import mboxes from '../mboxes';
-import ideService from './ide/ide-service';
+import { ideService } from './ide/ide-service';
 import {SongStore, SongPage, StoredRow} from './song-store';
 import { sings } from './sings';
 
@@ -453,6 +453,7 @@ export class MBoxPage {
         ideService.currentEdit.editPartsNio = editPartsNio;
         ideService.currentEdit.source = this.pageData.source;
         ideService.currentEdit.freezeStructure = !isMy;
+        ideService.editedItems = [];
 
         //console.log('currentEdit', ideService.currentEdit);
 

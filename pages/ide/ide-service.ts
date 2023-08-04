@@ -13,11 +13,22 @@ synthesizer.connect({ ctx: Sound.ctx });
 synthesizer.setSettings(toneAndDrumPlayerSettings); // defaultSynthSettings
 const ticker = new Ticker(Sound.ctx);
 
+export type EditedItem = {
+    rowInPartId: string, // partNio-rowNio
+    songName: string,
+    duration: number,
+    partId: string,
+    partNio: number, // номер части
+    rowNio: number,  // номер строки внутри части
+}
+
 class IdeService extends  EventEmitter {
     multiPlayer = multiPlayer;
     metronome = metronome;
     synthesizer = synthesizer;
     ticker = ticker;
+
+    editedItems: EditedItem[] = [];
 
     private _guid = 1;
     useToneInstrument: number = DEFAULT_TONE_INSTR;
@@ -37,9 +48,7 @@ class IdeService extends  EventEmitter {
     }
 }
 
-const instance = new IdeService();
-
-export default instance;
+export const ideService = new IdeService();
 
 export const ideEvents = {
     openFile: 'openFile'

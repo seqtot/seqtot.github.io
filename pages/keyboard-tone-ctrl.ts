@@ -1,5 +1,5 @@
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import ideService from './ide/ide-service';
+import { ideService } from './ide/ide-service';
 import * as un from '../libs/muse/utils/utils-note';
 import { KeyData, Line, LineModel, NoteItem, CELL_SIZE } from './line-model';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
@@ -37,7 +37,7 @@ export class ToneCtrl extends KeyboardCtrl {
         public page: KeyboardPage,
         public type: ToneKeyboardType
     ) {
-        super(page);
+        super(page, type);
 
         if (type === 'bassGuitar') {
             this.instrCode = hlp.bassGuitarInstr; // bassGuitarInstr;
@@ -97,8 +97,8 @@ export class ToneCtrl extends KeyboardCtrl {
                 <span
                     style="${style}"
                     data-action-type="tick"
-                    data-signature="3:4"                    
-                >3:4</span>&nbsp;
+                    data-signature="3:8"                    
+                >3:8</span>&nbsp;
                 <span
                     style="${style} color: gray;"
                     data-action-type="stop"
@@ -240,11 +240,14 @@ export class ToneCtrl extends KeyboardCtrl {
             
             ${this.getBeatContent()}
             ${this.getTopCommandPanel()}
-            <div style="margin: .5rem;">${this.page.getMetronomeContent()}<br/></div>
+            ${this.getMetronomeContent()}
             ${this.getRowActionsCommands()}                                    
             <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
             ${this.getMoveCommandPanel(1.2)}
             ${this.getDurationCommandPanel(1.2)}
+            <div data-edit-parts-wrapper>
+                ${this.getIdeContent()}                
+            </div>            
         `.trim();
 
         return result;
@@ -297,7 +300,7 @@ export class ToneCtrl extends KeyboardCtrl {
         let baseNote = this.playingNote.base || '';
         let baseChar = baseNote[0];
 
-        getWithDataAttr('note-key', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttr('note-key', this.page.pageEl).forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
 
             if (this.type === 'bassSolo34') {
@@ -349,24 +352,23 @@ export class ToneCtrl extends KeyboardCtrl {
             // может быть перезаписан при старте таймера
             this.recData.startTimeMs = Date.now();
 
-            getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
+            getWithDataAttrValue('action-tone', 'record-mode',pageEl).forEach((el: HTMLElement) => {
                 el.style.fontWeight = '700';
             });
-            getWithDataAttrValue('action-tone', 'record-beat-wrapper',pageEl)?.forEach((el: HTMLElement) => {
+            getWithDataAttrValue('action-tone', 'record-beat-wrapper',pageEl).forEach((el: HTMLElement) => {
                 el.style.display = 'block';
             });
         } else {
             this.clearRecordData();
 
-            getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
+            getWithDataAttrValue('action-tone', 'record-mode',pageEl).forEach((el: HTMLElement) => {
                 el.style.fontWeight = '400';
             });
-            getWithDataAttrValue('action-tone', 'record-beat-wrapper',pageEl)?.forEach((el: HTMLElement) => {
+            getWithDataAttrValue('action-tone', 'record-beat-wrapper',pageEl).forEach((el: HTMLElement) => {
                 el.style.display = 'none';
             });
         }
     }
-
 
     getOut(bpm: number, data: ToneCtrl['recData'] ) {
         data.sequence.forEach((item, i) => {
@@ -480,7 +482,7 @@ export class ToneCtrl extends KeyboardCtrl {
             this.memoBuffer = [];
         }
 
-        getWithDataAttrValue('action-tone', 'memo-clear', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-tone', 'memo-clear', this.page.pageEl).forEach((el: HTMLElement) => {
             el.style.fontWeight = this.memoBuffer.length ? '700' : '400';
         });
     }
@@ -489,7 +491,7 @@ export class ToneCtrl extends KeyboardCtrl {
     toggleMemo() {
         this.isMemoMode = !this.isMemoMode;
 
-        getWithDataAttrValue('action-tone', 'memo-mode', this.page.pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-tone', 'memo-mode', this.page.pageEl).forEach((el: HTMLElement) => {
             if (this.isMemoMode) {
                 el.style.fontWeight = '700';
             } else {
@@ -505,10 +507,6 @@ export class ToneCtrl extends KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.deleteCell(el));
         });
 
-        getWithDataAttr('action-drum-note', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
-        });
-
         getWithDataAttrValue('edit-row-action', 'add-row', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.addLine());
         });
@@ -519,6 +517,10 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.deleteLine());
+        });
+
+        getWithDataAttr('action-drum-note', pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
         });
     }
 
@@ -614,7 +616,7 @@ export class ToneCtrl extends KeyboardCtrl {
     subscribeBoardEvents() {
         const pageEl = this.page.pageEl;
 
-        getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttr('note-key', pageEl).forEach((el: HTMLElement) => {
             const keyboardId = el.dataset.keyboardId;
             const keyOrNote = el.dataset.noteLat || '';
             let keyId = keyboardId;
@@ -694,19 +696,19 @@ export class ToneCtrl extends KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.playOne());
         });
 
-        getWithDataAttrValue('action-tone', 'memo-mode', pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-tone', 'memo-mode', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.toggleMemo());
         });
 
-        getWithDataAttrValue('action-tone', 'memo-clear',pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-tone', 'memo-clear',pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.pushNoteToMemo(null));
         });
 
-        // getWithDataAttrValue('action-tone', 'record-stop',pageEl)?.forEach((el: HTMLElement) => {
+        // getWithDataAttrValue('action-tone', 'record-stop',pageEl).forEach((el: HTMLElement) => {
         //     el.addEventListener('pointerdown', () => this.toggleRecord())
         // });
 
-        getWithDataAttrValue('action-tone', 'record-beat',pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-tone', 'record-beat', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', (evt) => {
                 evt.preventDefault();
                 evt.stopImmediatePropagation();
@@ -720,12 +722,12 @@ export class ToneCtrl extends KeyboardCtrl {
             });
         });
 
-        getWithDataAttrValue('action-tone', 'record-mode',pageEl)?.forEach((el: HTMLElement) => {
+        getWithDataAttrValue('action-tone', 'record-mode', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.toggleRecord())
         });
 
         const clearColor = () => {
-            getWithDataAttr('note-key', pageEl)?.forEach((el: HTMLElement) => {
+            getWithDataAttr('note-key', pageEl).forEach((el: HTMLElement) => {
                 el.style.backgroundColor = el.dataset['bgColor'] || 'white';
             });
         };
@@ -759,8 +761,10 @@ export class ToneCtrl extends KeyboardCtrl {
     subscribeEvents() {
         this.subscribeCommonCommands();
         this.subscribeMoveCommands();
-        this.subscribeDurationCommands();
         this.subscribeEditCommands();
+        this.subscribeIdeEvents();
+
+        this.subscribeDurationCommands();
         this.subscribeBoardEvents();
     }
 
@@ -801,7 +805,6 @@ export class ToneCtrl extends KeyboardCtrl {
 
         return result;
     }
-
 
     playOne() {
         this.page.stop();
@@ -1004,5 +1007,19 @@ export class ToneCtrl extends KeyboardCtrl {
         }
 
         this.subscribeChess();
+    }
+
+    updateView() {
+        getWithDataAttr('row-in-part-item', this.page.pageEl).forEach(el => {
+            const rowInPartId = el.dataset['rowInPartId'];
+
+            if (ideService.editedItems.find(item => item.rowInPartId === rowInPartId)) {
+                el.style.fontWeight = '600';
+            } else {
+                el.style.fontWeight = '400';
+            }
+        });
+
+        this.updateChess();
     }
 }
