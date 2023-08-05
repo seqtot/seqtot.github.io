@@ -13,6 +13,10 @@ import { ToneKeyboardType, DrumKeyboardType } from './keyboard-ctrl';
 import { ideService } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
 
+import { getDevice } from 'framework7';
+
+console.log('getDevice', getDevice().desktop);
+
 type KeyboardType = ToneKeyboardType | DrumKeyboardType;
 
 const ns = {

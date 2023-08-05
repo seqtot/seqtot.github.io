@@ -1,10 +1,10 @@
+import { Dialog } from 'framework7/components/dialog/dialog';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { ideService } from './ide/ide-service';
 import * as un from '../libs/muse/utils/utils-note';
-import { KeyData, Line, LineModel, NoteItem, CELL_SIZE } from './line-model';
+import { KeyData, Line, LineModel, LineNote, CELL_SIZE } from './line-model';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
-
 import { sings } from './sings';
 
 const DOWN = 1;
@@ -12,7 +12,7 @@ const UP = 0;
 const rem = 'rem';
 
 export class ToneCtrl extends KeyboardCtrl {
-    instrCode = 162;
+    _instrCode = 162;
     playingNote: { [key: string]: string } = {};
     lastPlayingNote = '';
     offset = 0;
@@ -33,6 +33,12 @@ export class ToneCtrl extends KeyboardCtrl {
         keys: {}
     };
 
+    get instrName(): string {
+        return hlp.instrName[this._instrCode] || '';
+    }
+
+    get instrCode(): string | number { return this._instrCode}
+
     constructor(
         public page: KeyboardPage,
         public type: ToneKeyboardType
@@ -40,17 +46,17 @@ export class ToneCtrl extends KeyboardCtrl {
         super(page, type);
 
         if (type === 'bassGuitar') {
-            this.instrCode = hlp.bassGuitarInstr; // bassGuitarInstr;
+            this._instrCode = hlp.bassGuitarInstr; // bassGuitarInstr;
         }
         else if (type === 'guitar') {
-            this.instrCode = hlp.rockGuitarInstr;
+            this._instrCode = hlp.rockGuitarInstr;
         }
         else {
-            this.instrCode = hlp.organInstr;
+            this._instrCode = hlp.organInstr;
         }
     }
 
-    getGuitarBoardContent(type?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
+    getGuitarBoard(type?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
         settings = settings || this.getGuitarSettings();
 
         let stringCount = settings.stringCount;
@@ -154,7 +160,7 @@ export class ToneCtrl extends KeyboardCtrl {
         </div>`.trim();
     }
 
-    getGuitarInfoContent(): string {
+    getMusicInfoContent(): string {
         return `<div style="margin: .5rem;">
             <b>ДО</b> - С<br/>
                 до диез - С# или <b>t</b> <br/>
@@ -176,7 +182,7 @@ export class ToneCtrl extends KeyboardCtrl {
         </div>`.trim();
     }
 
-    getGuitarRightSideContent(type: 'guitar' | 'bassGuitar', settings: hlp.GuitarSettings): string {
+    getGuitarRightSide(type: 'guitar' | 'bassGuitar', settings: hlp.GuitarSettings): string {
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
         let stringCountCommands = '';
 
@@ -210,14 +216,12 @@ export class ToneCtrl extends KeyboardCtrl {
         `.trim();
     }
 
-    getHarmonicaContent(): string {
-        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
-
-        let result = `
+    getHarmonicaBoard(): string {
+        return `
             <div style="margin: 0; padding: 1rem .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
                 ${hlp.getVerticalKeyboard('base', 'bass34', hlp.bassKeys)}
                 ${hlp.getVerticalKeyboard('solo', 'solo34', hlp.soloKeys)}
-                <div 
+                <div
                     style="font-size: 2rem;
                     font-family: monospace;
                     width: 100%;
@@ -228,10 +232,15 @@ export class ToneCtrl extends KeyboardCtrl {
                     touch-action: none;
                     padding-left: .5rem;"
                     data-type="text-under-board"
-                >
-                    <!-- ${hlp.getPatternsList()} -->
-                </div>            
-            </div>
+                ></div>            
+            </div>`.trim();
+    }
+
+    getHarmonicaContent(): string {
+        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
+
+        let result = `
+            ${this.getHarmonicaBoard()}
             
             <div style="widht: 90%; margin: 0; padding: .5rem; padding-left: 1rem; user-select: none; touch-action: none;">
                 <span data-action-tone="memo-mode" style="${btnStl}">memo</span>&emsp;
@@ -241,13 +250,17 @@ export class ToneCtrl extends KeyboardCtrl {
             ${this.getBeatContent()}
             ${this.getTopCommandPanel()}
             ${this.getMetronomeContent()}
-            ${this.getRowActionsCommands()}                                    
+            ${this.getRowActionsCommands()}
+            
+            ${this.getDurationCommandPanel(1.2)}            
+            ${this.getMoveCommandPanel(1.2)}                                                
             <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
             ${this.getMoveCommandPanel(1.2)}
             ${this.getDurationCommandPanel(1.2)}
+            
             <div data-edit-parts-wrapper>
                 ${this.getIdeContent()}                
-            </div>            
+            </div>
         `.trim();
 
         return result;
@@ -260,25 +273,30 @@ export class ToneCtrl extends KeyboardCtrl {
         let result = `
             <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
                 <div data-guitar-board-wrapper style="user-select: none; touch-action: none;">
-                    ${this.getGuitarBoardContent(type, settings)}
+                    ${this.getGuitarBoard(type, settings)}
                 </div>
                 <div style="padding-left: .5rem; padding-top: .5rem;">
-                    ${this.getGuitarRightSideContent(type, settings)}                                        
+                    ${this.getGuitarRightSide(type, settings)}                                        
                 </div>
             </div>
             
             ${this.getBeatContent()}
             ${this.getTopCommandPanel()}
             <div style="margin: .5rem;">${this.page.getMetronomeContent()}<br/></div>
-            ${this.getRowActionsCommands()}            
+            ${this.getRowActionsCommands()}
+            
+            ${this.getDurationCommandPanel(1.2)}            
+            ${this.getMoveCommandPanel(1.2)}                        
             <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
             ${this.getMoveCommandPanel(1.2)}
             ${this.getDurationCommandPanel(1.2)}
             
-            ${this.hasIdeItem ? this.getBottomCommandPanel() : ''}
-                        
-            ${this.getGuitarInfoContent()}
-            
+            <div data-edit-parts-wrapper>
+                ${this.getIdeContent()}                
+            </div>
+
+            <br/>            
+            ${this.getMusicInfoContent()}
         `.trim();
 
         return result;
@@ -398,7 +416,7 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     handleKeyRecord(id: string, time: number, type: 0 | 1) {
-        const instrCode = this.instrCode;
+        const instrCode = this._instrCode;
 
         if (!this.isRecMode) {
             return;
@@ -500,28 +518,141 @@ export class ToneCtrl extends KeyboardCtrl {
         });
     }
 
+    boardPopup: Dialog.Dialog;
+
+    subscribePopupBoard(cb?: () => any) {
+        getWithDataAttr('dynamic-tone-board').forEach(el => {
+            el.addEventListener('pointerdown', () => {
+                this.boardPopup.close(false);
+            })
+        });
+
+        const parent = getWithDataAttr('dynamic-tone-board')[0] as HTMLElement;
+        const playingNote: { [key: string]: string } = {};
+
+        getWithDataAttr('note-key', parent).forEach((el: HTMLElement) => {
+            const keyboardId = el.dataset.keyboardId;
+            const keyOrNote = el.dataset.noteLat || '';
+            let keyId = keyboardId;
+
+            if (this.type === 'bassGuitar' || this.type === 'guitar') {
+                keyId = el.dataset.noteCellGuid;
+            }
+
+            let lastPlayingNote = '';
+
+            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+
+                const instrCode = this._instrCode;
+
+                ideService.synthesizer.playSound({
+                    keyOrNote: this.playingNote[keyId],
+                    id: keyId,
+                    onlyStop: true,
+                });
+
+                playingNote[keyId] = keyOrNote;
+                // this.lastPlayingNote = keyOrNote;
+                // this.lastNoteCellGuid = el?.dataset?.noteCellGuid || '';
+
+                lastPlayingNote = keyOrNote;
+
+                ideService.synthesizer.playSound({
+                    keyOrNote,
+                    id: keyId,
+                    instrCode,
+                });
+
+                //this.setKeysColor();
+
+                // if (this.isMemoMode) {
+                //     this.pushNoteToMemo(keyOrNote);
+                // }
+            });
+
+            el.addEventListener('pointerup', (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+
+                if (!lastPlayingNote) {
+                    return;
+                }
+
+                ideService.synthesizer.playSound({
+                    keyOrNote,
+                    id: keyId,
+                    onlyStop: true,
+                });
+
+                playingNote[keyId] = undefined;
+                this.addOrDelNoteClick(el);
+                this.boardPopup.close(false);
+            });
+        });
+    }
+
+    openGuitarBoard() {
+        this.boardPopup = (this.page.context.$f7 as any).popup.create({
+            content: `
+                <div class="popup">
+                    <div class="page">
+                        <div class="page-content" data-dynamic-tone-board>
+                            ${this.getGuitarBoard(<any>this.type)}
+                            <br/>
+                            <div style="margin-left: 1rem;">
+                                <a 
+                                    class="link"
+                                    data-close-popup-board
+                                >Close</a>
+                            </div>                            
+                        </div>                        
+                    </div>
+                </div>`.trim(),
+            on: {
+                opened: () => {
+                    this.subscribePopupBoard();
+                }
+            }
+        });
+
+        this.boardPopup.open(false);
+    }
+
+    openHarmonicaBoard() {
+        this.boardPopup = (this.page.context.$f7 as any).popup.create({
+            content: `
+                <div class="popup">
+                    <div class="page">
+                        <div class="navbar">
+                            <div class="navbar-bg"></div>
+                            <div class="navbar-inner">
+                                <div class="title">Dynamic Popup</div>
+                                <div class="right"><a  class="link popup-close">Close</a></div>
+                            </div>
+                        </div>
+                        <div class="page-content" data-dynamic-tone-board>
+                            ${this.getHarmonicaBoard()}
+                        </div>
+                    </div>
+                </div>`.trim(),
+            on: {
+                opened: () => {
+                    this.subscribePopupBoard();
+                }
+            }
+        });
+
+        this.boardPopup.open(false);
+    }
+
     subscribeEditCommands() {
-        const pageEl = this.page.pageEl;
+        super.subscribeEditCommands();
 
-        getWithDataAttrValue('edit-action', 'delete-cell', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteCell(el));
-        });
-
-        getWithDataAttrValue('edit-row-action', 'add-row', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addLine());
-        });
-
-        getWithDataAttrValue('edit-row-action', 'insert-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.insertLine());
-        });
-
-        getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteLine());
-        });
-
-        getWithDataAttr('action-drum-note', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
-        });
+        // getWithDataAttrValue('edit-row-action', 'test', this.page.pageEl).forEach((el: HTMLElement) => {
+        //     el.addEventListener('pointerdown', () => this.openHarmonicaBoard());
+        // });
     }
 
     getGuitarSettings(): hlp.GuitarSettings {
@@ -583,7 +714,7 @@ export class ToneCtrl extends KeyboardCtrl {
             el.innerHTML = null;
         });
 
-        const boardContent = this.getGuitarBoardContent(<any>this.type, settings);
+        const boardContent = this.getGuitarBoard(<any>this.type, settings);
 
         getWithDataAttr('guitar-board-wrapper').forEach(el => {
             el.innerHTML = boardContent;
@@ -602,7 +733,7 @@ export class ToneCtrl extends KeyboardCtrl {
             el.innerHTML = null;
         });
 
-        const boardContent = this.getGuitarBoardContent(<any>this.type, settings);
+        const boardContent = this.getGuitarBoard(<any>this.type, settings);
 
         getWithDataAttr('guitar-board-wrapper').forEach(el => {
             el.innerHTML = boardContent;
@@ -629,7 +760,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 evt.preventDefault();
                 evt.stopImmediatePropagation();
 
-                const instrCode = this.instrCode;
+                const instrCode = this._instrCode;
 
                 ideService.synthesizer.playSound({
                     keyOrNote: this.playingNote[keyId],
@@ -768,7 +899,7 @@ export class ToneCtrl extends KeyboardCtrl {
         this.subscribeBoardEvents();
     }
 
-    getChessCellFor(arr: NoteItem[]): hlp.ChessCell {
+    getChessCellFor(arr: LineNote[]): hlp.ChessCell {
         const result: hlp.ChessCell = {
             colInd: 0,
             noteId: 0,
@@ -811,7 +942,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
         const notes = LineModel.GetToneNotes({
             blockName: 'temp',
-            instr: hlp.instrName[this.instrCode],
+            instr: hlp.instrName[this._instrCode],
             chnl: this.type === 'bassGuitar' ? '$bass' : '$guit',
             rows: this.liner.lines,
         });
@@ -1022,4 +1153,50 @@ export class ToneCtrl extends KeyboardCtrl {
 
         this.updateChess();
     }
+
+    subscribeDurationCommands() {
+        super.subscribeDurationCommands();
+
+        getWithDataAttr('get-note-for-cell-action', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                if (this.type === 'bassGuitar' || this.type === 'guitar') {
+                    this.openGuitarBoard();
+                } else {
+                    this.openHarmonicaBoard();
+                }
+            });
+        });
+    }
 }
+
+// getContent  getTopCommandPanel updateView
+//
+// BOARD
+// getGuitarContent      getHarmonicaContent
+// getGuitarBoard        getHarmonicaBoard
+// openGuitarBoard       openHarmonicaBoard
+// getGuitarRightSide
+// getMusicInfoContent
+//
+// GUITAR BOARD
+// getGuitarSettings  setGuitarSettings
+// setStringCount  setGuitarOffset  fixBoardCell  setKeysColor
+//
+// CHESS
+// printChess getChessLine getChessCellFor
+//
+// EVENTS
+// subscribeEvents
+// subscribeCommonCommands subscribeEditCommands
+// subscribeBoardEvents    subscribePopupBoardEvents
+//
+// RECORD
+// getOut
+// toggleRecord handleKeyRecord  clearRecordData  getBeatContent
+//
+//
+// MEMO
+// toggleMemo pushNoteToMemo
+//
+// PLAY
+// playOne

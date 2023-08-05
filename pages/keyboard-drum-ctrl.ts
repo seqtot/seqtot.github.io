@@ -1,8 +1,7 @@
 import { drumInfo } from '../libs/muse/drums';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils/utils-note';
-import { parseInteger } from '../libs/common';
-import { LineModel, Line, NoteItem, KeyData } from './line-model';
+import { LineModel, Line, LineNote, KeyData } from './line-model';
 import { createOutBlock, TextBlock } from '../libs/muse/utils/utils-note';
 
 import { ideService } from './ide/ide-service';
@@ -67,7 +66,7 @@ export class DrumCtrl extends KeyboardCtrl {
     }
 
     highlightInstruments() {
-        getWithDataAttr('action-drum-note', this.page.pageEl).forEach(el => {
+        getWithDataAttr('add-note-action', this.page.pageEl).forEach(el => {
             el.style.fontWeight = '400';
             el.style.backgroundColor = 'white';
         });
@@ -75,7 +74,7 @@ export class DrumCtrl extends KeyboardCtrl {
         const notes = this.liner.getNotesByOffset(this.activeCell.offset);
 
         notes.forEach(note => {
-            getWithDataAttrValue('action-drum-note', note.note, this.page.pageEl).forEach(el => {
+            getWithDataAttrValue('add-note-action', note.note, this.page.pageEl).forEach(el => {
                 el.style.fontWeight = '700';
                 el.style.backgroundColor = 'lightgray';
             });
@@ -192,50 +191,6 @@ export class DrumCtrl extends KeyboardCtrl {
             repeatCount: 1,
             metaByLines: ideService.currentEdit.metaByLines,
         });
-    }
-
-    drumNoteClick(el: HTMLElement) {
-        const rowCol = this.activeCell.rowCol;
-        const cell = getWithDataAttrValue('chess-cell-row-col', rowCol)[0];
-
-        if (!cell) return;
-
-        const totalOffsetQ = parseInteger(cell.dataset['chessTotalOffset'], null);
-
-        if (totalOffsetQ === null) return;
-
-        const note = el.dataset['actionDrumNote'];
-
-        if (!note) return;
-
-        let noteInfo = (drumNotesInfo[note] || someDrum) as NoteItem;
-        noteInfo = {
-            ...noteInfo,
-            note,
-            durQ: 10,
-        }
-
-        const notes = this.liner.getNotesByOffset(totalOffsetQ);
-
-        let isDelete = false;
-
-        for (let iNote of notes) {
-            if (iNote.note === note) {
-                isDelete = true;
-
-                this.liner.deleteNoteByNoteAndOffset(totalOffsetQ, note);
-            }
-        }
-
-        if (!isDelete) {
-            let info = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
-            this.printChess(this.liner.lines);
-            this.highlightCellByRowCol(rowCol);
-            this.activeCell.id = info.note.id;
-        } else {
-            this.printChess(this.liner.lines);
-            this.highlightCellByRowCol(rowCol);
-        }
     }
 
     subscribeCommonCommands() {
@@ -369,24 +324,10 @@ export class DrumCtrl extends KeyboardCtrl {
     }
 
     subscribeEditCommands() {
-        getWithDataAttrValue('edit-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteCell(el));
-        });
+        super.subscribeEditCommands();
 
-        getWithDataAttrValue('edit-row-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addLine());
-        });
-
-        getWithDataAttrValue('edit-row-action', 'insert-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.insertLine());
-        });
-
-        getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteLine());
-        });
-
-        getWithDataAttr('action-drum-note', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.drumNoteClick(el));
+        getWithDataAttr('add-note-action', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addOrDelNoteClick(el));
         });
     }
 
@@ -427,7 +368,8 @@ export class DrumCtrl extends KeyboardCtrl {
             topRow += `
                 <span
                     style="${style}"
-                    data-action-drum-note="${info.note}"
+                    data-add-note-action="${info.note}"
+                    data-note-lat="${info.note}"
                 >${info.vocalism}</span>
             `;
         });
@@ -439,7 +381,8 @@ export class DrumCtrl extends KeyboardCtrl {
             midRow += `
                 <span
                     style="${style}"
-                    data-action-drum-note="${info.note}"
+                    data-add-note-action="${info.note}"
+                    data-note-lat="${info.note}"                    
                 >${info.vocalism}</span>
             `;
         });
@@ -451,7 +394,8 @@ export class DrumCtrl extends KeyboardCtrl {
             botRow += `
                 <span
                     style="${style}"
-                    data-action-drum-note="${info.note}"
+                    data-add-note-action="${info.note}"
+                    data-note-lat="${info.note}"                    
                 >${info.vocalism}</span>
             `;
         });
@@ -485,7 +429,7 @@ export class DrumCtrl extends KeyboardCtrl {
         return wrapper;
     }
 
-    getDrumBoardContent(keyboardId: string): string {
+    getDrumBoard(keyboardId: string): string {
         return this.board.getContent(keyboardId);
     }
 
@@ -548,7 +492,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
         const content = `
             <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-                ${this.getDrumBoardContent(keyboardId)}
+                ${this.getDrumBoard(keyboardId)}
                 ${this.getTopCommandPanel()}
                 ${this.getMetronomeContent()}                
                 ${this.getRowActionsCommands()}                
@@ -655,7 +599,7 @@ export class DrumCtrl extends KeyboardCtrl {
         let padding = .07;
         let rowHeight = 1.4;
 
-        const getTextAndColor = (arr: NoteItem[]): ChessCell => {
+        const getTextAndColor = (arr: LineNote[]): ChessCell => {
             const result: ChessCell = {
                 noteId: 0,
                 cellId: 0,
@@ -827,4 +771,41 @@ export class DrumCtrl extends KeyboardCtrl {
 
         this.subscribeChess();
     }
+
+    getNoteInfo(noteLat: string): {
+        note: string,
+        headColor: string,
+        bodyColor: string,
+        char: string,
+        vocalism: string,
+    } {
+        return drumNotesInfo[noteLat] || someDrum;
+    }
 }
+
+// getContent updateView
+//
+// getDrumBoard
+// getDrumNotesPanel  highlightInstruments
+// addOrDelNoteClick -> addOrDelNote
+//
+// getPatternsContent
+//
+//
+// CHESS
+// printChess
+// getOut
+//
+// RECORD
+// handleKeyRecord
+// clearRecordData
+//
+// SUBSCRIBE
+// subscribeEvents
+// subscribeCommonCommands
+// subscribeEditCommands
+//
+// PLAY
+// playOne  playActive  playBoth
+//
+// clearBpmInfo?

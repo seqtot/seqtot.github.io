@@ -13,7 +13,7 @@ export type KeyData = {
     char: string;
 };
 
-export type NoteItem = {
+export type LineNote = {
     id: number;
     durQ: number;
     note: string;
@@ -21,12 +21,15 @@ export type NoteItem = {
     bodyColor?: string;
     startOffsetQ: number;
     char: string;
+
+    instCode?: string | number;
+    instName?: string;
 };
 
 export type Cell = {
     id: number;
     startOffsetQ: number;
-    notes: NoteItem[]
+    notes: LineNote[]
 }
 
 export type Line = {
@@ -196,7 +199,7 @@ export class LineModel {
         return Math.max(...notes.map(item => item.id));
     }
 
-    getAllNotes(): NoteItem[] {
+    getAllNotes(): LineNote[] {
         const cells = this.getAllCells();
 
         if (!cells.length) return [];
@@ -206,8 +209,8 @@ export class LineModel {
         }, []);
     }
 
-    addNoteByOffset(offsetQ: number, note: NoteItem): {
-        note: NoteItem,
+    addNoteByOffset(offsetQ: number, note: LineNote): {
+        note: LineNote,
         coord: CellCoord,
     } {
         const row = this.getRowByOffset(offsetQ);
@@ -396,7 +399,7 @@ export class LineModel {
         let cellId = 1;
 
         seq.forEach((item, i) => {
-            let itemNew: NoteItem = {
+            let itemNew: LineNote = {
                 id: i + 1,
                 bodyColor: '',
                 headColor: '',
@@ -487,7 +490,7 @@ export class LineModel {
         let cellId = 1;
 
         seq.forEach((item, i) => {
-            let itemNew: NoteItem = {
+            let itemNew: LineNote = {
                 id: i + 1,
                 bodyColor: '',
                 headColor: '',
@@ -529,9 +532,9 @@ export class LineModel {
         return rows;
     }
 
-    static GetSortedNotes(rows: Line[]): NoteItem[] {
+    static GetSortedNotes(rows: Line[]): LineNote[] {
         rows = Array.isArray(rows) ? rows : [];
-        const notes: NoteItem[] = [];
+        const notes: LineNote[] = [];
 
         rows.forEach(row => {
             row.cells.forEach(cell => {
@@ -547,7 +550,7 @@ export class LineModel {
         return notes;
     }
 
-    getSortedNotes(rows: Line[]): NoteItem[] {
+    getSortedNotes(rows: Line[]): LineNote[] {
         return LineModel.GetSortedNotes(Array.isArray(rows) ? rows : this.lines);
     }
 
@@ -565,7 +568,7 @@ export class LineModel {
         });
     }
 
-    static SortByStartOffsetQ(arr: (Cell | NoteItem) []) {
+    static SortByStartOffsetQ(arr: (Cell | LineNote) []) {
         arr.sort((first, second) => {
             if (first.startOffsetQ < second.startOffsetQ) {
                 return -1;
@@ -579,11 +582,11 @@ export class LineModel {
         });
     }
 
-    sortByStartOffsetQ(arr: (Cell | NoteItem) []) {
+    sortByStartOffsetQ(arr: (Cell | LineNote) []) {
         LineModel.SortByStartOffsetQ(arr);
     }
 
-    static GetNoteNames(arr: NoteItem[]): string[] {
+    static GetNoteNames(arr: LineNote[]): string[] {
         const result: {[key: string]: string} = {};
 
         arr.forEach(item => {
@@ -593,7 +596,7 @@ export class LineModel {
         return Object.values(result);
     }
 
-    getNoteNames(arr: NoteItem[]): string[] {
+    getNoteNames(arr: LineNote[]): string[] {
         return LineModel.GetNoteNames(arr);
     }
 
@@ -625,8 +628,8 @@ export class LineModel {
         return result;
     }
 
-    getNotesListByOffset(row: Line, startOffsetQ: number): NoteItem[] {
-        const result: NoteItem[] = []
+    getNotesListByOffset(row: Line, startOffsetQ: number): LineNote[] {
+        const result: LineNote[] = []
 
         row.cells.forEach(cell => {
             if (cell.startOffsetQ !== startOffsetQ) {
@@ -639,8 +642,8 @@ export class LineModel {
         return result;
     }
 
-    getNotesByOffset(offsetQ: number): NoteItem[] {
-        const result: NoteItem[] = []
+    getNotesByOffset(offsetQ: number): LineNote[] {
+        const result: LineNote[] = []
 
         const row = this.getRowByOffset(offsetQ);
 

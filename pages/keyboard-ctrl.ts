@@ -3,11 +3,11 @@ import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Synthesizer } from '../libs/muse/synthesizer';
 import { MultiPlayer } from '../libs/muse/multi-player';
 
-import { Line, LineModel, CELL_SIZE } from './line-model';
+import { Line, LineModel, CELL_SIZE, LineNote } from './line-model';
 import * as un from '../libs/muse/utils'
 import { parseInteger } from '../libs/common';
 
-import {EditedItem, ideService} from './ide/ide-service';
+import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
 import { SongPage, SongStore, StoredRow, StoredSongNode } from './song-store';
 import { getOutBlocksInfo, OutBlockRowInfo, SongPartInfo, TextBlock } from '../libs/muse/utils';
@@ -135,11 +135,11 @@ export class KeyboardCtrl {
     }
 
     subscribeDurationCommands() {
-        getWithDataAttrValue('action-set-cell-duration', 'add', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('set-cell-duration-action', 'add', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, CELL_SIZE));
         });
 
-        getWithDataAttrValue('action-set-cell-duration', 'sub', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('set-cell-duration-action', 'sub', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, -CELL_SIZE));
         });
     }
@@ -161,8 +161,6 @@ export class KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, CELL_SIZE));
         });
     }
-
-    highlightInstruments() {}
 
     getCellId(el: HTMLElement) {
         return un.parseInteger(el.dataset['chessCellId'], 0);
@@ -260,7 +258,7 @@ export class KeyboardCtrl {
                 <span
                     style="${style} color: red;"
                     data-edit-row-action="delete-row"
-                >delR</span>                    
+                >delR</span>                                    
             </div>        
         `.trim();
     }
@@ -292,25 +290,21 @@ export class KeyboardCtrl {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
 
         let additional = '';
-        // if (hasDel) {
-        //     delButton = `
-        //         <span
-        //             style="${style} background-color: red; color: white;"
-        //             data-edit-action="delete-cell"
-        //         >del</span>
-        //     `;
-        // }
-
         return `
             <div style="${rowStyle}">
                 <span
                     style="${style}"
-                    data-action-set-cell-duration="add"
+                    data-set-cell-duration-action="add"
                 >&nbsp;+&nbsp;</span>
                 <span
                     style="${style}"
-                    data-action-set-cell-duration="sub"
-                >&nbsp;-&nbsp;</span>
+                    data-set-cell-duration-action="sub"
+                >&nbsp;-&nbsp;</span>&emsp;
+                <span
+                    style="${style}"
+                    data-get-note-for-cell-action
+                >note</span>                
+                
                 ${additional}
             </div>
         `.trim();
@@ -401,10 +395,6 @@ export class KeyboardCtrl {
         this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
-
-    printChess(rows: Line[]) {}
-
-    drumNoteClick(el: HTMLElement) {}
 
     getBottomCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
@@ -531,10 +521,6 @@ export class KeyboardCtrl {
         });
 
         return list;
-    }
-
-    updateView() {
-
     }
 
     getNotes(id: string, item: StoredRow): string {
@@ -1111,6 +1097,138 @@ export class KeyboardCtrl {
             </div>`.trim();
     }
 
+
+    subscribeEditCommands() {
+        getWithDataAttrValue('edit-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.deleteCell(el));
+        });
+
+        getWithDataAttrValue('edit-row-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.addLine());
+        });
+
+        getWithDataAttrValue('edit-row-action', 'insert-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.insertLine());
+        });
+
+        getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.deleteLine());
+        });
+    }
+
+    addOrDelNoteClick(el: HTMLElement) {
+        console.log('addOrDelNoteClick', el);
+
+        const rowCol = this.activeCell.rowCol;
+        const cell = getWithDataAttrValue('chess-cell-row-col', rowCol)[0];
+
+        if (!cell) return;
+
+        const totalOffsetQ = parseInteger(cell.dataset['chessTotalOffset'], null);
+
+        if (totalOffsetQ === null) return;
+
+        const note = el.dataset['noteLat'];
+
+        if (!note) return;
+
+        this.addOrDelNote(note, rowCol, totalOffsetQ);
+    }
+
+    addOrDelNote(note: string, rowCol: string, totalOffsetQ: number) {
+        let noteInfo = this.getNoteInfo(note) as any as LineNote;
+        noteInfo = {
+            ...noteInfo,
+            note,
+            durQ: 10,
+            instCode: this.instrCode,
+            instName: this.instrName,
+        }
+
+        const notes = this.liner.getNotesByOffset(totalOffsetQ);
+
+        let isDelete = false;
+
+        for (let iNote of notes) {
+            if (iNote.note === note) {
+                isDelete = true;
+
+                this.liner.deleteNoteByNoteAndOffset(totalOffsetQ, note);
+            }
+        }
+
+        if (!isDelete) {
+            let info = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
+            this.printChess(this.liner.lines);
+            this.highlightCellByRowCol(rowCol);
+            this.activeCell.id = info.note.id;
+        } else {
+            this.printChess(this.liner.lines);
+            this.highlightCellByRowCol(rowCol);
+        }
+    }
+
     playBoth(){}
     playActive(){}
+    updateView() {}
+    printChess(rows: Line[]) {}
+    highlightInstruments() {}
+    getNoteInfo(noteLat: string): {
+        note: string,
+        headColor: string,
+        bodyColor: string,
+        char: string,
+        vocalism: string,
+    } {
+        return {} as any;
+    }
+    get instrName(): string {return ''}
+    get instrCode(): string | number { return ''}
 }
+
+// CONTENT
+//  getIdeContent
+//  getRowActionsCommands
+//  getMetronomeContent
+//  getMoveCommandPanel
+//  getDurationCommandPanel
+//  getTopCommandPanel
+//  getBottomCommandPanel
+
+// SUBSCRIBE
+//  subscribeEditCommands
+//  subscribeIdeEvents
+//  subscribeDurationCommands
+//  subscribeMoveCommands
+//  subscribeChess
+
+// saveEditingItems saveEditingItemsMy
+//  loadFile
+//  addRowInPart
+//  resetEditingParts
+//  songRowClick
+//  sortEditingItems
+//  addOrRemoveEditingItem
+//  getMidiConfig
+
+// updateChess
+// buildBlocksForMySong
+// getPartsWithRows  getRowsForPart
+// getNotes
+// resetBlockOffset
+
+// CHESS
+
+
+// EDITING ITEMS
+// setEditingItemDurationAndBlockOffsetByLines
+// addOrDelNoteClick -> addOrDelNote
+// getEmptyBpmInfo
+// getMoveButtons
+//
+// CELL
+// getCellInfo  setActiveCell  getCellId  moveCell  addCellDuration
+// chessCellClick highlightCellByRowCol deleteCell
+
+// CHESS LINE
+// addLine insertLine deleteLine
