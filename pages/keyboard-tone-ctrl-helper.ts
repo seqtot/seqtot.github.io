@@ -20,9 +20,10 @@ export type GuitarSettings = {
 }
 
 export const instrName = {
-    374: '$cBass*f',
-    276: '$guit*ec',
     327: '$egit*drp',
+    321: '$egit*drpm',
+    276: '$guit*ec',
+    374: '$cBass*f',
     182: '$organ*r',
 }
 

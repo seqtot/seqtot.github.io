@@ -6,7 +6,7 @@ import { KeyData, Line, LineModel, LineNote, CELL_SIZE } from './line-model';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { sings } from './sings';
-import {SongStore} from './song-store';
+import { SongStore } from './song-store';
 
 const DOWN = 1;
 const UP = 0;
@@ -209,7 +209,8 @@ export class ToneCtrl extends KeyboardCtrl {
         return `
             ${stringCountCommands}<br/>
             <span data-action-tone="set-offset-up" style="${btnStl}">up</span>&emsp;
-            <span data-action-tone="set-offset-down" style="${btnStl}">down</span><br/><br/>
+            <span data-action-tone="set-offset-down" style="${btnStl}">down</span><br/>
+            <span data-action-tone="open-guitar-board" style="${btnStl}">sound</span><br/><br/>            
             <span data-action-tone="fix-board-cell" style="${btnStl} font-size: 1.4rem; background-color: yellow; ">fix</span><br/><br/>
             <span data-action-tone="unfix-board-cell" style="${btnStl}">unfix</span><br/><br/>
             <span data-action-tone="memo-mode" style="${btnStl}">memo</span><br/><br/>
@@ -528,14 +529,32 @@ export class ToneCtrl extends KeyboardCtrl {
     boardPopup: Dialog.Dialog;
 
     subscribePopupBoard(cb?: () => any) {
-        getWithDataAttr('dynamic-tone-board').forEach(el => {
+        let lastNoteEl: HTMLElement;
+        let lastPlayingNote = '';
+        const playingNote: { [key: string]: string } = {};
+        const parent = getWithDataAttr('dynamic-tone-board')[0] as HTMLElement;
+
+        getWithDataAttr('instrument-code', parent).forEach(el => {
+            el.addEventListener('pointerdown', () => {
+                this._instrCode = un.parseInteger(el.dataset.instrumentCode, 162); // jjkl
+            })
+        });
+
+        getWithDataAttr('close-popup-board', parent).forEach(el => {
             el.addEventListener('pointerdown', () => {
                 this.boardPopup.close(false);
             })
         });
 
-        const parent = getWithDataAttr('dynamic-tone-board')[0] as HTMLElement;
-        const playingNote: { [key: string]: string } = {};
+        getWithDataAttr('select-note-action', parent).forEach(el => {
+            el.addEventListener('pointerdown', () => {
+                if (lastNoteEl) {
+                    this.addOrDelNoteClick(lastNoteEl);
+                }
+
+                this.boardPopup.close(false);
+            });
+        });
 
         getWithDataAttr('note-key', parent).forEach((el: HTMLElement) => {
             const keyboardId = el.dataset.keyboardId;
@@ -545,8 +564,6 @@ export class ToneCtrl extends KeyboardCtrl {
             if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
                 keyId = el.dataset.noteCellGuid;
             }
-
-            let lastPlayingNote = '';
 
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
                 evt.preventDefault();
@@ -561,10 +578,8 @@ export class ToneCtrl extends KeyboardCtrl {
                 });
 
                 playingNote[keyId] = keyOrNote;
-                // this.lastPlayingNote = keyOrNote;
-                // this.lastNoteCellGuid = el?.dataset?.noteCellGuid || '';
-
                 lastPlayingNote = keyOrNote;
+                lastNoteEl = el;
 
                 ideService.synthesizer.playSound({
                     keyOrNote,
@@ -573,10 +588,6 @@ export class ToneCtrl extends KeyboardCtrl {
                 });
 
                 //this.setKeysColor();
-
-                // if (this.isMemoMode) {
-                //     this.pushNoteToMemo(keyOrNote);
-                // }
             });
 
             el.addEventListener('pointerup', (evt: MouseEvent) => {
@@ -594,25 +605,48 @@ export class ToneCtrl extends KeyboardCtrl {
                 });
 
                 playingNote[keyId] = undefined;
-                this.addOrDelNoteClick(el);
-                this.boardPopup.close(false);
             });
         });
     }
 
     openGuitarBoard() {
+        let instruments = '';
+
+        Object.keys(hlp.instrName).forEach(key => {
+            instruments = instruments + `
+                <span 
+                    data-instrument-code="${key}"
+                    data-instrument-name="${hlp.instrName[key]}"                    
+                >${hlp.instrName[key]}</span>&emsp;
+            `.trim();
+        });
+
+        const content = `
+            <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
+                <div style="user-select: none; touch-action: none;">
+                    ${this.getGuitarBoard(<any>this.boardType)}
+                </div>
+                <div style="padding-left: .5rem; padding-top: .5rem;">
+                    <div 
+                        data-select-note-action
+                        style="height: 2rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                    >OK</div>
+                    <br/>
+                    <div
+                        data-close-popup-board
+                        style="height: 2rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                    >Close</div>
+                </div>
+        </div>`.trim();
+
         this.boardPopup = (this.page.context.$f7 as any).popup.create({
             content: `
                 <div class="popup">
                     <div class="page">
                         <div class="page-content" data-dynamic-tone-board>
-                            ${this.getGuitarBoard(<any>this.boardType)}
-                            <br/>
-                            <div style="margin-left: 1rem;">
-                                <a 
-                                    class="link"
-                                    data-close-popup-board
-                                >Close</a>
+                            ${content}
+                            <div style="margin: 1rem;">
+                                use:&emsp;${instruments} 
                             </div>                            
                         </div>                        
                     </div>
@@ -637,7 +671,12 @@ export class ToneCtrl extends KeyboardCtrl {
                             <div class="navbar-bg"></div>
                             <div class="navbar-inner">
                                 <div class="title">Dynamic Popup</div>
-                                <div class="right"><a  class="link popup-close">Close</a></div>
+                                <div class="right">
+                                    <a
+                                        data-close-popup-board
+                                        class="link popup-close"
+                                    >Close</a>
+                                </div>
                             </div>
                         </div>
                         <div class="page-content" data-dynamic-tone-board>
@@ -848,6 +887,10 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttrValue('action-tone', 'set-offset-down', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.setGuitarOffset(-1));
+        });
+
+        getWithDataAttrValue('action-tone', 'open-guitar-board', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.openGuitarBoard());
         });
 
         getWithDataAttrValue('action-tone', 'fix-board-cell', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1200,7 +1243,7 @@ export class ToneCtrl extends KeyboardCtrl {
 // EVENTS
 // subscribeEvents
 // subscribeCommonCommands subscribeEditCommands
-// subscribeBoardEvents    subscribePopupBoardEvents
+// subscribeBoardEvents    subscribePopupBoard
 //
 // RECORD
 // getOut
