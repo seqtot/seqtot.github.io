@@ -283,7 +283,7 @@ export class ToneCtrl extends KeyboardCtrl {
             
             ${this.getBeatContent()}
             ${this.getTopCommandPanel()}
-            <div style="margin: .5rem;">${this.page.getMetronomeContent()}<br/></div>
+            ${this.getMetronomeContent()}            
             ${this.getRowActionsCommands()}
             
             ${this.getDurationCommandPanel(1.2)}            

@@ -60,13 +60,13 @@ export class KeyboardCtrl {
         col: number,
         row: number,
         rowCol: string,
-        offset: number,
+        totalOffset: number,
     } = {
         id: 0,
         col: 0,
         row: 0,
         rowCol: '',
-        offset: 0
+        totalOffset: 0
     };
 
     get hasIdeItem(): boolean {
@@ -150,6 +150,8 @@ export class KeyboardCtrl {
         }
     }
 
+    notesForCopy: LineNote[] = [];
+
     subscribeDurationCommands() {
         getWithDataAttrValue('set-cell-duration-action', 'add', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, CELL_SIZE));
@@ -157,6 +159,26 @@ export class KeyboardCtrl {
 
         getWithDataAttrValue('set-cell-duration-action', 'sub', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, -CELL_SIZE));
+        });
+
+        getWithDataAttr('copy-notes-action', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                if (this.activeCell.id) {
+                    this.notesForCopy = this.liner.getNotesByOffset(this.activeCell.totalOffset);
+                }
+            });
+        });
+
+        getWithDataAttr('paste-notes-action', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                if (!this.notesForCopy.length || !this.activeCell.rowCol) {
+                    return;
+                }
+
+                this.notesForCopy.forEach(note => {
+                    this.addOrDelNote(note, this.activeCell.rowCol, this.activeCell.totalOffset);
+                });
+            });
         });
     }
 
@@ -193,7 +215,7 @@ export class KeyboardCtrl {
                 col: 0,
                 row: 0,
                 rowCol: '',
-                offset: 0,
+                totalOffset: 0,
             }
         }
 
@@ -202,7 +224,7 @@ export class KeyboardCtrl {
             row: parseInteger(el.dataset['chessCellRow'], 0), // data-chess-cell-row
             col: parseInteger(el.dataset['chessCellCol'], 0), // data-chess-cell-col
             rowCol: el.dataset['chessCellRowCol'], // data-chess-cell-row-col
-            offset: parseInteger(el.dataset['chessTotalOffset'], 0), // data-chess-total-offset
+            totalOffset: parseInteger(el.dataset['chessTotalOffset'], 0), // data-chess-total-offset
         }
     }
 
@@ -319,8 +341,15 @@ export class KeyboardCtrl {
                 <span
                     style="${style}"
                     data-get-note-for-cell-action
-                >note</span>                
-                
+                >note</span>&emsp;
+                <span
+                    style="${style}"
+                    data-copy-notes-action
+                >cop</span>
+                <span
+                    style="${style}"
+                    data-paste-notes-action
+                >pst</span>                                
                 ${additional}
             </div>
         `.trim();
@@ -1158,7 +1187,7 @@ export class KeyboardCtrl {
 
     getMetronomeContent() {
         return `
-            <div style="margin: 0 0 1.5rem 1rem; width: 80%;">
+            <div style="margin: 0 0 1.5rem 1rem; width: 15rem;">
                 ${this.page.getMetronomeContent()}
             </div>`.trim();
     }
@@ -1201,14 +1230,16 @@ export class KeyboardCtrl {
         this.addOrDelNote(note, rowCol, totalOffsetQ);
     }
 
-    addOrDelNote(note: string, rowCol: string, totalOffsetQ: number) {
-        let noteInfo = this.getNoteInfo(note) as any as LineNote;
+    addOrDelNote(pNote: string | LineNote, rowCol: string, totalOffsetQ: number) {
+        const note = typeof pNote === 'string' ? {note: pNote} : pNote;
+        let noteInfo = this.getNoteInfo(note.note) as any as LineNote;
+
         noteInfo = {
             ...noteInfo,
-            note,
             durQ: 10,
             instCode: this.instrCode,
             instName: this.instrName,
+            ...note,
         }
 
         const notes = this.liner.getNotesByOffset(totalOffsetQ);
@@ -1216,10 +1247,10 @@ export class KeyboardCtrl {
         let isDelete = false;
 
         for (let iNote of notes) {
-            if (iNote.note === note) {
+            if (iNote.note === note.note) {
                 isDelete = true;
 
-                this.liner.deleteNoteByNoteAndOffset(totalOffsetQ, note);
+                this.liner.deleteNoteByNoteAndOffset(totalOffsetQ, note.note);
             }
         }
 

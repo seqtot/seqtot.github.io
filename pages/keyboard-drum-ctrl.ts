@@ -65,7 +65,7 @@ export class DrumCtrl extends KeyboardCtrl {
             el.style.backgroundColor = 'white';
         });
 
-        const notes = this.liner.getNotesByOffset(this.activeCell.offset);
+        const notes = this.liner.getNotesByOffset(this.activeCell.totalOffset);
 
         notes.forEach(note => {
             getWithDataAttrValue('add-note-action', note.note, this.page.pageEl).forEach(el => {
