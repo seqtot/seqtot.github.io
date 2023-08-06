@@ -528,13 +528,13 @@ export class KeyboardCtrl {
                     );
 
                     partRows.push({
-                            track: this.trackName,
-                            rowInPartId: row.rowInPartId,
-                            type: this.boardType,
-                            partId: row.partId,
-                            rowNio: un.getRowNio(row.rowInPartId),
-                            status: 'unknown',
-                            lines
+                        type: this.boardType,
+                        track: this.trackName,
+                        partId: row.partId,
+                        rowInPartId: row.rowInPartId,
+                        rowNio: un.getRowNio(row.rowInPartId),
+                        status: 'unknown',
+                        lines
                     });
                 });
 
@@ -686,7 +686,7 @@ export class KeyboardCtrl {
                 const song = (isMy ? SongStore.getSong(songId, true) : null) as SongPage;
                 if (!iLines.length && song) {
                     song.dynamic.forEach(item => {
-                        if (item.rowInPartId === editedItem.rowInPartId && item.type === this.boardType) {
+                        if (item.rowInPartId === editedItem.rowInPartId && item.track === this.trackName) {
                             iLines = [...iLines, ...item.lines];
                         }
                     });
@@ -1082,7 +1082,7 @@ export class KeyboardCtrl {
         const savedItems = ideService.editedItems.map(item => item.rowInPartId);
 
         const dynamic = song.dynamic.filter(item => {
-            return !savedItems.includes(item.rowInPartId) || (savedItems.includes(item.rowInPartId) && item.type !== this.boardType);
+            return !savedItems.includes(item.rowInPartId) || (savedItems.includes(item.rowInPartId) && item.track !== this.trackName);
         });
 
         ideService.editedItems.forEach(item => {
@@ -1091,13 +1091,13 @@ export class KeyboardCtrl {
             if (!lines.length) return;
 
             dynamic.push({
+                track: this.trackName,
                 type: this.boardType,
                 rowInPartId: item.rowInPartId,
-                lines,
                 partId: item.partId,
                 rowNio: item.rowNio,
                 status: 'unknown',
-                track: this.trackName,
+                lines
             });
         });
 
@@ -1136,6 +1136,7 @@ export class KeyboardCtrl {
                 songNode[item.rowInPartId] = itemsNode;
             }
 
+            // jjkl
             let drumsNode = itemsNode.items.find(iItem => iItem.rowInPartId === item.rowInPartId && iItem.type === this.boardType);
             if (!drumsNode) {
                 drumsNode = {
@@ -1269,9 +1270,9 @@ export class KeyboardCtrl {
         const notes = this.getNotes(
             'temp',
             {
+                track: this.trackName || '$unknown',
                 type: this.boardType,
                 lines: this.liner.lines,
-                track: this.trackName || '$unknown',
             }
         );
 
@@ -1313,8 +1314,8 @@ export class KeyboardCtrl {
                 LineModel.ClearBlockOffset(lines);
 
                 const notes = this.getNotes(ideService.guid.toString(), {
-                    type: this.boardType,
                     track: this.trackName,
+                    type: this.boardType,
                     lines
                 });
 
