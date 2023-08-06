@@ -757,6 +757,19 @@ export function guid(length: number = 10) {
     return value.slice(0, length);
 }
 
+export function getPartNio(pVal: any): number {
+    let val = (pVal || '') as string;
+    val = val.replace(nioChar, '').trim();
+
+    return parseInteger(val.split('-')[0], 0);
+}
+
+export function getRowNio(pVal: any): number {
+    let val = (pVal || '') as string;
+    val = val.replace(nioChar, '').trim();
+
+    return parseInteger(val.split('-')[1], 0);
+}
 
 // arduino гармошка
 // https://www.youtube.com/watch?v=aVjl3yQguc4

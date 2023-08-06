@@ -6,6 +6,7 @@ import { KeyData, Line, LineModel, LineNote, CELL_SIZE } from './line-model';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { sings } from './sings';
+import {SongStore} from './song-store';
 
 const DOWN = 1;
 const UP = 0;
@@ -41,14 +42,14 @@ export class ToneCtrl extends KeyboardCtrl {
 
     constructor(
         public page: KeyboardPage,
-        public type: ToneKeyboardType
+        public boardType: ToneKeyboardType
     ) {
-        super(page, type);
+        super(page, boardType);
 
-        if (type === 'bassGuitar') {
-            this._instrCode = hlp.bassGuitarInstr; // bassGuitarInstr;
+        if (boardType === 'bassGuitar') {
+            this._instrCode = hlp.bassGuitarInstr;
         }
-        else if (type === 'guitar') {
+        else if (boardType === 'guitar') {
             this._instrCode = hlp.rockGuitarInstr;
         }
         else {
@@ -56,17 +57,17 @@ export class ToneCtrl extends KeyboardCtrl {
         }
     }
 
-    getGuitarBoard(type?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
+    getGuitarBoard(boardType?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
         settings = settings || this.getGuitarSettings();
 
         let stringCount = settings.stringCount;
         let firstString = 0;
 
-        if (type === 'bassGuitar' && stringCount === 4) {
+        if (boardType === 'bassGuitar' && stringCount === 4) {
             firstString = 1;
         }
 
-        if (type === 'guitar' && stringCount === 6) {
+        if (boardType === 'guitar' && stringCount === 6) {
             firstString = 1;
         }
 
@@ -76,7 +77,7 @@ export class ToneCtrl extends KeyboardCtrl {
            return row.slice(firstString, stringCount + firstString);
         });
 
-        return hlp.getVerticalKeyboard('base', type, boardKeys);
+        return hlp.getVerticalKeyboard('base', boardType, boardKeys);
     }
 
     getTopCommandPanel(): string {
@@ -182,11 +183,11 @@ export class ToneCtrl extends KeyboardCtrl {
         </div>`.trim();
     }
 
-    getGuitarRightSide(type: 'guitar' | 'bassGuitar', settings: hlp.GuitarSettings): string {
+    getGuitarRightSide(boardType: 'guitar' | 'bassGuitar', settings: hlp.GuitarSettings): string {
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
         let stringCountCommands = '';
 
-        if (type === 'guitar') {
+        if (boardType === 'guitar') {
             stringCountCommands = `
                 <div>
                     <span data-action-set-string-count="6" style="${btnStl}">6s</span>
@@ -195,7 +196,7 @@ export class ToneCtrl extends KeyboardCtrl {
             `.trim();
         }
 
-        if (type === 'bassGuitar') {
+        if (boardType === 'bassGuitar') {
             stringCountCommands = `
                 <div>
                     <span data-action-set-string-count="4" style="${btnStl}">4s</span>
@@ -268,7 +269,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
     getGuitarContent(type?: 'guitar' | 'bassGuitar', settings?: hlp.GuitarSettings): string {
         settings = settings || this.getGuitarSettings();
-        type = type || <any>this.type;
+        type = type || <any>this.boardType;
 
         let result = `
             <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
@@ -302,14 +303,20 @@ export class ToneCtrl extends KeyboardCtrl {
         return result;
     }
 
-    getContent(type?: ToneKeyboardType): string {
-        if (type === 'bassSolo34') {
+    getContent(boardType?: ToneKeyboardType): string {
+        if (this.isMy) {
+            const song = SongStore.getSong(this.songId);
+            const tracks = song.tracks.filter(track => track.board === boardType);
+            this.trackName = tracks[0] ? tracks[0].name: '';
+        }
+
+        if (boardType === 'bassSolo34') {
             return this.getHarmonicaContent();
         }
-        else if(type === 'bassGuitar') {
+        else if(boardType === 'bassGuitar') {
             return this.getGuitarContent('bassGuitar');
         }
-        else if(type === 'guitar') {
+        else if(boardType === 'guitar') {
             return this.getGuitarContent('guitar');
         }
     }
@@ -321,7 +328,7 @@ export class ToneCtrl extends KeyboardCtrl {
         getWithDataAttr('note-key', this.page.pageEl).forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
 
-            if (this.type === 'bassSolo34') {
+            if (this.boardType === 'bassSolo34') {
                 el.style.boxShadow = null;
             }
 
@@ -342,7 +349,7 @@ export class ToneCtrl extends KeyboardCtrl {
             }
 
             // GUITAR
-            if (this.type === 'bassGuitar' || this.type === 'guitar') {
+            if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
                 baseChar = this.lastPlayingNote[0];
 
                 if (data.row !== '0' && data.row !== '12') {
@@ -535,7 +542,7 @@ export class ToneCtrl extends KeyboardCtrl {
             const keyOrNote = el.dataset.noteLat || '';
             let keyId = keyboardId;
 
-            if (this.type === 'bassGuitar' || this.type === 'guitar') {
+            if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
                 keyId = el.dataset.noteCellGuid;
             }
 
@@ -599,7 +606,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 <div class="popup">
                     <div class="page">
                         <div class="page-content" data-dynamic-tone-board>
-                            ${this.getGuitarBoard(<any>this.type)}
+                            ${this.getGuitarBoard(<any>this.boardType)}
                             <br/>
                             <div style="margin-left: 1rem;">
                                 <a 
@@ -613,6 +620,7 @@ export class ToneCtrl extends KeyboardCtrl {
             on: {
                 opened: () => {
                     this.subscribePopupBoard();
+                    this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
                 }
             }
         });
@@ -656,10 +664,10 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getGuitarSettings(): hlp.GuitarSettings {
-        if (!localStorage.getItem(`[settings]${this.type}`)) {
+        if (!localStorage.getItem(`[settings]${this.boardType}`)) {
             let offset = 0;
 
-            if (this.type === 'guitar') {
+            if (this.boardType === 'guitar') {
                 offset = 12;
             }
 
@@ -669,32 +677,59 @@ export class ToneCtrl extends KeyboardCtrl {
             });
         }
 
-        return JSON.parse(localStorage.getItem(`[settings]${this.type}`));
+        return JSON.parse(localStorage.getItem(`[settings]${this.boardType}`));
     }
 
     setGuitarSettings(settings: hlp.GuitarSettings) {
-        localStorage.setItem(`[settings]${this.type}`, JSON.stringify(settings));
+        localStorage.setItem(`[settings]${this.boardType}`, JSON.stringify(settings));
+    }
+
+    updateFixedCellsOnBoard(parent?: HTMLElement) {
+        parent = parent || this.page.pageEl;
+
+        const board = (ideService.boards[this.boardType] || {}) as {fixedCells: string[]};
+
+        if (!ideService.boards[this.boardType]) {
+            ideService.boards[this.boardType] = board;
+        }
+
+        if (!board.fixedCells) {
+            board.fixedCells = [];
+        }
+
+        getWithDataAttr('note-cell-guid', parent).forEach(el => {
+            if (board.fixedCells.includes(el.dataset.noteCellGuid)) {
+                el.dataset['fixNoteCell'] = 'true';
+                el.style.boxShadow = 'inset 0px 0px 6px yellow';
+            } else {
+                el.style.boxShadow = null;
+                el.dataset['fixNoteCell'] = '';
+            }
+        });
     }
 
     fixBoardCell(resetFix = false) {
-        if (resetFix) {
-            getWithDataAttrValue('fix-note-cell', 'true', this.page.pageEl).forEach(el => {
-                el.style.boxShadow = null;
-                el.dataset['fixCell'] = '';
-            });
+        const board = (ideService.boards[this.boardType] || {}) as {fixedCells: string[]};
 
-            return;
+        if (!ideService.boards[this.boardType]) {
+            ideService.boards[this.boardType] = board;
         }
 
-        getWithDataAttrValue('note-cell-guid', this.lastNoteCellGuid, this.page.pageEl).forEach(el => {
-            if (el.dataset['fixNoteCell']) {
-                el.style.boxShadow = null;
-                el.dataset['fixNoteCell'] = '';
+        if (!board.fixedCells) {
+            board.fixedCells = [];
+        }
+
+        if (resetFix) {
+            ideService.boards[this.boardType]['fixedCells'] = [];
+        } else {
+            if (board.fixedCells.includes(this.lastNoteCellGuid)) {
+                board.fixedCells = board.fixedCells.filter(guid => guid !== this.lastNoteCellGuid);
             } else {
-                el.dataset['fixNoteCell'] = 'true';
-                el.style.boxShadow = 'inset 0px 0px 6px yellow';
+                board.fixedCells.push(this.lastNoteCellGuid);
             }
-        });
+        }
+
+        this.updateFixedCellsOnBoard();
     }
 
     setGuitarOffset(step: number) {
@@ -714,7 +749,7 @@ export class ToneCtrl extends KeyboardCtrl {
             el.innerHTML = null;
         });
 
-        const boardContent = this.getGuitarBoard(<any>this.type, settings);
+        const boardContent = this.getGuitarBoard(<any>this.boardType, settings);
 
         getWithDataAttr('guitar-board-wrapper').forEach(el => {
             el.innerHTML = boardContent;
@@ -733,7 +768,7 @@ export class ToneCtrl extends KeyboardCtrl {
             el.innerHTML = null;
         });
 
-        const boardContent = this.getGuitarBoard(<any>this.type, settings);
+        const boardContent = this.getGuitarBoard(<any>this.boardType, settings);
 
         getWithDataAttr('guitar-board-wrapper').forEach(el => {
             el.innerHTML = boardContent;
@@ -752,7 +787,7 @@ export class ToneCtrl extends KeyboardCtrl {
             const keyOrNote = el.dataset.noteLat || '';
             let keyId = keyboardId;
 
-            if (this.type === 'bassGuitar' || this.type === 'guitar') {
+            if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
                 keyId = el.dataset.noteCellGuid;
             }
 
@@ -935,32 +970,6 @@ export class ToneCtrl extends KeyboardCtrl {
         result.durQ = arr[0].durQ;
 
         return result;
-    }
-
-    playOne() {
-        this.page.stop();
-
-        const notes = LineModel.GetToneNotes({
-            blockName: 'temp',
-            instr: hlp.instrName[this._instrCode],
-            chnl: this.type === 'bassGuitar' ? '$bass' : '$guit',
-            rows: this.liner.lines,
-        });
-
-        //console.log('notes', notes);
-
-        if (!notes) return;
-
-        let blocks = [
-            '<out r100>',
-            'temp',
-            notes
-        ].join('\n');
-
-        this.page.multiPlayer.tryPlayMidiBlock({
-            blocks,
-            bpm: this.page.bpmValue,
-        });
     }
 
     getChessLine(count: number): hlp.ChessCell[] {
@@ -1152,6 +1161,7 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         this.updateChess();
+        this.updateFixedCellsOnBoard();
     }
 
     subscribeDurationCommands() {
@@ -1159,7 +1169,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('get-note-for-cell-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => {
-                if (this.type === 'bassGuitar' || this.type === 'guitar') {
+                if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
                     this.openGuitarBoard();
                 } else {
                     this.openHarmonicaBoard();
@@ -1180,7 +1190,9 @@ export class ToneCtrl extends KeyboardCtrl {
 //
 // GUITAR BOARD
 // getGuitarSettings  setGuitarSettings
-// setStringCount  setGuitarOffset  fixBoardCell  setKeysColor
+// setStringCount  setGuitarOffset setKeysColor
+// fixBoardCell  updateFixedCellsOnBoard
+
 //
 // CHESS
 // printChess getChessLine getChessCellFor

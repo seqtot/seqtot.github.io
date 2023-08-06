@@ -26,7 +26,7 @@ export class MBoxPage {
     settings: FileSettings = <any>{};
     pitchShift: number = 0;
     excludePartNio: number [] = [];
-    excludeInstrument: {[key: string]: any} = {};
+    excludeTrack: {[key: string]: any} = {};
 
     selectedSong = '';
 
@@ -59,8 +59,12 @@ export class MBoxPage {
         return  this.blocks.find((item) => item.id === 'out');
     }
 
+    get isMy():boolean {
+        return this.pageData.source === 'my';
+    }
+
     get allSongParts(): string[] {
-        if (this.pageData.source === 'my') {
+        if (this.isMy) {
             const song = SongStore.getSong(this.songId, true);
 
             return song.parts.map((item, i) => {
@@ -131,9 +135,9 @@ export class MBoxPage {
         let songListContent = '';
         let commands = '';
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const isMy = this.pageData.source === 'my';
+        const isMy = this.isMy;
 
-        if (isMy) {
+        if (this.isMy) {
             songListContent = '';
             const songs = SongStore.getSongs();
 
@@ -260,16 +264,31 @@ export class MBoxPage {
     getInstrumentsContent(): string {
         let items = '';
 
-        Object.keys(this.settings.metaByLines).forEach(key => {
-            items = items + `
+
+        if (this.isMy) {
+            const song = SongStore.getSong(this.songId, true);
+            song.tracks.forEach(track => {
+                items = items + `
                 <span
                     style="font-weight: 700;"                  
-                    data-action-use-instrument="${key}"
+                    data-use-track-action="${track.name}"
+                >
+                    ${track.name}
+                </span>&emsp;            
+            `.trim();
+            });
+        } else {
+            Object.keys(this.settings.metaByLines).forEach(key => {
+                items = items + `
+                <span
+                    style="font-weight: 700;"                  
+                    data-use-track-action="${key}"
                 >
                     ${key}
                 </span>&emsp;            
             `.trim();
-        })
+            });
+        }
 
         const result =  `
             <div style="margin: .5rem 1rem;">
@@ -392,17 +411,18 @@ export class MBoxPage {
     }
 
     subscribeInstrumentEvents() {
-        getWithDataAttr('action-use-instrument', this.pageEl)?.forEach((el) => {
+        getWithDataAttr('use-track-action', this.pageEl)?.forEach((el) => {
             el.addEventListener('click', (evt: MouseEvent) => {
                 let el: HTMLElement = evt.target as any;
-                let key = el.dataset.actionUseInstrument;
+                let key = el.dataset.useTrackAction;
 
-                if (this.excludeInstrument[key]) {
-                    this.excludeInstrument[key] = null;
+
+                if (this.excludeTrack[key]) {
+                    this.excludeTrack[key] = null;
                     el.style.fontWeight = '700';
                 }
                 else {
-                    this.excludeInstrument[key] = key;
+                    this.excludeTrack[key] = key;
                     el.style.fontWeight = '400';
                 }
             });
@@ -808,7 +828,7 @@ export class MBoxPage {
         };
 
         Object.keys(metaByLines).forEach(key => {
-            if (this.excludeInstrument[key]) {
+            if (this.excludeTrack[key]) {
                 metaByLines[key] = 'v0';
             }
         })
@@ -931,8 +951,8 @@ export class MBoxPage {
         return LineModel.GetToneNotes({
             blockName: id,
             rows: item.lines,
-            instr: '$organ',
-            chnl: '$organ',
+            instrName: '$organ',
+            track: item.track || '$unknown',
         });
     }
 
@@ -994,7 +1014,7 @@ export class MBoxPage {
                 let rows = map[rowInPartId].items[0].rows;
 
                 if (Array.isArray(rows)) {
-                     rows = LineModel.CloneRows(rows);
+                     rows = LineModel.CloneLines(rows);
                      rows.forEach(row => (row.blockOffsetQ = 0));
                 } else {
                     return;

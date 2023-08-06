@@ -732,14 +732,14 @@ export class LineModel {
     //     return Object.values(result);
     // }
 
-    static GetToneNotes(x:{
+    static GetToneNotes(x: {
         blockName: string,
-        chnl: string,
-        instr: string,
+        track: string,
+        instrName: string,
         rows: Line[]
     }): string {
         let blockName = x.blockName || 'no_name';
-        let rows = this.CloneRows(x.rows);
+        let rows = this.CloneLines(x.rows);
         rows = this.RecalcAndClearBlockOffset(rows);
 
         const totalDurQ = this.GetDurationQByLines(rows);
@@ -751,9 +751,10 @@ export class LineModel {
         }
 
         let result = `<${blockName} $>` + '\n';
-        result += `${x.chnl}: `;
+        result += `${x.track}: `;
 
         notes.forEach((note, i) => {
+            const instName = note.instName || x.instrName;
             const nextNote = notes[i+1];
             let durationForNext = 0;
             let pause = '';
@@ -768,17 +769,15 @@ export class LineModel {
                 pause = `${note.startOffsetQ} `;
             }
 
-            result += `${pause}${note.note}=${durationForNext}=${note.durQ} `;
+            result += `${pause} ${instName} ${note.note}=${durationForNext}=${note.durQ} `;
         });
-
-        result += x.instr;
 
         return result;
     }
 
     static GetDrumNotes(name: string, rows: Line[]): string {
         name = name || 'no_name';
-        rows = this.CloneRows(rows);
+        rows = this.CloneLines(rows);
         rows = this.RecalcAndClearBlockOffset(rows);
 
         const totalDurQ = this.GetDurationQByLines(rows);
@@ -841,10 +840,10 @@ export class LineModel {
         return LineModel.GetDrumNotes(name, rows);
     }
 
-    static CloneRows(rows: Line[]): Line[] {
-        rows = Array.isArray(rows) ? rows : [];
+    static CloneLines(lines: Line[]): Line[] {
+        lines = Array.isArray(lines) ? lines : [];
 
-        return rows.map(row => {
+        return lines.map(row => {
             row = {...row};
 
             row.cells = row.cells.map(cell => {
@@ -864,7 +863,7 @@ export class LineModel {
     cloneRows(rows?: Line[]): Line[] {
         rows = Array.isArray(rows) ? rows : this.lines;
 
-        return LineModel.CloneRows(rows);
+        return LineModel.CloneLines(rows);
     }
 
     getLinesByMask(pMask: string | number): Line[] {

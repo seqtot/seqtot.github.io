@@ -6,16 +6,22 @@ export type StoredRow = {
     rowNio?: number,
     rowInPartId: string,
     type: string,
+    track: string,
     status: string,
     lines: Line[],
-    isHead?: boolean,
+}
+
+type TrackInfo = {
+    name: string,
+    board: string,
+    volume: number,
 }
 
 export type SongPage = {
     content: string,
     break: string,
     drums: string,
-    tracks: { key: string; value: string; name: string }[],
+    tracks: TrackInfo[],
     hideMetronome?: boolean,
     score: string,
     parts: {name: string, id: string}[],
@@ -182,6 +188,39 @@ export class SongStore {
 
             song.parts = Array.isArray(song.parts) ? song.parts : [];
             song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
+            song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
+
+            // костыль
+            song.dynamic.forEach(item => {
+                if (!item.track && item.type === 'drums') {
+                    item.track = '@drums';
+                }
+            });
+
+            if (!song.tracks.length) {
+                song.tracks = [
+                    {
+                        name: '@drums',
+                        board: 'drums',
+                        volume: 50,
+                    },
+                    {
+                        name: '$bass',
+                        board: 'bassGuitar',
+                        volume: 30,
+                    },
+                    {
+                        name: '$guitar',
+                        board: 'guitar',
+                        volume: 50,
+                    },
+                    {
+                        name: '$organ',
+                        board: 'bassSolo34',
+                        volume: 50,
+                    },
+                ]
+            }
 
             return song;
         }

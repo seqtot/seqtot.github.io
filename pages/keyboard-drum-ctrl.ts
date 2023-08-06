@@ -1,8 +1,6 @@
 import { drumInfo } from '../libs/muse/drums';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import * as un from '../libs/muse/utils/utils-note';
 import { LineModel, Line, LineNote, KeyData } from './line-model';
-import { createOutBlock, TextBlock } from '../libs/muse/utils/utils-note';
 
 import { ideService } from './ide/ide-service';
 import { DrumBoard, drumNotesInfo } from './drum-board';
@@ -55,10 +53,6 @@ export class DrumCtrl extends KeyboardCtrl {
     tickStartMs: number = 0;
     board: DrumBoard;
 
-    get hasEditedItems(): boolean {
-        return !!ideService.editedItems.length;
-    }
-
     constructor(public page: KeyboardPage, public type: DrumKeyboardType) {
         super(page, type);
 
@@ -93,104 +87,6 @@ export class DrumCtrl extends KeyboardCtrl {
         });
 
         this.updateChess();
-    }
-
-    playOne() {
-        this.page.stop();
-
-        const notes = this.liner.getDrumNotes('temp');
-
-        if (!notes) return;
-
-        let blocks = [
-            '<out r100>',
-            'temp',
-            notes
-        ].join('\n');
-
-        this.page.multiPlayer.tryPlayMidiBlock({
-            blocks,
-            bpm: this.page.bpmValue,
-        });
-    }
-
-    playBoth() {
-        this.page.stop();
-        if (!this.hasEditedItems) return;
-
-        let rowsForPlay: string[] = [];
-
-        const midiConfig = this.getMidiConfig({ resetBlockOffset: true, useEditing: true });
-        let blocks = midiConfig.blocks;
-        let playBlock = midiConfig.playBlockOut as TextBlock;
-
-        const playingRows = playBlock.rows.filter(item => {
-            const part = un.getPartInfo(item);
-            return !!ideService.editedItems.find(item => item.rowInPartId === part.rowInPartId);
-        });
-
-        playingRows.forEach(playRow => {
-            const part = un.getPartInfo(playRow);
-            let rows = this.liner.lines.filter(row => row.rowInPartId === part.rowInPartId)
-            rows = this.liner.cloneRows(rows);
-            rows.forEach(row => (row.blockOffsetQ = 0));
-
-            const notes = this.liner.getDrumNotes(ideService.guid.toString(), rows);
-
-            if (notes) {
-                const block = un.getTextBlocks(notes)[0];
-
-                rowsForPlay.push(`${playRow} ${block.id}`);
-                blocks = [...blocks, block];
-            } else {
-                rowsForPlay.push(`${playRow}`);
-            }
-        });
-
-        playBlock = createOutBlock({
-            id: 'out',
-            type: 'set',
-            rows: rowsForPlay,
-            bpm: this.page.bpmValue
-        });
-
-        this.page.multiPlayer.tryPlayMidiBlock({
-            blocks,
-            playBlock,
-            bpm: this.page.bpmValue,
-            repeatCount: 1,
-            metaByLines: ideService.currentEdit.metaByLines,
-        });
-    }
-
-    playActive() {
-        if (!this.hasEditedItems) return;
-
-        const midiConfig = this.getMidiConfig({ resetBlockOffset: true });
-        const playBlock = midiConfig.playBlockOut as TextBlock;
-        const playingRows = playBlock.rows.filter(item => {
-            const part = un.getPartInfo(item);
-            return !!ideService.editedItems.find(item => item.rowInPartId === part.rowInPartId);
-        });
-
-        this.page.stop();
-
-        if (!playingRows.length) return;
-
-        const newOutBlock = createOutBlock({
-            id: 'out',
-            type: 'set',
-            rows: playingRows,
-            bpm: this.page.bpmValue
-        });
-
-        this.page.multiPlayer.tryPlayMidiBlock({
-            blocks: midiConfig.blocks,
-            playBlock: newOutBlock,
-            bpm: this.page.bpmValue,
-            repeatCount: 1,
-            metaByLines: ideService.currentEdit.metaByLines,
-        });
     }
 
     subscribeCommonCommands() {
@@ -479,6 +375,8 @@ export class DrumCtrl extends KeyboardCtrl {
     }
 
     getContent(keyboardId: string): string {
+        this.trackName = '@drums'; // костыль
+
         let drums = Object.keys(drumInfo).reduce((acc, key) => {
             const info = drumInfo[key];
             const label = key === info.noteLat ? key: `${key}:${info.noteLat}`;
@@ -805,7 +703,6 @@ export class DrumCtrl extends KeyboardCtrl {
 // subscribeCommonCommands
 // subscribeEditCommands
 //
-// PLAY
-// playOne  playActive  playBoth
+// PLAY: in parent
 //
 // clearBpmInfo?

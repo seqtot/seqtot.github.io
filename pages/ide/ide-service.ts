@@ -27,6 +27,7 @@ class IdeService extends  EventEmitter {
     metronome = metronome;
     synthesizer = synthesizer;
     ticker = ticker;
+    boards: any = {};
 
     editedItems: EditedItem[] = [];
 
