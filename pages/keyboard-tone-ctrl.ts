@@ -396,7 +396,7 @@ export class ToneCtrl extends KeyboardCtrl {
         }
     }
 
-    getOut(bpm: number, data: ToneCtrl['recData'] ) {
+    handleRecordResult(bpm: number, data: ToneCtrl['recData'] ) {
         data.sequence.forEach((item, i) => {
             const next = data.sequence[i+1];
 
@@ -407,11 +407,35 @@ export class ToneCtrl extends KeyboardCtrl {
             }
         });
 
-        const rows = LineModel.GetToneLineModelFromRecord(
+        const lines = LineModel.GetToneLineModelFromRecord(
             bpm, data.startTimeMs, data.sequence
         );
-        this.liner.setData(rows);
-        this.printChess(rows);
+
+        let oldLine: Line;
+
+        // согласование старого блока с новым
+        if (this.hasEditedItems && this.liner.lines) {
+            lines.forEach((line, i) => {
+                if (this.liner.lines[i]) {
+                    oldLine = this.liner.lines[i];
+                }
+                if (oldLine) {
+                    line.rowInPartId = oldLine.rowInPartId
+                    line.blockOffsetQ = oldLine.blockOffsetQ;
+                    line.startOffsetQ = line.startOffsetQ - line.blockOffsetQ;
+                    line.cells.forEach(cell => {
+                        cell.startOffsetQ = cell.startOffsetQ - line.blockOffsetQ;
+                        cell.notes.forEach(note => {
+                            note.instCode = this.instrCode;
+                            note.instName = this.instrName;
+                        })
+                    })
+                }
+            });
+        }
+
+        this.liner.setData(lines);
+        this.printChess(lines);
     }
 
     clearRecordData() {
@@ -492,7 +516,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 this.recData.keys[id] = null;
             });
 
-            this.getOut(this.page.bpmValue, this.recData);
+            this.handleRecordResult(this.page.bpmValue, this.recData);
             this.page.stopTicker();
 
             setTimeout(() => this.toggleRecord(), 300);
@@ -1246,8 +1270,8 @@ export class ToneCtrl extends KeyboardCtrl {
 // subscribeBoardEvents    subscribePopupBoard
 //
 // RECORD
-// getOut
-// toggleRecord handleKeyRecord  clearRecordData  getBeatContent
+// handleRecordResult
+// toggleRecord  handleKeyRecord  clearRecordData  getBeatContent
 //
 //
 // MEMO
