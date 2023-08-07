@@ -122,9 +122,16 @@ let navbar = `
 `;
 
 navbar = `
-<div style="text-align: center;">
-  <a class="panel-open" data-panel=".panel-left">LFT</a>&nbsp;
-  <a class="panel-open" data-panel=".panel-right">RHT</a>
+<div app-header-container style="height: 2rem; display: flex; justify-content: center; align-items: center; user-select: none;">
+  <a class="panel-open"
+    data-panel=".panel-left"
+    style="user-select: none; touch-action: none;"
+  ><b>LEFT</b></a>
+  &nbsp;&nbsp;&nbsp;
+  <a class="panel-open"
+    data-panel=".panel-right"
+    style="user-select: none; touch-action: none;"    
+    ><b>RIGHT</b></a>
 </div>
 `;
 

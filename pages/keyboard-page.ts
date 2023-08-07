@@ -9,15 +9,13 @@ import { MultiPlayer } from '../libs/muse/multi-player';
 import { standardTicks as ticks } from './ticks';
 import { DrumCtrl } from './keyboard-drum-ctrl';
 import { ToneCtrl } from './keyboard-tone-ctrl';
-import { ToneKeyboardType, DrumKeyboardType } from './keyboard-ctrl';
+import { ToneKeyboardType, DrumKeyboardType, KeyboardType } from './keyboard-ctrl';
 import { ideService } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
 
-import { getDevice } from 'framework7';
-
-console.log('getDevice', getDevice().desktop);
-
-type KeyboardType = ToneKeyboardType | DrumKeyboardType;
+// import { getDevice } from 'framework7';
+//
+// console.log('getDevice', getDevice().desktop);
 
 const ns = {
     setBmpAction: 'set-bmp-action',
@@ -36,7 +34,7 @@ interface Page {
 }
 
 export class KeyboardPage implements Page {
-    keyboardType: KeyboardType = 'drums';
+    keyboardType: KeyboardType = ideService.lastBoardView;
     drumCtrl: DrumCtrl;
     toneCtrl: ToneCtrl;
 
@@ -87,16 +85,17 @@ export class KeyboardPage implements Page {
         //console.log('getBoundingClientRect', this.pageEl.getBoundingClientRect());
 
         this.setRightPanelContent();
-        this.setPageContent();
+        this.setContent();
 
         setTimeout(() => {
             this.subscribeRightPanelEvents();
         }, 100);
     }
 
-    setPageContent(keyboardType?: KeyboardType) {
+    setContent(keyboardType?: KeyboardType) {
         keyboardType = keyboardType ||  this.keyboardType;
         this.keyboardType = keyboardType;
+        ideService.lastBoardView = keyboardType;
 
         if (
             this.keyboardType === 'bassSolo34' ||
@@ -242,8 +241,8 @@ export class KeyboardPage implements Page {
 
     subscribeRightPanelEvents() {
         getWithDataAttr('action-set-keyboard-type', dyName('panel-right-content'))?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => {
-                this.setPageContent(<any>el.dataset.actionSetKeyboardType);
+            el.addEventListener('click', () => {
+                this.setContent(<any>el.dataset.actionSetKeyboardType);
             });
         });
     }

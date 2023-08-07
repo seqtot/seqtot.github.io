@@ -5,12 +5,15 @@ import {Sound} from '../../libs/muse/sound';
 import {MultiPlayer} from '../../libs/muse/multi-player';
 import {Synthesizer} from '../../libs/muse/synthesizer';
 import {Ticker} from '../../libs/muse/ticker';
+import {KeyboardType} from '../keyboard-ctrl';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
+
 const synthesizer = new Synthesizer();
 synthesizer.connect({ ctx: Sound.ctx });
 synthesizer.setSettings(toneAndDrumPlayerSettings); // defaultSynthSettings
+
 const ticker = new Ticker(Sound.ctx);
 
 export type EditedItem = {
@@ -23,11 +26,25 @@ export type EditedItem = {
 }
 
 class IdeService extends  EventEmitter {
+    _lastBoardView: KeyboardType = '' as any;
     multiPlayer = multiPlayer;
     metronome = metronome;
     synthesizer = synthesizer;
     ticker = ticker;
     boards: any = {};
+
+    get lastBoardView(): KeyboardType {
+        if (!this._lastBoardView) {
+            this._lastBoardView = (localStorage.getItem('lastBoardView') || 'drums') as any;
+        }
+
+        return this._lastBoardView;
+    }
+
+    set lastBoardView(view: string) {
+        this._lastBoardView = (view || 'drums') as any;
+        localStorage.setItem('lastBoardView', this._lastBoardView);
+    }
 
     editedItems: EditedItem[] = [];
 

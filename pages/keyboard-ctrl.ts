@@ -51,6 +51,7 @@ export const drumBoards = {
 
 export type ToneKeyboardType = 'bassGuitar' | 'solo34' | 'bass34' | 'bassSolo34' | 'guitar';
 export type DrumKeyboardType = 'drums' | 'percussion';
+export type KeyboardType = ToneKeyboardType | DrumKeyboardType;
 
 export class KeyboardCtrl {
     liner = new LineModel();
@@ -296,7 +297,7 @@ export class KeyboardCtrl {
                 <span
                     style="${style} color: red;"
                     data-edit-row-action="delete-row"
-                >delR</span>                                    
+                >delR</span>
             </div>        
         `.trim();
     }
@@ -430,10 +431,18 @@ export class KeyboardCtrl {
 
     deleteLine() {
         if (!this.activeCell.rowCol) {
-            return null;
+            return;
         }
 
         const line = this.liner.lines[this.activeCell.row];
+
+        if (this.hasEditedItems) {
+            const groupLines = this.liner.lines.filter(item => item.rowInPartId === line.rowInPartId);
+
+            if (groupLines.length - 1 < 1) {
+                return;
+            }
+        }
 
         this.liner.deleteLine(this.activeCell.row, line.rowInPartId);
         this.setEditingItemDurationAndBlockOffsetByLines();
@@ -1427,7 +1436,6 @@ export class KeyboardCtrl {
 // resetBlockOffset
 
 // CHESS
-
 
 // EDITING ITEMS
 // setEditingItemDurationAndBlockOffsetByLines

@@ -840,24 +840,26 @@ export class LineModel {
         return LineModel.GetDrumNotes(name, rows);
     }
 
+    static CloneLine(line: Line): Line {
+        line = {...line};
+
+        line.cells = line.cells.map(cell => {
+            cell = {...cell};
+
+            cell.notes = cell.notes.map(note => {
+                return {...note};
+            });
+
+            return cell;
+        });
+
+        return line;
+    }
+
     static CloneLines(lines: Line[]): Line[] {
         lines = Array.isArray(lines) ? lines : [];
 
-        return lines.map(row => {
-            row = {...row};
-
-            row.cells = row.cells.map(cell => {
-                cell = {...cell};
-
-                cell.notes = cell.notes.map(note => {
-                    return {...note};
-                });
-
-                return cell;
-            });
-
-            return row;
-        });
+        return lines.map(line => LineModel.CloneLine(line));
     }
 
     cloneRows(rows?: Line[]): Line[] {

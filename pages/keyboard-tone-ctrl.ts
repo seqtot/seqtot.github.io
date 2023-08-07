@@ -14,10 +14,13 @@ const rem = 'rem';
 
 export class ToneCtrl extends KeyboardCtrl {
     _instrCode = 162;
+    _instrCodeBass = 162;
+
     playingNote: { [key: string]: string } = {};
     lastPlayingNote = '';
     offset = 0;
     isMemoMode = false;
+    realBoardType: ToneKeyboardType = '' as any;
 
     isRecMode = false;
     memoBuffer: string[] = [];
@@ -38,7 +41,13 @@ export class ToneCtrl extends KeyboardCtrl {
         return hlp.instrName[this._instrCode] || '';
     }
 
-    get instrCode(): string | number { return this._instrCode}
+    get instrNameBass(): string {
+        return hlp.instrName[this._instrCodeBass] || '';
+    }
+
+    get instrCodeBass(): string | number { return this._instrCodeBass }
+
+    get instrCode(): string | number { return this._instrCode }
 
     constructor(
         public page: KeyboardPage,
@@ -263,6 +272,11 @@ export class ToneCtrl extends KeyboardCtrl {
             <div data-edit-parts-wrapper>
                 ${this.getIdeContent()}                
             </div>
+            
+            <br/>
+            <div>
+                <span data-use-this-board="bassSolo34">this board always<span>
+            </div>
         `.trim();
 
         return result;
@@ -311,7 +325,10 @@ export class ToneCtrl extends KeyboardCtrl {
             this.trackName = tracks[0] ? tracks[0].name: '';
         }
 
-        if (boardType === 'bassSolo34') {
+        this.realBoardType = boardType;
+
+        if (boardType === 'bassSolo34' || localStorage.getItem('useThisBoard') === 'bassSolo34') {
+            this.realBoardType = 'bassSolo34';
             return this.getHarmonicaContent();
         }
         else if(boardType === 'bassGuitar') {
@@ -329,16 +346,16 @@ export class ToneCtrl extends KeyboardCtrl {
         getWithDataAttr('note-key', this.page.pageEl).forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
 
-            if (this.boardType === 'bassSolo34') {
-                el.style.boxShadow = null;
-            }
-
             const data = (el?.dataset || {}) as {
                 keyboardId: string;
                 noteLat: string;
                 row: string;
             };
             const note = data.noteLat || '';
+
+            if (this.realBoardType === 'bassSolo34' && baseNote) {
+                el.style.boxShadow = null;
+            }
 
             if (data.keyboardId === 'solo') {
                 if (note[0] === baseChar) {
@@ -350,7 +367,7 @@ export class ToneCtrl extends KeyboardCtrl {
             }
 
             // GUITAR
-            if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
+            if (this.realBoardType === 'bassGuitar' || this.realBoardType === 'guitar') {
                 baseChar = this.lastPlayingNote[0];
 
                 if (data.row !== '0' && data.row !== '12') {
@@ -432,6 +449,15 @@ export class ToneCtrl extends KeyboardCtrl {
                     })
                 }
             });
+        }
+
+        if (this.liner.lines.length > lines.length) {
+            const diff = this.liner.lines.length - lines.length;
+
+            for (let i = this.liner.lines.length - diff; i < this.liner.lines.length; i++) {
+                const line = LineModel.CloneLine(this.liner.lines[i]);
+                lines.push(line);
+            }
         }
 
         this.liner.setData(lines);
@@ -633,7 +659,7 @@ export class ToneCtrl extends KeyboardCtrl {
         });
     }
 
-    openGuitarBoard() {
+    getInstrumentsForChoice(): string {
         let instruments = '';
 
         Object.keys(hlp.instrName).forEach(key => {
@@ -645,6 +671,10 @@ export class ToneCtrl extends KeyboardCtrl {
             `.trim();
         });
 
+        return instruments;
+    }
+
+    openGuitarBoard() {
         const content = `
             <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
                 <div style="user-select: none; touch-action: none;">
@@ -670,7 +700,7 @@ export class ToneCtrl extends KeyboardCtrl {
                         <div class="page-content" data-dynamic-tone-board>
                             ${content}
                             <div style="margin: 1rem;">
-                                use:&emsp;${instruments} 
+                                use:&emsp;${this.getInstrumentsForChoice()} 
                             </div>                            
                         </div>                        
                     </div>
@@ -691,20 +721,22 @@ export class ToneCtrl extends KeyboardCtrl {
             content: `
                 <div class="popup">
                     <div class="page">
-                        <div class="navbar">
-                            <div class="navbar-bg"></div>
-                            <div class="navbar-inner">
-                                <div class="title">Dynamic Popup</div>
-                                <div class="right">
-                                    <a
-                                        data-close-popup-board
-                                        class="link popup-close"
-                                    >Close</a>
-                                </div>
-                            </div>
-                        </div>
                         <div class="page-content" data-dynamic-tone-board>
+                        <div style="margin: 1rem 0 0 1rem;">
+                            <div 
+                                data-select-note-action
+                                style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                            >OK</div>
+                            &emsp;
+                            <div
+                                data-close-popup-board
+                                style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                            >Close</div>                        
+                        </div>
                             ${this.getHarmonicaBoard()}
+                            <div style="margin: 0 1rem 0 1rem;">
+                                use:&emsp;${this.getInstrumentsForChoice()}
+                            </div>
                         </div>
                     </div>
                 </div>`.trim(),
@@ -850,7 +882,7 @@ export class ToneCtrl extends KeyboardCtrl {
             const keyOrNote = el.dataset.noteLat || '';
             let keyId = keyboardId;
 
-            if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
+            if (this.realBoardType === 'bassGuitar' || this.realBoardType === 'guitar') {
                 keyId = el.dataset.noteCellGuid;
             }
 
@@ -935,6 +967,17 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttrValue('action-tone', 'memo-clear',pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.pushNoteToMemo(null));
+        });
+
+        getWithDataAttr('use-this-board', pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                const name = el.dataset.useThisBoard;
+                if (localStorage.getItem('useThisBoard')) {
+                    localStorage.setItem('useThisBoard', '');
+                } else {
+                    localStorage.setItem('useThisBoard', name);
+                }
+            });
         });
 
         // getWithDataAttrValue('action-tone', 'record-stop',pageEl).forEach((el: HTMLElement) => {
@@ -1236,7 +1279,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('get-note-for-cell-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => {
-                if (this.boardType === 'bassGuitar' || this.boardType === 'guitar') {
+                if (this.realBoardType === 'bassGuitar' || this.realBoardType === 'guitar') {
                     this.openGuitarBoard();
                 } else {
                     this.openHarmonicaBoard();
