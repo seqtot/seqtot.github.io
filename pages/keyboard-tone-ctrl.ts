@@ -241,7 +241,15 @@ export class ToneCtrl extends KeyboardCtrl {
         }
 
         return `
-            <div style="margin: 0; padding: 1rem .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
+            <div style="
+                margin: 0;
+                padding: 1rem 1rem 1rem .5rem;
+                user-select: none;
+                touch-action: none;
+                display: flex;
+                justify-content: space-between;
+                position: relative;"
+            >
                 ${hlp.getVerticalKeyboard('base', boardType, baseKeys)}
                 ${hlp.getVerticalKeyboard('solo', boardType, soloKeys)}
                 <div
@@ -265,9 +273,17 @@ export class ToneCtrl extends KeyboardCtrl {
         let result = `
             ${this.getHarmonicaBoard(boardType)}
             
-            <div style="widht: 90%; margin: 0; padding: .5rem; padding-left: 1rem; user-select: none; touch-action: none;">
+            <div style="
+                width: 90%;
+                margin: 0;
+                padding: .5rem;
+                padding-left: 1rem;
+                user-select: none;
+                touch-action: none;"
+            >
                 <span data-action-tone="memo-mode" style="${btnStl}">memo</span>&emsp;
-                <span data-action-tone="memo-clear" style="${btnStl} color: red;">&times;mem</span>
+                <span data-action-tone="memo-clear" style="${btnStl} color: red;">&times;mem</span>&emsp;
+                <span data-get-note-for-cell-action style="${btnStl}">pop</span>                
             </div>
             
             ${this.getBeatContent()}
