@@ -360,8 +360,8 @@ export class KeyboardCtrl {
     }
 
     getTopCommandPanel(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none;`;
+        const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none;`;
         let result = '';
 
         result = `
