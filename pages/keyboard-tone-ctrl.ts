@@ -91,9 +91,8 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getTopCommandPanel(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none; touch-action: none;`;
+        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none;`;
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
-
         let result = '';
 
         result = `
@@ -272,14 +271,12 @@ export class ToneCtrl extends KeyboardCtrl {
 
         let result = `
             ${this.getHarmonicaBoard(boardType)}
-            
             <div style="
                 width: 90%;
                 margin: 0;
                 padding: .5rem;
                 padding-left: 1rem;
-                user-select: none;
-                touch-action: none;"
+                user-select: none;"
             >
                 <span data-action-tone="memo-mode" style="${btnStl}">memo</span>&emsp;
                 <span data-action-tone="memo-clear" style="${btnStl} color: red;">&times;mem</span>&emsp;

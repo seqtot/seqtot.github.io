@@ -281,7 +281,7 @@ export class KeyboardCtrl {
 
     getRowActionsCommands(): string {
         const display = `display: ${ideService.currentEdit?.freezeStructure ? 'none': 'block'};`;
-        const style = `font-size: 1.1rem; border-radius: 0.25rem; border: 1px solid lightgray; user-select: none; touch-action: none;`;
+        const style = `font-size: 1.1rem; border-radius: 0.25rem; border: 1px solid lightgray; user-select: none;`;
         const rowStyle = `${display} width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
 
         return `
