@@ -13,6 +13,8 @@ const DOWN = 1;
 const UP = 0;
 const rem = 'rem';
 
+const monoFont = 'font-family: monospace;';
+
 export class ToneCtrl extends KeyboardCtrl {
     _instrCode = 162;
     _instrCodeBass = 162;
@@ -92,7 +94,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none;`;
-        const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none;`;
+        const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none; ${monoFont}`;
         let result = '';
 
         result = `

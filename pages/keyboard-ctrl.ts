@@ -56,6 +56,8 @@ export type ToneKeyboardType = 'bassGuitar' | 'solo34' | 'bass34' | 'bassSolo34'
 export type DrumKeyboardType = 'drums' | 'percussion';
 export type KeyboardType = ToneKeyboardType | DrumKeyboardType;
 
+const monoFont = 'font-family: monospace;';
+
 export class KeyboardCtrl {
     liner = new LineModel();
     trackName = '';
@@ -361,7 +363,7 @@ export class KeyboardCtrl {
 
     getTopCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none;`;
-        const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none;`;
+        const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none; ${monoFont}`;
         let result = '';
 
         result = `
