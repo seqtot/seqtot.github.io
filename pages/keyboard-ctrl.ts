@@ -33,6 +33,7 @@ export interface KeyboardPage {
     synthesizer: Synthesizer;
     multiPlayer: MultiPlayer;
     context: ComponentContext,
+    setContent: () => void,
 }
 
 export const toneBoards = {
@@ -40,6 +41,8 @@ export const toneBoards = {
     solo34: 'solo34',
     bass34: 'bass34',
     bassSolo34: 'bassSolo34',
+    bassBass34: 'bassBass34',
+    soloSolo34: 'soloSolo34',
     guitar: 'guitar',
     piano: 'guitar',
 }
@@ -49,7 +52,7 @@ export const drumBoards = {
     percussion: 'percussion'
 }
 
-export type ToneKeyboardType = 'bassGuitar' | 'solo34' | 'bass34' | 'bassSolo34' | 'guitar';
+export type ToneKeyboardType = 'bassGuitar' | 'solo34' | 'bass34' | 'bassSolo34' | 'soloSolo34' | 'bassBass34' | 'guitar';
 export type DrumKeyboardType = 'drums' | 'percussion';
 export type KeyboardType = ToneKeyboardType | DrumKeyboardType;
 

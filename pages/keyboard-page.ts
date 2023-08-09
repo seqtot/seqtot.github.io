@@ -9,7 +9,7 @@ import { MultiPlayer } from '../libs/muse/multi-player';
 import { standardTicks as ticks } from './ticks';
 import { DrumCtrl } from './keyboard-drum-ctrl';
 import { ToneCtrl } from './keyboard-tone-ctrl';
-import { ToneKeyboardType, DrumKeyboardType, KeyboardType } from './keyboard-ctrl';
+import {ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards} from './keyboard-ctrl';
 import { ideService } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
 
@@ -93,19 +93,13 @@ export class KeyboardPage implements Page {
     }
 
     setContent(keyboardType?: KeyboardType) {
-        keyboardType = keyboardType ||  this.keyboardType;
+        keyboardType = keyboardType || this.keyboardType;
         this.keyboardType = keyboardType;
         ideService.lastBoardView = keyboardType;
 
-        if (
-            this.keyboardType === 'bassSolo34' ||
-            this.keyboardType === 'bassGuitar' ||
-            this.keyboardType === 'guitar'
-        ) {
-            this.setToneContent(this.keyboardType);
-        }
-        else
-        {
+        if (toneBoards[this.keyboardType]) {
+            this.setToneContent(this.keyboardType as any);
+        } else {
             this.setDrumsContent('drums');
         }
 
@@ -254,10 +248,7 @@ export class KeyboardPage implements Page {
     }
 
     subscribePageEvents() {
-        if (this.keyboardType === 'bassSolo34' ||
-            this.keyboardType === 'bassGuitar' ||
-            this.keyboardType === 'guitar'
-        ) {
+        if (toneBoards[this.keyboardType]) {
             this.subscribeMetronomeEvents();
             this.toneCtrl.subscribeEvents();
             //this.toneCtrl.subscribeRelativeKeyboardEvents();

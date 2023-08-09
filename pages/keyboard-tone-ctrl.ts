@@ -7,6 +7,7 @@ import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { sings } from './sings';
 import { SongStore } from './song-store';
+import {isT34} from './keyboard-tone-ctrl-helper';
 
 const DOWN = 1;
 const UP = 0;
@@ -227,11 +228,22 @@ export class ToneCtrl extends KeyboardCtrl {
         `.trim();
     }
 
-    getHarmonicaBoard(): string {
+    getHarmonicaBoard(boardType: ToneKeyboardType): string {
+        let baseKeys = hlp.harmonicaKeys.slice(3);
+        let soloKeys = hlp.harmonicaKeys.slice(0, 12);
+
+        if (boardType === 'solo34' || boardType === 'soloSolo34') {
+            baseKeys = hlp.harmonicaKeys.slice(0, 13);
+            soloKeys = hlp.harmonicaKeys.slice(0, 13);
+        } else if (boardType === 'bass34' || boardType === 'bassBass34') {
+            baseKeys = hlp.harmonicaKeys.slice(3);
+            soloKeys = hlp.harmonicaKeys.slice(3);
+        }
+
         return `
             <div style="margin: 0; padding: 1rem .5rem; user-select: none; touch-action: none; display: flex; justify-content: space-between; position: relative;">
-                ${hlp.getVerticalKeyboard('base', 'bass34', hlp.bassKeys)}
-                ${hlp.getVerticalKeyboard('solo', 'solo34', hlp.soloKeys)}
+                ${hlp.getVerticalKeyboard('base', boardType, baseKeys)}
+                ${hlp.getVerticalKeyboard('solo', boardType, soloKeys)}
                 <div
                     style="font-size: 2rem;
                     font-family: monospace;
@@ -247,11 +259,11 @@ export class ToneCtrl extends KeyboardCtrl {
             </div>`.trim();
     }
 
-    getHarmonicaContent(): string {
+    getHarmonicaContent(boardType: ToneKeyboardType): string {
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
 
         let result = `
-            ${this.getHarmonicaBoard()}
+            ${this.getHarmonicaBoard(boardType)}
             
             <div style="widht: 90%; margin: 0; padding: .5rem; padding-left: 1rem; user-select: none; touch-action: none;">
                 <span data-action-tone="memo-mode" style="${btnStl}">memo</span>&emsp;
@@ -273,10 +285,12 @@ export class ToneCtrl extends KeyboardCtrl {
                 ${this.getIdeContent()}                
             </div>
             
-            <br/>
-            <div>
-                <span data-use-this-board="bassSolo34">this board always<span>
-            </div>
+            <div style="margin: 1rem;">
+                use board:
+                <span data-use-board-type="soloSolo34">SS</span>&nbsp;
+                <span data-use-board-type="bassSolo34">BS</span>&nbsp;
+                <span data-use-board-type="bassBass34">BB</span>&nbsp;
+            </div>            
         `.trim();
 
         return result;
@@ -319,6 +333,8 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getContent(boardType?: ToneKeyboardType): string {
+        boardType = boardType || 'soloSolo34';
+
         if (this.isMy) {
             const song = SongStore.getSong(this.songId);
             const tracks = song.tracks.filter(track => track.board === boardType);
@@ -326,10 +342,11 @@ export class ToneCtrl extends KeyboardCtrl {
         }
 
         this.realBoardType = boardType;
+        const localStoreBoard = localStorage.getItem('useThisBoard') as ToneKeyboardType;
 
-        if (boardType === 'bassSolo34' || localStorage.getItem('useThisBoard') === 'bassSolo34') {
-            this.realBoardType = 'bassSolo34';
-            return this.getHarmonicaContent();
+        if (hlp.isT34(boardType) || hlp.isT34(localStoreBoard)) {
+            this.realBoardType = localStoreBoard || boardType;
+            return this.getHarmonicaContent(localStoreBoard || boardType);
         }
         else if(boardType === 'bassGuitar') {
             return this.getGuitarContent('bassGuitar');
@@ -353,7 +370,7 @@ export class ToneCtrl extends KeyboardCtrl {
             };
             const note = data.noteLat || '';
 
-            if (this.realBoardType === 'bassSolo34' && baseNote) {
+            if (isT34(this.realBoardType) && baseNote) {
                 el.style.boxShadow = null;
             }
 
@@ -716,7 +733,12 @@ export class ToneCtrl extends KeyboardCtrl {
         this.boardPopup.open(false);
     }
 
-    openHarmonicaBoard() {
+    openHarmonicaBoard(boardType?: ToneKeyboardType) {
+        boardType = (
+            boardType ||
+            localStorage.getItem('useThisBoard') as ToneKeyboardType ||
+            'soloSolo34') as ToneKeyboardType;
+
         this.boardPopup = (this.page.context.$f7 as any).popup.create({
             content: `
                 <div class="popup">
@@ -733,7 +755,7 @@ export class ToneCtrl extends KeyboardCtrl {
                                 style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
                             >Close</div>                        
                         </div>
-                            ${this.getHarmonicaBoard()}
+                            ${this.getHarmonicaBoard(boardType)}                           
                             <div style="margin: 0 1rem 0 1rem;">
                                 use:&emsp;${this.getInstrumentsForChoice()}
                             </div>
@@ -969,13 +991,14 @@ export class ToneCtrl extends KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.pushNoteToMemo(null));
         });
 
-        getWithDataAttr('use-this-board', pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttr('use-board-type', pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => {
-                const name = el.dataset.useThisBoard;
+                const name = el.dataset.useBoardType;
                 if (localStorage.getItem('useThisBoard')) {
                     localStorage.setItem('useThisBoard', '');
                 } else {
                     localStorage.setItem('useThisBoard', name);
+                    this.page.setContent();
                 }
             });
         });

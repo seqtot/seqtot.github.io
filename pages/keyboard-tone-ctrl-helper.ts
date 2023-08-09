@@ -59,7 +59,7 @@ export const mapNoteToChar = {
     b: 'B'
 }
 
-export function getBassСellStyles(note: string, iRow: number, iCol: number): {
+export function getGuitarСellStyles(note: string, iRow: number, iCol: number): {
     bgColor: string,
     borders: string,
     text: string,
@@ -329,8 +329,11 @@ export const guitarKeys: string[][] = [
     ['ko', 'na', 'za', 'te', 've', 'ke', 'ni',],
 ];
 
+export const harmonicaKeys: string[][] = [
+    ['ze', 'le', 'ke', 'be'],
+    ['me', 'fe', 've', 'se'],
+    ['de', 'te', 're', 'ne'],
 
-export const bassKeys: string[][] = [
     ['za', 'la', 'ka', 'ba'],
     ['ma', 'fa', 'va', 'sa'],
     ['da', 'ta', 'ra', 'na'],
@@ -348,24 +351,46 @@ export const bassKeys: string[][] = [
     ['du', 'tu', 'ru', 'nu'],
 ];
 
+// export const bassKeys: string[][] = [
+//     ['za', 'la', 'ka', 'ba'],
+//     ['ma', 'fa', 'va', 'sa'],
+//     ['da', 'ta', 'ra', 'na'],
+//
+//     ['zo', 'lo', 'ko', 'bo'],
+//     ['mo', 'fo', 'vo', 'so'],
+//     ['do', 'to', 'ro', 'no'],
+//
+//     ['zy', 'ly', 'ky', 'by'],
+//     ['my', 'fy', 'vy', 'sy'],
+//     ['dy', 'ty', 'ry', 'ny'],
+//
+//     ['zu', 'lu', 'ku', 'bu'],
+//     ['mu', 'fu', 'vu', 'su'],
+//     ['du', 'tu', 'ru', 'nu'],
+// ];
+//
+//
+// export const soloKeys: string[][] = [
+//     ['ze', 'le', 'ke', 'be'],
+//     ['me', 'fe', 've', 'se'],
+//     ['de', 'te', 're', 'ne'],
+//
+//     ['za', 'la', 'ka', 'ba'],
+//     ['ma', 'fa', 'va', 'sa'],
+//     ['da', 'ta', 'ra', 'na'],
+//
+//     ['zo', 'lo', 'ko', 'bo'],
+//     ['mo', 'fo', 'vo', 'so'],
+//     ['do', 'to', 'ro', 'no'],
+//
+//     ['zy', 'ly', 'ky', 'by'],
+//     ['my', 'fy', 'vy', 'sy'],
+//     ['dy', 'ty', 'ry', 'ny'],
+// ];
 
-export const soloKeys: string[][] = [
-    ['ze', 'le', 'ke', 'be'],
-    ['me', 'fe', 've', 'se'],
-    ['de', 'te', 're', 'ne'],
-
-    ['za', 'la', 'ka', 'ba'],
-    ['ma', 'fa', 'va', 'sa'],
-    ['da', 'ta', 'ra', 'na'],
-
-    ['zo', 'lo', 'ko', 'bo'],
-    ['mo', 'fo', 'vo', 'so'],
-    ['do', 'to', 'ro', 'no'],
-
-    ['zy', 'ly', 'ky', 'by'],
-    ['my', 'fy', 'vy', 'sy'],
-    ['dy', 'ty', 'ry', 'ny'],
-];
+export function isT34(val: any): boolean {
+    return val === 'bassSolo34' || val === 'soloSolo34' || val === 'bassBass34' || val === 'bass34' || val === 'solo34';
+}
 
 export function getVerticalKeyboard(
     keyboardId: number | string,
@@ -374,15 +399,14 @@ export function getVerticalKeyboard(
 ): string {
     keyboardId = keyboardId || '';
 
-    const isHarmonica = type === 'bassSolo34' || type === 'bass34' || type === 'solo34';
-    const size = 1.9;
-
+    const isT34Type = isT34(type);
+    const size = 1.8;
 
     const getKey = getKeyFn({
         keyboardId,
         cellSize: `${size}rem`,
-        fontSize: '1.5rem',
-        cellStylesFn: isHarmonica ? getHarmonicaCellStyles: getBassСellStyles,
+        fontSize: '1.3rem',
+        cellStylesFn: isT34Type ? getHarmonicaCellStyles: getGuitarСellStyles,
     });
 
     let minWidth = '';
