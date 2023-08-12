@@ -84,8 +84,10 @@ export class KeyboardPage implements Page {
         //console.log(ideService.currentEdit);
         //console.log('getBoundingClientRect', this.pageEl.getBoundingClientRect());
 
-        this.setRightPanelContent();
-        this.setContent();
+        setTimeout(() => {
+            this.setRightPanelContent();
+            this.setContent();
+        }, 50);
 
         setTimeout(() => {
             this.subscribeRightPanelEvents();
