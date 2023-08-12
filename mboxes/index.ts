@@ -11,6 +11,7 @@ import bell from './bell';
 import carcassiOp60n7 from './carcassiOp60n7';
 import partingGlass from './partingGlass';
 import billy from './billy';
+import peterGunn from './peterGunn';
 
 export default {
   set_e,
@@ -26,4 +27,5 @@ export default {
   carcassiOp60n7,
   partingGlass,
   billy,
+  peterGunn,
 };

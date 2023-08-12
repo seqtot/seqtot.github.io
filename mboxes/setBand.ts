@@ -15,6 +15,18 @@ function getBpmLink(bpm: number): string {
   >${bpm}</a>`;
 }
 
+// const peterGunn = `<div style="margin: .5rem;">
+//   <b>Peter Gunn: ${getBpmLink(124)}</b><br/>
+//   ${getLink('lesson', 'https://www.youtube.com/watch?v=vhdSodIxZSE')} |
+//   ${getLink('Duane Eddy', 'https://www.youtube.com/watch?v=296wS9ome4M')}
+// </div>
+// `;
+
+const peterGunn = `<div style="margin: .5rem;">
+    ${getInnerLink('Peter Gunn', '/mbox/peterGunn/')}
+</div>
+`.trim();
+
 const billy = `<div style="margin: .5rem;">
     ${getInnerLink('Billy', '/mbox/billy/')} (Билли)
 </div>
@@ -47,13 +59,6 @@ const enterSandmen = `<div style="margin: .5rem;">
     'tabs',
     'https://www.songsterr.com/a/wsa/metallica-enter-sandman-tab-s19'
   )}
-</div>
-`;
-
-const peterGunn = `<div style="margin: .5rem;">
-  <b>Peter Gunn: ${getBpmLink(124)}</b><br/>
-  ${getLink('lesson', 'https://www.youtube.com/watch?v=vhdSodIxZSE')} |
-  ${getLink('Duane Eddy', 'https://www.youtube.com/watch?v=296wS9ome4M')}
 </div>
 `;
 
@@ -106,6 +111,7 @@ const itsGoingGood = `<div style="margin: .5rem;">
 </div>`;
 
 const content = `
+  ${peterGunn}
   ${billy}
   ${carcassiOp60n7}
   ${bell}
