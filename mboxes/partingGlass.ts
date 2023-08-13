@@ -5,8 +5,8 @@ const score = `
 https://www.youtube.com/watch?v=DLEWBmWTfUI
 
 <settings>
-_ $bass: v20; $____: v5; $guit: v30;
-  volume: 100, bpm: 80, handle: both
+  pitchShift: 0;
+_ @drums: v50; $bass: v20; $solo: v50; $____: v5; $guit: v30;
 
 # соло  : МДСР МДСР МДСР М-СВМ
 # куплет: МДСР МДСР МДСР М-ДР-М

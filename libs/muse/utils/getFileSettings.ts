@@ -1,23 +1,31 @@
 'use babel';
 
 import * as un from './utils-note';
-import {toneChar} from './utils-note';
+import {drumChar, toneChar} from './utils-note';
 
 export type FileSettings = {
     import: string[],
     exclude: string[],
-    metaByLines: {[key: string]: string},
+    dataByTracks: {[key: string]: string},
     pitchShift: string[],
     boardShift: string[],
     bpm: string[],
-    [key: string]: any,
+    //[key: string]: any,
 };
+
+export function getPitchShiftSetting(settings: any): number {
+    if (!Array.isArray((settings as FileSettings)?.pitchShift)) {
+        return 0;
+    }
+
+    return un.parseInteger((settings as FileSettings).pitchShift[0], 0);
+}
 
 export function getFileSettings(blocks: un.TextBlock[] ): FileSettings {
     const result: FileSettings = {
         import: [],
         exclude: [],
-        metaByLines: <any>{},
+        dataByTracks: <any>{},
         pitchShift: [],
         boardShift: [],
         bpm: [],
@@ -55,11 +63,11 @@ export function getFileSettings(blocks: un.TextBlock[] ): FileSettings {
     });
 
     Object.keys(result).forEach(key => {
-        if (!key.startsWith(toneChar)) {
+        if (!key.startsWith(toneChar) && !key.startsWith(drumChar)) {
             return;
         }
 
-        result.metaByLines[key] = result[key].join(' ');
+        result.dataByTracks[key] = result[key].join(' ');
     });
 
     return result;

@@ -6,6 +6,7 @@ import {MultiPlayer} from '../../libs/muse/multi-player';
 import {Synthesizer} from '../../libs/muse/synthesizer';
 import {Ticker} from '../../libs/muse/ticker';
 import {KeyboardType} from '../keyboard-ctrl';
+import {FileSettings} from '@muse/utils/getFileSettings';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -56,9 +57,10 @@ class IdeService extends  EventEmitter {
         bpmValue: number,
         allSongParts: string[],
         editPartsNio?: number[],
-        metaByLines: {[key: string]: string},
+        dataByTracks: {[key: string]: string},
         freezeStructure: boolean,
         source?: 'my' | 'band' | null | undefined,
+        settings: FileSettings,
     } = { } as any;
 
     get guid(): number {

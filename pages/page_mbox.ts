@@ -9,7 +9,7 @@ import * as un from '../libs/muse/utils/utils-note';
 import { standardTicks as ticks } from './ticks';
 import {getMidiConfig, getTopOutList, MidiConfig} from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
-import { FileSettings, getFileSettings } from '../libs/muse/utils/getFileSettings';
+import {FileSettings, getFileSettings, getPitchShiftSetting} from '../libs/muse/utils/getFileSettings';
 import {isPresent, parseInteger, SongPartInfo, TextBlock} from '../libs/muse/utils/utils-note';
 import { LineModel } from './line-model';
 import mboxes from '../mboxes';
@@ -218,7 +218,7 @@ export class MBoxPage {
 
         this.blocks = un.getTextBlocks(this.pageData.score) || [];
         this.settings = getFileSettings(this.blocks);
-        this.pitchShift = un.parseInteger(this.settings.pitchShift[0]);
+        this.pitchShift = getPitchShiftSetting(this.settings);
 
         const wrapper = `
             <div
@@ -278,7 +278,7 @@ export class MBoxPage {
             `.trim();
             });
         } else {
-            Object.keys(this.settings.metaByLines).forEach(key => {
+            Object.keys(this.settings.dataByTracks).forEach(key => {
                 items = items + `
                 <span
                     style="font-weight: 700;"                  
@@ -414,8 +414,7 @@ export class MBoxPage {
         getWithDataAttr('use-track-action', this.pageEl)?.forEach((el) => {
             el.addEventListener('click', (evt: MouseEvent) => {
                 let el: HTMLElement = evt.target as any;
-                let key = el.dataset.useTrackAction;
-
+                let key = el.dataset.useTrackAction
 
                 if (this.excludeTrack[key]) {
                     this.excludeTrack[key] = null;
@@ -469,11 +468,12 @@ export class MBoxPage {
         ideService.currentEdit.allSongParts = this.allSongParts;
         ideService.currentEdit.blocks = this.blocks;
         ideService.currentEdit.bpmValue = this.bpmValue;
-        ideService.currentEdit.metaByLines = this.getMetaByLines();
+        ideService.currentEdit.dataByTracks = this.getDataByTracks();
         ideService.currentEdit.editPartsNio = editPartsNio;
         ideService.currentEdit.source = this.pageData.source;
         ideService.currentEdit.freezeStructure = !isMy;
         ideService.editedItems = [];
+        ideService.currentEdit.settings = this.settings;
 
         //console.log('currentEdit', ideService.currentEdit);
 
@@ -822,20 +822,20 @@ export class MBoxPage {
         return ideService.multiPlayer.tryPlayTextLine({ text, repeat });
     }
 
-    getMetaByLines(): {[key: string]: string} {
-        const metaByLines = {
-            ...this.settings.metaByLines
+    getDataByTracks(): {[key: string]: string} {
+        const dataByTracks = {
+            ...this.settings.dataByTracks
         };
 
-        Object.keys(metaByLines).forEach(key => {
+        Object.keys(dataByTracks).forEach(key => {
             if (this.excludeTrack[key]) {
-                metaByLines[key] = 'v0';
+                dataByTracks[key] = 'v0';
             }
         })
 
         //console.log(this.settings, metaByLines);
 
-        return metaByLines;
+        return dataByTracks;
     }
 
 
@@ -1041,8 +1041,8 @@ export class MBoxPage {
                     //console.log(type, data);
                 },
                 excludeLines: this.settings.exclude,
-                metaByLines: this.getMetaByLines(),
-                pitchShift: un.parseInteger(this.settings.pitchShift[0]),
+                dataByTracks: this.getDataByTracks(),
+                pitchShift: getPitchShiftSetting(this.settings),
                 bpm: this.bpmValue,
                 //beatsWithOffsetMs: un.getBeatsByBpmWithOffset(90, 8),
             });

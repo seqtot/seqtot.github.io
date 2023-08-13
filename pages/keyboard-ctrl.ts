@@ -15,6 +15,7 @@ import {
 } from '../libs/muse/utils';
 
 import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
+import {getPitchShiftSetting} from '@muse/utils/getFileSettings';
 
 export type BpmInfo = {
     bpm: number;
@@ -1300,12 +1301,14 @@ export class KeyboardCtrl {
             bpm: this.page.bpmValue
         });
 
+
         this.page.multiPlayer.tryPlayMidiBlock({
             blocks: midiConfig.blocks,
             playBlock: newOutBlock,
             bpm: this.page.bpmValue,
             repeatCount: 1,
-            metaByLines: ideService.currentEdit.metaByLines,
+            dataByTracks: ideService.currentEdit.dataByTracks,
+            //pitchShift: getPitchShiftSetting(ideService.currentEdit?.settings)
         });
     }
 
@@ -1389,7 +1392,7 @@ export class KeyboardCtrl {
             playBlock,
             bpm: this.page.bpmValue,
             repeatCount: 1,
-            metaByLines: ideService.currentEdit.metaByLines,
+            dataByTracks: ideService.currentEdit.dataByTracks,
         });
     }
 

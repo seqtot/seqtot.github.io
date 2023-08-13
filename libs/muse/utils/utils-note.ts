@@ -27,7 +27,7 @@ export const partIdChar = '%';
 type BlockType = 'text' | 'drums' | 'tones' | 'set';
 
 type NoteLineByName = {
-    name: string,
+    trackName: string,
     noteLine: string
 }
 
@@ -326,12 +326,12 @@ export function getNoteLnsByToneInstruments(arr: string[]): NoteLineByName[] {
             const noteLine = clearNoteLine(arr.join(':') || '');
 
             acc.push({
-                name,
+                trackName: name,
                 noteLine
             });
 
             return acc;
-        }, []);
+        }, <NoteLineByName[]>[]);
 
     return noteLns;
 }
@@ -351,17 +351,17 @@ export function getNoteLnsByDrumInstruments(arr: string[]): NoteLineByName[] {
             let noteLine = arr[1];
             noteLine = noteLine.substr(noteLine.length - lengtn);
 
-            acc.push({ name, noteLine})
+            acc.push({ trackName: name, noteLine})
 
             return acc;
-        }, []);
+        }, <NoteLineByName[]>[]);
 
     let result: NoteLineByName[] = [];
 
     noteLns.forEach(noteLn => {
         const beatLine = noteLn.noteLine;
-        const name = noteLn.name;
-        const asNote = name.replace(drumChar, '');
+        const trackName = noteLn.trackName;
+        const asNote = trackName.replace(drumChar, '');
         let noteLine = '';
         let i = -1;
 
@@ -378,7 +378,7 @@ export function getNoteLnsByDrumInstruments(arr: string[]): NoteLineByName[] {
         }
 
         result.push({
-            name: noteLn.name,
+            trackName: noteLn.trackName,
             noteLine: `drums ${noteLine.trim()}`,
         });
     });

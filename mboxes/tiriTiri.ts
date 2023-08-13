@@ -2,7 +2,8 @@ import dynamic from '../mbox_dynamics/tiriTiri.dynamic';
 
 const score = `
 <settings>
-# pitchShift: 1
+  pitchShift: 1;
+_ @drums: v50;    
 _ $bass: v20;  $guit: v30; $solo: v35;
 _ $back: v5; $mark: v0;
 
@@ -261,11 +262,8 @@ $back: ва=60 са=60 $flute
 $bass: бы=60 кы=60 $cBass*s
 $back: бо=60 ко=60 $flute
 
-
-<tick b120 @>
--       : 1234:
-@cowbell: xxxx:
-
+<tick b120 $>
+$tick: бе=60 бе=60 бе=60 бе=60 $xylo
 
 <note>
 # абвгдеёжзийклмнопрстуфхцчшщъыьэюя
@@ -282,19 +280,19 @@ $back: бо=60 ко=60 $flute
 // </pre>
 // </div>
 
+// <b>ТЕМА</b><br/>
+// a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C<br/>
+// <b>СОЛО1</b><br/>
+// a#a BDAB #fa BDAB de D#FAB     BDAB de #F#ABG #FED#C<br/>
+// <b>ТЕМА</b><br/>
+// <b>СОЛО2</b><br/>
+// b#A  B#CDE  D#CD#F  B#CDE  D#F#B<br/>
+// <b>ТЕМА</b><br/>
+// <b>КОДА</b><br/>
+// a#ab
+
 const info = `
 <div style="margin: .5rem;">
-
-<b>ТЕМА</b><br/>
-a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C<br/>
-<b>СОЛО1</b><br/>
-a#a BDAB #fa BDAB de D#FAB     BDAB de #F#ABG #FED#C<br/>
-<b>ТЕМА</b><br/>
-<b>СОЛО2</b><br/>
-b#A  B#CDE  D#CD#F  B#CDE  D#F#B
-<b>ТЕМА</b><br/>
-<b>КОДА</b><br/>
-a#ab
 
 <br/><br/>
 </div>

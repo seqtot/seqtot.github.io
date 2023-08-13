@@ -17,7 +17,7 @@ import {
 import {getNoteLineInfo, isNoteWithDurationOrPause} from './getNoteLineInfo';
 
 type NoteLn = {
-    name: string,
+    trackName: string,
     noteLine: string,
     parentVolume: number,
     repeat: number,
@@ -184,7 +184,7 @@ export function getOutBlocksInfo(
             const typeByName = getBlockType(item); // $: voice @:drum
             const colInfoArr = (item || '').split(/[:]/).filter(item => !!item); // [-:]
             const colInfoStr = colInfoArr.join(' ');
-            let noteLinesWithName: {name: string, noteLine: string}[];
+            let noteLinesWithTrackName: {trackName: string, noteLine: string}[];
             let colNoteLns: NoteLn[] = [];
             let colId = colInfoArr[0].trim();
             let colVolume: number;
@@ -207,15 +207,15 @@ export function getOutBlocksInfo(
             colVolume = getVolumeFromString(colInfoStr, DEFAULT_VOLUME);
 
             if (block.type === 'drums' || typeByName === 'drums') {
-                noteLinesWithName = getNoteLnsByDrumInstruments(block.rows);
+                noteLinesWithTrackName = getNoteLnsByDrumInstruments(block.rows);
             } else {
-                noteLinesWithName = getNoteLnsByToneInstruments(block.rows);
+                noteLinesWithTrackName = getNoteLnsByToneInstruments(block.rows);
             }
 
-            noteLinesWithName.forEach(noteLineWithName => {
+            noteLinesWithTrackName.forEach(noteLineWithTrackName => {
                 //console.log('noteLinesByName', item);
 
-                const info = getNoteLineMetaAndInstr(noteLineWithName.noteLine, noteLineWithName.name);
+                const info = getNoteLineMetaAndInstr(noteLineWithTrackName.noteLine, noteLineWithTrackName.trackName);
                 const volume = getVolumeFromString(info.meta);
                 const noteLine = `${head}r${colRepeat} v${volume} ${info.instr} ${info.noteLine}`;
                 const noteLineInfo = getNoteLineInfo(noteLine);
@@ -227,7 +227,7 @@ export function getOutBlocksInfo(
                 }
 
                 colNoteLns.push({
-                    name: noteLineWithName.name,
+                    trackName: noteLineWithTrackName.trackName,
                     noteLine,
                     noteLineInfo,
                     repeat: colRepeat,

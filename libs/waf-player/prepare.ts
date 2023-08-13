@@ -279,8 +279,11 @@ export async function preparePreset(
 
 	x.preset.pitchShift = numValue(x.preset.pitchShift, 0);
 
-	// TODO: сделать нормальный override
+	// TODO: сделать нормальный override костыль
 	if (x.var === '_tone_0180_FluidR3_GM_sf2_file') {
+		x.preset.pitchShift = 12;
+	}
+	else if (x.var === '_tone_0130_GeneralUserGS_sf2_file') {
 		x.preset.pitchShift = 12;
 	}
 

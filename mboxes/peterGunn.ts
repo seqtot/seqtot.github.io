@@ -3,8 +3,8 @@ const score = `
 https://www.songsterr.com/a/wsa/blues-brothers-peter-gunn-theme-tab-s3601
 
 <settings>
-  pitchShift: -1
-_ $bass: v20; $guit: v25; $solo: v50; $mark: v0
+  pitchShift: -5
+_ @drums: v50; $bass: v20; $guit: v25; $solo: v50; $mark: v50
 
 <out b120 v80>
 > СЧЁТ
@@ -241,7 +241,6 @@ $solo: ме=60 ка=60 $organ*r
 
 <pg_bass_riff b120 $> #480
 $bass: лы=60 лы=60 бы=60 лы=60  ду=60 лы=60  ру=60 ту=60 $eBass*f
-$mark: ле=60 $xylo
 
 <pg_guitar_riff1 b120 $>
 $guit: лу=60 лу=60  бу=60 лу=60 до=60 лу=60  ро=60 то=60 $egit*drpm
@@ -257,7 +256,6 @@ $guit: *EDM лу=60 *ED ма+ла=60 *EDM лу=60 лу=60 *ED ма+ла=60 *EDM 
 
 <pg_bass_riff_short b120 $> #300
 $bass: лы=60 лы=60 бы=60 лы=60 ду=60 $eBass*f
-$mark: лe=60 $xylo
 
 <pg_guitar_riff_short b120 $>
 $guit: лу=60 лу=60 бу=60 лу=60 до=60 $egit*drp

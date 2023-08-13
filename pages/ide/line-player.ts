@@ -17,7 +17,7 @@ import {NoteInfo} from '../../libs/muse/types';
 import { ideService } from './ide-service';
 
 import {getMidiConfig} from '../../libs/muse/utils/getMidiConfig';
-import {getFileSettings, FileSettings} from '../../libs/muse/utils/getFileSettings';
+import {getFileSettings, FileSettings, getPitchShiftSetting} from '../../libs/muse/utils/getFileSettings';
 import {getNextLinesForHandlePlay} from '../../libs/muse/utils/getNextLinesForHandlePlay';
 import {Sound} from '../../libs/muse/sound';
 import * as wav from '../../libs/muse/utils/node-wav'
@@ -578,7 +578,7 @@ export class LinePlayer {
                     //console.log(type, data);
                 },
                 excludeLines: this.settings.exclude,
-                metaByLines: this.settings.metaByLines,
+                dataByTracks: this.settings.dataByTracks,
                 pitchShift: un.parseInteger(this.settings.pitchShift[0]),
                 //beatsWithOffsetMs: un.getBeatsByBpmWithOffset(90, 8),
             });
@@ -606,7 +606,7 @@ export class LinePlayer {
         let text = this.textInput.getValue() + '\n';
 
         this.settings = getFileSettings(un.getTextBlocks(text));
-        this.pitchShift = un.parseInteger(this.settings.pitchShift[0]);
+        this.pitchShift = getPitchShiftSetting(this.settings);
         //console.log('onConnect.settings', this.settings);
 
         if (this.settings['import'].length) {

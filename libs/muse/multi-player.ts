@@ -351,7 +351,7 @@ export class MultiPlayer {
         beatsMs?: number[],
         bpm?: number,
         excludeLines?: string[],
-        metaByLines?: {[key: string]: string},
+        dataByTracks?: {[key: string]: string},
         pitchShift?: number
     }): OutLoopsInfo {
         //console.log('getLoopsInfo.params', {...params});
@@ -365,9 +365,9 @@ export class MultiPlayer {
 
         //console.log('outBlock', playBlock, outBlock);
 
-        const metaByLines = x.metaByLines || {};
-        const volumeByLines = Object.keys(metaByLines).reduce((acc, key) => {
-            acc[key] = un.getVolumeFromString(metaByLines[key]);
+        const dataByTracks = x.dataByTracks || {};
+        const volumeByTracks = Object.keys(dataByTracks).reduce((acc, key) => {
+            acc[key] = un.getVolumeFromString(dataByTracks[key]);
 
             return acc;
         },{});
@@ -402,12 +402,19 @@ export class MultiPlayer {
         outBlocks.rows.forEach(row => {
             row.noteLns.forEach(noteLn => {
                 noteLn.noteLineInfo.notes.forEach(noteInfo => {
+                    noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
+                    let trackName = noteLn.trackName;
+
+                    // костыль ?
+                    if (noteLn.trackName.startsWith('@')) {
+                        trackName = '@drums';
+                    }
+
                     // зануляем громкость исключённых линий
                     noteInfo.volume = un.mergeVolume(
                         noteInfo.volume,
-                        un.getSafeVolume(volumeByLines[noteLn.name])
+                        un.getSafeVolume(volumeByTracks[trackName])
                     );
-                    noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
                 });
             });
         });
@@ -510,7 +517,7 @@ export class MultiPlayer {
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
         excludeLines?: string[]
-        metaByLines?: {[key: string]: string},
+        dataByTracks?: {[key: string]: string},
     }) {
         if (!x.dontClear) {
             this.midiPlayer.stopAndClear();

@@ -165,9 +165,9 @@ export class ToneCtrl extends KeyboardCtrl {
             >beat me</div>                
             <div
                 data-action-tone="record-beat"
-                data-id="beat4"
-                style="${actionStyle} height: 7rem;"
-            >beat me</div>
+                data-id="stop"
+                style="${actionStyle} color: red;"
+            >STOP</div>
             <br/>
         </div>`.trim();
     }
@@ -512,7 +512,7 @@ export class ToneCtrl extends KeyboardCtrl {
             return;
         }
 
-        if (type === DOWN && this.memoBuffer2.length) {
+        if (id !== 'stop' && type === DOWN && this.memoBuffer2.length) {
             const note = this.memoBuffer2.shift();
 
             this.recData.keys[id] = {
@@ -539,7 +539,7 @@ export class ToneCtrl extends KeyboardCtrl {
             return;
         }
 
-        if (type === UP && this.recData.keys[id]) {
+        if (id !== 'stop' && type === UP && this.recData.keys[id]) {
             this.recData.keys[id].up = time;
 
             ideService.synthesizer.playSound({
@@ -553,7 +553,7 @@ export class ToneCtrl extends KeyboardCtrl {
             return;
         }
 
-        if (!this.memoBuffer2.length && type === DOWN) {
+        if ((!this.memoBuffer2.length || id === 'stop') && type === DOWN) {
             this.recData.endTimeMs = time;
 
             Object.keys(this.recData.keys).forEach(id => {
@@ -610,6 +610,18 @@ export class ToneCtrl extends KeyboardCtrl {
 
     boardPopup: Dialog.Dialog;
 
+    updatePopupBoard() {
+        const parent = getWithDataAttr('dynamic-tone-board')[0] as HTMLElement;
+
+        getWithDataAttr('instrument-code', parent).forEach(el => {
+            el.style.fontWeight = '400';
+        });
+
+        getWithDataAttrValue('instrument-code', this.instrCode, parent).forEach(el => {
+            el.style.fontWeight = '700';
+        });
+    }
+
     subscribePopupBoard(cb?: () => any) {
         let lastNoteEl: HTMLElement;
         let lastPlayingNote = '';
@@ -619,6 +631,22 @@ export class ToneCtrl extends KeyboardCtrl {
         getWithDataAttr('instrument-code', parent).forEach(el => {
             el.addEventListener('pointerdown', () => {
                 this._instrCode = un.parseInteger(el.dataset.instrumentCode, 162); // jjkl
+                this.updatePopupBoard();
+                ideService.synthesizer.playSound({
+                    keyOrNote: 'do',
+                    id: 'popup',
+                    instrCode: this._instrCode,
+                });
+            })
+        });
+
+        getWithDataAttr('instrument-code', parent).forEach(el => {
+            el.addEventListener('pointerup', () => {
+                ideService.synthesizer.playSound({
+                    keyOrNote: 'do',
+                    id: 'popup',
+                    onlyStop: true
+                });
             })
         });
 
@@ -692,14 +720,47 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getInstrumentsForChoice(): string {
+        const style = `
+            display: inline-block;
+            margin: 0 .5rem .5rem 0;
+            border-radius: 0.25rem;
+            border: 1px solid lightgray;
+            font-size: 1.1rem;
+            user-select: none;`.trim();
+
         let instruments = '';
 
-        Object.keys(hlp.instrName).forEach(key => {
+        const instrs = [
+            {code: 327, label: 'RGtr:Drive'},
+            {code: 321, label: 'RGtr:Drive:Mute'},
+            {code: 276, label: 'EGtr:Clean'},
+
+            {code: 374, label: 'CBass:Finger'},
+            {code: 366, label: 'CBass:Slap'},
+
+            {code: 375, label: 'EBass:Finger'},
+            {code: 388, label: 'EBass:Mediator'},
+            {code: 405, label: 'EBass:Beat'},
+
+            {code: 182, label: 'Organ:Hard'},
+            {code: 162, label: 'Organ:Soft'},
+            {code: 235, label: 'Bayan'},
+
+            {code: 136, label: 'Xylo'},
+
+            {code: 617, label: 'Trumpet'},
+            {code: 626, label: 'Trombone'},
+            {code: 635, label: 'Tuba'},
+
+            {code: 466, label: 'Violin'},
+        ];
+
+        instrs.forEach(item => {
             instruments = instruments + `
-                <span 
-                    data-instrument-code="${key}"
-                    data-instrument-name="${hlp.instrName[key]}"                    
-                >${hlp.instrName[key]}</span>&emsp;
+                <span
+                    style="${style}" 
+                    data-instrument-code="${item.code}"                    
+                >${item.label}</span>&emsp;
             `.trim();
         });
 
@@ -732,7 +793,7 @@ export class ToneCtrl extends KeyboardCtrl {
                         <div class="page-content" data-dynamic-tone-board>
                             ${content}
                             <div style="margin: 1rem;">
-                                use:&emsp;${this.getInstrumentsForChoice()} 
+                                ${this.getInstrumentsForChoice()} 
                             </div>                            
                         </div>                        
                     </div>
@@ -740,6 +801,7 @@ export class ToneCtrl extends KeyboardCtrl {
             on: {
                 opened: () => {
                     this.subscribePopupBoard();
+                    this.updatePopupBoard()
                     this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
                 }
             }
@@ -772,7 +834,7 @@ export class ToneCtrl extends KeyboardCtrl {
                         </div>
                             ${this.getHarmonicaBoard(boardType)}                           
                             <div style="margin: 0 1rem 0 1rem;">
-                                use:&emsp;${this.getInstrumentsForChoice()}
+                                ${this.getInstrumentsForChoice()}
                             </div>
                         </div>
                     </div>
@@ -780,6 +842,7 @@ export class ToneCtrl extends KeyboardCtrl {
             on: {
                 opened: () => {
                     this.subscribePopupBoard();
+                    this.updatePopupBoard();
                 }
             }
         });

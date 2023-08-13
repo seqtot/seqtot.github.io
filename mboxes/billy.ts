@@ -2,8 +2,8 @@ import dynamic from '../mbox_dynamics/billy.dynamic';
 
 const score = `
 <settings>
-# pitchShift: -1
-_ $bass: v30; $back: v20; $mark: v0;
+  pitchShift: 0
+_ @drums: v50; $bass: v30; $bassSolo: v100; $guit: v50; $back: v20; $solo: v50; $mark: v0;
 
 <out b105>
 > проход    %A
@@ -66,10 +66,10 @@ $mark: 0    ле=80 400 ле=80 400 ле=80 400 ле=80 400      $xylo
 
 <соло_бас b105 $>
 $mark:     0   ле=80 400  ле=80 400  ле=80 400  ле=80 400 $xylo
-$bass: 0       лу=90 *f мо=90 до=40 20  бу=90 *f со=90 бу=50 $cBass*f v100 #480
-$bass: 480     до=90 *f мо=90 до=40 20  ро=90 *f мо=90 фо=50 $cBass*f v100 #480
-$bass: 960     мо=90 *f до=90 су=40 20  ро=90 *f бу=90 су=50 $cBass*f v100 #480
-$bass: 1440    мо=90 *f до=90 су=40 20  зу=90 *f бу=90 мо=50 $cBass*f v100 #480
+$bassSolo: 0       лу=90 мо=90 до=40 20  бу=90 со=90 бу=50 $cBass*f v100 #480
+$bassSolo: 480     до=90 мо=90 до=40 20  ро=90 мо=90 фо=50 $cBass*f v100 #480
+$bassSolo: 960     мо=90 до=90 су=40 20  ро=90 бу=90 су=50 $cBass*f v100 #480
+$bassSolo: 1440    мо=90 до=90 су=40 20  зу=90 бу=90 мо=50 $cBass*f v100 #480
 # 8Q       1920
 
 <сбивка b105 $>
@@ -115,10 +115,8 @@ $back: 960      до=240 бу=240 $organ
 $solo: 1440     да=30 ра=30 да=180 120 бо=120  d480 $organ*r
 $back: 1440     до=240 мо=240 $organ
 
-<tick b105 @>
--       : 1 2 3 4 :
-@cowbell: x x x x :
-
+<tick b105 $>
+$tick: ле=120 ле=120 ле=120 ле=120 $xylo
 
 `.trim();
 
