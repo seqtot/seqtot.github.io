@@ -16,6 +16,7 @@ import {
 
 import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 import {getPitchShiftSetting} from '@muse/utils/getFileSettings';
+import {Dialog} from 'framework7/components/dialog/dialog';
 
 export type BpmInfo = {
     bpm: number;
@@ -294,16 +295,16 @@ export class KeyboardCtrl {
             >
                 <span
                     style="${style}"
-                    data-edit-row-action="add-row"
-                >addR</span>
+                    data-edit-row-action="add-line"
+                >addL</span>
                 <span
                     style="${style}"
-                    data-edit-row-action="insert-row"
-                >insR</span>&nbsp;&nbsp;
+                    data-edit-row-action="insert-line"
+                >insL</span>&nbsp;&nbsp;
                 <span
                     style="${style} color: red;"
-                    data-edit-row-action="delete-row"
-                >delR</span>
+                    data-edit-row-action="delete-line"
+                >delL</span>
             </div>        
         `.trim();
     }
@@ -317,7 +318,7 @@ export class KeyboardCtrl {
             delButton = `
                 &nbsp;&nbsp;<span
                     style="${style} background-color: red; color: white;"
-                    data-edit-action="delete-cell"
+                    data-edit-line-action="delete-cell"
                 >del</span>            
             `;
         }
@@ -348,7 +349,7 @@ export class KeyboardCtrl {
                 <span
                     style="${style}"
                     data-get-note-for-cell-action
-                >note</span>&emsp;
+                >${sings.note}</span>&emsp;
                 <span
                     style="${style}"
                     data-copy-notes-action
@@ -889,12 +890,20 @@ export class KeyboardCtrl {
             });
 
             if (!ideService.currentEdit.freezeStructure) {
-                editingPartsContent += `&emsp;<span
-                    style="${cmdStyle}"
-                    data-ide-action="add-row"
-                    data-part-nio="${part.partNio}"
-                    data-part-id="${part.partId}"                    
-                >add</span>`.trim();
+                editingPartsContent += `&emsp;
+                    <span
+                        style="${cmdStyle} color: green;"
+                        data-ide-action="add-row"
+                        data-part-nio="${part.partNio}"
+                        data-part-id="${part.partId}"                    
+                    >${sings.add}</span>&emsp;
+                    <span
+                        style="${cmdStyle} color: red;"
+                        data-ide-action="delete-row"
+                        data-part-nio="${part.partNio}"
+                        data-part-id="${part.partId}"                    
+                    >${sings.delete}</span>&emsp;
+                `.trim();
             }
 
             editingPartsContent += '</div>';
@@ -925,6 +934,10 @@ export class KeyboardCtrl {
                 ${editingPartsContent}
             </div>
         `.trim();
+    }
+
+    removeEditingItem(rowInPartId: string) {
+        ideService.editedItems = ideService.editedItems.filter(iItem => iItem.rowInPartId !== rowInPartId);
     }
 
     addOrRemoveEditingItem(item: EditedItem, el: HTMLElement) {
@@ -1024,10 +1037,52 @@ export class KeyboardCtrl {
         getWithDataAttrValue('ide-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.addRowInPart(el.dataset['partId'], el.dataset['partNio']));
         });
+
+        getWithDataAttrValue('ide-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.delRowFromPart(el.dataset['partId'], el.dataset['partNio']));
+        });
     }
 
     gotoSong() {
         this.page.context.$f7router.navigate(`/mbox/${this.songId}/`);
+    }
+
+    confirm: Dialog.Dialog;
+
+    delRowFromPart(partId: string, partNio: number | string) {
+        partId = (partId || '').trim();
+        partNio = un.parseInteger(partNio, 0);
+
+        if (!partId && !partNio) return;
+
+        const song = SongStore.getSong(this.songId);
+        const rows = SongStore.getRowsByPart(song.dynamic, partId, partNio);
+
+        const rowNios = rows.map(item => un.getRowNio(item.rowInPartId));
+        rowNios.sort();
+
+        const rowNioForDel = rowNios[rowNios.length - 1];
+
+        if (!rowNioForDel) return;
+
+        this.confirm = (this.page.context.$f7 as any).dialog.confirm(
+            '',
+            `Удалить строку ${rowNioForDel} во всех трэках?`,
+            () => {
+                SongStore.delRowFromPart(this.songId, song, partId, <number>partNio, rowNioForDel);
+                this.removeEditingItem(`${partNio}-${rowNioForDel}`)
+
+                getWithDataAttr('edit-parts-wrapper').forEach(el => {
+                    el.innerHTML = this.getIdeContent();
+                    this.subscribeIdeEvents();
+                });
+
+                this.updateView();
+            },
+            () => {}, // cancel
+        );
+
+        this.confirm.open();
     }
 
     addRowInPart(partId: string, partNio: number | string) {
@@ -1038,33 +1093,14 @@ export class KeyboardCtrl {
 
         const song = SongStore.getSong(this.songId);
 
-        const rowNios = song.dynamic.reduce((acc, item) => {
-            const iPartId = (item.partId || '').trim();
-            const iPartNio = un.parseInteger(item.rowInPartId.split('-')[0], 0);
-            const iRowNio = un.parseInteger(item.rowInPartId.split('-')[1], 0);
-
-            if (partId && iPartId && partId !== iPartId) {
-                return acc;
-            }
-            else if(partNio && iPartNio && partNio !== iPartNio) {
-                return acc;
-            }
-
-            if (!iRowNio) {
-                return acc;
-            }
-
-            acc.push(iRowNio);
-
-            return acc;
-        }, []);
-
+        const rowNios = SongStore.getRowsByPart(song.dynamic, partId, partNio).map(item => un.getRowNio(item.rowInPartId));
         const rowNio = (rowNios.length ? Math.max(...rowNios) : 0) + 1;
         const rowInPartId = `${partNio}-${rowNio}`;
 
         song.dynamic.push({
             partId,
             rowInPartId: `${partNio}-${rowNio}`,
+            rowNio: rowNio,
             type: this.boardType,
             status: 'draft',
             lines: [
@@ -1209,19 +1245,19 @@ export class KeyboardCtrl {
 
 
     subscribeEditCommands() {
-        getWithDataAttrValue('edit-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('edit-line-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.deleteCell(el));
         });
 
-        getWithDataAttrValue('edit-row-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('edit-row-action', 'add-line', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.addLine());
         });
 
-        getWithDataAttrValue('edit-row-action', 'insert-row', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('edit-row-action', 'insert-line', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.insertLine());
         });
 
-        getWithDataAttrValue('edit-row-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('edit-row-action', 'delete-line', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.deleteLine());
         });
     }

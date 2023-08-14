@@ -314,7 +314,7 @@ export class DrumCtrl extends KeyboardCtrl {
             <div style="${rowStyle} display: flex; justify-content: flex-end; padding-right: 1rem;">
                <span
                     style="${style} background-color: red; color: white; font-size: 1rem;"
-                    data-edit-action="delete-cell"
+                    data-edit-line-action="delete-cell"
                 >del</span>
             </div>               
         `.trim();

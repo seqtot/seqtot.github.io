@@ -7,4 +7,5 @@ export const sings = {
     unselect: '&nbsp;&#9744;&nbsp;',
     add: '&nbsp;&#10010;&nbsp;',
     delete:  '&nbsp;&#9746&nbsp;',
+    note: '&nbsp;&#9834;&nbsp;'
 }

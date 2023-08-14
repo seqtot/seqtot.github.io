@@ -3,7 +3,7 @@ import {Line} from './line-model';
 
 export type StoredRow = {
     partId?: string,
-    rowNio?: number,
+    rowNio?: number, // jjkl
     rowInPartId: string,
     type: string,
     track: string,
@@ -307,6 +307,62 @@ export class SongStore {
         items.push(song);
 
         SongStore.setSongs(items);
+
+        return song;
+    }
+
+    static getRowsByPart(rows: StoredRow[], partId: string, partNio: number): StoredRow[] {
+        const result = rows.reduce((acc, item) => {
+            const iPartId = (item.partId || '').trim();
+            const iPartNio = un.getPartNio(item.rowInPartId);
+            const iRowNio = un.getRowNio(item.rowInPartId);
+
+            if (partId && iPartId && partId !== iPartId) {
+                return acc;
+            }
+            else if(partNio && iPartNio && partNio !== iPartNio) {
+                return acc;
+            }
+
+            if (!iRowNio) {
+                return acc;
+            }
+
+            acc.push(item);
+
+            return acc;
+        }, <StoredRow[]>[]);
+
+        return result;
+    }
+
+    static delRowFromPart(
+        songId: string,
+        song: SongPage,
+        partId: string,
+        partNio: number,
+        rowNio: number
+    ): SongPage {
+        song.dynamic = song.dynamic.filter(item  => {
+            const iPartId = (item.partId || '').trim();
+            const iPartNio = un.getPartNio(item.rowInPartId);
+            const iRowNio = un.getRowNio(item.rowInPartId);
+
+            if (partId && iPartId && partId !== iPartId) {
+                return true;
+            }
+            else if(partNio && iPartNio && partNio !== iPartNio) {
+                return true;
+            }
+
+            if (iRowNio !== rowNio) {
+                return true;
+            }
+
+            return false;
+        });
+
+        SongStore.setSong(songId, song);
 
         return song;
     }

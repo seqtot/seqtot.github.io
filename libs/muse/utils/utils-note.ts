@@ -771,6 +771,13 @@ export function getRowNio(pVal: any): number {
     return parseInteger(val.split('-')[1], 0);
 }
 
+export function getPartRowNio(val: any): {partNio: number, rowNio: number} {
+    return {
+        partNio: getPartNio(val),
+        rowNio: getRowNio(val),
+    };
+}
+
 // arduino гармошка
 // https://www.youtube.com/watch?v=aVjl3yQguc4
 
