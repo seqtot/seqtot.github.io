@@ -60,6 +60,14 @@ export type KeyboardType = ToneKeyboardType | DrumKeyboardType;
 
 const monoFont = 'font-family: monospace;';
 
+const iconBtnStl = [
+    `display: inline-block;`,
+    `border: 1px solid lightgray; border-radius: 0.25rem;`,
+    `line-height: 0;`,
+    `user-select: none;`,
+    `padding: 0; margin: 0; margin-right: .4rem;`,
+].join('');
+
 export class KeyboardCtrl {
     liner = new LineModel();
     trackName = '';
@@ -110,31 +118,31 @@ export class KeyboardCtrl {
         };
     }
 
-    getMoveButtons(size: number = 1): string {
-        const style = [
-            `user-select: none; touch-action: none;`,
-            `padding-left: .2rem; padding-right: .2rem;`,
-            `font-size: ${size}rem; font-weight: 800;`,
-            `border-radius: 0.25rem; border: 1px solid lightgray;`,
-        ].join('');
-
+    getMoveButtons(): string {
         return `
-            <span
-                style="${style}"
-                data-action-move-cell="left"
-            >&lt;</span>&emsp;
-            <span
-                style="${style}"
-                data-action-move-cell="top"
-            >&uarr;</span>&emsp;
-            <span
-                style="${style}"
-                data-action-move-cell="bottom"
-            >&darr;</span>&emsp;
-            <span
-                style="${style}"
-                data-action-move-cell="right"
-            >&gt;</span>
+            <span style="${iconBtnStl}" data-action-move-cell="left">
+                <svg fill="#000000" width="20px" height="20px" viewBox="-8.5 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.094 15.938l7.688 7.688-3.719 3.563-11.063-11.063 11.313-11.344 3.531 3.5z"></path>
+                </svg>            
+            </span>
+
+            <span style="${iconBtnStl}" data-action-move-cell="top">
+                <svg fill="#000000" width="20px" height="20px" viewBox="-5 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.25 15.688l-7.656 7.656-3.594-3.688 11.063-11.094 11.344 11.344-3.5 3.5z"></path>
+                </svg>            
+            </span>
+
+            <span style="${iconBtnStl}" data-action-move-cell="bottom">
+                <svg fill="#000000" width="20px" height="20px" viewBox="-5 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path>
+                </svg>            
+            </span>
+
+            <span style="${iconBtnStl}" data-action-move-cell="right">
+                <svg fill="#000000" width="20px" height="20px" viewBox="-8.5 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.75 16.063l-7.688-7.688 3.719-3.594 11.063 11.094-11.344 11.313-3.5-3.469z"></path>
+                </svg>
+            </span>
         `.trim();
     }
 
@@ -309,55 +317,90 @@ export class KeyboardCtrl {
         `.trim();
     }
 
-    getMoveCommandPanel(size: number = 1, hasDel = true) {
-        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
-
+    getMoveCommandPanel(hasDel = true) {
+        let rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
         let delButton = '';
+
         if (hasDel) {
             delButton = `
-                &nbsp;&nbsp;<span
-                    style="${style} background-color: red; color: white;"
-                    data-edit-line-action="delete-cell"
-                >del</span>            
+                <span style="${iconBtnStl} margin-left: .5rem; border: none;" data-edit-line-action="delete-cell">
+                    <svg fill="red" width="20px" height="20px" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M48,0A48,48,0,1,0,96,48,48.0512,48.0512,0,0,0,48,0Zm0,84A36,36,0,1,1,84,48,36.0393,36.0393,0,0,1,48,84Z"/>
+                        <path d="M64.2422,31.7578a5.9979,5.9979,0,0,0-8.4844,0L48,39.5156l-7.7578-7.7578a5.9994,5.9994,0,0,0-8.4844,8.4844L39.5156,48l-7.7578,7.7578a5.9994,5.9994,0,1,0,8.4844,8.4844L48,56.4844l7.7578,7.7578a5.9994,5.9994,0,0,0,8.4844-8.4844L56.4844,48l7.7578-7.7578A5.9979,5.9979,0,0,0,64.2422,31.7578Z"/>
+                    </svg>
+                </span>            
             `;
         }
 
         return `
             <div style="${rowStyle}">
-                ${this.getMoveButtons(size)}
+                ${this.getMoveButtons()}
                 ${delButton}
             </div>
         `.trim();
     }
 
-    getDurationCommandPanel(size: number = 1) {
+    getDurationCommandPanel() {
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: ${size}rem; user-select: none; touch-action: none;`;
+
+        // https://www.svgrepo.com
 
         let additional = '';
+
         return `
             <div style="${rowStyle}">
-                <span
-                    style="${style}"
-                    data-set-cell-duration-action="add"
-                >&nbsp;+&nbsp;</span>
-                <span
-                    style="${style}"
-                    data-set-cell-duration-action="sub"
-                >&nbsp;-&nbsp;</span>&emsp;
-                <span
-                    style="${style}"
-                    data-get-note-for-cell-action
-                >${sings.note}</span>&emsp;
-                <span
-                    style="${style}"
-                    data-copy-notes-action
-                >cop</span>
-                <span
-                    style="${style}"
-                    data-paste-notes-action
-                >pst</span>                                
+                <span style="${iconBtnStl}"
+                    data-set-cell-duration-action="add"                 
+                >
+                    <svg
+                        width="20px" height="20px" viewBox="0 0 20 20" fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        style="fill: green; stroke: green;"                        
+                    >
+                        <rect x="2" y="8" width="16" height="4"></rect>                
+                        <rect x="8" y="2" width="4" height="16"></rect>                        
+                    </svg>
+                </span>
+                
+                <span style="${iconBtnStl}"
+                    data-set-cell-duration-action="sub"                 
+                >
+                    <svg
+                        width="20px" height="20px" viewBox="0 0 20 20" fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        style="fill: orange; stroke: orange;"                        
+                    >
+                        <rect x="2" y="8" width="16" height="4"></rect>
+                    </svg>
+                </span>
+
+                <span style="${iconBtnStl}" data-get-note-for-cell-action>
+                    <svg width="20px" height="20px" viewBox="0 0 20 20" fill="blue" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9.78103 1.69759C14.1038 4.63512 16.25 6.76176 16.25 8.30413C16.25 9.79646 15.4291 11.0034 13.8541 11.8872C13.418 12.132 12.9324 11.6555 13.1688 11.2148C13.5756 10.4565 13.4416 9.60793 12.7079 8.59803C11.934 7.53285 10.8174 6.75731 9.34301 6.26969C9.13826 6.20198 9 6.01063 9 5.79498V2.11114C9 1.70978 9.44906 1.47201 9.78103 1.69759Z"/>
+                        <path d="M7.75 17.75C5.97914 17.75 4.5 16.607 4.5 15.125C4.5 13.643 5.97914 12.5 7.75 12.5C9.52086 12.5 11 13.643 11 15.125C11 16.607 9.52086 17.75 7.75 17.75Z"/>
+                        <path d="M10 4C10.5523 4 11 4.44772 11 5V15C11 15.5523 10.5523 16 10 16C9.44772 16 9 15.5523 9 15V5C9 4.44772 9.44772 4 10 4Z"/>
+                    </svg>
+                </span>
+                
+                <span style="${iconBtnStl}" data-copy-notes-action>
+                    <svg width="20px" height="20px" fill="#000000"  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 2H10c-1.103 0-2 .897-2 2v4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h10c1.103 0 2-.897 2-2v-4h4c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zM4 20V10h10l.002 10H4zm16-6h-4v-4c0-1.103-.897-2-2-2h-4V4h10v10z"/>
+                    </svg>                
+                </span>
+                
+                <!--span style="${iconBtnStl}" data-copy-row-action>
+                    <svg width="20px" height="20px" fill="#000000"  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 2H10c-1.103 0-2 .897-2 2v4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h10c1.103 0 2-.897 2-2v-4h4c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zM4 20V10h10l.002 10H4zm16-6h-4v-4c0-1.103-.897-2-2-2h-4V4h10v10z"/><path d="M6 12h6v2H6zm0 4h6v2H6z"/>
+                    </svg>                
+                </span-->
+                
+                <span style="${iconBtnStl}" data-paste-notes-action>
+                    <svg width="20px" height="20px" fill="#000000" viewBox="0 0 36 36" version="1.1"  preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <path d="M22.6,4H21.55a3.89,3.89,0,0,0-7.31,0H13.4A2.41,2.41,0,0,0,11,6.4V10H25V6.4A2.41,2.41,0,0,0,22.6,4ZM23,8H13V6.25A.25.25,0,0,1,13.25,6h2.69l.12-1.11A1.24,1.24,0,0,1,16.61,4a2,2,0,0,1,3.15,1.18l.09.84h2.9a.25.25,0,0,1,.25.25Z" class="clr-i-outline clr-i-outline-path-1"></path><path d="M33.25,18.06H21.33l2.84-2.83a1,1,0,1,0-1.42-1.42L17.5,19.06l5.25,5.25a1,1,0,0,0,.71.29,1,1,0,0,0,.71-1.7l-2.84-2.84H33.25a1,1,0,0,0,0-2Z" class="clr-i-outline clr-i-outline-path-2"></path><path d="M29,16h2V6.68A1.66,1.66,0,0,0,29.35,5H27.08V7H29Z" class="clr-i-outline clr-i-outline-path-3"></path><path d="M29,31H7V7H9V5H6.64A1.66,1.66,0,0,0,5,6.67V31.32A1.66,1.66,0,0,0,6.65,33H29.36A1.66,1.66,0,0,0,31,31.33V22.06H29Z" class="clr-i-outline clr-i-outline-path-4"></path>
+                        <rect x="0" y="0" width="36" height="36" fill-opacity="0"/>
+                    </svg>
+                </span>
+                
                 ${additional}
             </div>
         `.trim();

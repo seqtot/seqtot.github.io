@@ -290,11 +290,11 @@ export class ToneCtrl extends KeyboardCtrl {
             ${this.getMetronomeContent()}
             ${this.getRowActionsCommands()}
             
-            ${this.getDurationCommandPanel(1.2)}            
-            ${this.getMoveCommandPanel(1.2)}                                                
+            ${this.getDurationCommandPanel()}            
+            ${this.getMoveCommandPanel()}                                                
             <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
-            ${this.getMoveCommandPanel(1.2)}
-            ${this.getDurationCommandPanel(1.2)}
+            ${this.getMoveCommandPanel()}
+            ${this.getDurationCommandPanel()}
             
             <div data-edit-parts-wrapper>
                 ${this.getIdeContent()}                
@@ -330,11 +330,11 @@ export class ToneCtrl extends KeyboardCtrl {
             ${this.getMetronomeContent()}            
             ${this.getRowActionsCommands()}
             
-            ${this.getDurationCommandPanel(1.2)}            
-            ${this.getMoveCommandPanel(1.2)}                        
+            ${this.getDurationCommandPanel()}            
+            ${this.getMoveCommandPanel()}                        
             <div data-name="chess-wrapper" style="width: 90%; padding-left: 1rem;"></div>
-            ${this.getMoveCommandPanel(1.2)}
-            ${this.getDurationCommandPanel(1.2)}
+            ${this.getMoveCommandPanel()}
+            ${this.getDurationCommandPanel()}
             
             <div data-edit-parts-wrapper>
                 ${this.getIdeContent()}                
