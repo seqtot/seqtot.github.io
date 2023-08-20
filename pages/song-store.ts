@@ -287,15 +287,13 @@ export class SongStore {
 
         song.parts.push(part);
 
-        const partNio = song.parts.length + 1;
+        const partNio = song.parts.length;
 
         let items = song.dynamic.filter(item => item.partId === sourceId);
 
         items.forEach(item => {
             const rowNio = un.getRowNio(item.rowInPartId);
             const rowInPartId = `${partNio}-${rowNio}`;
-
-            console.log('rowInPartId', rowInPartId);
 
             item = JSON.parse(JSON.stringify(item));
             item.partId = id;

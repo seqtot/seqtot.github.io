@@ -336,10 +336,10 @@ export class MBoxPage {
                     style="${btnStl} margin-right: 1rem;"
                     data-rename-part-action                                           
                 >name</span>                                    
-                <!--span
+                <span
                     style="${btnStl} margin-right: 1rem;"
                     data-clone-part-action                                           
-                >clone</span-->
+                >clone</span>
                 <span
                     style="${btnStl} color: red;"
                     data-delete-part-action                                          
