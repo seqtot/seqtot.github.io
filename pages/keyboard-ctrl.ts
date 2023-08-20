@@ -74,15 +74,15 @@ export class KeyboardCtrl {
     activeCell: {
         id: number,
         col: number,
-        row: number,
+        lineInd: number,
         rowCol: string,
         totalOffset: number,
     } = {
         id: 0,
         col: 0,
-        row: 0,
+        lineInd: 0,
         rowCol: '',
-        totalOffset: 0
+        totalOffset: 0,
     };
 
     get hasIdeItem(): boolean {
@@ -167,6 +167,80 @@ export class KeyboardCtrl {
     }
 
     notesForCopy: LineNote[] = [];
+    linesForCopy: Line[];
+
+    pasteFromClipboard() {
+        if (!this.activeCell.rowCol) {
+            return;
+        }
+
+        if (this.notesForCopy.length) {
+            this.notesForCopy.forEach(note => {
+                this.addOrDelNote(note, this.activeCell.rowCol, this.activeCell.totalOffset);
+            });
+
+            return;
+        }
+
+        if (this.linesForCopy.length) {
+            let selectedLine = this.liner.lines[this.activeCell.lineInd];
+
+            if (!selectedLine) {
+                return;
+            }
+
+
+            const linesForCopy = LineModel.CloneLines(this.linesForCopy);
+            let cellId = this.liner.getMaxCellId() + 1;
+            let noteId = this.liner.getMaxNoteId() + 1;
+
+            const rowInPartId = selectedLine.rowInPartId;
+            const lines = this.liner.lines.filter(item => item.rowInPartId === rowInPartId);
+
+            linesForCopy.forEach((newLine, i) => {
+                if (i > lines.length - 1) {
+                    return;
+                }
+
+                const oldLine = lines[i];
+                oldLine.cells = newLine.cells;
+                oldLine.cells.forEach(cell => {
+                    cell.id = cellId++;
+                    cell.notes.forEach(note => {
+                        note.id = noteId++;
+                    });
+                })
+            });
+
+            this.updateChess();
+        }
+
+        console.log(this.liner.lines);
+    }
+
+    copyToClipboard(type: 'notes' | 'row') {
+        this.linesForCopy = [];
+        this.notesForCopy = [];
+
+        if (type === 'notes') {
+            if (this.activeCell.id) {
+                this.notesForCopy = this.liner.getNotesByOffset(this.activeCell.totalOffset);
+            }
+
+            return;
+        }
+
+        if (type === 'row') {
+            const line = this.liner.lines[this.activeCell.lineInd];
+
+            if (line && line.rowInPartId) {
+                const rowInPartId = this.liner.lines[this.activeCell.lineInd].rowInPartId;
+
+                const lines = this.liner.lines.filter(item => item.rowInPartId === rowInPartId);
+                this.linesForCopy = LineModel.CloneLines(lines);
+            }
+        }
+    }
 
     subscribeDurationCommands() {
         getWithDataAttrValue('set-cell-duration-action', 'add', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -178,23 +252,15 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttr('copy-notes-action', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => {
-                if (this.activeCell.id) {
-                    this.notesForCopy = this.liner.getNotesByOffset(this.activeCell.totalOffset);
-                }
-            });
+            el.addEventListener('pointerdown', () => this.copyToClipboard('notes'));
+        });
+
+        getWithDataAttr('copy-row-action', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.copyToClipboard('row'));
         });
 
         getWithDataAttr('paste-notes-action', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => {
-                if (!this.notesForCopy.length || !this.activeCell.rowCol) {
-                    return;
-                }
-
-                this.notesForCopy.forEach(note => {
-                    this.addOrDelNote(note, this.activeCell.rowCol, this.activeCell.totalOffset);
-                });
-            });
+            el.addEventListener('pointerdown', () => this.pasteFromClipboard());
         });
     }
 
@@ -229,7 +295,7 @@ export class KeyboardCtrl {
             return  {
                 id: 0,
                 col: 0,
-                row: 0,
+                lineInd: 0,
                 rowCol: '',
                 totalOffset: 0,
             }
@@ -237,7 +303,7 @@ export class KeyboardCtrl {
 
         return {
             id: this.getCellId(el), // data-chess-cell-id
-            row: parseInteger(el.dataset['chessCellRow'], 0), // data-chess-cell-row
+            lineInd: parseInteger(el.dataset['chessCellLineInd'], 0), // data-chess-line-ind
             col: parseInteger(el.dataset['chessCellCol'], 0), // data-chess-cell-col
             rowCol: el.dataset['chessCellRowCol'], // data-chess-cell-row-col
             totalOffset: parseInteger(el.dataset['chessTotalOffset'], 0), // data-chess-total-offset
@@ -388,11 +454,11 @@ export class KeyboardCtrl {
                     </svg>                
                 </span>
                 
-                <!--span style="${iconBtnStl}" data-copy-row-action>
+                <span style="${iconBtnStl}" data-copy-row-action>
                     <svg width="20px" height="20px" fill="#000000"  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M20 2H10c-1.103 0-2 .897-2 2v4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h10c1.103 0 2-.897 2-2v-4h4c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zM4 20V10h10l.002 10H4zm16-6h-4v-4c0-1.103-.897-2-2-2h-4V4h10v10z"/><path d="M6 12h6v2H6zm0 4h6v2H6z"/>
                     </svg>                
-                </span-->
+                </span>
                 
                 <span style="${iconBtnStl}" data-paste-notes-action>
                     <svg width="20px" height="20px" fill="#000000" viewBox="0 0 36 36" version="1.1"  preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -460,9 +526,9 @@ export class KeyboardCtrl {
     }
 
     addLine() {
-        const line = this.liner.lines[this.activeCell.row];
+        const line = this.liner.lines[this.activeCell.lineInd];
 
-        this.liner.addLineAfter(this.activeCell.row, line?.rowInPartId || '');
+        this.liner.addLineAfter(this.activeCell.lineInd, line?.rowInPartId || '');
         this.setEditingItemDurationAndBlockOffsetByLines();
 
         this.printChess(this.liner.lines);
@@ -470,9 +536,9 @@ export class KeyboardCtrl {
     }
 
     insertLine() {
-        const line = this.liner.lines[this.activeCell.row];
+        const line = this.liner.lines[this.activeCell.lineInd];
 
-        this.liner.addLineAfter(this.activeCell.row - 1, line?.rowInPartId || '');
+        this.liner.addLineAfter(this.activeCell.lineInd - 1, line?.rowInPartId || '');
         this.setEditingItemDurationAndBlockOffsetByLines();
 
         this.printChess(this.liner.lines);
@@ -484,7 +550,7 @@ export class KeyboardCtrl {
             return;
         }
 
-        const line = this.liner.lines[this.activeCell.row];
+        const line = this.liner.lines[this.activeCell.lineInd];
 
         if (this.hasEditedItems) {
             const groupLines = this.liner.lines.filter(item => item.rowInPartId === line.rowInPartId);
@@ -494,7 +560,7 @@ export class KeyboardCtrl {
             }
         }
 
-        this.liner.deleteLine(this.activeCell.row, line.rowInPartId);
+        this.liner.deleteLine(this.activeCell.lineInd, line.rowInPartId);
         this.setEditingItemDurationAndBlockOffsetByLines();
         this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);

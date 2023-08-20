@@ -336,6 +336,10 @@ export class MBoxPage {
                     style="${btnStl} margin-right: 1rem;"
                     data-rename-part-action                                           
                 >name</span>                                    
+                <!--span
+                    style="${btnStl} margin-right: 1rem;"
+                    data-clone-part-action                                           
+                >clone</span-->
                 <span
                     style="${btnStl} color: red;"
                     data-delete-part-action                                          
@@ -523,6 +527,10 @@ export class MBoxPage {
             el.addEventListener('pointerdown', () => this.renamePart());
         });
 
+        getWithDataAttr('clone-part-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.clonePart());
+        });
+
         getWithDataAttr('move-part-up-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.movePart(-1));
         });
@@ -668,6 +676,29 @@ export class MBoxPage {
         );
 
         this.confirm.open();
+    }
+
+    clonePart() {
+        const songId = (this.songId || '').trim();
+        const part = this.getOneSelectedPartInfo();
+
+        if (!songId || !part) return;
+
+        const newPart = SongStore.clonePart(this.songId, part.partId);
+        this.setPageContent();
+
+        console.log(songId, part, newPart);
+
+        // this.prompt = (this.context.$f7 as any).dialog.prompt(
+        //     'Название только буквами, цифрами, знаками - или _ (без пробелов)',
+        //     'Наименование',
+        //     (newName: string) => {
+        //         SongStore.renamePart(songId, part.partId, newName.trim());
+        //         this.setPageContent();
+        //     },
+        // );
+        //
+        // this.prompt.open();
     }
 
     renamePart() {

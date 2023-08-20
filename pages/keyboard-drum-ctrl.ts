@@ -602,7 +602,7 @@ export class DrumCtrl extends KeyboardCtrl {
             cols.forEach((col, iCol) => {
                 totalOut = totalOut +
                     `<span
-                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-line-ind="${iRow}"
                         data-chess-cell-col="${iCol}"
                         data-chess-cell-row-col="${iRow}-${iCol}"
                         data-chess-cell-id=""
@@ -632,7 +632,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
                 totalOut = totalOut +
                     `<span
-                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-line-ind="${iRow}"
                         data-chess-cell-col="${iCell}"
                         data-chess-cell-row-col="${iRow}-${iCell}"                                                
                         data-chess-cell-id="${cell.cellId}"

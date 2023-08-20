@@ -1,5 +1,6 @@
 import * as un from '../libs/muse/utils/utils-note';
 import {Line} from './line-model';
+import {lineLength} from '../libs/cm/line/spans';
 
 export type StoredRow = {
     partId?: string,
@@ -256,6 +257,58 @@ export class SongStore {
             dynamic: [],
             source: 'my'
         };
+    }
+
+    static clonePart(songId: string, sourceId: string): {name: string, id: string} {
+        let song = SongStore.getSong(songId);
+
+        if (!song) return;
+
+        const sourcePart = song.parts.filter(item => item.id === sourceId)[0];
+
+        if (!sourcePart) return;
+
+        const name = sourcePart.name.trim();
+
+        if (!name) return;
+
+        let id = '';
+        while (!id) {
+            const guid = un.guid(2);
+
+            let parts = song.parts.filter(item => item.id === guid);
+
+            if (!parts.length) {
+                id = guid;
+            }
+        }
+
+        const part = {name, id};
+
+        song.parts.push(part);
+
+        const partNio = song.parts.length + 1;
+
+        let items = song.dynamic.filter(item => item.partId === sourceId);
+
+        items.forEach(item => {
+            const rowNio = un.getRowNio(item.rowInPartId);
+            const rowInPartId = `${partNio}-${rowNio}`;
+
+            console.log('rowInPartId', rowInPartId);
+
+            item = JSON.parse(JSON.stringify(item));
+            item.partId = id;
+            item.rowInPartId = rowInPartId;
+            item.lines.forEach(line => {
+                line.rowInPartId = rowInPartId;
+            });
+            song.dynamic.push(item);
+        });
+
+        SongStore.setSong(songId, song);
+
+        return part;
     }
 
     static addPart(songId: string, name: string): {name: string, id: string} {

@@ -1291,7 +1291,7 @@ export class ToneCtrl extends KeyboardCtrl {
             box.cols.forEach(col => {
                 totalOut = totalOut +
                     `<span
-                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-line-ind="${iRow}"
                         data-chess-cell-col="${col.colInd}"
                         data-chess-cell-row-col="${iRow}-${col.colInd}"
                         data-chess-cell-id=""
@@ -1321,7 +1321,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
                 totalOut = totalOut +
                     `<span
-                        data-chess-cell-row="${iRow}"
+                        data-chess-cell-line-ind="${iRow}"
                         data-chess-cell-col="${cell.colInd}"
                         data-chess-cell-row-col="${iRow}-${cell.colInd}"                                                
                         data-chess-cell-id="${cell.cellId}"
