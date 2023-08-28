@@ -347,12 +347,12 @@ export class ToneCtrl extends KeyboardCtrl {
         return result;
     }
 
-    getContent(boardType?: ToneKeyboardType): string {
+    getContent(boardType?: ToneKeyboardType, trackName = ''): string {
         boardType = boardType || 'soloSolo34';
 
         if (this.isMy) {
             const song = SongStore.getSong(this.songId);
-            const tracks = song.tracks.filter(track => track.board === boardType);
+            const tracks = song.tracks.filter(track => track.name === trackName);
             this.trackName = tracks[0] ? tracks[0].name: '';
         }
 

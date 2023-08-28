@@ -12,10 +12,11 @@ export type StoredRow = {
     lines: Line[],
 }
 
-type TrackInfo = {
+export type TrackInfo = {
     name: string,
     board: string,
     volume: number,
+    label?: string,
 }
 
 export type SongPage = {
@@ -157,6 +158,26 @@ export class SongStore {
             if (part.id === partId) {
                 part.name = partName;
             }
+        });
+
+        SongStore.setSong(songId, song);
+    }
+
+    static renameTrack(songId: string, oldTrackName: string, newTrackName: string) {
+        const song = SongStore.getSong(songId);
+
+        if (!song) return;
+
+        song.tracks.forEach(item => {
+            if (item.name === oldTrackName) {
+                item.name = newTrackName;
+            }
+        });
+
+        song.dynamic.forEach(item => {
+           if (item.track === oldTrackName) {
+               item.track = newTrackName;
+           }
         });
 
         SongStore.setSong(songId, song);
@@ -307,6 +328,23 @@ export class SongStore {
         SongStore.setSong(songId, song);
 
         return part;
+    }
+
+    static deleteTrack(songId: string, name: string): boolean {
+        const song = SongStore.getSong(songId);
+
+        if (!song) return false;
+
+        const track = song.tracks.find(item => item.name === name);
+
+        if (!track) return false;
+
+        song.tracks = song.tracks.filter(item => item.name !== name);
+        song.dynamic = song.dynamic.filter(item => item.track !== name);
+
+        this.setSong(songId, song);
+
+        return true;
     }
 
     static addPart(songId: string, name: string): {name: string, id: string} {

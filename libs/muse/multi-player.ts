@@ -347,6 +347,7 @@ export class MultiPlayer {
         blocks?: un.TextBlock[] | string,
         playBlock?: un.TextBlock | string,
         repeat?: number, // jjkl delete ?
+        repeatCount?: number, // jjkl delete ?
         beatOffsetMs?: number, // jjkl delete ?
         beatsMs?: number[],
         bpm?: number,
@@ -381,7 +382,7 @@ export class MultiPlayer {
         //     getOutBlocksInfo
 
         const outBlocks = un.getOutBlocksInfo(allBlocks, <any>playBlock);
-        const repeat = x.repeat || un.getRepeatFromString(outBlock.head);
+        const repeat = x.repeat || x.repeatCount || un.getRepeatFromString(outBlock.head);
 
         //console.log('getLoopsInfo.outBlock', outBlock);
         console.log('getLoopsInfo.outBlocks', outBlocks);

@@ -17,6 +17,7 @@ import {
 import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 import {getPitchShiftSetting} from '@muse/utils/getFileSettings';
 import {Dialog} from 'framework7/components/dialog/dialog';
+import * as svg from './svg-icons';
 
 export type BpmInfo = {
     bpm: number;
@@ -408,65 +409,16 @@ export class KeyboardCtrl {
 
     getDurationCommandPanel() {
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
-
-        // https://www.svgrepo.com
-
         let additional = '';
 
         return `
             <div style="${rowStyle}">
-                <span style="${iconBtnStl}"
-                    data-set-cell-duration-action="add"                 
-                >
-                    <svg
-                        width="20px" height="20px" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        style="fill: green; stroke: green;"                        
-                    >
-                        <rect x="2" y="8" width="16" height="4"></rect>                
-                        <rect x="8" y="2" width="4" height="16"></rect>                        
-                    </svg>
-                </span>
-                
-                <span style="${iconBtnStl}"
-                    data-set-cell-duration-action="sub"                 
-                >
-                    <svg
-                        width="20px" height="20px" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        style="fill: orange; stroke: orange;"                        
-                    >
-                        <rect x="2" y="8" width="16" height="4"></rect>
-                    </svg>
-                </span>
-
-                <span style="${iconBtnStl}" data-get-note-for-cell-action>
-                    <svg width="20px" height="20px" viewBox="0 0 20 20" fill="blue" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9.78103 1.69759C14.1038 4.63512 16.25 6.76176 16.25 8.30413C16.25 9.79646 15.4291 11.0034 13.8541 11.8872C13.418 12.132 12.9324 11.6555 13.1688 11.2148C13.5756 10.4565 13.4416 9.60793 12.7079 8.59803C11.934 7.53285 10.8174 6.75731 9.34301 6.26969C9.13826 6.20198 9 6.01063 9 5.79498V2.11114C9 1.70978 9.44906 1.47201 9.78103 1.69759Z"/>
-                        <path d="M7.75 17.75C5.97914 17.75 4.5 16.607 4.5 15.125C4.5 13.643 5.97914 12.5 7.75 12.5C9.52086 12.5 11 13.643 11 15.125C11 16.607 9.52086 17.75 7.75 17.75Z"/>
-                        <path d="M10 4C10.5523 4 11 4.44772 11 5V15C11 15.5523 10.5523 16 10 16C9.44772 16 9 15.5523 9 15V5C9 4.44772 9.44772 4 10 4Z"/>
-                    </svg>
-                </span>
-                
-                <span style="${iconBtnStl}" data-copy-notes-action>
-                    <svg width="20px" height="20px" fill="#000000"  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 2H10c-1.103 0-2 .897-2 2v4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h10c1.103 0 2-.897 2-2v-4h4c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zM4 20V10h10l.002 10H4zm16-6h-4v-4c0-1.103-.897-2-2-2h-4V4h10v10z"/>
-                    </svg>                
-                </span>
-                
-                <span style="${iconBtnStl}" data-copy-row-action>
-                    <svg width="20px" height="20px" fill="#000000"  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 2H10c-1.103 0-2 .897-2 2v4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h10c1.103 0 2-.897 2-2v-4h4c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zM4 20V10h10l.002 10H4zm16-6h-4v-4c0-1.103-.897-2-2-2h-4V4h10v10z"/><path d="M6 12h6v2H6zm0 4h6v2H6z"/>
-                    </svg>                
-                </span>
-                
-                <span style="${iconBtnStl}" data-paste-notes-action>
-                    <svg width="20px" height="20px" fill="#000000" viewBox="0 0 36 36" version="1.1"  preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <path d="M22.6,4H21.55a3.89,3.89,0,0,0-7.31,0H13.4A2.41,2.41,0,0,0,11,6.4V10H25V6.4A2.41,2.41,0,0,0,22.6,4ZM23,8H13V6.25A.25.25,0,0,1,13.25,6h2.69l.12-1.11A1.24,1.24,0,0,1,16.61,4a2,2,0,0,1,3.15,1.18l.09.84h2.9a.25.25,0,0,1,.25.25Z" class="clr-i-outline clr-i-outline-path-1"></path><path d="M33.25,18.06H21.33l2.84-2.83a1,1,0,1,0-1.42-1.42L17.5,19.06l5.25,5.25a1,1,0,0,0,.71.29,1,1,0,0,0,.71-1.7l-2.84-2.84H33.25a1,1,0,0,0,0-2Z" class="clr-i-outline clr-i-outline-path-2"></path><path d="M29,16h2V6.68A1.66,1.66,0,0,0,29.35,5H27.08V7H29Z" class="clr-i-outline clr-i-outline-path-3"></path><path d="M29,31H7V7H9V5H6.64A1.66,1.66,0,0,0,5,6.67V31.32A1.66,1.66,0,0,0,6.65,33H29.36A1.66,1.66,0,0,0,31,31.33V22.06H29Z" class="clr-i-outline clr-i-outline-path-4"></path>
-                        <rect x="0" y="0" width="36" height="36" fill-opacity="0"/>
-                    </svg>
-                </span>
-                
+                ${svg.plusBtn('data-set-cell-duration-action="add"', 'green')}
+                ${svg.minusBtn('data-set-cell-duration-action="sub"', 'orange')}
+                ${svg.noteBtn('data-get-note-for-cell-action', 'blue')}
+                ${svg.copyBtn('data-copy-notes-action', 'black')}
+                ${svg.copyManyBtn('data-copy-row-action', 'black')}
+                ${svg.pasteBtn('data-paste-notes-action', 'black')}
                 ${additional}
             </div>
         `.trim();

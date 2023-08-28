@@ -9,9 +9,10 @@ import { MultiPlayer } from '../libs/muse/multi-player';
 import { standardTicks as ticks } from './ticks';
 import { DrumCtrl } from './keyboard-drum-ctrl';
 import { ToneCtrl } from './keyboard-tone-ctrl';
-import {ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards} from './keyboard-ctrl';
-import { ideService } from './ide/ide-service';
+import {ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards, drumBoards} from './keyboard-ctrl';
+import { ideService, defaultTracks } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
+import {SongStore, TrackInfo} from './song-store';
 
 // import { getDevice } from 'framework7';
 //
@@ -35,6 +36,8 @@ interface Page {
 
 export class KeyboardPage implements Page {
     keyboardType: KeyboardType = ideService.lastBoardView;
+    trackName = ideService.lastTrackName;
+
     drumCtrl: DrumCtrl;
     toneCtrl: ToneCtrl;
 
@@ -48,6 +51,14 @@ export class KeyboardPage implements Page {
     tickNode: AudioBufferSourceNode | null = null;
     synthesizer = ideService.synthesizer;
     multiPlayer = ideService.multiPlayer;
+
+    get songId(): string {
+        return ideService.currentEdit.songId;
+    }
+
+    get isMy(): boolean {
+        return !!(ideService.currentEdit && ideService.currentEdit.source === 'my');
+    }
 
     get pageId(): string {
         return this.props.id;
@@ -94,15 +105,35 @@ export class KeyboardPage implements Page {
         }, 100);
     }
 
-    setContent(keyboardType?: KeyboardType) {
-        keyboardType = keyboardType || this.keyboardType;
-        this.keyboardType = keyboardType;
-        ideService.lastBoardView = keyboardType;
+
+    getTracks(): TrackInfo[] {
+        const song = this.isMy ? SongStore.getSong(this.songId) : null;
+
+        return song ? song.tracks : defaultTracks;
+    }
+
+    getTrackByName(trackName: string): TrackInfo {
+        return this.getTracks().find(item => item.name === trackName);
+    }
+
+    setContent(trackName: string = '') {
+        let track = this.getTrackByName(trackName || this.trackName);
+
+        track = track || defaultTracks.find(board => board.name === trackName);
+        track = track || defaultTracks.find(board => board.name === this.trackName);
+        track = track || defaultTracks.find(board => board.board === this.keyboardType);
+        track = track || defaultTracks[0];
+
+        this.keyboardType = track.board as KeyboardType;
+        this.trackName = track.name;
+
+        ideService.lastBoardView = this.keyboardType;
+        ideService.lastTrackName = this.trackName;
 
         if (toneBoards[this.keyboardType]) {
-            this.setToneContent(this.keyboardType as any);
+            this.setToneContent(this.keyboardType as ToneKeyboardType, this.trackName);
         } else {
-            this.setDrumsContent('drums');
+            this.setDrumsContent('drums', this.trackName);
         }
 
         setTimeout(() => {
@@ -113,13 +144,21 @@ export class KeyboardPage implements Page {
     }
 
     setRightPanelContent() {
-        dyName('panel-right-content').innerHTML = `
-            <p data-action-set-keyboard-type="bassGuitar">Bass guitar</p>
-            <p data-action-set-keyboard-type="guitar">Guitar</p>                       
-            <p data-action-set-keyboard-type="bassSolo34">Harmonica</p>
-            <p data-action-set-keyboard-type="drums">Percussion</p>
-            <p data-action-set-keyboard-type="drums">Drums</p>
-        `;
+        const song = this.isMy ? SongStore.getSong(this.songId) : null;
+        const tracks = song ? song.tracks : defaultTracks;
+        let content = '';
+
+        tracks.forEach(track => {
+            content += `
+                    <p 
+                        data-set-keyboard-type-action
+                        data-board-type="${track.board}"
+                        data-track-name="${track.name}"                                                
+                    >${track.label || track.name}</p>                
+                `.trim();
+        });
+
+        dyName('panel-right-content').innerHTML = content;
     }
 
     getMetronomeContent(): string {
@@ -184,11 +223,18 @@ export class KeyboardPage implements Page {
         );
     }
 
-    setDrumsContent(type: DrumKeyboardType) {
-        this.drumCtrl = new DrumCtrl(this, type);
+    setDrumsContent(boardType: DrumKeyboardType, trackName: string) {
+        this.drumCtrl = new DrumCtrl(this, boardType);
 
-        this.keyboardType = type;
-        this.el$.html(this.drumCtrl.getContent('drums'));
+        const content = `
+            <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 10rem;">
+                ${this.drumCtrl.getContent(boardType, trackName)}
+            </div>`.trim();
+
+        console.log(boardType, this.keyboardType)
+        //this.keyboardType = boardType;
+
+        this.el$.html(content);
         this.drumCtrl.updateView();
 
         //console.log('setDrumContent', this.bpmValue);
@@ -198,6 +244,10 @@ export class KeyboardPage implements Page {
             on: {
                 changed: (range: any) => {
                     this.bpmValue = range.value;
+
+                    if (this.playingTick) {
+                        this.playTick(this.playingTick);
+                    }
                 },
             },
         });
@@ -209,13 +259,12 @@ export class KeyboardPage implements Page {
         }, 100);
     }
 
-    setToneContent(type: ToneKeyboardType) {
+    setToneContent(boardType: ToneKeyboardType, trackName: string) {
         this.toneCtrl = new ToneCtrl(this, <ToneKeyboardType>this.keyboardType);
 
         const content = `
             <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 10rem;">
-                <!-- ${this.getTracksContent()} -->                
-                ${this.toneCtrl.getContent(type)}
+                ${this.toneCtrl.getContent(boardType, trackName)}
             </div>`.trim();
 
         this.el$.html(content);
@@ -233,12 +282,18 @@ export class KeyboardPage implements Page {
                 },
             },
         });
+
+        setTimeout(() => {
+            //  this.subscribeViewInfoEvents();
+            //  this.bpmValue = this.outBlock.bpm;
+            this.bpmRange.setValue(this.bpmValue);
+        }, 100);
     }
 
     subscribeRightPanelEvents() {
-        getWithDataAttr('action-set-keyboard-type', dyName('panel-right-content'))?.forEach((el) => {
-            el.addEventListener('click', () => {
-                this.setContent(<any>el.dataset.actionSetKeyboardType);
+        getWithDataAttr('set-keyboard-type-action', dyName('panel-right-content')).forEach((el) => {
+            el.addEventListener('pointerdown', () => {
+                this.setContent(el.dataset.trackName);
             });
         });
     }

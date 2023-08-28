@@ -5,8 +5,9 @@ import {Sound} from '../../libs/muse/sound';
 import {MultiPlayer} from '../../libs/muse/multi-player';
 import {Synthesizer} from '../../libs/muse/synthesizer';
 import {Ticker} from '../../libs/muse/ticker';
-import {KeyboardType} from '../keyboard-ctrl';
+import {drumBoards, KeyboardType, toneBoards} from '../keyboard-ctrl';
 import {FileSettings} from '@muse/utils/getFileSettings';
+import {TrackInfo} from '../song-store';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -26,8 +27,33 @@ export type EditedItem = {
     rowNio: number,  // номер строки внутри части
 }
 
+export const defaultTracks: TrackInfo[] = [
+    {
+        name: '@drums',
+        board: drumBoards.drums,
+        volume: 50
+    },
+    {
+        name: '$bass',
+        board: toneBoards.bassGuitar,
+        volume: 50
+    },
+    {
+        name: '$guitar',
+        board: toneBoards.guitar,
+        volume: 50
+    },
+    {
+        name: '$harmonica',
+        board: toneBoards.bassSolo34,
+        volume: 50
+    },
+];
+
 class IdeService extends  EventEmitter {
-    _lastBoardView: KeyboardType = '' as any;
+    private _lastTrackName: string = '';
+    private _lastBoardView: KeyboardType = '' as any;
+
     multiPlayer = multiPlayer;
     metronome = metronome;
     synthesizer = synthesizer;
@@ -42,9 +68,22 @@ class IdeService extends  EventEmitter {
         return this._lastBoardView;
     }
 
+    get lastTrackName(): string {
+        if (!this._lastTrackName) {
+            this._lastTrackName = localStorage.getItem('lastTrackName') || '';
+        }
+
+        return this._lastTrackName;
+    }
+
     set lastBoardView(view: string) {
         this._lastBoardView = (view || 'drums') as any;
         localStorage.setItem('lastBoardView', this._lastBoardView);
+    }
+
+    set lastTrackName(trackName: string) {
+        this._lastTrackName = trackName || '';
+        localStorage.setItem('lastTrackName', this._lastTrackName);
     }
 
     editedItems: EditedItem[] = [];

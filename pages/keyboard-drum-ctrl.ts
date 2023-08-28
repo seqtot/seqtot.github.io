@@ -374,8 +374,8 @@ export class DrumCtrl extends KeyboardCtrl {
         return content;
     }
 
-    getContent(keyboardId: string): string {
-        this.trackName = '@drums'; // костыль
+    getContent(keyboardId: string, trackName: string): string {
+        this.trackName = trackName; // jjkl сделать в ToneCtrl
 
         let drums = Object.keys(drumInfo).reduce((acc, key) => {
             const info = drumInfo[key];
@@ -389,34 +389,32 @@ export class DrumCtrl extends KeyboardCtrl {
         }, '');
 
         const content = `
-            <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 2rem;">
-                ${this.getDrumBoard(keyboardId)}
-                ${this.getTopCommandPanel()}
-                ${this.getMetronomeContent()}                
-                ${this.getRowActionsCommands()}                
-                <!--${this.getMoveCommandPanel()} -->
-                ${this.getDrumNotesPanel()}
-                
-                <div
-                    data-name="chess-wrapper"
-                    style="width: 90%; padding-left: 1rem;"
-                ></div>
-                
-                <div data-edit-parts-wrapper>
-                    ${this.getIdeContent()}                
-                </div>                                
-                
-                <div style="font-size: 1.5rem;">
-                    ${drums}
-                </div>
-                
-                <div 
-                    data-name="drum-patterns"                
-                    style="width: 90%; padding-left: 2%;"
-                >
-                    ${this.getPatternsContent()}               
-                </div>                
-            </div>`.trim();
+            ${this.getDrumBoard(keyboardId)}
+            ${this.getTopCommandPanel()}
+            ${this.getMetronomeContent()}                
+            ${this.getRowActionsCommands()}                
+            <!--${this.getMoveCommandPanel()} -->
+            ${this.getDrumNotesPanel()}
+            
+            <div
+                data-name="chess-wrapper"
+                style="width: 90%; padding-left: 1rem;"
+            ></div>
+            
+            <div data-edit-parts-wrapper>
+                ${this.getIdeContent()}                
+            </div>                                
+            
+            <div style="font-size: 1.5rem;">
+                ${drums}
+            </div>
+            
+            <div 
+                data-name="drum-patterns"                
+                style="width: 90%; padding-left: 2%;"
+            >
+                ${this.getPatternsContent()}               
+        </div>`.trim();
 
         return content;
     }
