@@ -15,7 +15,6 @@ import { LineModel } from './line-model';
 import mboxes from '../mboxes';
 import { ideService } from './ide/ide-service';
 import { SongStore, SongPage, StoredRow } from './song-store';
-import { sings } from './sings';
 import * as svg from './svg-icons';
 import {toneBoards, drumBoards} from './keyboard-ctrl';
 import {TrackContentDialog} from './track-content-dialog';
@@ -134,7 +133,7 @@ export class MBoxPage {
         return metronomeView;
     }
 
-    getListPageContent(): string {
+    getSongListContent(): string {
         let content = this.pageData.content;
         let songListContent = '';
         let commands = '';
@@ -195,9 +194,13 @@ export class MBoxPage {
 
             <div
                 data-tracks-content-wrapper
-                style="margin: .5rem; border-top: 1px solid gray; border-bottom: 1px solid gray;"
+                style="
+                    margin: 0;
+                    padding: .5rem .5rem 1rem 1rem;                    
+                    border-top: 1px solid gray;
+                    border-bottom: 1px solid gray;"
             >
-                ${this.getTracksContent()}                
+                ${this.getTrackListContent()}                
             </div>
                             
             ${this.getSongPartsContent()}
@@ -226,7 +229,7 @@ export class MBoxPage {
         let content = '';
 
         if (this.pageData.isSongList) {
-            content = wrapper.replace('%content%', this.getListPageContent());
+            content = wrapper.replace('%content%', this.getSongListContent());
             this.el$.html(content);
             this.updateSongListView();
         }
@@ -258,16 +261,16 @@ export class MBoxPage {
         }, 100);
     }
 
-    getTracksContent(): string {
+    getTrackListContent(): string {
         let content = '';
 
         let actions = `
-            <div style="margin: 0.5rem 0;">
-                ${svg.uncheckBtn('data-uncheck-all-tracks-action', 'black')}
-                ${svg.checkBtn('data-check-all-tracks-action', 'black')}            
-                ${svg.plusBtn('data-add-track-action')}             
-                ${svg.minusBtn('data-delete-track-action')}
-                ${svg.editBtn('data-edit-track-action')}                                
+            <div style="margin: 1rem 0 0 0;">
+                ${svg.uncheckBtn('data-uncheck-all-tracks-action', 'black', 24)}
+                ${svg.checkBtn('data-check-all-tracks-action', 'black', 24)}
+                ${svg.plusBtn('data-add-track-action', '', 24)}
+                ${svg.minusBtn('data-delete-track-action', '', 24)}
+                ${svg.editBtn('data-edit-track-action', '', 24)}
             </div>
         `.trim();
 
@@ -276,7 +279,7 @@ export class MBoxPage {
             song.tracks.forEach(track => {
                 content += `
                     <span
-                        style="margin-right: .5rem; font-weight: 400; user-select: none;"                  
+                        style="display: inline-block; margin-right: .5rem; margin-top: .5rem; font-weight: 400; user-select: none;"                  
                         data-use-track-action="${track.name}"
                     >
                         ${track.name}:${track.volume}
@@ -289,7 +292,7 @@ export class MBoxPage {
             Object.keys(this.settings.dataByTracks).forEach(key => {
                 content += `
                     <span
-                        style="margin-right: .5rem; font-weight: 400; user-select: none;"                  
+                        style="display: inline-block; margin-right: .5rem; margin-top: .5rem; font-weight: 400; user-select: none;"                  
                         data-use-track-action="${key}"
                     >
                         ${key}
@@ -498,7 +501,7 @@ export class MBoxPage {
     }
 
     renderTracksView() {
-        const content = this.getTracksContent();
+        const content = this.getTrackListContent();
 
         getWithDataAttr('tracks-content-wrapper', this.pageEl).forEach((el) => {
             el.innerHTML = content;
