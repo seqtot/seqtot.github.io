@@ -146,8 +146,8 @@ export class MBoxPage {
             const songs = SongStore.getSongs();
 
             songs.forEach(song => {
-                content += `<div class="row" style="margin: .5rem;">
-                    <div>
+                content += `<div class="row" style="margin: .5rem; align-items: center;">
+                    <div style="font-size: 1rem;">
                         <span
                             style="font-weight: 400; user-select: none;"
                             data-song-id="${song.id}"
@@ -155,38 +155,22 @@ export class MBoxPage {
                             data-song-name="${song.name}"                                                    
                         >${song.name}</span>
                     </div>
-                    <div>
-                        <span
-                            style="${btnStl} margin-right: .5rem;"
+                    <div style="margin-right: 1rem;">
+                        ${svg.editBtn(`
+                            data-edit-song-action
                             data-song-id="${song.id}"
-                            data-edit-song-action="${song.id}"
-                        >${sings.edit}</span>                                           
+                        `, '', 24)}
                     </div>
                 </div>`;
             });
 
             commands = `
             <div style="margin: .5rem; margin-top: 1rem;">
-                <span
-                    style="${btnStl} margin-right: .5rem;"
-                    data-move-song-up-action
-                >&nbsp;&uarr;&nbsp;</span>
-                <span
-                    style="${btnStl} margin-right: .5rem;"
-                    data-move-song-down-action
-                >&nbsp;&darr;&nbsp;</span>                        
-                <span
-                    style="${btnStl} margin-right: 1rem;"
-                    data-rename-song-action
-                >name</span>
-                <span 
-                    style="${btnStl} margin-right: 1rem;"
-                    data-add-song-action="add-song"
-                >${sings.add}</span>                                    
-                <span
-                    style="${btnStl} color: red;"
-                    data-delete-song-action
-                >${sings.delete}</span>
+                ${svg.moveTopBtn('data-move-song-up-action', '', 24)}
+                ${svg.moveDownBtn('data-move-song-up-action', '', 24)}
+                ${svg.renameBtn('data-rename-song-action', '', 24)}                
+                ${svg.plusBtn('data-add-song-action', '', 24)}
+                ${svg.minusBtn('data-delete-song-action', '', 24)}
             </div>
         `.trim();
         }
@@ -323,8 +307,6 @@ export class MBoxPage {
         const isMy = this.pageData.source === 'my';
 
         const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
-        let addPart = `<span style="${btnStl}" data-action-type="add-part">${sings.add}</span>&emsp;`;
-        addPart = isMy ? addPart : '';
 
         const commandsWrapper = `
             <div style="margin: .5rem 1rem;">
@@ -332,63 +314,57 @@ export class MBoxPage {
             </div>        
         `.trim();
 
-        let commands = `
-            <div>
-                <span style="${btnStl}" data-action-type="unselect-all">${sings.unselect}</span>&emsp;            
-                <span style="${btnStl}" data-action-type="select-all">${sings.select}</span>&emsp;
-                <span style="${btnStl}" data-action-type="edit-selected">${sings.edit}</span>&emsp;
-                ${addPart}                                
-                <span style="${btnStl} color: gray;" data-action-type="stop">${sings.stop}</span>&emsp;                                                
-                <span style="${btnStl} color: blue;" data-action-type="play-all">${sings.play}</span>&emsp;
-                <span style="${btnStl} color: blue;" data-action-type="play-all-loop">${sings.play}2</span>
-            </div>
-            <div style="margin-top: 1rem;">
-                <span
-                    style="${btnStl} margin-right: .5rem;"
-                    data-move-part-up-action
-                >&nbsp;&uarr;&nbsp;</span>
-                <span
-                    style="${btnStl} margin-right: .5rem;"
-                    data-move-part-down-action
-                >&nbsp;&darr;&nbsp;</span>
-                <span
-                    style="${btnStl} margin-right: 1rem;"
-                    data-rename-part-action                                           
-                >name</span>                                    
-                <span
-                    style="${btnStl} margin-right: 1rem;"
-                    data-clone-part-action                                           
-                >clone</span>
-                <span
-                    style="${btnStl} color: red;"
-                    data-delete-part-action                                          
-                >${sings.delete}</span>
-            </div>
-        `.trim();
 
-        if (!allSongParts.length) {
-            commands = addPart;
+        let editCommands = '';
+        if (isMy) {
+            const addPartCommand = `${svg.plusBtn('data-add-part-action', '', 24)}`;
+
+            editCommands = `
+                <div style="margin-top: 1rem;">
+                    ${svg.moveTopBtn('data-move-part-up-action', '', 24)}
+                    ${svg.moveDownBtn('data-move-part-down-action', '', 24)}                    
+                    ${svg.editBtn('data-edit-selected-parts-action', '', 24)}
+                    ${addPartCommand}
+                    ${svg.minusBtn('data-delete-part-action', '', 24)}
+                    ${svg.renameBtn('data-rename-part-action', '', 24)}
+                    ${svg.copyPasteBtn('data-clone-part-action', '', 24)}
+                </div>            
+            `.trim();
+
+            if (!allSongParts.length) {
+                editCommands = addPartCommand;
+            }
         }
 
-        commands = commandsWrapper.replace('%content%', commands);
+        let allCommands = `
+            <div>
+                ${svg.uncheckBtn('data-unselect-all-parts-action', '', 24)}            
+                ${svg.checkBtn('data-select-all-parts-action', '', 24)}            
+                ${svg.stopBtn('data-action-type="stop"', '', 24)}                                                                
+                ${svg.playBtn('data-action-type="play-all"', '', 24)}
+                ${svg.playLoopBtn('data-action-type="play-all-loop"', '', 24)}
+            </div>
+            ${editCommands}
+        `.trim();
+
+        allCommands = commandsWrapper.replace('%content%', allCommands);
 
         let tracks = allSongParts.reduce((acc, item, i) => {
             const info = un.getPartInfo(item);
 
             acc = acc + `
-                <div class="row" style="margin: .5rem;">
+                <div class="row" style="margin: .5rem; align-items: center;">
                     <span
-                        style="font-weight: 700; user-select: none;"
+                        style="font-weight: 700; font-size: 1rem; user-select: none;"
                         data-part-nio="${i+1}"
                         data-part-item="${info.ref}"                        
                     >${info.partNio}&nbsp;&nbsp;${info.ref}</span>
-                    <div>                                            
-                        <span
-                            style="${btnStl} margin-right: .5rem;"
+                    <div style="margin-right: 1rem;">   
+                        ${svg.editBtn(`
+                            data-edit-part-action                        
                             data-part-nio="${i+1}"
-                            data-part-id="${info.partId}"
-                            data-edit-part-action="${i+1}"                                           
-                        >${sings.edit}</span>
+                            data-part-id="${info.partId}"                                                        
+                        `, '', 24)}
                     </div>                    
                 </div>
             `.trim();
@@ -396,7 +372,7 @@ export class MBoxPage {
                 return acc;
             }, '');
 
-        return commands + tracks  + (allSongParts.length > 5 ? commands : '');
+        return allCommands + tracks  + (allSongParts.length > 5 ? allCommands : '');
     }
 
     playTick(name?: string) {
@@ -886,7 +862,7 @@ export class MBoxPage {
     }
 
     subscribePageEvents() {
-        getWithDataAttrValue('action-type', 'add-part', this.pageEl).forEach((el) => {
+        getWithDataAttr('add-part-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => {
                 this.prompt = (this.context.$f7 as any).dialog.prompt(
                     'Название только буквами, цифрами, знаками - или _ (без пробелов)',
@@ -934,15 +910,15 @@ export class MBoxPage {
             el.addEventListener('pointerdown', () => this.playAll(0, 100));
         });
 
-        getWithDataAttrValue('action-type', 'select-all', this.pageEl)?.forEach((el) => {
+        getWithDataAttr('select-all-parts-action', this.pageEl)?.forEach((el) => {
             el.addEventListener('pointerdown', () => this.selectAllParts());
         });
 
-        getWithDataAttrValue('action-type', 'unselect-all', this.pageEl).forEach((el) => {
+        getWithDataAttr('unselect-all-parts-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.unselectAllParts());
         });
 
-        getWithDataAttrValue('action-type', 'edit-selected', this.pageEl)?.forEach((el) => {
+        getWithDataAttr('edit-selected-parts-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.gotoEditPart());
         });
     }
@@ -1216,4 +1192,10 @@ export class MBoxPage {
 // action-type:
 // add-song  add-part
 // stop
-// select-all  unselect-all  play-all  edit-selected
+
+// SONGS:
+// move-song-up-action move-song-down-action rename-song-action add-song-action delete-song-action
+
+// PARTS:
+// unselect-all-parts-action select-all-parts-action edit-selected-parts-action add-part-action
+// move-part-up-action move-part-down-action rename-part-action clone-part-action delete-part-action

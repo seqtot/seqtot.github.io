@@ -8,13 +8,14 @@ const svgIconBtnStl = [
     `padding: 0; margin: 0; margin-right: .4rem;`,
 ].join('');
 
-export function plusBtn(data: string, color= 'green') {
+export function plusBtn(data: string, color= 'green', size= 20) {
     data = (data || '').trim();
+    color = (color || '').trim() || 'green';
 
     return `
         <span style="${svgIconBtnStl}" ${data}>
             <svg
-                width="20px" height="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                width="${size}px" height="${size}px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
                 style="fill: ${color}; stroke: ${color};"
             >
                 <rect x="2" y="8" width="16" height="4"></rect>                
@@ -23,13 +24,14 @@ export function plusBtn(data: string, color= 'green') {
         </span>`.trim();
 }
 
-export function minusBtn(data: string, color= 'red') {
+export function minusBtn(data: string, color= 'red', size= 20) {
     data = (data || '').trim();
+    color = (color || '').trim() || 'red';
 
     return `
         <span style="${svgIconBtnStl}" ${data}>
             <svg
-                width="20px" height="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                width="${size}px" height="${size}px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
                 style="fill: ${color}; stroke: ${color};"
             >
                 <rect x="2" y="8" width="16" height="4"></rect>                        
@@ -96,13 +98,14 @@ export function pasteBtn(data: string, color= 'black') {
         </span>`.trim();
 }
 
-export function renameBtn(data: string, color= 'black') {
+export function renameBtn(data: string, color= 'black', size= 20) {
     data = (data || '').trim();
+    color = (color || '').trim() || 'black';
 
     return `
         <span style="${svgIconBtnStl}" ${data}>
              <svg 
-                width="20px" height="20px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"
+                width="${size}px" height="${size}px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"
                 style="fill: ${color};"
             >
                  <g id="Page-1" stroke="none" stroke-width="1">
@@ -115,13 +118,14 @@ export function renameBtn(data: string, color= 'black') {
         </span>`.trim();
 }
 
-export function checkBtn(data: string, color= 'black') {
+export function checkBtn(data: string, color= 'black', size = 20 ) {
     data = (data || '').trim();
+    color = (color || '').trim() || 'black';
 
     return `
         <span style="${svgIconBtnStl}" ${data}>
             <svg 
-                width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                width="${size}px" height="${size}px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
                 style="fill: none; stroke: ${color};"                
             >
                 <path
@@ -132,13 +136,14 @@ export function checkBtn(data: string, color= 'black') {
         </span>`.trim();
 }
 
-export function uncheckBtn(data: string, color= 'black') {
+export function uncheckBtn(data: string, color= 'black', size = 20 ) {
     data = (data || '').trim();
+    color = (color || '').trim() || 'black';
 
     return `
         <span style="${svgIconBtnStl}" ${data}>
             <svg 
-                width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                width="${size}px" height="${size}px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
                 style="fill: none; stroke: ${color};"                
             >
                 <g id="Interface / Checkbox_Unchecked">
@@ -151,16 +156,193 @@ export function uncheckBtn(data: string, color= 'black') {
         </span>`.trim();
 }
 
-export function editBtn(data: string, color= 'black') {
+export function editBtn(data: string, color= 'black', size = 20) {
     data = (data || '').trim();
+    color = (color || '').trim() || 'black';
 
     return `
         <span style="${svgIconBtnStl}" ${data}>
             <svg 
-                width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
+                width="${size}px" height="${size}px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                 style="fill: ${color};"                
             >
                 <path d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z" />
             </svg>
         </span>`.trim();
 }
+
+
+export function moveLeftBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="-8.5 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M7.094 15.938l7.688 7.688-3.719 3.563-11.063-11.063 11.313-11.344 3.531 3.5z"></path>
+            </svg>
+        </span>`.trim();
+}
+
+export function moveRightBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="-8.5 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M7.75 16.063l-7.688-7.688 3.719-3.594 11.063 11.094-11.344 11.313-3.5-3.469z"></path>
+            </svg>
+        </span>`.trim();
+}
+
+export function moveTopBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="-5 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M11.25 15.688l-7.656 7.656-3.594-3.688 11.063-11.094 11.344 11.344-3.5 3.5z"></path>
+            </svg>
+        </span>`.trim();
+}
+
+export function moveDownBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="-5 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path>
+            </svg>
+        </span>`.trim();
+}
+
+
+export function copyPasteBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M15,13h2v2h-2v2h-2v-2h-2v-2h2v-2h2V13z M27,7v2v20H9v-4H5V3h18v4H27z M21,23V5H7v18H21z M25,9 h-2v16H11v2h14V9z"/>
+            </svg>
+        </span>`.trim();
+}
+
+
+export function deleteBtn(data: string, color= 'red', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'red';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M48,0A48,48,0,1,0,96,48,48.0512,48.0512,0,0,0,48,0Zm0,84A36,36,0,1,1,84,48,36.0393,36.0393,0,0,1,48,84Z"/>
+                <path d="M64.2422,31.7578a5.9979,5.9979,0,0,0-8.4844,0L48,39.5156l-7.7578-7.7578a5.9994,5.9994,0,0,0-8.4844,8.4844L39.5156,48l-7.7578,7.7578a5.9994,5.9994,0,1,0,8.4844,8.4844L48,56.4844l7.7578,7.7578a5.9994,5.9994,0,0,0,8.4844-8.4844L56.4844,48l7.7578-7.7578A5.9979,5.9979,0,0,0,64.2422,31.7578Z"/>
+            </svg>
+        </span>`.trim();
+}
+
+export function playBtn(data: string, color= 'blue', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'blue';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M5.92 24.096q0 1.088 0.928 1.728 0.512 0.288 1.088 0.288 0.448 0 0.896-0.224l16.16-8.064q0.48-0.256 0.8-0.736t0.288-1.088-0.288-1.056-0.8-0.736l-16.16-8.064q-0.448-0.224-0.896-0.224-0.544 0-1.088 0.288-0.928 0.608-0.928 1.728v16.16z"></path>
+            </svg>
+        </span>`.trim();
+}
+
+export function stopBtn(data: string, color= 'gray', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'gray';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M5.92 24.096q0 0.832 0.576 1.408t1.44 0.608h16.128q0.832 0 1.44-0.608t0.576-1.408v-16.16q0-0.832-0.576-1.44t-1.44-0.576h-16.128q-0.832 0-1.44 0.576t-0.576 1.44v16.16z"></path>
+            </svg>
+        </span>`.trim();
+}
+
+export function playLoopBtn(data: string, color= 'blue', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'blue';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <g>
+                    <path d="M83.729,23.57c-0.007-0.562-0.32-1.084-0.825-1.337c-0.503-0.259-1.107-0.212-1.568,0.114l-5.944,4.262l-0.468,0.336 c-6.405-6.391-15.196-10.389-24.938-10.389c-13.284,0-24.878,7.354-30.941,18.201l0.024,0.013 c-0.548,1.183-0.124,2.607,1.026,3.271c0.001,0,0.001,0,0.002,0.001l8.136,4.697c1.218,0.704,2.777,0.287,3.48-0.932 c0.006-0.011,0.009-0.023,0.015-0.034c3.591-6.404,10.438-10.747,18.289-10.747c4.879,0,9.352,1.696,12.914,4.5l-1.001,0.719 l-5.948,4.262c-0.455,0.327-0.696,0.89-0.611,1.447c0.081,0.558,0.471,1.028,1.008,1.208l25.447,8.669 c0.461,0.162,0.966,0.084,1.367-0.203c0.399-0.29,0.629-0.746,0.627-1.23L83.729,23.57z"/>
+                    <path d="M79.904,61.958c0,0-0.001,0-0.002-0.001l-8.136-4.697c-1.218-0.704-2.777-0.287-3.48,0.932 c-0.006,0.011-0.009,0.023-0.015,0.034c-3.591,6.404-10.438,10.747-18.289,10.747c-4.879,0-9.352-1.696-12.914-4.5l1.001-0.719 l5.948-4.262c0.455-0.327,0.696-0.89,0.611-1.447c-0.081-0.558-0.471-1.028-1.008-1.208l-25.447-8.669 c-0.461-0.162-0.966-0.084-1.367,0.203c-0.399,0.29-0.629,0.746-0.627,1.23l0.092,26.828c0.007,0.562,0.32,1.084,0.825,1.337 c0.503,0.259,1.107,0.212,1.568-0.114l5.944-4.262l0.468-0.336c6.405,6.391,15.196,10.389,24.938,10.389 c13.284,0,24.878-7.354,30.941-18.201L80.93,65.23C81.478,64.046,81.055,62.623,79.904,61.958z"/>
+                </g>
+            </svg>
+        </span>`.trim();
+}
+
+// ADD LINE
+// <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+// <svg
+//     width="24"
+// height="24"
+// viewBox="0 0 24 24"
+// fill="none"
+// xmlns="http://www.w3.org/2000/svg"
+// >
+// <path d="M2 5H14V7H2V5Z" fill="#000000" />
+// <path d="M2 9H14V11H2V9Z" fill="#000000" />
+// <path d="M10 13H2V15H10V13Z" fill="#000000" />
+// <path d="M16 9H18V13H22V15H18V19H16V15H12V13H16V9Z" fill="#000000" />
+//     </svg>
+
+
+
+// <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+// <svg
+//     width="24"
+// height="24"
+// viewBox="0 0 24 24"
+// fill="none"
+// xmlns="http://www.w3.org/2000/svg"
+// >
+// <path d="M15.9644 4.63379H3.96442V6.63379H15.9644V4.63379Z" fill="#000000" />
+// <path d="M15.9644 8.63379H3.96442V10.6338H15.9644V8.63379Z" fill="#000000" />
+// <path d="M3.96442 12.6338H11.9644V14.6338H3.96442V12.6338Z" fill="#000000" />
+// <path
+//     d="M12.9645 13.7093L14.3787 12.295L16.5 14.4163L18.6213 12.2951L20.0355 13.7093L17.9142 15.8305L20.0356 17.9519L18.6214 19.3661L16.5 17.2447L14.3786 19.3661L12.9644 17.9519L15.0858 15.8305L12.9645 13.7093Z"
+// fill="#000000"
+//     />
+//     </svg>
