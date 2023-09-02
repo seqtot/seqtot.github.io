@@ -6,6 +6,7 @@ import { ideService } from './ide/ide-service';
 import { DrumBoard, drumNotesInfo } from './drum-board';
 import { KeyboardCtrl, BpmInfo, KeyboardPage, DrumKeyboardType } from './keyboard-ctrl';
 import { sings } from './sings';
+import * as svg from './svg-icons';
 
 const drumCodesTop = [
     {note: 'ho', alias: 'ча'},
@@ -302,20 +303,11 @@ export class DrumCtrl extends KeyboardCtrl {
                 ${this.getMoveButtons()}
             </div>
             <div style="${rowStyle}">
-                <span
-                    style="${style} color: gray;"
-                    data-action-type="stop"
-                >${sings.stop}</span>
-                <span
-                    style="${style} color: blue;"
-                    data-page-action="play-one"
-                >${sings.play}</span>
+                ${svg.stopBtn('data-action-type="stop"')}
+                ${svg.playBtn('data-page-action="play-one"')}
             </div>     
             <div style="${rowStyle} display: flex; justify-content: flex-end; padding-right: 1rem;">
-               <span
-                    style="${style} background-color: red; color: white; font-size: 1rem;"
-                    data-edit-line-action="delete-cell"
-                >del</span>
+                ${svg.deleteBtn('data-edit-line-action="delete-cell"')}
             </div>               
         `.trim();
 

@@ -1,3 +1,5 @@
+import dynamic from '../mbox_dynamics/peterGunn.dynamic';
+
 const score = `
 <info>
 https://www.songsterr.com/a/wsa/blues-brothers-peter-gunn-theme-tab-s3601
@@ -310,4 +312,5 @@ export default {
   content: info,
   tracks: [],
   score,
+  dynamic
 };

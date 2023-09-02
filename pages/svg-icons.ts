@@ -313,36 +313,86 @@ export function playLoopBtn(data: string, color= 'blue', size = 20) {
         </span>`.trim();
 }
 
-// ADD LINE
-// <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-// <svg
-//     width="24"
-// height="24"
-// viewBox="0 0 24 24"
-// fill="none"
-// xmlns="http://www.w3.org/2000/svg"
-// >
-// <path d="M2 5H14V7H2V5Z" fill="#000000" />
-// <path d="M2 9H14V11H2V9Z" fill="#000000" />
-// <path d="M10 13H2V15H10V13Z" fill="#000000" />
-// <path d="M16 9H18V13H22V15H18V19H16V15H12V13H16V9Z" fill="#000000" />
-//     </svg>
+export function insertLineBtn(data: string, color= 'black', size= 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
 
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg
+                width="${size}px" height="${size}px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color}; stroke: none;"
+            >
+                <rect x="10" y="10" width="100" height="10" fill="gray"></rect>
+                <rect x="10" y="50" width="50"  height="10"></rect>                
+                <rect x="10" y="90" width="100" height="10" fill="gray"></rect>
+                
+                <rect x="70" y="50" width="40" height="15" fill="green"></rect>                
+                <rect x="82" y="37" width="15" height="40" fill="green"></rect>
+                                                
+            </svg>
+        </span>`.trim();
+}
 
+export function addLineBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
 
-// <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-// <svg
-//     width="24"
-// height="24"
-// viewBox="0 0 24 24"
-// fill="none"
-// xmlns="http://www.w3.org/2000/svg"
-// >
-// <path d="M15.9644 4.63379H3.96442V6.63379H15.9644V4.63379Z" fill="#000000" />
-// <path d="M15.9644 8.63379H3.96442V10.6338H15.9644V8.63379Z" fill="#000000" />
-// <path d="M3.96442 12.6338H11.9644V14.6338H3.96442V12.6338Z" fill="#000000" />
-// <path
-//     d="M12.9645 13.7093L14.3787 12.295L16.5 14.4163L18.6213 12.2951L20.0355 13.7093L17.9142 15.8305L20.0356 17.9519L18.6214 19.3661L16.5 17.2447L14.3786 19.3661L12.9644 17.9519L15.0858 15.8305L12.9645 13.7093Z"
-// fill="#000000"
-//     />
-//     </svg>
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color}; stroke: none;"                
+            >
+                <rect x="10" y="10" width="100" height="10" fill="gray"></rect>
+                <rect x="60" y="50" width="50"  height="10" fill="gray"></rect>                
+                <rect x="10" y="90" width="100" height="10"></rect>
+                
+                <rect x="10" y="50" width="40" height="15" fill="green"></rect>                
+                <rect x="22" y="37" width="15" height="40" fill="green"></rect>
+            </svg>
+        </span>`.trim();
+}
+
+export function deleteLineBtn(data: string, color= 'black', size= 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg
+                width="${size}px" height="${size}px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color}; stroke: none;"
+            >
+                <rect x="10" y="10" width="100" height="10" fill="gray"></rect>
+                <rect x="10" y="50" width="50"  height="10" fill="gray"></rect>                
+                <rect x="10" y="90" width="100" height="10" fill="gray"></rect>
+                
+                <rect x="70" y="48" width="40" height="20" fill="red"></rect>                                                
+            </svg>
+        </span>`.trim();
+}
+
+export function instrumentBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 498.341 498.341" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <g>
+                    <g>
+                        <path d="M492.293,158.605c-30.763-52.48-87.019-105.707-151.125-142.955c-8.149-6.315-19.008-7.829-28.736-3.776 c-10.709,4.501-17.536,14.933-17.429,26.368l0.128,73.792c0.384,21.547,0.192,34.176-7.531,42.048 c-2.005,1.771-202.56,178.667-271.296,244.011c-10.347,9.813-16.128,23.083-16.299,37.312 c-0.192,14.293,5.291,27.755,15.424,37.888h0.021c10.261,10.283,23.701,15.424,37.163,15.424c12.715,0,25.472-4.608,35.605-13.931 c14.187-13.077,33.92-31.68,56.064-52.715c2.624,13.781,9.237,26.944,19.883,37.589c13.653,13.632,31.829,21.163,51.243,21.163 c19.392,0,37.568-7.531,51.221-21.163l84.352-84.352c28.245-28.245,28.245-74.197,0-102.464 c-9.109-9.109-20.587-14.891-32.747-17.92c20.693-20.011,34.197-33.109,34.795-33.685c11.2-11.328,27.285-16.853,52.395-16.469 h64.043c11.051,0.427,22.101-6.72,26.624-17.451C500.144,177.656,498.629,166.755,492.293,158.605z M320.816,303.011 c11.605,11.627,11.605,30.528,0,42.133l-84.352,84.352c-11.179,11.157-30.955,11.157-42.133,0 c-11.605-11.627-11.605-30.528,0-42.133l84.352-84.352c5.589-5.568,13.077-8.661,21.077-8.661 C307.738,294.349,315.226,297.443,320.816,303.011z"/>
+                    </g>
+                </g>
+            </svg>
+        </span>`.trim();
+}
+
+// gray lightgray
+// blue lightblue
+// green lightgreen
+// orange

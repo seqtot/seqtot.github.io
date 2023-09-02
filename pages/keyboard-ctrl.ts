@@ -341,26 +341,13 @@ export class KeyboardCtrl {
 
     getRowActionsCommands(): string {
         const display = `display: ${ideService.currentEdit?.freezeStructure ? 'none': 'block'};`;
-        const style = `font-size: 1.1rem; border-radius: 0.25rem; border: 1px solid lightgray; user-select: none;`;
         const rowStyle = `${display} width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
 
         return `
-            <div
-                data-edit-row-actions
-                style="${rowStyle}"
-            >
-                <span
-                    style="${style}"
-                    data-edit-row-action="add-line"
-                >addL</span>
-                <span
-                    style="${style}"
-                    data-edit-row-action="insert-line"
-                >insL</span>&nbsp;&nbsp;
-                <span
-                    style="${style} color: red;"
-                    data-edit-row-action="delete-line"
-                >delL</span>
+            <div data-edit-row-actions style="${rowStyle}">
+                ${svg.addLineBtn('data-edit-row-action="add-line"', '')}
+                ${svg.insertLineBtn('data-edit-row-action="insert-line"', '')}&emsp;
+                ${svg.deleteLineBtn('data-edit-row-action="delete-line"', 'red')}
             </div>        
         `.trim();
     }
