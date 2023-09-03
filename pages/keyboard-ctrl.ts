@@ -496,7 +496,7 @@ export class KeyboardCtrl {
                     >save</span>&nbsp;
                     <span
                         style="${style}"
-                        data-ide-action="load"
+                        data-load-song-action
                     >load</span>&nbsp;
                     <!--span
                         style="${style}"
@@ -1030,7 +1030,7 @@ export class KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.saveEditingItems());
         });
 
-        getWithDataAttrValue('ide-action', 'load', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttr('load-song-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.loadFile());
         });
 
@@ -1145,13 +1145,16 @@ export class KeyboardCtrl {
 
         if (!songName) return;
 
-        let songNode: StoredSongNode;
+        let songNode: any; // StoredSongNode
 
-        if (!localStorage.getItem(songName)) {
-            songNode = {};
+        if (this.isMy) {
+            songNode = SongStore.getSong(songName);
         } else {
-            songNode = JSON.parse(localStorage.getItem(songName));
+            songNode = localStorage.getItem(songName);
+            songNode = songNode ? JSON.parse(songNode) : songNode;
         }
+
+        if (!songNode) return;
 
         let data = JSON.stringify(songNode);
         //let type = 'application/json';
