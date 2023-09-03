@@ -12,6 +12,7 @@ import carcassiOp60n7 from './carcassiOp60n7';
 import partingGlass from './partingGlass';
 import billy from './billy';
 import peterGunn from './peterGunn';
+import sweetLeaf from './sweetLeaf';
 
 export default {
   set_e,
@@ -28,4 +29,5 @@ export default {
   partingGlass,
   billy,
   peterGunn,
+  sweetLeaf,
 };

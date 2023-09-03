@@ -22,6 +22,11 @@ function getBpmLink(bpm: number): string {
 // </div>
 // `;
 
+const sweetLeaf = `<div style="margin: .5rem;">
+    ${getInnerLink('Sweet Leaf', '/mbox/sweetLeaf/')}
+</div>
+`.trim();
+
 const peterGunn = `<div style="margin: .5rem;">
     ${getInnerLink('Peter Gunn', '/mbox/peterGunn/')}
 </div>
@@ -111,6 +116,7 @@ const itsGoingGood = `<div style="margin: .5rem;">
 </div>`;
 
 const content = `
+  ${sweetLeaf}
   ${peterGunn}
   ${billy}
   ${carcassiOp60n7}
