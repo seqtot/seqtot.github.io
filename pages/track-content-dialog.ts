@@ -231,8 +231,10 @@ export class TrackContentDialog {
                 item.volume = this.track.volume;
 
                 this.song.dynamic.forEach(item => {
-                    item.track = newName;
-                })
+                    if (item.track === oldName) {
+                        item.track = newName;
+                    }
+                });
             }
         });
     }
