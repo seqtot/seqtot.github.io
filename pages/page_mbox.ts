@@ -14,7 +14,7 @@ import { isPresent, parseInteger, SongPartInfo, TextBlock } from '../libs/muse/u
 import { LineModel } from './line-model';
 import mboxes from '../mboxes';
 import { ideService } from './ide/ide-service';
-import { SongStore, SongPage, StoredRow } from './song-store';
+import { SongStore, SongNode, StoredRow } from './song-store';
 import * as svg from './svg-icons';
 import {toneBoards, drumBoards} from './keyboard-ctrl';
 import {TrackContentDialog} from './track-content-dialog';
@@ -49,7 +49,7 @@ export class MBoxPage {
         return this.context.$el.value;
     }
 
-    get pageData(): SongPage {
+    get pageData(): SongNode {
 
         if (mboxes[this.songId]) {
             return mboxes[this.songId];
@@ -137,8 +137,6 @@ export class MBoxPage {
         let content = this.pageData.content;
         let songListContent = '';
         let commands = '';
-        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const isMy = this.isMy;
 
         if (this.isMy) {
             songListContent = '';
@@ -307,9 +305,6 @@ export class MBoxPage {
 
     getSongPartsContent(): string {
         let allSongParts = this.allSongParts;
-        const isMy = this.pageData.source === 'my';
-
-        const btnStl = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.2rem; user-select: none; touch-action: none;`;
 
         const commandsWrapper = `
             <div style="margin: .5rem 1rem;">
@@ -317,9 +312,12 @@ export class MBoxPage {
             </div>        
         `.trim();
 
+        let fileCommands = `
+            ${svg.downloadBtn('data-download-song-action', '', 24)}        
+        `.trim();
 
         let editCommands = '';
-        if (isMy) {
+        if (this.isMy) {
             const addPartCommand = `${svg.plusBtn('data-add-part-action', '', 24)}`;
 
             editCommands = `
@@ -337,7 +335,15 @@ export class MBoxPage {
             if (!allSongParts.length) {
                 editCommands = addPartCommand;
             }
+
+            // ${svg.saveBtn('data-save-song-action', '', 24)}
+            fileCommands += `
+                ${svg.uploadBtn('data-upload-song-action', '', 24)}
+                <input style="display: none;" type="file" data-upload-song-input multiple />                                
+            `.trim();
         }
+
+        fileCommands = `<div style="margin: 1rem;">${fileCommands}</div>`;
 
         let allCommands = `
             <div>
@@ -375,7 +381,7 @@ export class MBoxPage {
                 return acc;
             }, '');
 
-        return allCommands + tracks  + (allSongParts.length > 5 ? allCommands : '');
+        return allCommands + tracks  + (allSongParts.length > 5 ? allCommands : '') + fileCommands;
     }
 
     playTick(name?: string) {
@@ -616,6 +622,18 @@ export class MBoxPage {
 
         getWithDataAttr('move-part-down-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.movePart(1));
+        });
+
+        getWithDataAttr('download-song-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.downloadFile());
+        });
+
+        getWithDataAttr('upload-song-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.uploadFileClick());
+        });
+
+        getWithDataAttr('upload-song-input', this.pageEl).forEach((el) => {
+            el.addEventListener('change', (evt) => this.uploadFile(evt));
         });
     }
 
@@ -1189,6 +1207,89 @@ export class MBoxPage {
             repeatCount,
             //bpmMultiple: this.bpmMultiple,
         });
+    }
+
+    replaceSong(val: string) {
+        val = (val || '').trim();
+
+        if (!val) return null;
+
+        let songNode: SongNode;
+
+        songNode = JSON.parse(val) as SongNode;
+        //songNode = SongStore.Transform(val);
+
+        SongStore.setSong(this.songId, songNode);
+        this.setPageContent();
+    }
+
+    uploadFile(evt: Event) {
+        const fileList = evt.target['files'];
+
+        const loadText = async (file: File) => {
+            const reader = new FileReader();
+            // reader.readAsDataURL(file);
+            reader.readAsText(file);
+
+            reader.addEventListener('load', async (event) => {
+                //console.log('ON LOAD TEXT 1', event);
+
+                const result = event.target.result as string;
+
+                this.replaceSong(result);
+            });
+        }
+
+        if (fileList[0]) {
+            loadText(fileList[0]);
+        }
+    }
+
+    uploadFileClick() {
+        getWithDataAttr('upload-song-input', this.pageEl).forEach((el) => {
+            el.click();
+        });
+    }
+
+    downloadFile() {
+        // https://webtips.dev/download-any-file-with-javascript
+        let songId = this.songId;
+
+        if (!songId) return;
+
+        let songNode: any; // StoredSongNode
+
+        if (this.isMy) {
+            songNode = SongStore.getSong(songId);
+        } else {
+            songNode = localStorage.getItem(songId);
+            songNode = songNode ? JSON.parse(songNode) : songNode;
+        }
+
+        if (!songNode) return;
+
+        let data = JSON.stringify(songNode);
+        //let type = 'application/json';
+        let type = 'application/text';
+        let name = `${songId}.txt`;
+
+        //console.log('songNode', songNode);
+
+        downloader(data, type, name)
+
+        function downloader(data, type, name) {
+            let blob = new Blob([data], {type});
+            let url = (window as any).URL.createObjectURL(blob);
+            downloadURI(url, name);
+            (window as any).URL.revokeObjectURL(url);
+        }
+
+        function downloadURI(uri, name) {
+            let link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            link.click();
+        }
     }
 }
 

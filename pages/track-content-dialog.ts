@@ -4,13 +4,13 @@ import { Dialog } from 'framework7/components/dialog/dialog';
 import {dyName, getWithDataAttr} from '../src/utils';
 import {toneBoards, drumBoards} from './keyboard-ctrl';
 import {ComponentContext} from 'framework7/modules/component/component';
-import {SongPage, SongStore, TrackInfo} from './song-store';
+import {SongNode, SongStore, TrackInfo} from './song-store';
 
 export class TrackContentDialog {
     dialog: Dialog.Dialog;
     cb: (ok: boolean) => void;
     trackName = '';
-    song: SongPage = null;
+    song: SongNode = null;
     track: TrackInfo = null;
     trackSrc: TrackInfo = null;
     volumeRange: Range.Range;

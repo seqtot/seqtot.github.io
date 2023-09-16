@@ -9,6 +9,25 @@ const toneChar = '$';
 const drumChar = '@';
 export const instruments: { [code: number | string]: WavePreset } = {};
 
+
+// bass guitar
+export const bassGuitarCodes = {
+    366: 'cBass*s', // slap
+    374: 'cBass*f', // finger
+    393: 'cBass*w', // fretless
+
+    375: 'eBass*f', // finger
+    388: 'eBass*m', // mediator
+    405: 'eBass*b', // beat
+};
+
+// guitar
+export const guitarCodes = {
+    327: 'egit*drp;  egit*drp1;  guitar*ED;  guit*ed;',
+    321: 'egit*drpm; egit*drpm1; guitar*EDM; guit*edm;',
+    276: 'egit*cl;   egit*cl1; guit*ec; guitar*EC;',
+};
+
 // https://surikov.github.io/webaudiofont/examples/customsample.html
 const instrAliasCodeVariable = [
     // voice
@@ -86,6 +105,7 @@ const instrAliasCodeVariable = [
 
     // dn-5, dnt-1, dns-4, dfl-4
     // dn - DistortioN
+    // cl cl1  cr cr1  crt crt1  crl crl1  dr dr1 dr2  drs drs1 drs2 drs3  drp drpm  dn dn1 dn2 dn3 dn4 dn5  dns dns1 dns2 dns3 dns4 dns5
     'egit*dn:334:_tone_0300_Chaos_sf2_file', // 334 + distortion (dn) 0300_Chaos_sf2_file.js _tone_0300_Chaos_sf2_file
     'egit*dn1:334:_tone_0300_Chaos_sf2_file', // 334 + distortion (dn) 0300_Chaos_sf2_file.js _tone_0300_Chaos_sf2_file
     'egit*dn2:333:_tone_0300_Aspirin_sf2_file', // 333 + distortion (dn) поправить строй 0300_Aspirin_sf2_file.js _tone_0300_Aspirin_sf2_file
@@ -108,6 +128,9 @@ const instrAliasCodeVariable = [
     'egit*dfl2:359:_tone_0310_LesPaul_sf2', // 359 + 0310_LesPaul_sf2.js _tone_0310_LesPaul_sf2
     'egit*dfl3:360:_tone_0310_LesPaul_sf2_file', // 360 + 0310_LesPaul_sf2_file.js _tone_0310_LesPaul_sf2_file
     'egit*dfl4:361:_drum_80_0_SBLive_sf2', // 361 + 12880_0_SBLive_sf2.js _drum_80_0_SBLive_sf2
+
+    // cl cl1  cr cr1  crt crt1  crl crl1  dr dr1 dr2  drs drs1 drs2 drs3  drp drpm  dn dn1 dn2 dn3 dn4 dn5  dns dns1 dns2 dns3 dns4 dns5
+    // dfl dfl1 dfl2 dfl3 dfl4
 
     // accordion
     'accordion:235:_tone_0230_JCLive_sf2_file',

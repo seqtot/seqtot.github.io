@@ -392,6 +392,54 @@ export function instrumentBtn(data: string, color= 'black', size = 20) {
         </span>`.trim();
 }
 
+export function downloadBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                style="stroke: ${color}; fill: none;"                
+            >
+                <path d="M13.5 3H12H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H7.5M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V9.75V12V19C19 20.1046 18.1046 21 17 21H16.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 12V20M12 20L9.5 17.5M12 20L14.5 17.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </span>`.trim();
+}
+
+export function uploadBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                style="stroke: ${color}; fill: none;"                
+            >
+                <path d="M13.5 3H12H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H7.5M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V9.75V12V19C19 20.1046 18.1046 21 17 21H16.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 21L12 13M12 13L14.5 15.5M12 13L9.5 15.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </span>`.trim();
+}
+
+export function saveBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                style="stroke: ${color}; fill: ${color};"                
+            >
+                <path  fill="none" d="M0 0h24v24H0z"/>
+                <path d="M4 3h13l3.707 3.707a1 1 0 0 1 .293.707V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM5 5v4h10V5H5z"/>
+            </svg>
+        </span>`.trim();
+}
+
 // gray lightgray
 // blue lightblue
 // green lightgreen

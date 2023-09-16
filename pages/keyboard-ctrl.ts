@@ -9,7 +9,7 @@ import { parseInteger } from '../libs/common';
 
 import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
-import { SongPage, SongStore, StoredRow, StoredSongNode } from './song-store';
+import { SongNode, SongStore, StoredRow, StoredSongNodeOld } from './song-store';
 import {
     createOutBlock, getOutBlocksInfo, OutBlockRowInfo, SongPartInfo, TextBlock
 } from '../libs/muse/utils';
@@ -536,7 +536,7 @@ export class KeyboardCtrl {
         });
     }
 
-    getRowsForPart(song: SongPage, part: SongPartInfo): StoredRow[] {
+    getRowsForPart(song: SongNode, part: SongPartInfo): StoredRow[] {
         const partRows = song.dynamic.filter(row => {
             const iPartId = (row.partId || '').trim();
             const iPartNio = un.getPartNio(row.rowInPartId);
@@ -560,7 +560,7 @@ export class KeyboardCtrl {
     }
 
     getPartsWithRows(x: {
-        song: SongPage,
+        song: SongNode,
         parts: SongPartInfo[],
         resetBlockOffset: boolean,
         useEditingItems: boolean
@@ -734,7 +734,7 @@ export class KeyboardCtrl {
             let iLines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
 
             if (!isMy) {
-                let songNode: StoredSongNode = localStorage.getItem(songId) as any;
+                let songNode: StoredSongNodeOld = localStorage.getItem(songId) as any;
                 if (!iLines.length && songNode) {
                     songNode = JSON.parse(songNode as any as string);
 
@@ -748,7 +748,7 @@ export class KeyboardCtrl {
                 }
 
             } else {
-                const song = (isMy ? SongStore.getSong(songId, true) : null) as SongPage;
+                const song = (isMy ? SongStore.getSong(songId, true) : null) as SongNode;
                 if (!iLines.length && song) {
                     song.dynamic.forEach(item => {
                         if (item.rowInPartId === editedItem.rowInPartId && item.track === this.trackName) {
@@ -1219,7 +1219,7 @@ export class KeyboardCtrl {
         }
 
         let songName = ideService.editedItems[0].songName;
-        let songNode: StoredSongNode;
+        let songNode: StoredSongNodeOld;
 
         if (!localStorage.getItem(songName)) {
             songNode = {};
