@@ -59,6 +59,10 @@ function isGuitarInst(val: string | number): boolean {
     return !!guitarCodes[val];
 }
 
+function asOrganInst(note: LineNote): boolean {
+    return !isGuitarInst(note.instCode) && !isBassGuitarInst(note.instCode) && !isDrumNote(note.note);
+}
+
 export class SongStore {
     static deletePart(songId: string, partId = '') {
         const song = SongStore.getSong(songId);
@@ -469,99 +473,29 @@ export class SongStore {
         return song;
     }
 
-    static GetDrumRows(rows: StoredRow[]): StoredRow[] {
+    static GetRowsByInstrument(rows: StoredRow[], check: (note: LineNote) => boolean): StoredRow[] {
         const result: StoredRow[] = [];
 
         rows.forEach(row => {
-            let isDrumRow = false;
+            let rowNoteCount = 0;
 
             row.lines.forEach(line => {
-               line.cells.forEach(cell => {
+                line.cells = line.cells.filter(cell => {
+                    let cellNoteCount = 0;
+
                     cell.notes = cell.notes.filter(note => {
-                        const isDrum = isDrumNote(note.note);
-                        isDrumRow = isDrum || isDrumRow;
+                        const add = check(note) ? 1 : 0;
+                        rowNoteCount = rowNoteCount + add;
+                        cellNoteCount = cellNoteCount + add;
 
-                        return isDrum;
+                        return !!add;
                     });
-               });
-            });
 
-            if (isDrumRow) {
-                result.push(row);
-            }
-        });
-
-        return result;
-    }
-
-    static GetBassGuitarRows(rows: StoredRow[]): StoredRow[] {
-        const result: StoredRow[] = [];
-
-        rows.forEach(row => {
-            let isBassRow = false;
-
-            row.lines.forEach(line => {
-                line.cells.forEach(cell => {
-                    cell.notes = cell.notes.filter(note => {
-                        const isBass = isBassGuitarInst(note.instCode);
-                        isBassRow = isBass || isBassRow;
-
-                        return isBass;
-                    });
+                    return !!cellNoteCount;
                 });
             });
 
-            if (isBassRow) {
-                result.push(row);
-            }
-        });
-
-        return result;
-    }
-
-    static GetGuitarRows(rows: StoredRow[]): StoredRow[] {
-        const result: StoredRow[] = [];
-
-        rows.forEach(row => {
-            let isGuitarRow = false;
-
-            row.lines.forEach(line => {
-                line.cells.forEach(cell => {
-                    cell.notes = cell.notes.filter(note => {
-                        const isGuitar = isGuitarInst(note.instCode);
-                        isGuitarRow = isGuitar || isGuitarRow;
-
-                        return isGuitar;
-                    });
-                });
-            });
-
-            if (isGuitarRow) {
-                result.push(row);
-            }
-        });
-
-        return result;
-    }
-
-    static GetOrganRows(rows: StoredRow[]): StoredRow[] {
-        const result: StoredRow[] = [];
-
-        rows.forEach(row => {
-            let isOrganRow = false;
-
-            row.lines.forEach(line => {
-                line.cells.forEach(cell => {
-                    cell.notes = cell.notes.filter(note => {
-                        const isOrgan = !isGuitarInst(note.instCode) && !isBassGuitarInst(note.instCode) && !isDrumNote(note.note);
-                        isOrganRow = isOrgan || isOrganRow;
-
-                        return isOrgan;
-                    });
-                });
-            });
-
-            if (isOrganRow) {
+            if (rowNoteCount) {
                 result.push(row);
             }
         });
@@ -578,7 +512,7 @@ export class SongStore {
 
         // DRUMS
         songNode = JSON.parse(val) as SongNode;
-        const drumRows = SongStore.GetDrumRows(songNode.dynamic);
+        const drumRows = SongStore.GetRowsByInstrument(songNode.dynamic, (note) => isDrumNote(note.note));
         drumRows.forEach(row => {
             row.track = '@drums';
             row.type = 'drums';
@@ -586,7 +520,7 @@ export class SongStore {
 
         // BASS
         songNode = JSON.parse(val) as SongNode;
-        const bassRows = SongStore.GetBassGuitarRows(songNode.dynamic);
+        const bassRows = SongStore.GetRowsByInstrument(songNode.dynamic, (note) => isBassGuitarInst(note.instCode));
         bassRows.forEach(row => {
             row.track = '$bass';
             row.type = 'bassGuitar';
@@ -594,7 +528,7 @@ export class SongStore {
 
         // GUITAR
         songNode = JSON.parse(val) as SongNode;
-        const guitarRows = SongStore.GetGuitarRows(songNode.dynamic);
+        const guitarRows = SongStore.GetRowsByInstrument(songNode.dynamic, (note) => isGuitarInst(note.instCode));
         guitarRows.forEach(row => {
             row.track = '$guitar';
             row.type = 'guitar';
@@ -602,13 +536,14 @@ export class SongStore {
 
         // ORGAN
         songNode = JSON.parse(val) as SongNode;
-        const organRows = SongStore.GetOrganRows(songNode.dynamic);
+        const organRows = SongStore.GetRowsByInstrument(songNode.dynamic, (note) => asOrganInst(note));
         organRows.forEach(row => {
             row.track = '$organ';
             row.type = 'guitar';
         });
 
         songNode.dynamic = [...organRows, ...bassRows, ...guitarRows, ...drumRows];
+        //songNode.dynamic = [...guitarRows];
 
         return songNode;
     }

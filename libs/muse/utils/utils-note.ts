@@ -121,6 +121,44 @@ export function getBpmFromString(str: string, byDefault = 120) {
     return parseInteger(str, byDefault);
 }
 
+export function getEndPointVolume(val: any, byDefault?: number): number {
+    const valIn = getSafeVolume(val, byDefault);
+
+    //return val;
+
+    let valOut: number;
+    let mid = 20;
+
+    if (valIn === 0 || valIn === 100) {
+        valOut = valIn;
+    } else {
+        valOut = valIn / 100;
+        valOut = (1 - Math.sqrt(1 - (valOut * valOut))) * 100;
+    }
+
+    //console.log(val, valIn, valOut);
+
+    return valOut
+
+    // if (valIn === 0 || valIn === 100) {
+    //     valOut = valIn;
+    // }
+    // else if (valIn <= 50) {
+    //     valOut = valIn / 50;
+    //     //valOut = mid * valOut;
+    //     valOut = (1 - Math.sqrt(1 - (valOut * valOut))) * mid;
+    // } else {
+    //     valOut = (valIn - 50 ) / 50;
+    //     valOut = ((100 - mid) * valOut) + mid;
+    //
+    //     //valOut = ((1 - Math.sqrt(1 - (valOut * valOut))) * (100 - mid)) + mid;
+    // }
+    //
+    // console.log(val, valIn, valOut);
+    //
+    // return valOut;
+}
+
 export function getSafeVolume(val: any, byDefault?: number): number {
     function getVolume(val: any): number {
         val = parseInteger(val, null);

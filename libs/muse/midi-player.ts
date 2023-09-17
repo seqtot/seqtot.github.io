@@ -189,7 +189,8 @@ export class MidiPlayer extends Sound {
 
         let { durationMs, volume, pitchShift } = x;
 
-        volume = un.getSafeVolume(volume);
+        // volume = un.getSafeVolume(volume);
+        volume = un.getEndPointVolume(volume);
 
         const item = (<any>{
             isSound: true,

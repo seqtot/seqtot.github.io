@@ -1,7 +1,7 @@
 const score = `
 <settings>
 # boardShift: -12;
-_ @drums: v50; $bass: v30; $guit: v40;
+_ @drums: v50; $bass: v50; $guit: v50;
 
 <info>
 https://lyrsense.com/black_sabbath/sweet_leaf

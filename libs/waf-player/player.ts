@@ -180,14 +180,14 @@ export  class WebAudioFontPlayer {
 			hasVolumeSlide = volumeIsPresent || hasVolumeSlide;
 			lastSlideVolume = volumeIsPresent
 				? volume * (slide.volume / 50)
-				: lastSlideVolume;			
+				: lastSlideVolume;
 
 			if (i === 0) {
 				envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, endWhen);
 				// иначе установится в setupWaveBox, но возможно нужен будет рефакторинг
 				if (slide.hasVolumeSlide) {
 					gain.setValueAtTime(this.noZeroVolume(lastSlideVolume), startWhen);
-					gain.setValueAtTime(this.noZeroVolume(lastSlideVolume), endWhen);					
+					gain.setValueAtTime(this.noZeroVolume(lastSlideVolume), endWhen);
 				}
 			}
 			else {
@@ -199,18 +199,20 @@ export  class WebAudioFontPlayer {
 						lastSlideDelta = slide.delta || 0;
 						lastSlidePlaybackRate = 1.0 * Math.pow(2, ((100.0 * pitch + cent + lastSlideDelta) - baseDetune) / 1200.0);
 						envelope.audioBufferSourceNode.playbackRate.linearRampToValueAtTime(lastSlidePlaybackRate, endWhen);
-					}					
+					}
 
 					if (volumeIsPresent) {
 						gain.linearRampToValueAtTime(this.noZeroVolume(lastSlideVolume), endWhen);
-					} 				
+					}
 				}
 			}
 		}
 
+		//console.log('volume', hasVolumeSlide, volume);
+
 		if (hasVolumeSlide) {
 			gain.linearRampToValueAtTime(this.noZeroVolume(0), startWhen + soundDuration);
-		} 
+		}
 		else {
 			this.setupWaveBox(x.audioContext, envelope, zone, volume, startWhen, soundDuration, x.duration);
 		}

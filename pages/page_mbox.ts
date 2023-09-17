@@ -966,21 +966,30 @@ export class MBoxPage {
     }
 
     getDataByTracks(): {[key: string]: string} {
-        const dataByTracks = {
+        let dataByTracks = {
             ...this.settings.dataByTracks
         };
+
+        if (this.isMy) {
+            const song = SongStore.getSong(this.songId, true);
+
+            dataByTracks = {};
+
+            song.tracks.forEach(track => {
+                dataByTracks[track.name] = `v${track.volume}`;
+            });
+        }
 
         Object.keys(dataByTracks).forEach(key => {
             if (this.excludeTrack[key]) {
                 dataByTracks[key] = 'v0';
             }
-        })
+        });
 
         //console.log(this.settings, metaByLines);
 
         return dataByTracks;
     }
-
 
     buildBlocksForMySong(blocks: TextBlock[]): TextBlock[] {
         const songId = this.songId;
@@ -1173,6 +1182,8 @@ export class MBoxPage {
             });
         }
 
+        //console.log('getDataByTrack', this.getDataByTracks());
+
         if (x.playBlockOut) {
             ideService.multiPlayer.tryPlayMidiBlock({
                 blocks,
@@ -1303,3 +1314,5 @@ export class MBoxPage {
 // PARTS:
 // unselect-all-parts-action select-all-parts-action edit-selected-parts-action add-part-action
 // move-part-up-action move-part-down-action rename-part-action clone-part-action delete-part-action
+
+// PLAY: playAll
