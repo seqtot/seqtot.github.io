@@ -11,7 +11,11 @@ import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
 import { SongNode, SongStore, StoredRow, StoredSongNodeOld } from './song-store';
 import {
-    createOutBlock, getOutBlocksInfo, OutBlockRowInfo, SongPartInfo, TextBlock
+    createOutBlock,
+    getOutBlocksInfo,
+    OutBlockRowInfo,
+    SongPartInfo,
+    TextBlock
 } from '../libs/muse/utils';
 
 import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';

@@ -7,7 +7,9 @@ import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { sings } from './sings';
 import { SongStore } from './song-store';
-import {isT34} from './keyboard-tone-ctrl-helper';
+import { isT34 } from './keyboard-tone-ctrl-helper';
+import { DEFAULT_TONE_INSTR } from '../libs/muse/keyboards';
+import { getInstrNameByCode } from '../libs/muse/instruments';
 
 const DOWN = 1;
 const UP = 0;
@@ -16,9 +18,7 @@ const rem = 'rem';
 const monoFont = 'font-family: monospace;';
 
 export class ToneCtrl extends KeyboardCtrl {
-    _instrCode = 162;
-    _instrCodeBass = 162;
-
+    _instrCode = DEFAULT_TONE_INSTR;
     playingNote: { [key: string]: string } = {};
     lastPlayingNote = '';
     offset = 0;
@@ -41,14 +41,10 @@ export class ToneCtrl extends KeyboardCtrl {
     };
 
     get instrName(): string {
-        return hlp.instrName[this._instrCode] || '';
-    }
+        const name = getInstrNameByCode(this.instrCode);
 
-    get instrNameBass(): string {
-        return hlp.instrName[this._instrCodeBass] || '';
+        return name ? '$' + name : '';
     }
-
-    get instrCodeBass(): string | number { return this._instrCodeBass }
 
     get instrCode(): string | number { return this._instrCode }
 
@@ -506,7 +502,7 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     handleKeyRecord(id: string, time: number, type: 0 | 1) {
-        const instrCode = this._instrCode;
+        const instrCode = this.instrCode;
 
         if (!this.isRecMode) {
             return;
@@ -630,12 +626,13 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('instrument-code', parent).forEach(el => {
             el.addEventListener('pointerdown', () => {
-                this._instrCode = un.parseInteger(el.dataset.instrumentCode, 162); // jjkl
+                this._instrCode = un.parseInteger(el.dataset.instrumentCode, DEFAULT_TONE_INSTR);
                 this.updatePopupBoard();
+
                 ideService.synthesizer.playSound({
                     keyOrNote: 'do',
                     id: 'popup',
-                    instrCode: this._instrCode,
+                    instrCode: this.instrCode,
                 });
             })
         });
@@ -679,7 +676,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 evt.preventDefault();
                 evt.stopImmediatePropagation();
 
-                const instrCode = this._instrCode;
+                const instrCode = this.instrCode;
 
                 ideService.synthesizer.playSound({
                     keyOrNote: this.playingNote[keyId],
@@ -990,7 +987,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 evt.preventDefault();
                 evt.stopImmediatePropagation();
 
-                const instrCode = this._instrCode;
+                const instrCode = this.instrCode;
 
                 ideService.synthesizer.playSound({
                     keyOrNote: this.playingNote[keyId],

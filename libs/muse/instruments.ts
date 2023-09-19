@@ -219,6 +219,8 @@ const instrAliasCodeVariable = [
 export const hardcodedInstruments: {[key: string | number]: string} = {};
 const toneCodeByAlias: {[key: string]: number} = {};
 
+export const instrumentCodeAndName: { name: string, code: number | string }[] = [];
+
 function getIdFromArray(arr: string[]): number | null {
     for (let item of arr) {
         let id = parseInteger(item, null);
@@ -251,12 +253,26 @@ function getIdFromArray(arr: string[]): number | null {
                 }
 
                 toneCodeByAlias[val] = id;
+
+                instrumentCodeAndName.push({
+                    name: val,
+                    code: id,
+                });
+
             });
         } else {
             // инструмент без id (ударные)
             hardcodedInstruments[arr[0]] = varName;
         }
     });
+}
+
+export function getInstrNameByCode(val: number | string): string {
+    const item = instrumentCodeAndName.find(item => item.code.toString() === val.toString());
+
+    console.log('getInstrNameByCode', val, item?.name);
+
+    return item?.name || '';
 }
 
 const instrCodeByAlias = {
