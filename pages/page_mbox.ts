@@ -21,7 +21,6 @@ import {TrackContentDialog} from './track-content-dialog';
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
-    bpmValue = 100;
     playingTick = '';
     bpmRange: Range.Range;
     blocks: un.TextBlock[] = [];
@@ -32,6 +31,14 @@ export class MBoxPage {
 
     selectedSong = '';
     selectedSongName = '';
+
+    get bpmValue(): number {
+        return ideService.bpmValue;
+    }
+
+    set bpmValue(bpmValue: number) {
+        ideService.bpmValue = bpmValue;
+    }
 
     get pageId(): string {
         return this.props.id;
@@ -250,9 +257,20 @@ export class MBoxPage {
             },
         });
 
+        // SET BPM
+        let bpmValue = this.bpmValue;
+
+        if (this.view === 'song') {
+            if (this.songId === ideService.currentEdit.songId) {
+                bpmValue = this.bpmValue;
+            } else {
+                bpmValue = this.outBlock?.bpm || 90;
+            }
+        }
+
         setTimeout(() => {
             this.subscribeEvents();
-            this.bpmValue = this.outBlock?.bpm || 100;
+            this.bpmValue = bpmValue;
             this.bpmRange.setValue(this.bpmValue);
 
             this.updateView();
@@ -556,7 +574,7 @@ export class MBoxPage {
         ideService.currentEdit.songId = this.songId;
         ideService.currentEdit.allSongParts = this.allSongParts;
         ideService.currentEdit.blocks = this.blocks;
-        ideService.currentEdit.bpmValue = this.bpmValue;
+        //ideService.currentEdit.bpmValue = this.bpmValue;
         ideService.currentEdit.dataByTracks = this.getDataByTracks();
         ideService.currentEdit.editPartsNio = editPartsNio;
         ideService.currentEdit.source = this.pageData.source;

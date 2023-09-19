@@ -829,7 +829,7 @@ export class KeyboardCtrl {
         const currentEdit = ideService.currentEdit;
         const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
 
-        this.page.bpmValue = currentEdit.bpmValue || 90;
+        //this.page.bpmValue = currentEdit.bpmValue || 90;
 
         const midiConfig = this.getMidiConfig();
         const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
@@ -934,7 +934,7 @@ export class KeyboardCtrl {
             <div style="padding-left: 1rem;">
                 <span
                     style="${cmdStyle}"
-                    data-ide-action="back"
+                    data-ide-action="back-to-parts"
                 >back</span>&nbsp;&nbsp;
                 <span
                     style="${cmdStyle} color: blue;"
@@ -1034,7 +1034,7 @@ export class KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.loadFile());
         });
 
-        getWithDataAttrValue('ide-action', 'back', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('ide-action', 'back-to-parts', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.gotoSong());
         });
 

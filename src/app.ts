@@ -127,7 +127,7 @@ navbar = `
     data-panel=".panel-left"
     style="user-select: none; touch-action: none;"
   ><b>LEFT</b></a>
-  &nbsp;&nbsp;&nbsp;
+  <div style="max-width: 5rem; padding-left: 1rem; padding-right: 1rem;" data-main-menu-center></div>
   <a class="panel-open"
     data-panel=".panel-right"
     style="user-select: none; touch-action: none;"    

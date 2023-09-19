@@ -59,6 +59,7 @@ class IdeService extends  EventEmitter {
     synthesizer = synthesizer;
     ticker = ticker;
     boards: any = {};
+    bpmValue = 90;
 
     get lastBoardView(): KeyboardType {
         if (!this._lastBoardView) {
@@ -93,7 +94,7 @@ class IdeService extends  EventEmitter {
     currentEdit: {
         songId: string,
         blocks: TextBlock[],
-        bpmValue: number,
+        //bpmValue: number,
         allSongParts: string[],
         editPartsNio?: number[],
         dataByTracks: {[key: string]: string},

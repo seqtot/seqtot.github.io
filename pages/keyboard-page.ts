@@ -9,19 +9,14 @@ import { MultiPlayer } from '../libs/muse/multi-player';
 import { standardTicks as ticks } from './ticks';
 import { DrumCtrl } from './keyboard-drum-ctrl';
 import { ToneCtrl } from './keyboard-tone-ctrl';
-import {ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards, drumBoards} from './keyboard-ctrl';
+import { ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards, drumBoards } from './keyboard-ctrl';
 import { ideService, defaultTracks } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
-import {SongStore, TrackInfo} from './song-store';
+import { SongStore, TrackInfo } from './song-store';
 
 // import { getDevice } from 'framework7';
 //
 // console.log('getDevice', getDevice().desktop);
-
-const ns = {
-    setBmpAction: 'set-bmp-action',
-    setNote: 'set-note',
-};
 
 interface Page {
     bpmValue: number;
@@ -41,7 +36,6 @@ export class KeyboardPage implements Page {
     drumCtrl: DrumCtrl;
     toneCtrl: ToneCtrl;
 
-    bpmValue = 100;
     playingTick = '';
     bpmRange: Range.Range;
     tickInfo = {
@@ -51,6 +45,14 @@ export class KeyboardPage implements Page {
     tickNode: AudioBufferSourceNode | null = null;
     synthesizer = ideService.synthesizer;
     multiPlayer = ideService.multiPlayer;
+
+    get bpmValue(): number {
+        return ideService.bpmValue;
+    }
+
+    set bpmValue(bpmValue: number) {
+        ideService.bpmValue = bpmValue;
+    }
 
     get songId(): string {
         return ideService.currentEdit.songId;
@@ -91,18 +93,29 @@ export class KeyboardPage implements Page {
         public context: ComponentContext
     ) {}
 
+    onClosePage() {
+        //console.log('onClosePage');
+        this.setTrackName();
+    }
+
     onMounted() {
         //console.log(ideService.currentEdit);
         //console.log('getBoundingClientRect', this.pageEl.getBoundingClientRect());
 
-        setTimeout(() => {
-            this.setRightPanelContent();
-            this.setContent();
-        }, 50);
+        this.el$.html(`
+            <div 
+                class="page-content"
+                style="padding-top: 0; padding-bottom: 10rem;"
+            >
+                <div
+                    style="display: flex;"
+                    data-name="keyboard-page-wrapper"
+                >
+                </div>
+            </div>`
+        .trim());
 
-        setTimeout(() => {
-            this.subscribeRightPanelEvents();
-        }, 100);
+        setTimeout(() => this.setContent(), 50);
     }
 
 
@@ -114,6 +127,23 @@ export class KeyboardPage implements Page {
 
     getTrackByName(trackName: string): TrackInfo {
         return this.getTracks().find(item => item.name === trackName);
+    }
+
+    setTrackName(name?: string) {
+        // return `<a class="link" href="${href}">${name}</a>`;
+        const href = this.songId ? `href="/mbox/${this.songId}/"`: '';
+
+        getWithDataAttr('main-menu-center').forEach(el => {
+            if (name) {
+                el.innerHTML = `<a
+                    style="user-select: none; touch-action: none;"
+                    ${href}
+                    >${name}</a>
+                `.trim();
+            } else {
+                el.innerHTML = '';
+            }
+        });
     }
 
     setContent(trackName: string = '') {
@@ -136,11 +166,15 @@ export class KeyboardPage implements Page {
             this.setDrumsContent('drums', this.trackName);
         }
 
+        this.setRightPanelContent();
+        this.updateRightPanel();
+        this.setTrackName(track.name);
+
         setTimeout(() => {
             this.subscribeCommonPageEvents();
             this.subscribePageEvents();
-            //this.bpmRange.setValue(this.bpmValue);
-        }, 100);
+            this.subscribeRightPanelEvents();
+        }, 50);
     }
 
     setRightPanelContent() {
@@ -159,6 +193,18 @@ export class KeyboardPage implements Page {
         });
 
         dyName('panel-right-content').innerHTML = content;
+    }
+
+    updateRightPanel() {
+        getWithDataAttr('set-keyboard-type-action', dyName('panel-right-content')).forEach((el) => {
+            el.style.color = 'white';
+
+            console.log(el, this.trackName);
+
+            if (el.dataset.trackName === this.trackName) {
+                el.style.color = 'lime';
+            }
+        });
     }
 
     getMetronomeContent(): string {
@@ -213,7 +259,7 @@ export class KeyboardPage implements Page {
             el.addEventListener('click', (evt: MouseEvent) => this.playTick3());
         });
 
-        getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
+        getWithDataAttr('set-bmp-action', this.pageEl)?.forEach(
             (el: HTMLElement) => {
                 el.addEventListener('pointerdown', () => {
                     this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);
@@ -226,18 +272,15 @@ export class KeyboardPage implements Page {
     setDrumsContent(boardType: DrumKeyboardType, trackName: string) {
         this.drumCtrl = new DrumCtrl(this, boardType);
 
-        const content = `
-            <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 10rem;">
-                ${this.drumCtrl.getContent(boardType, trackName)}
-            </div>`.trim();
+        const content = `<div style="width: 100%; max-width: 350px;" keyboard-instanse>
+            ${this.drumCtrl.getContent(boardType, trackName)}
+        </div>`;
 
-        console.log(boardType, this.keyboardType)
-        //this.keyboardType = boardType;
-
-        this.el$.html(content);
+        dyName('keyboard-page-wrapper').innerHTML = content;
         this.drumCtrl.updateView();
 
-        //console.log('setDrumContent', this.bpmValue);
+        //console.log(boardType, this.keyboardType)
+        //this.keyboardType = boardType;
 
         this.bpmRange = (this.context.$f7 as any).range.create({
             el: dyName('slider', this.pageEl),
@@ -262,12 +305,11 @@ export class KeyboardPage implements Page {
     setToneContent(boardType: ToneKeyboardType, trackName: string) {
         this.toneCtrl = new ToneCtrl(this, <ToneKeyboardType>this.keyboardType);
 
-        const content = `
-            <div class="page-content" data="page-content" style="padding-top: 0; padding-bottom: 10rem;">
-                ${this.toneCtrl.getContent(boardType, trackName)}
-            </div>`.trim();
+        const content = `<div style="width: 100%; max-width: 350px;" keyboard-instanse>
+            ${this.toneCtrl.getContent(boardType, trackName)}
+        </div>`;
 
-        this.el$.html(content);
+        dyName('keyboard-page-wrapper').innerHTML = content;
         this.toneCtrl.updateView();
 
         this.bpmRange = (this.context.$f7 as any).range.create({

@@ -12,6 +12,8 @@ const pages = {
     //page_sample_editor: SamplePage,
 };
 
+let vc: any;
+
 // https://framework7.io/docs/init-app.html
 // https://framework7.io/docs/kitchen-sink.html
 // https://framework7.io/docs/router-component
@@ -23,7 +25,9 @@ export const pageRc = (props: Props, context: ComponentContext) => {
         return () => context.$h`<div class="page">COMPONENT NOT FOUND</div>`;
     }
 
-    let vc = new pages[props.id](props, context);
+    vc?.onClosePage && vc.onClosePage();
+
+    vc = new pages[props.id](props, context);
 
     // Called right before component will be added to DOM
     context['$onBeforeMount'](() => vc.onBeforeMount && vc.onBeforeMount());
@@ -52,3 +56,6 @@ export const pageRc = (props: Props, context: ComponentContext) => {
 
     return () => context.$h`<div class="page"></div>`;
 };
+
+// onBeforeUnmount
+// onUnmounted
