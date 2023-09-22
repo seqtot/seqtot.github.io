@@ -290,3 +290,4 @@ export class MuseEditorPage {
         ideService.off(ideEvents.openFile, this);
     }
 }
+

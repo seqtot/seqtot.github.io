@@ -17,7 +17,7 @@ import { ideService } from './ide/ide-service';
 import { SongStore, SongNode, StoredRow } from './song-store';
 import * as svg from './svg-icons';
 import {toneBoards, drumBoards} from './keyboard-ctrl';
-import {TrackContentDialog} from './track-content-dialog';
+import {TrackContentDialog} from './dialogs/track-content-dialog';
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -57,7 +57,6 @@ export class MBoxPage {
     }
 
     get pageData(): SongNode {
-
         if (mboxes[this.songId]) {
             return mboxes[this.songId];
         }
@@ -75,7 +74,7 @@ export class MBoxPage {
 
     get allSongParts(): string[] {
         if (this.isMy) {
-            const song = SongStore.getSong(this.songId, true);
+            const song = this.pageData;
 
             return song.parts.map((item, i) => {
                 return `${item.name} %${item.id} №${i+1}`;
@@ -264,7 +263,7 @@ export class MBoxPage {
             if (this.songId === ideService.currentEdit.songId) {
                 bpmValue = this.bpmValue;
             } else {
-                bpmValue = this.outBlock?.bpm || 90;
+                bpmValue = (this.isMy ? this.pageData.bmpValue : this.outBlock?.bpm) || 90;
             }
         }
 
@@ -291,7 +290,8 @@ export class MBoxPage {
         `.trim();
 
         if (this.isMy) {
-            const song = SongStore.getSong(this.songId, true);
+            const song = this.pageData;
+
             song.tracks.forEach(track => {
                 content += `
                     <span
@@ -331,7 +331,7 @@ export class MBoxPage {
         `.trim();
 
         let fileCommands = `
-            ${svg.downloadBtn('data-download-song-action', '', 24)}        
+            ${svg.downloadBtn('data-download-song-action', '', 24)}&nbsp;        
         `.trim();
 
         let editCommands = '';
@@ -354,14 +354,16 @@ export class MBoxPage {
                 editCommands = addPartCommand;
             }
 
-            // ${svg.saveBtn('data-save-song-action', '', 24)}
             fileCommands += `
-                ${svg.uploadBtn('data-upload-song-action', '', 24)}
+                ${svg.uploadBtn('data-upload-song-action', '', 24)}&nbsp;
+                ${svg.saveBtn('data-save-song-action', '', 24)}&nbsp;                
                 <input style="display: none;" type="file" data-upload-song-input multiple />                                
             `.trim();
         }
 
-        fileCommands = `<div style="margin: 1rem;">${fileCommands}</div>`;
+        fileCommands = `<div style="margin: 1rem;">
+            ${fileCommands}
+        </div>`.trim();
 
         let allCommands = `
             <div>
@@ -648,6 +650,10 @@ export class MBoxPage {
 
         getWithDataAttr('upload-song-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.uploadFileClick());
+        });
+
+        getWithDataAttr('save-song-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.saveSong());
         });
 
         getWithDataAttr('upload-song-input', this.pageEl).forEach((el) => {
@@ -989,7 +995,7 @@ export class MBoxPage {
         };
 
         if (this.isMy) {
-            const song = SongStore.getSong(this.songId, true);
+            const song = this.pageData;
 
             dataByTracks = {};
 
@@ -1010,8 +1016,7 @@ export class MBoxPage {
     }
 
     buildBlocksForMySong(blocks: TextBlock[]): TextBlock[] {
-        const songId = this.songId;
-        const song = SongStore.getSong(songId);
+        const song = this.pageData;
         const hash = {};
         const list: {id: string, rows: StoredRow[][]}[] = [];
         const selectedParts = this.getSelectedParts();
@@ -1249,6 +1254,7 @@ export class MBoxPage {
         //songNode = SongStore.Transform(val);
 
         SongStore.setSong(this.songId, songNode);
+
         this.setPageContent();
     }
 
@@ -1280,6 +1286,20 @@ export class MBoxPage {
         });
     }
 
+    saveSong() {
+        let songId = this.songId;
+
+        if (!songId) return;
+
+        let songNode = this.pageData;
+
+        if (!songNode) return;
+
+        songNode.bmpValue = this.bpmValue
+
+        SongStore.setSong(songId, songNode);
+    }
+
     downloadFile() {
         // https://webtips.dev/download-any-file-with-javascript
         let songId = this.songId;
@@ -1289,7 +1309,7 @@ export class MBoxPage {
         let songNode: any; // StoredSongNode
 
         if (this.isMy) {
-            songNode = SongStore.getSong(songId);
+            songNode = this.pageData;
         } else {
             songNode = localStorage.getItem(songId);
             songNode = songNode ? JSON.parse(songNode) : songNode;

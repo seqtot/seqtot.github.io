@@ -88,6 +88,10 @@ export class KeyboardPage implements Page {
         return this.pageId + '-' + id;
     }
 
+    onWindowResize = () => {
+        console.log('onWindowResize');
+    }
+
     constructor(
         public props: Props,
         public context: ComponentContext
@@ -96,11 +100,11 @@ export class KeyboardPage implements Page {
     onClosePage() {
         //console.log('onClosePage');
         this.setTrackName();
+        window.removeEventListener('resize', this.onWindowResize);
     }
 
     onMounted() {
-        //console.log(ideService.currentEdit);
-        //console.log('getBoundingClientRect', this.pageEl.getBoundingClientRect());
+        window.addEventListener('resize', this.onWindowResize);
 
         this.el$.html(`
             <div 
@@ -198,9 +202,6 @@ export class KeyboardPage implements Page {
     updateRightPanel() {
         getWithDataAttr('set-keyboard-type-action', dyName('panel-right-content')).forEach((el) => {
             el.style.color = 'white';
-
-            console.log(el, this.trackName);
-
             if (el.dataset.trackName === this.trackName) {
                 el.style.color = 'lime';
             }

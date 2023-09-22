@@ -5,8 +5,8 @@ import { LineModel, Line, LineNote, KeyData } from './line-model';
 import { ideService } from './ide/ide-service';
 import { DrumBoard, drumNotesInfo } from './drum-board';
 import { KeyboardCtrl, BpmInfo, KeyboardPage, DrumKeyboardType } from './keyboard-ctrl';
-import { sings } from './sings';
 import * as svg from './svg-icons';
+import { KeyboardChessCtrl } from './keyboard-chess-ctrl';
 
 const drumCodesTop = [
     {note: 'ho', alias: 'ча'},
@@ -53,9 +53,11 @@ export class DrumCtrl extends KeyboardCtrl {
     keySequence: KeyData[] = [];
     tickStartMs: number = 0;
     board: DrumBoard;
+    chess: KeyboardChessCtrl;
 
     constructor(public page: KeyboardPage, public type: DrumKeyboardType) {
         super(page, type);
+        this.chess = new KeyboardChessCtrl(this.page, this.liner, this);
 
         this.board = new DrumBoard();
     }
@@ -388,10 +390,7 @@ export class DrumCtrl extends KeyboardCtrl {
             <!--${this.getMoveCommandPanel()} -->
             ${this.getDrumNotesPanel()}
             
-            <div
-                data-name="chess-wrapper"
-                style="width: 90%; padding-left: 1rem;"
-            ></div>
+            <div data-name="chess-wrapper" style="width: 100%;"></div>
             
             <div data-edit-parts-wrapper>
                 ${this.getIdeContent()}                
@@ -468,196 +467,7 @@ export class DrumCtrl extends KeyboardCtrl {
     }
 
     printChess(rows: Line[]) {
-        const rem = 'rem';
-        const getMask = (count: number): ChessCell[] => {
-            const arr = Array(count).fill(null);
-            return arr.map(() => ({
-                bgColor: 'whitesmoke',
-                noteId: 0,
-                cellId: 0,
-                char: '',
-                startOffsetQ: 0,
-                totalOffsetQ: 0,
-                underline: false,
-            }));
-        }
-
-        let totalOut = '';
-        let height = 1.26;
-        let padding = .07;
-        let rowHeight = 1.4;
-
-        const getTextAndColor = (arr: LineNote[]): ChessCell => {
-            const result: ChessCell = {
-                noteId: 0,
-                cellId: 0,
-                char: '',
-                //color: 'white',
-                bgColor: 'lightgray',
-                underline: false,
-                startOffsetQ: 0,
-                totalOffsetQ: 0,
-            }
-
-            const map = {
-                bd: 0,
-                sn: 0,
-                hc: 0
-            }
-
-            arr = arr.filter(item => {
-                if (item.note === 'bd' || item.note === 'sn' || item.note === 'hc') {
-                    map[item.note] = item.id;
-
-                    return false;
-                }
-
-                return true;
-            });
-
-            if (arr.length) {
-                result.char = (drumNotesInfo[arr[0].note])?.char || '?';
-                result.noteId = arr[0].id || 0;
-            }
-            else {
-                result.char = map.hc ? '_' : '';
-                result.noteId = map.hc ? map.hc : 0;
-            }
-
-            if (map.bd && map.sn) {
-                result.noteId = map.bd;
-                result.bgColor = 'black';
-            } else if (map.bd) {
-                result.noteId = map.bd;
-                result.bgColor = drumNotesInfo.bd.headColor;
-            } else if (map.sn) {
-                result.noteId = map.sn;
-                result.bgColor = drumNotesInfo.sn.headColor;
-            } else if (arr.length) {
-                result.bgColor = drumNotesInfo[arr[0].note]?.headColor || 'darkgray';
-            }
-
-            if (map.hc) {
-                result.underline = true;
-            }
-
-            const cell = this.liner.getCellByNoteId(result.noteId);
-            result.cellId = cell?.id;
-
-            return result;
-        }
-
-        rows.forEach((row, iRow) => {
-            const nextRow = rows[iRow + 1];
-            const offsets = this.liner.getOffsetsByRow(row);
-            const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
-            const rowBorderBottom = hasLine ? '1px solid gray;' : 'none;';
-
-            totalOut = totalOut +
-                `<div style="
-                    box-sizing: border-box;
-                    position: relative;
-                    margin: 0;
-                    padding: 0;
-                    font-size: 1.2rem;
-                    line-height: .9rem;
-                    color: white;                    
-                    user-select: none;
-                    padding-top: .07rem;
-                    height: 1.4rem;
-                    border-bottom: ${rowBorderBottom};
-                ">`;
-
-            const cellSizeQ = 10;
-            const cols = getMask(row.durQ / row.cellSizeQ);
-            cols.forEach((col, i) => {
-               col.startOffsetQ = row.startOffsetQ + (cellSizeQ * i);
-               col.totalOffsetQ = col.startOffsetQ + row.blockOffsetQ;
-            });
-
-            for (let offset of offsets) {
-                const iCell = (offset - row.startOffsetQ) / cellSizeQ;
-                const notes = this.liner.getNotesListByOffset(row, offset);
-
-                const col = cols[iCell];
-                const textAndColor = getTextAndColor(notes);
-
-                col.cellId = textAndColor.cellId;
-                col.noteId = textAndColor.noteId;
-                col.bgColor = textAndColor.bgColor;
-                col.char = textAndColor.char;
-                col.underline = textAndColor.underline;
-            }
-
-            cols.forEach((col, iCol) => {
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-line-ind="${iRow}"
-                        data-chess-cell-col="${iCol}"
-                        data-chess-cell-row-col="${iRow}-${iCol}"
-                        data-chess-cell-id=""
-                        data-chess-total-offset="${col.totalOffsetQ}"                        
-                        style="
-                            box-sizing: border-box;
-                            border: 1px solid white;
-                            display: inline-block;
-                            z-index: 0;
-                            position: absolute;
-                            width: ${height}${rem};
-                            height: ${height}${rem};
-                            background-color: ${col.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            left: ${iCol * height}${rem};
-                        "
-                    ></span>`.trim();
-            });
-
-            cols.forEach((cell, iCell) => {
-                if (!cell.cellId) return;
-
-                const textDecoration = cell.underline ? 'underline' : 'none';
-                const rem = 'rem';
-
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-line-ind="${iRow}"
-                        data-chess-cell-col="${iCell}"
-                        data-chess-cell-row-col="${iRow}-${iCell}"                                                
-                        data-chess-cell-id="${cell.cellId}"
-                        data-chess-total-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
-                        style="
-                            box-sizing: border-box;
-                            border: 1px solid white;
-                            display: inline-block;
-                            position: absolute;
-                            width: ${height}${rem};
-                            height: ${height}${rem};
-                            background-color: ${cell.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            font-weight: 700;
-                            z-index: 0;
-                            text-decoration: ${textDecoration};
-                            left: ${iCell * height}${rem};
-                        "
-                    >${cell.char}</span>`.trim();
-            });
-
-            totalOut = totalOut + '</div>';
-        });
-
-        const el = dyName('chess-wrapper', this.page.pageEl);
-        if (el) {
-            el.innerHTML = totalOut;
-            el.style.height = `${rows.length * rowHeight}rem`;
-        }
-
-        this.subscribeChess();
+        this.chess.printDrumChess(rows);
     }
 
     getNoteInfo(noteLat: string): {

@@ -321,28 +321,6 @@ export class KeyboardCtrl {
         }
     }
 
-    chessCellClick(el: HTMLElement) {
-        const offset = parseInteger(el.dataset['chessTotalOffset'], null);
-
-        if (offset === null) {
-            return;
-        }
-
-        if (!el.dataset['selected']) {
-            this.setActiveCell(el);
-            this.highlightCellByRowCol(this.activeCell.rowCol);
-        } else {
-            this.highlightCellByRowCol(this.activeCell.rowCol, false);
-            this.setActiveCell(null);
-        }
-    }
-
-    subscribeChess() {
-        getWithDataAttr('chess-cell-row-col', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.chessCellClick(el));
-        });
-    }
-
     getRowActionsCommands(): string {
         const display = `display: ${ideService.currentEdit?.freezeStructure ? 'none': 'block'};`;
         const rowStyle = `${display} width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
@@ -1506,8 +1484,6 @@ export class KeyboardCtrl {
 // getNotes
 // resetBlockOffset
 
-// CHESS
-
 // EDITING ITEMS
 // setEditingItemDurationAndBlockOffsetByLines
 // addOrDelNoteClick -> addOrDelNote
@@ -1516,7 +1492,7 @@ export class KeyboardCtrl {
 //
 // CELL
 // getCellInfo  setActiveCell  getCellId  moveCell  addCellDuration
-// chessCellClick highlightCellByRowCol deleteCell
+// highlightCellByRowCol deleteCell
 
 // CHESS LINE
 // addLine insertLine deleteLine

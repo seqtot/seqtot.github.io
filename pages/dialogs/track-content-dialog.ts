@@ -1,10 +1,10 @@
 import { Range } from 'framework7/components/range/range';
 import { Dialog } from 'framework7/components/dialog/dialog';
 
-import {dyName, getWithDataAttr} from '../src/utils';
-import {toneBoards, drumBoards} from './keyboard-ctrl';
+import {dyName, getWithDataAttr} from '../../src/utils';
+import {toneBoards, drumBoards} from '../keyboard-ctrl';
 import {ComponentContext} from 'framework7/modules/component/component';
-import {SongNode, SongStore, TrackInfo} from './song-store';
+import {SongNode, SongStore, TrackInfo} from '../song-store';
 
 export class TrackContentDialog {
     dialog: Dialog.Dialog;

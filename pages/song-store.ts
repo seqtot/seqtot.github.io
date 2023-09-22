@@ -21,6 +21,7 @@ export type TrackInfo = {
 }
 
 export type SongNode = {
+    bmpValue: number,
     content: string,
     break: string,
     drums: string,
@@ -62,6 +63,8 @@ function isGuitarInst(val: string | number): boolean {
 function asOrganInst(note: LineNote): boolean {
     return !isGuitarInst(note.instCode) && !isBassGuitarInst(note.instCode) && !isDrumNote(note.note);
 }
+
+const DEFAULT_BPM_VALUE = 90;
 
 export class SongStore {
     static deletePart(songId: string, partId = '') {
@@ -228,6 +231,7 @@ export class SongStore {
             song.parts = Array.isArray(song.parts) ? song.parts : [];
             song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
             song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
+            song.bmpValue = song.bmpValue ? song.bmpValue : DEFAULT_BPM_VALUE;
 
             // костыль
             song.dynamic.forEach(item => {
@@ -281,6 +285,7 @@ export class SongStore {
 
     static getEmptySong(): SongNode {
         return {
+            bmpValue: DEFAULT_BPM_VALUE,
             content: '',
             break: '',
             drums: '',
