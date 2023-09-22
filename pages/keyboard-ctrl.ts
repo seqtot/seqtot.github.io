@@ -865,7 +865,7 @@ export class KeyboardCtrl {
             const part = item.part;
 
             editingPartsContent += `
-                <div >
+                <div style="padding-right: .5rem; padding-left: .5rem;">
                     <span style="margin: .5rem; font-weight: 600;"
                     >${part.partNio}-${part.ref}</span>
             `.trim();
@@ -880,7 +880,7 @@ export class KeyboardCtrl {
                 }
 
                 editingPartsContent += `<span
-                    style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0;"
+                    style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0; user-select: none; touch-action: none;"
                     data-row-in-part-item
                     data-row-in-part-id="${info.partNio}-${info.rowNio}"                    
                     data-song-name="${currentEdit.songId}"
