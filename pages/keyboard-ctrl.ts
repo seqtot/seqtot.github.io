@@ -865,7 +865,7 @@ export class KeyboardCtrl {
             const part = item.part;
 
             editingPartsContent += `
-                <div style="padding-right: .5rem; padding-left: .5rem;">
+                <div style="padding-left: .5rem; padding-right: 1rem;">
                     <span style="margin: .5rem; font-weight: 600;"
                     >${part.partNio}-${part.ref}</span>
             `.trim();

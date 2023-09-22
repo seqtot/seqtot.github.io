@@ -132,7 +132,7 @@ export class KeyboardChessCtrl {
             const nextRow = rows[iRow + 1];
             const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
 
-            box.rowBorderBottom = hasLine ? '2px solid gray;' : 'none;';
+            box.rowBorderBottom = hasLine ? '2px solid black;' : 'none;';
 
             box.cols = this.getChessLine(row.durQ / row.cellSizeQ);
             box.cols.forEach((col, i) => {
