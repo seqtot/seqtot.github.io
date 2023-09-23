@@ -8,10 +8,6 @@ import {drumNotesInfo} from './drum-board';
 const rem = 'rem';
 const px = 'px';
 
-let cellHeight = 1.26;
-let cellWidth = 1.26;
-let rowHeight = 1.4;
-
 let cellSizePx = 0;
 let rowHeightPx = 0;
 let fontSizePx = 0;
@@ -119,7 +115,88 @@ export class KeyboardChessCtrl {
         return result;
     }
 
-    printToneChess(rows: Line[]) {
+
+    getRowTpl({rowBorderBottom}: {rowBorderBottom: string}): string {
+        return `<div style="
+            box-sizing: border-box;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            color: white;                    
+            user-select: none;
+            height: ${rowHeightPx}px;
+            width:${cellSizePx*12}px;                    
+            border-bottom: ${rowBorderBottom}
+        ">
+            %content%
+        </div>`;
+    }
+
+    getColTpl({iRow, iCol, totalOffsetQ, bgColor}:{iRow: number, iCol: number, totalOffsetQ: number, bgColor: string}): string {
+        return `<span
+            data-chess-cell-line-ind="${iRow}"
+            data-chess-cell-col="${iCol}"
+            data-chess-cell-row-col="${iRow}-${iCol}"
+            data-chess-cell-id=""
+            data-chess-total-offset="${totalOffsetQ}"                        
+            style="
+                box-sizing: border-box;
+                border: 1px solid white;
+                display: inline-block;
+                z-index: 0;
+                position: absolute;
+                width: ${cellSizePx}${px};
+                height: ${cellSizePx}${px};
+                background-color: ${bgColor};
+                user-select: none;
+                touch-action: none;
+                text-align: center;
+                left: ${iCol * cellSizePx}${px};
+                top: 1px;
+            "
+        ></span>`.trim();
+    }
+
+    getCellTpl({iRow, iCol, cellId, totalOffsetQ, bgColor, char, textDecoration}: {
+        iRow: number,
+        iCol: number,
+        cellId: string | number,
+        totalOffsetQ: number,
+        bgColor: string,
+        char: number | string,
+        textDecoration: string,
+    }): string {
+        return `<span
+            data-chess-cell-line-ind="${iRow}"
+            data-chess-cell-col="${iCol}"
+            data-chess-cell-row-col="${iRow}-${iCol}"                                                
+            data-chess-cell-id="${cellId}"
+            data-chess-total-offset="${totalOffsetQ}"
+            data-chess-cell-with-id-offset="${totalOffsetQ}"
+            data-chess-cell-with-id-row-col="${iRow}-${iCol}"                                                                        
+            style="
+                box-sizing: border-box;
+                border: none;
+                display: inline-block;
+                position: absolute;
+                z-index: 0;                            
+                width: ${cellSizePx-2}${px};
+                height: ${cellSizePx-2}${px};
+                background-color: ${bgColor};
+                user-select: none;
+                touch-action: none;
+                text-align: center;
+                font-weight: 700;
+                font-size: ${fontSizePx}${px};
+                line-height: ${fontSizePx}${px};
+                text-decoration: ${textDecoration};
+                left: ${(iCol * cellSizePx) + 1}${px};
+                top: 2px;
+            "
+        >${char}</span>`.trim();
+    }
+
+    getToneChess(rows: Line[]) {
         let totalOut = '';
 
         const boxedRows: {
@@ -187,112 +264,47 @@ export class KeyboardChessCtrl {
         });
 
         boxedRows.forEach((box, iRow) => {
-            // ROW tone
-            totalOut = totalOut +
-                `<div style="
-                    box-sizing: border-box;
-                    position: relative;
-                    margin: 0;
-                    padding: 0;
-                    color: white;                    
-                    user-select: none;
-                    height: ${rowHeightPx}px;
-                    width:${cellSizePx*12}px;                    
-                    border-bottom: ${box.rowBorderBottom}
-                ">`;
+            let rowOut = '';
+            let rowTpl = this.getRowTpl({rowBorderBottom: box.rowBorderBottom});
 
             // COLS tone
             box.cols.forEach(col => {
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-line-ind="${iRow}"
-                        data-chess-cell-col="${col.colInd}"
-                        data-chess-cell-row-col="${iRow}-${col.colInd}"
-                        data-chess-cell-id=""
-                        data-chess-total-offset="${col.totalOffsetQ}"                        
-                        style="
-                            box-sizing: border-box;
-                            border: 1px solid white;
-                            display: inline-block;
-                            z-index: 0;
-                            position: absolute;
-                            width: ${cellSizePx}px;
-                            height: ${cellSizePx}${px};
-                            background-color: ${col.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            left: ${col.colInd * cellSizePx}px;
-                            top: 1px;
-                        "
-                    ></span>`.trim();
+                rowOut += this.getColTpl({
+                    iRow,
+                    iCol: col.colInd,
+                    totalOffsetQ: col.totalOffsetQ,
+                    bgColor: col.bgColor
+                });
             });
 
             // CELLS tone
             box.cells.forEach(cell => {
                 if (!cell.cellId) return;
 
-                const textDecoration = cell.underline ? 'underline' : 'none';
-
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-line-ind="${iRow}"
-                        data-chess-cell-col="${cell.colInd}"
-                        data-chess-cell-row-col="${iRow}-${cell.colInd}"                                                
-                        data-chess-cell-id="${cell.cellId}"
-                        data-chess-total-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-row-col="${iRow}-${cell.colInd}"                                                                        
-                        style="
-                            box-sizing: border-box;
-                            border: none;
-                            display: inline-block;
-                            position: absolute;
-                            z-index: 0;                            
-                            width: ${cellSizePx-2}px;
-                            height: ${cellSizePx-2}px;
-                            background-color: ${cell.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            font-weight: 700;
-                            font-size: ${fontSizePx}px;
-                            line-height: ${fontSizePx}px;
-                            text-decoration: ${textDecoration};
-                            left: ${(cell.colInd * cellSizePx) + 1}px;
-                            top: 2px;
-                        "
-                    >${cell.char}</span>`.trim();
+                rowOut += this.getCellTpl({
+                    iRow,
+                    iCol: cell.colInd,
+                    cellId: cell.cellId,
+                    totalOffsetQ: cell.totalOffsetQ,
+                    bgColor: cell.bgColor,
+                    char: cell.char,
+                    textDecoration: cell.underline ? 'underline' : 'none',
+                });
             });
 
-            totalOut = totalOut + '</div>';
+            totalOut += rowTpl.replace('%content%', rowOut);
         });
 
-
-        const height = rows.length * rowHeightPx;
-
-        const content = `
-            <div style="display: flex; padding-left: ${cellSizePx}px;">
-                <div style="width: ${cellSizePx*12}px; height: ${height}px; user-select: none; touch-action: none;">
-                    ${totalOut}
-                </div>
-                <div style="width: ${cellSizePx*3}px; height: ${height}px;">
-                    <!--  -->
-                </div>
-            </div>
-        `.trim();
-
-        // UPDATE CHESS
-        const el = dyName('chess-wrapper', this.page.pageEl);
-        if (el) {
-            el.innerHTML = content;
-            //el.style.height = `${rows.length * rowHeight}rem`;
+        return {
+            content: totalOut,
+            rows: rows.length,
         }
-
-        this.subscribeChess();
     }
 
-    printDrumChess(rows: Line[]) {
+    getDrumChess(rows: Line[]): {
+        content: string,
+        rows: number,
+    } {
         const getMask = (count: number): DrumChessCell[] => {
             const arr = Array(count).fill(null);
             return arr.map(() => ({
@@ -374,19 +386,7 @@ export class KeyboardChessCtrl {
             const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
             const rowBorderBottom = hasLine ? '2px solid black;' : 'none;';
 
-            // ROW drum
-            totalOut = totalOut +
-                `<div style="
-                    box-sizing: border-box;
-                    position: relative;
-                    margin: 0;
-                    padding: 0;
-                    color: white;                    
-                    user-select: none;
-                    height: ${rowHeightPx}px;
-                    width:${cellSizePx*12}px;                    
-                    border-bottom: ${rowBorderBottom}
-                ">`;
+            let rowOut = '';
 
             const cellSizeQ = 10;
             const cols = getMask(row.durQ / row.cellSizeQ);
@@ -411,77 +411,46 @@ export class KeyboardChessCtrl {
 
             // COL drum
             cols.forEach((col, iCol) => {
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-line-ind="${iRow}"
-                        data-chess-cell-col="${iCol}"
-                        data-chess-cell-row-col="${iRow}-${iCol}"
-                        data-chess-cell-id=""
-                        data-chess-total-offset="${col.totalOffsetQ}"                        
-                        style="
-                            box-sizing: border-box;
-                            border: 1px solid white;
-                            display: inline-block;
-                            z-index: 0;
-                            position: absolute;
-                            width: ${cellSizePx}${px};
-                            height: ${cellSizePx}${px};
-                            background-color: ${col.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            left: ${iCol * cellSizePx}${px};
-                            top: 1px;
-                        "
-                    ></span>`.trim();
+                rowOut += this.getColTpl({
+                    iRow,
+                    iCol,
+                    totalOffsetQ: col.totalOffsetQ,
+                    bgColor: col.bgColor,
+                });
             });
 
             // CELL drum
-            cols.forEach((cell, iCell) => {
+            cols.forEach((cell, iCol) => {
                 if (!cell.cellId) return;
 
-                const textDecoration = cell.underline ? 'underline' : 'none';
-
-                totalOut = totalOut +
-                    `<span
-                        data-chess-cell-line-ind="${iRow}"
-                        data-chess-cell-col="${iCell}"
-                        data-chess-cell-row-col="${iRow}-${iCell}"                                                
-                        data-chess-cell-id="${cell.cellId}"
-                        data-chess-total-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-offset="${cell.totalOffsetQ}"
-                        data-chess-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
-                        style="
-                            box-sizing: border-box;
-                            border: none;
-                            display: inline-block;
-                            position: absolute;
-                            z-index: 0;                            
-                            width: ${cellSizePx-2}${px};
-                            height: ${cellSizePx-2}${px};
-                            background-color: ${cell.bgColor};
-                            user-select: none;
-                            touch-action: none;
-                            text-align: center;
-                            font-weight: 700;
-                            font-size: ${fontSizePx}${px};
-                            line-height: ${fontSizePx}${px};
-                            text-decoration: ${textDecoration};
-                            left: ${(iCell * cellSizePx) + 1}px;
-                            top: 2px;
-                        "
-                    >${cell.char}</span>`.trim();
+                rowOut += this.getCellTpl({
+                    iRow,
+                    iCol,
+                    cellId: cell.cellId,
+                    totalOffsetQ: cell.totalOffsetQ,
+                    bgColor: cell.bgColor,
+                    textDecoration: cell.underline ? 'underline' : 'none',
+                    char: cell.char,
+                });
             });
 
-            totalOut = totalOut + '</div>';
+            let rowTpl = this.getRowTpl({rowBorderBottom});
+            totalOut += rowTpl.replace('%content%', rowOut);
         });
 
-        const height = rows.length * rowHeightPx;
+        return {
+           content: totalOut,
+           rows: rows.length,
+        }
+    }
+
+    printChess(x: {content: string, rows: number}): {content: string, rows: number} {
+        const height = x.rows * rowHeightPx;
 
         const content = `
             <div style="display: flex; padding-left: ${cellSizePx}px;">
                 <div style="width: ${cellSizePx*12}px; height: ${height}px; user-select: none; touch-action: none;">
-                    ${totalOut}
+                    ${x.content}
                 </div>
                 <div style="width: ${cellSizePx*3}px; height: ${height}px;">
                     <!--  -->
@@ -493,18 +462,18 @@ export class KeyboardChessCtrl {
         const el = dyName('chess-wrapper', this.page.pageEl);
         if (el) {
             el.innerHTML = content;
-            //el.style.height = `${rows.length * rowHeight}rem`;
         }
 
         this.subscribeChess();
 
-        // // UPDATE CHESS
-        // const el = dyName('chess-wrapper', this.page.pageEl);
-        // if (el) {
-        //     el.innerHTML = totalOut;
-        //     el.style.height = `${rows.length * rowHeight}rem`;
-        // }
-        //
-        // this.subscribeChess();
+        return x;
+    }
+
+    printDrumChess(rows: Line[]) {
+        this.printChess(this.getDrumChess(rows));
+    }
+
+    printToneChess(rows: Line[]) {
+        this.printChess(this.getToneChess(rows));
     }
 }

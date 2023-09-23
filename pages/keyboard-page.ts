@@ -188,12 +188,13 @@ export class KeyboardPage implements Page {
 
         tracks.forEach(track => {
             content += `
-                    <p 
-                        data-set-keyboard-type-action
-                        data-board-type="${track.board}"
-                        data-track-name="${track.name}"                                                
-                    >${track.label || track.name}</p>                
-                `.trim();
+                <p 
+                    data-set-keyboard-type-action
+                    data-board-type="${track.board}"
+                    data-track-name="${track.name}"
+                    style="user-select: none; touch-action: none; font-size: 1.1rem;"                                                
+                >${track.label || track.name}</p>                
+            `.trim();
         });
 
         dyName('panel-right-content').innerHTML = content;

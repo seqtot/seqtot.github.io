@@ -460,38 +460,15 @@ export class KeyboardCtrl {
     }
 
     getBottomCommandPanel(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        const style2 = `border-radius: 0.25rem; border: 1px solid black; font-size: 1rem; user-select: none; touch-action: none;`;
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
         let result = '';
 
         result = `
             <div data-bottom-command-panel>
                 <div style="${rowStyle}">
-                    <!--span 
-                        style="${style}"
-                        data-ide-action="ready"
-                    >ready</span-->
-                    <span
-                        style="${style}"
-                        data-ide-action="save"
-                    >save</span>&nbsp;
-                    <span
-                        style="${style}"
-                        data-load-song-action
-                    >load</span>&nbsp;
-                    <!--span
-                        style="${style}"
-                        data-ide-action="clear"
-                    >clear</span-->
-                    <span
-                        style="${style} color: gray;"
-                        data-ide-action="stop"
-                    >${sings.stop}</span>
-                    <span
-                        style="${style} color: blue; padding-left: .25rem; padding-right: .25rem;"
-                        data-ide-action="play-both"
-                    >${sings.play1}2</span>
+                    ${svg.saveBtn('data-ide-action="save"', '', 20)}&nbsp;
+                    ${svg.stopBtn('data-ide-action="stop"', '', 20)}&nbsp;
+                    ${svg.playBtn('data-ide-action="play-both"', '', 20)}
                 </div>
             </div>
         `.trim();
@@ -914,18 +891,9 @@ export class KeyboardCtrl {
         return `
             ${this.getBottomCommandPanel()}
             <div style="padding-left: 1rem;">
-                <span
-                    style="${cmdStyle}"
-                    data-ide-action="back-to-parts"
-                >back</span>&nbsp;&nbsp;
-                <span
-                    style="${cmdStyle} color: blue;"
-                    data-ide-action="play-active"
-                >${sings.play}</span>
-                <span
-                    style="${cmdStyle} color: gray;"
-                    data-ide-action="stop"
-                >${sings.stop}</span>&nbsp;&nbsp;                
+                ${svg.backBtn('data-ide-action="back-to-parts"', '', 20)}&nbsp;
+                ${svg.playBtn('data-ide-action="play-active"', '', 20)}&nbsp;
+                ${svg.stopBtn('data-ide-action="stop"', '', 20)}&nbsp;
                 <span
                     style="${cmdStyle}"
                     data-ide-action="clear"
@@ -1012,6 +980,7 @@ export class KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.saveEditingItems());
         });
 
+        // jjkl: delete?
         getWithDataAttr('load-song-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.loadFile());
         });
