@@ -372,7 +372,7 @@ export class KeyboardChessCtrl {
             const nextRow = rows[iRow + 1];
             const offsets = this.liner.getOffsetsByRow(row);
             const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
-            const rowBorderBottom = hasLine ? '2px solid block;' : 'none;';
+            const rowBorderBottom = hasLine ? '2px solid black;' : 'none;';
 
             // ROW drum
             totalOut = totalOut +
