@@ -187,7 +187,7 @@ export class KeyboardChessCtrl {
         });
 
         boxedRows.forEach((box, iRow) => {
-            // ROW
+            // ROW tone
             totalOut = totalOut +
                 `<div style="
                     box-sizing: border-box;
@@ -201,7 +201,7 @@ export class KeyboardChessCtrl {
                     border-bottom: ${box.rowBorderBottom}
                 ">`;
 
-            // COLS
+            // COLS tone
             box.cols.forEach(col => {
                 totalOut = totalOut +
                     `<span
@@ -228,7 +228,7 @@ export class KeyboardChessCtrl {
                     ></span>`.trim();
             });
 
-            // CELLS
+            // CELLS tone
             box.cells.forEach(cell => {
                 if (!cell.cellId) return;
 
@@ -372,21 +372,20 @@ export class KeyboardChessCtrl {
             const nextRow = rows[iRow + 1];
             const offsets = this.liner.getOffsetsByRow(row);
             const hasLine = (!!nextRow && nextRow.blockOffsetQ !== row.blockOffsetQ);
-            const rowBorderBottom = hasLine ? '1px solid gray;' : 'none;';
+            const rowBorderBottom = hasLine ? '2px solid block;' : 'none;';
 
+            // ROW drum
             totalOut = totalOut +
                 `<div style="
                     box-sizing: border-box;
                     position: relative;
                     margin: 0;
                     padding: 0;
-                    font-size: 1.2rem;
-                    line-height: .9rem;
                     color: white;                    
                     user-select: none;
-                    padding-top: .07rem;
-                    height: 1.4rem;
-                    border-bottom: ${rowBorderBottom};
+                    height: ${rowHeightPx}px;
+                    width:${cellSizePx*12}px;                    
+                    border-bottom: ${rowBorderBottom}
                 ">`;
 
             const cellSizeQ = 10;
@@ -410,6 +409,7 @@ export class KeyboardChessCtrl {
                 col.underline = textAndColor.underline;
             }
 
+            // COL drum
             cols.forEach((col, iCol) => {
                 totalOut = totalOut +
                     `<span
@@ -424,17 +424,19 @@ export class KeyboardChessCtrl {
                             display: inline-block;
                             z-index: 0;
                             position: absolute;
-                            width: ${cellWidth}${rem};
-                            height: ${cellHeight}${rem};
+                            width: ${cellSizePx}${px};
+                            height: ${cellSizePx}${px};
                             background-color: ${col.bgColor};
                             user-select: none;
                             touch-action: none;
                             text-align: center;
-                            left: ${iCol * cellWidth}${rem};
+                            left: ${iCol * cellSizePx}${px};
+                            top: 1px;
                         "
                     ></span>`.trim();
             });
 
+            // CELL drum
             cols.forEach((cell, iCell) => {
                 if (!cell.cellId) return;
 
@@ -451,19 +453,22 @@ export class KeyboardChessCtrl {
                         data-chess-cell-with-id-row-col="${iRow}-${iCell}"                                                                        
                         style="
                             box-sizing: border-box;
-                            border: 1px solid white;
+                            border: none;
                             display: inline-block;
                             position: absolute;
-                            width: ${cellWidth}${rem};
-                            height: ${cellHeight}${rem};
+                            z-index: 0;                            
+                            width: ${cellSizePx-2}${px};
+                            height: ${cellSizePx-2}${px};
                             background-color: ${cell.bgColor};
                             user-select: none;
                             touch-action: none;
                             text-align: center;
                             font-weight: 700;
-                            z-index: 0;
+                            font-size: ${fontSizePx}${px};
+                            line-height: ${fontSizePx}${px};
                             text-decoration: ${textDecoration};
-                            left: ${iCell * cellWidth}${rem};
+                            left: ${(iCell * cellSizePx) + 1}px;
+                            top: 2px;
                         "
                     >${cell.char}</span>`.trim();
             });
@@ -471,13 +476,35 @@ export class KeyboardChessCtrl {
             totalOut = totalOut + '</div>';
         });
 
+        const height = rows.length * rowHeightPx;
+
+        const content = `
+            <div style="display: flex; padding-left: ${cellSizePx}px;">
+                <div style="width: ${cellSizePx*12}px; height: ${height}px; user-select: none; touch-action: none;">
+                    ${totalOut}
+                </div>
+                <div style="width: ${cellSizePx*3}px; height: ${height}px;">
+                    <!--  -->
+                </div>
+            </div>
+        `.trim();
+
         // UPDATE CHESS
         const el = dyName('chess-wrapper', this.page.pageEl);
         if (el) {
-            el.innerHTML = totalOut;
-            el.style.height = `${rows.length * rowHeight}rem`;
+            el.innerHTML = content;
+            //el.style.height = `${rows.length * rowHeight}rem`;
         }
 
         this.subscribeChess();
+
+        // // UPDATE CHESS
+        // const el = dyName('chess-wrapper', this.page.pageEl);
+        // if (el) {
+        //     el.innerHTML = totalOut;
+        //     el.style.height = `${rows.length * rowHeight}rem`;
+        // }
+        //
+        // this.subscribeChess();
     }
 }
