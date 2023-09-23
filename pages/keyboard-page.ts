@@ -100,6 +100,7 @@ export class KeyboardPage implements Page {
     onClosePage() {
         //console.log('onClosePage');
         this.setTrackName();
+        this.addTracksLink();
         window.removeEventListener('resize', this.onWindowResize);
     }
 
@@ -133,19 +134,36 @@ export class KeyboardPage implements Page {
         return this.getTracks().find(item => item.name === trackName);
     }
 
-    setTrackName(name?: string) {
-        // return `<a class="link" href="${href}">${name}</a>`;
-        const href = this.songId ? `href="/mbox/${this.songId}/"`: '';
-
-        getWithDataAttr('main-menu-center').forEach(el => {
-            if (name) {
-                el.innerHTML = `<a
+    addTracksLink(add = false) {
+        getWithDataAttr('app-right-header-area').forEach((el) => {
+            el.innerHTML = add ?
+                `<a class="panel-open"
+                    data-panel=".panel-right"
                     style="user-select: none; touch-action: none;"
-                    ${href}
-                    >${name}</a>
-                `.trim();
+                ><b>TRACKS</b></a>            
+            `.trim()
+            : null;
+        });
+    }
+
+    setTrackName(name?: string) {
+        const href = this.songId ? `href="/mbox/${this.songId}/"`: '';
+        const mainLink = '<a class="panel-open" data-panel=".panel-left" style="user-select: none; touch-action: none;"><b>MAIN</b></a>';
+        const backLink = href ? `&emsp;<a style="user-select: none; touch-action: none;" ${href}><b>BACK</b></a>` : '';
+
+        getWithDataAttr('app-center-header-area').forEach(el => {
+            if (name) {
+                el.innerHTML = `<a style="user-select: none; touch-action: none;" ${href}>${name}</a>`;
             } else {
                 el.innerHTML = '';
+            }
+        });
+
+        getWithDataAttr('app-left-header-area').forEach(el => {
+            if (name) {
+                el.innerHTML = `${mainLink}${backLink}`;
+            } else {
+                el.innerHTML = mainLink;
             }
         });
     }
@@ -198,6 +216,11 @@ export class KeyboardPage implements Page {
         });
 
         dyName('panel-right-content').innerHTML = content;
+
+        this.addTracksLink(true);
+        getWithDataAttr('app-right-panel-title').forEach((el) => {
+            el.innerHTML = 'Tracks';
+        });
     }
 
     updateRightPanel() {

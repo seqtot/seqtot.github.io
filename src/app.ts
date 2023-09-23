@@ -17,8 +17,8 @@ import { pageRc } from './page-rc';
 const appEl = document.getElementById('app');
 
 const isDev =
-  /devitband/.test(window.location.href) ||
-  /local/.test(window.location.href);
+    /devitband/.test(window.location.href) ||
+    /local/.test(window.location.href);
 
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
@@ -29,23 +29,23 @@ const defRoute = isDev ? '/page/page_keyboard/' : '/set/set_all/';
 //const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
 const linksToPage = [
-  { href: '/mbox/setBand/', name: 'Список' },
-  { href: '/mbox/setMy/', name: 'Мои вещи' },
-  { href: '/page/page_roll/', name: 'roll', isDev: true },
-  { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
-  { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
-  { href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
+    { href: '/mbox/setBand/', name: 'Список' },
+    { href: '/mbox/setMy/', name: 'Мои вещи' },
+    { href: '/page/page_roll/', name: 'roll', isDev: true },
+    { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
+    { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
+    { href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
 ];
 
 const linksHtml = linksToPage
-  .map((item) => {
-    if (!isDev && item['isDev']) {
-      return '';
-    }
+    .map((item) => {
+        if (!isDev && item['isDev']) {
+            return '';
+        }
 
-    return `<a href="${item.href}" data-view=".view-main" class="panel-close">${item.name}</a>`;
-  })
-  .join('');
+        return `<a href="${item.href}" data-view=".view-main" class="panel-close">${item.name}</a>`;
+    })
+    .join('');
 
 
 const leftPanel = `
@@ -58,7 +58,7 @@ const leftPanel = `
       <div class="navbar">
         <div class="navbar-bg"></div>
         <div class="navbar-inner sliding">
-          <div class="title">Left Panel</div>
+          <div class="title" data-app-left-panel-title></div>
         </div>
       </div><!-- navbar -->
 
@@ -83,7 +83,7 @@ const rightPanel = `
       <div class="navbar">
         <div class="navbar-bg"></div>
         <div class="navbar-inner sliding">
-          <div class="title">Right Panel</div>
+          <div data-app-right-panel-title class="title"></div>
         </div>
       </div><!-- navbar -->
 
@@ -122,16 +122,16 @@ let navbar = `
 `;
 
 navbar = `
-<div app-header-container style="height: 2rem; display: flex; justify-content: center; align-items: center; user-select: none;">
-  <a class="panel-open"
-    data-panel=".panel-left"
-    style="user-select: none; touch-action: none;"
-  ><b>LEFT</b></a>
-  <div style="max-width: 5rem; padding-left: 1rem; padding-right: 1rem;" data-main-menu-center></div>
-  <a class="panel-open"
-    data-panel=".panel-right"
-    style="user-select: none; touch-action: none;"    
-    ><b>RIGHT</b></a>
+<div app-header-container style="height: 2rem; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+    <div data-app-left-header-area style="padding-left: 1rem;">
+        <a class="panel-open"
+            data-panel=".panel-left"
+            style="user-select: none; touch-action: none;"
+        ><b>MAIN</b></a>    
+    </div>
+    <div data-app-center-header-area style=""></div>  
+    <div data-app-right-header-area style="padding-right: 1rem;">
+  </div>  
 </div>
 `;
 
@@ -147,36 +147,36 @@ appEl.innerHTML = appTpl;
 // appEl.innerHTML = panels;
 
 const app = new Framework7({
-  el: '#app',
-  name: 'ITBand',
-  panel: {
-    // swipe: true,
-  },
-  routes: [
-    // {
-    //   path: '/set/:id',
-    //   component: mboxOldRc,
-    // },
-    {
-      path: '/page/:id',
-      component: pageRc,
+    el: '#app',
+    name: 'ITBand',
+    panel: {
+        // swipe: true,
     },
-    {
-      path: '/:id/:song',
-      component: pageRc,
+    routes: [
+        // {
+        //   path: '/set/:id',
+        //   component: mboxOldRc,
+        // },
+        {
+            path: '/page/:id',
+            component: pageRc,
+        },
+        {
+            path: '/:id/:song',
+            component: pageRc,
+        },
+    ],
+    on: {
+        // init: function () {
+        //console.log('App initialized', arguments.length, this);
+        // },
+        // pageInit: function () {
+        //console.log('Page initialized', arguments.length, arguments[0]);
+        // },
+        // pageMounted: function () {
+        //console.log('Page mounted', arguments.length);
+        // }
     },
-  ],
-  on: {
-    // init: function () {
-    //console.log('App initialized', arguments.length, this);
-    // },
-    // pageInit: function () {
-    //console.log('Page initialized', arguments.length, arguments[0]);
-    // },
-    // pageMounted: function () {
-    //console.log('Page mounted', arguments.length);
-    // }
-  },
 });
 
 // app.views.main.router.navigate('/set/peterGunn/', {
