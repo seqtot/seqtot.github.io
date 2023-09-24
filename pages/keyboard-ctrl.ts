@@ -175,7 +175,6 @@ export class KeyboardCtrl {
                 return;
             }
 
-
             const linesForCopy = LineModel.CloneLines(this.linesForCopy);
             let cellId = this.liner.getMaxCellId() + 1;
             let noteId = this.liner.getMaxNoteId() + 1;
@@ -357,6 +356,7 @@ export class KeyboardCtrl {
                 ${svg.plusBtn('data-set-cell-duration-action="add"', 'green')}
                 ${svg.minusBtn('data-set-cell-duration-action="sub"', 'orange')}
                 ${svg.noteBtn('data-get-note-for-cell-action', 'blue')}
+                ${svg.instrumentBtn('data-get-instrument-action', 'blue')}
                 ${svg.copyBtn('data-copy-notes-action', 'black')}
                 ${svg.copyManyBtn('data-copy-row-action', 'black')}
                 ${svg.pasteBtn('data-paste-notes-action', 'black')}
@@ -891,13 +891,12 @@ export class KeyboardCtrl {
         return `
             ${this.getBottomCommandPanel()}
             <div style="padding-left: 1rem;">
-                ${svg.backBtn('data-ide-action="back-to-parts"', '', 20)}&nbsp;
                 ${svg.playBtn('data-ide-action="play-active"', '', 20)}&nbsp;
                 ${svg.stopBtn('data-ide-action="stop"', '', 20)}&nbsp;
                 <span
                     style="${cmdStyle}"
                     data-ide-action="clear"
-                >clear</span>
+                >free</span>
             </div>
             
             <div style="margin-top: .5rem;">
@@ -967,8 +966,10 @@ export class KeyboardCtrl {
         getWithDataAttr('edit-row-actions', this.page.pageEl).forEach((el: HTMLElement) => {
             el.style.display = 'block';
         });
-        this.liner.fillLinesStructure('480');
-        this.printChess(this.liner.lines);
+
+        this.page.setContent();
+        //this.liner.fillLinesStructure('480');
+        //this.printChess(this.liner.lines);
     }
 
     subscribeIdeEvents() {
@@ -985,6 +986,7 @@ export class KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.loadFile());
         });
 
+        // jjkl: delete?
         getWithDataAttrValue('ide-action', 'back-to-parts', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.gotoSong());
         });
@@ -1061,6 +1063,8 @@ export class KeyboardCtrl {
         partId = (partId || '').trim();
 
         if (!partId && !partNio) return;
+
+        console.log(partId, partNio);
 
         const song = SongStore.getSong(this.songId);
 
@@ -1236,23 +1240,58 @@ export class KeyboardCtrl {
         });
     }
 
-    addOrDelNoteClick(el: HTMLElement) {
-        console.log('addOrDelNoteClick', el);
-
-        const rowCol = this.activeCell.rowCol;
+    getTotalOffsetByRowCol(rowCol: string): number {
         const cell = getWithDataAttrValue('chess-cell-row-col', rowCol)[0];
-
-        if (!cell) return;
+        if (!cell) return null;
 
         const totalOffsetQ = parseInteger(cell.dataset['chessTotalOffset'], null);
 
-        if (totalOffsetQ === null) return;
+        if (totalOffsetQ === null) return null;
 
-        const note = el.dataset['noteLat'];
+        return totalOffsetQ;
+    }
 
-        if (!note) return;
+    replaceInstrument(el: HTMLElement) {
+        const inArea = el.dataset.replaceInstrumentAction;
+        const rowCol = this.activeCell.rowCol;
+        let notes:LineNote[] = [];
 
-        this.addOrDelNote(note, rowCol, totalOffsetQ);
+        console.log('replaceInstrument', inArea, this.activeCell);
+
+        if (inArea === 'note') {
+            const totalOffsetQ = this.getTotalOffsetByRowCol(rowCol);
+
+            if (totalOffsetQ === null) return;
+
+            notes = this.liner.getNotesByOffset(totalOffsetQ);
+        }
+        else if (inArea === 'block') {
+            const line = this.liner.lines[this.activeCell.lineInd];
+
+            if (line && line.rowInPartId) {
+                const rowInPartId = this.liner.lines[this.activeCell.lineInd].rowInPartId;
+                const lines = this.liner.lines.filter(item => item.rowInPartId === rowInPartId);
+
+                lines.forEach(line => {
+                    line.cells.forEach(cell => {
+                        cell.notes.forEach(note => {
+                           notes.push(note);
+                        });
+                    })
+                });
+            }
+        }
+        else if (inArea === 'blocks') {
+            notes = this.liner.getAllNotes();
+        }
+
+        notes.forEach(note => {
+            note.instCode = this.instrCode;
+            note.instName = this.instrName;
+        });
+
+        this.printChess(this.liner.lines);
+        this.highlightCellByRowCol(rowCol);
     }
 
     addOrDelNote(pNote: string | LineNote, rowCol: string, totalOffsetQ: number) {
@@ -1288,6 +1327,21 @@ export class KeyboardCtrl {
             this.printChess(this.liner.lines);
             this.highlightCellByRowCol(rowCol);
         }
+    }
+
+    addOrDelNoteClick(el: HTMLElement) {
+        console.log('addOrDelNoteClick', el);
+
+        const rowCol = this.activeCell.rowCol;
+        const totalOffsetQ = this.getTotalOffsetByRowCol(rowCol);
+
+        if (totalOffsetQ === null) return;
+
+        const note = el.dataset['noteLat'];
+
+        if (!note) return;
+
+        this.addOrDelNote(note, rowCol, totalOffsetQ);
     }
 
     playActive() {

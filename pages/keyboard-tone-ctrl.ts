@@ -612,11 +612,64 @@ export class ToneCtrl extends KeyboardCtrl {
         const parent = getWithDataAttr('dynamic-tone-board')[0] as HTMLElement;
 
         getWithDataAttr('instrument-code', parent).forEach(el => {
-            el.style.fontWeight = '400';
+            el.style.backgroundColor = 'white';
         });
 
         getWithDataAttrValue('instrument-code', this.instrCode, parent).forEach(el => {
-            el.style.fontWeight = '700';
+            el.style.backgroundColor = 'lightgray';
+        });
+    }
+
+    updateInstrumentsPopup() {
+        const parent = getWithDataAttr('instruments-popup')[0] as HTMLElement;
+
+        getWithDataAttr('instrument-code', parent).forEach(el => {
+            el.style.backgroundColor = 'white';
+        });
+
+        getWithDataAttrValue('instrument-code', this.instrCode, parent).forEach(el => {
+            el.style.backgroundColor = 'lightgray';
+        });
+    }
+
+    subscribeInstrumentsPopup() {
+        const parent = getWithDataAttr('instruments-popup')[0] as HTMLElement;
+
+        getWithDataAttr('instrument-code', parent).forEach(el => {
+            el.addEventListener('pointerdown', () => {
+                this._instrCode = un.parseInteger(el.dataset.instrumentCode, DEFAULT_TONE_INSTR);
+                this.updatePopupBoard();
+
+                ideService.synthesizer.playSound({
+                    keyOrNote: 'do',
+                    id: 'popup',
+                    instrCode: this.instrCode,
+                });
+            })
+        });
+
+        getWithDataAttr('instrument-code', parent).forEach(el => {
+            el.addEventListener('pointerup', () => {
+                ideService.synthesizer.playSound({
+                    keyOrNote: 'do',
+                    id: 'popup',
+                    onlyStop: true
+                });
+            })
+        });
+
+        getWithDataAttr('close-popup', parent).forEach(el => {
+            el.addEventListener('pointerdown', () => {
+                this.boardPopup.close(false);
+
+            })
+        });
+
+        getWithDataAttr('replace-instrument-action', parent).forEach(el => {
+            el.addEventListener('pointerdown', () => {
+                this.replaceInstrument(el);
+                this.boardPopup.close(false);
+            })
         });
     }
 
@@ -649,7 +702,7 @@ export class ToneCtrl extends KeyboardCtrl {
             })
         });
 
-        getWithDataAttr('close-popup-board', parent).forEach(el => {
+        getWithDataAttr('close-popup', parent).forEach(el => {
             el.addEventListener('pointerdown', () => {
                 this.boardPopup.close(false);
             })
@@ -721,7 +774,7 @@ export class ToneCtrl extends KeyboardCtrl {
     getInstrumentsForChoice(): string {
         const style = `
             display: inline-block;
-            margin: 0 .5rem .5rem 0;
+            margin: 0 1rem .5rem 0;
             border-radius: 0.25rem;
             border: 1px solid lightgray;
             font-size: 1.1rem;
@@ -730,40 +783,93 @@ export class ToneCtrl extends KeyboardCtrl {
         let instruments = '';
 
         const instrs = [
-            {code: 327, label: 'RGtr:Drive'},
-            {code: 321, label: 'RGtr:Drive:Mute'},
-            {code: 276, label: 'EGtr:Clean'},
+            [
+                {code: 327, label: 'RGtr:Drive'},
+                {code: 321, label: 'RGtr:Drive:Mute'},
+                {code: 276, label: 'EGtr:Clean'},
+            ],
+            [
+                {code: 374, label: 'CBass:Finger'},
+                {code: 366, label: 'CBass:Slap'},
 
-            {code: 374, label: 'CBass:Finger'},
-            {code: 366, label: 'CBass:Slap'},
+                {code: 375, label: 'EBass:Finger'},
+                {code: 388, label: 'EBass:Mediator'},
+                {code: 405, label: 'EBass:Beat'},
+            ],
+            [
+                {code: 182, label: 'Organ:Hard'},
+                {code: 162, label: 'Organ:Soft'},
+                {code: 235, label: 'Bayan'},
+            ],
+            [
+                {code: 617, label: 'Trumpet'},
+                {code: 626, label: 'Trombone'},
+                {code: 635, label: 'Tuba'},
 
-            {code: 375, label: 'EBass:Finger'},
-            {code: 388, label: 'EBass:Mediator'},
-            {code: 405, label: 'EBass:Beat'},
-
-            {code: 182, label: 'Organ:Hard'},
-            {code: 162, label: 'Organ:Soft'},
-            {code: 235, label: 'Bayan'},
-
-            {code: 136, label: 'Xylo'},
-
-            {code: 617, label: 'Trumpet'},
-            {code: 626, label: 'Trombone'},
-            {code: 635, label: 'Tuba'},
-
-            {code: 466, label: 'Violin'},
+                {code: 762, label: 'picFlute'},
+                {code: 790, label: 'panFlute'},
+            ],
+            [
+                {code: 136, label: 'Xylo'},
+                {code: 466, label: 'Violin'},
+            ]
         ];
 
-        instrs.forEach(item => {
-            instruments = instruments + `
-                <span
+        instrs.forEach(group => {
+            group.forEach(item => {
+                instruments += `<span
                     style="${style}" 
                     data-instrument-code="${item.code}"                    
-                >${item.label}</span>&emsp;
+                >${item.label}</span>
             `.trim();
+            });
+
+            instruments += '</br>';
         });
 
         return instruments;
+    }
+
+    openInstrumentBoard() {
+        this.boardPopup = (this.page.context.$f7 as any).popup.create({
+            content: `
+                <div class="popup">
+                    <div class="page">
+                        <div class="page-content" data-instruments-popup>
+                            <div style="margin: 1rem 0 0 1rem;">
+                                <div 
+                                    data-replace-instrument-action="note"
+                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                                >NOTE</div>
+                                <div 
+                                    data-replace-instrument-action="block"
+                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                                >BLOCK</div>
+                                <div 
+                                    data-replace-instrument-action="blocks"                                    
+                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                                >BLOCKS</div>                            
+                                &emsp;
+                                <div
+                                    data-close-popup
+                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                                >Close</div>                        
+                            </div>
+                            <div style="margin: 1rem 2rem 0 1rem;">
+                                ${this.getInstrumentsForChoice()}
+                            </div>
+                        </div>
+                    </div>
+                </div>`.trim(),
+            on: {
+                opened: () => {
+                    this.subscribeInstrumentsPopup();
+                    this.updateInstrumentsPopup();
+                }
+            }
+        });
+
+        this.boardPopup.open(false);
     }
 
     openGuitarBoard() {
@@ -779,7 +885,7 @@ export class ToneCtrl extends KeyboardCtrl {
                     >OK</div>
                     <br/>
                     <div
-                        data-close-popup-board
+                        data-close-popup
                         style="height: 2rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
                     >Close</div>
                 </div>
@@ -827,7 +933,7 @@ export class ToneCtrl extends KeyboardCtrl {
                             >OK</div>
                             &emsp;
                             <div
-                                data-close-popup-board
+                                data-close-popup
                                 style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
                             >Close</div>                        
                         </div>
@@ -1173,6 +1279,13 @@ export class ToneCtrl extends KeyboardCtrl {
                 }
             });
         });
+
+        getWithDataAttr('get-instrument-action', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                this.openInstrumentBoard();
+            });
+        });
+
     }
 }
 

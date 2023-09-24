@@ -106,6 +106,10 @@ class IdeService extends  EventEmitter {
     get guid(): number {
         return this._guid++;
     }
+
+    reset() {
+        // jjkl: todo
+    }
 }
 
 export const ideService = new IdeService();
