@@ -1,27 +1,26 @@
+import {Dialog} from 'framework7/components/dialog/dialog';
 import { ComponentContext } from 'framework7/modules/component/component';
+
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Synthesizer } from '../libs/muse/synthesizer';
 import { MultiPlayer } from '../libs/muse/multi-player';
-
 import { Line, LineModel, CELL_SIZE, LineNote } from './line-model';
 import * as un from '../libs/muse/utils'
 import { parseInteger } from '../libs/common';
-
 import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
 import { SongNode, SongStore, StoredRow, StoredSongNodeOld } from './song-store';
 import {
-    createOutBlock,
+    createOutBlock, DEFAULT_VOLUME,
     getOutBlocksInfo,
     OutBlockRowInfo,
     SongPartInfo,
     TextBlock
 } from '../libs/muse/utils';
-
 import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
-import {getPitchShiftSetting} from '@muse/utils/getFileSettings';
-import {Dialog} from 'framework7/components/dialog/dialog';
 import * as svg from './svg-icons';
+
+import { NoteDetailsDialog } from './dialogs/note-details-dialog';
 
 export type BpmInfo = {
     bpm: number;
@@ -41,6 +40,7 @@ export interface KeyboardPage {
     multiPlayer: MultiPlayer;
     context: ComponentContext,
     setContent: () => void,
+    songId: string,
 }
 
 export const toneBoards = {
@@ -74,8 +74,12 @@ const iconBtnStl = [
 ].join('');
 
 export class KeyboardCtrl {
-    liner = new LineModel();
     trackName = '';
+    liner = new LineModel();
+    confirm: Dialog.Dialog;
+    notesForCopy: LineNote[] = [];
+    linesForCopy: Line[];
+
     activeCell: {
         id: number,
         col: number,
@@ -151,9 +155,6 @@ export class KeyboardCtrl {
             this.activeCell.id = id;
         }
     }
-
-    notesForCopy: LineNote[] = [];
-    linesForCopy: Line[];
 
     pasteFromClipboard() {
         if (!this.activeCell.rowCol) {
@@ -304,9 +305,29 @@ export class KeyboardCtrl {
             el.dataset['selected'] = '';
         });
 
+        getWithDataAttr('chess-pony-col-line-ind', this.page.pageEl).forEach(el => {
+            el.style.display = 'none';
+        });
+
         if (highlight) {
             this.setActiveCell(null);
-            const el = getWithDataAttrValue('chess-cell-with-id-row-col', rowCol)[0] || getWithDataAttrValue('chess-cell-row-col', rowCol)[0];
+            let el = getWithDataAttrValue('chess-cell-with-id-row-col', rowCol)[0];
+
+            // pony cell
+            if (el) {
+                const cellId = this.getCellId(el);
+                const noteForEdit = this.liner.getNoteById(cellId);
+
+                if (!noteForEdit) return;
+
+                getWithDataAttrValue('chess-pony-col-line-ind', el.dataset.chessCellLineInd).forEach(el => {
+                    el.style.display = 'block';
+
+                    el.innerHTML = (un.parseInteger(noteForEdit.volume, DEFAULT_VOLUME).toString() + (noteForEdit.slides ? '~' : ''));
+                });
+            }
+
+            el = el || getWithDataAttrValue('chess-cell-row-col', rowCol)[0];
 
             if (el) {
                 this.setActiveCell(el);
@@ -1020,8 +1041,6 @@ export class KeyboardCtrl {
         this.page.context.$f7router.navigate(`/mbox/${this.songId}/`);
     }
 
-    confirm: Dialog.Dialog;
-
     delRowFromPart(partId: string, partNio: number | string) {
         partId = (partId || '').trim();
         partNio = un.parseInteger(partNio, 0);
@@ -1213,14 +1232,12 @@ export class KeyboardCtrl {
         localStorage.setItem(songName, JSON.stringify(songNode));
     }
 
-
     getMetronomeContent() {
         return `
             <div style="margin: 0 0 1.5rem 1rem; width: 15rem;">
                 ${this.page.getMetronomeContent()}
             </div>`.trim();
     }
-
 
     subscribeEditCommands() {
         getWithDataAttrValue('edit-line-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1460,6 +1477,19 @@ export class KeyboardCtrl {
         });
     }
 
+    ponyCellClicked() {
+        const noteForEdit = this.liner.getNoteById(this.activeCell?.id);
+
+        if (!noteForEdit) return;
+
+        new NoteDetailsDialog(this.page.context, this).openDialog(noteForEdit, (note:LineNote) => {
+            noteForEdit.volume = note.volume;
+            noteForEdit.slides = note.slides;
+
+            console.log('ponyCellClicked.dialog.ok', noteForEdit);
+        });
+    }
+
     updateView() {}
     printChess(rows: Line[]) {}
     highlightInstruments() {}
@@ -1516,6 +1546,7 @@ export class KeyboardCtrl {
 // CELL
 // getCellInfo  setActiveCell  getCellId  moveCell  addCellDuration
 // highlightCellByRowCol deleteCell
+// ponyCellClicked
 
 // CHESS LINE
 // addLine insertLine deleteLine

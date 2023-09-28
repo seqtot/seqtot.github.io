@@ -57,7 +57,7 @@ export class ToneCtrl extends KeyboardCtrl {
         public boardType: ToneKeyboardType
     ) {
         super(page, boardType);
-        this.chess = new KeyboardChessCtrl(this.page, this.liner, this);
+        this.chess = new KeyboardChessCtrl(this, this.liner);
 
         if (boardType === 'bassGuitar') {
             this._instrCode = hlp.bassGuitarInstr;
@@ -925,18 +925,24 @@ export class ToneCtrl extends KeyboardCtrl {
             content: `
                 <div class="popup">
                     <div class="page">
-                        <div class="page-content" data-dynamic-tone-board>
-                        <div style="margin: 1rem 0 0 1rem;">
-                            <div 
-                                data-select-note-action
-                                style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                            >OK</div>
-                            &emsp;
-                            <div
-                                data-close-popup
-                                style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                            >Close</div>                        
+                        <div class="navbar">
+                              <div class="navbar-bg"></div>
+                              <div class="navbar-inner sliding">
+                                
+                            </div>
                         </div>
+                        <div class="page-content" data-dynamic-tone-board>
+                            <div style="margin: 1rem 0 0 1rem;">
+                                <div 
+                                    data-select-note-action
+                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                                >OK</div>
+                                &emsp;
+                                <div
+                                    data-close-popup
+                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
+                                >Close</div>                        
+                            </div>
                             ${this.getHarmonicaBoard(boardType)}                           
                             <div style="margin: 0 1rem 0 1rem;">
                                 ${this.getInstrumentsForChoice()}

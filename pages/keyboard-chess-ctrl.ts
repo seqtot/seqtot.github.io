@@ -23,13 +23,16 @@ type DrumChessCell = {
 }
 
 export class KeyboardChessCtrl {
+    get page(): KeyboardPage {
+        return this.board.page;
+    }
+
     constructor(
-        public page: KeyboardPage,
-        public liner: LineModel,
         public board: KeyboardCtrl,
+        public liner: LineModel,
     ){
         //console.log(ideService.currentEdit);
-        console.log('getBoundingClientRect', Math.floor(this.page.pageEl.getBoundingClientRect().width / 16));
+        //console.log('getBoundingClientRect', Math.floor(this.page.pageEl.getBoundingClientRect().width / 16));
 
         cellSizePx = Math.floor(this.page.pageEl.getBoundingClientRect().width / 16 / 2) * 2;
         rowHeightPx = cellSizePx + 4;
@@ -57,6 +60,10 @@ export class KeyboardChessCtrl {
     subscribeChess() {
         getWithDataAttr('chess-cell-row-col', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.chessCellClick(el));
+        });
+
+        getWithDataAttr('chess-pony-col-line-ind', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.board.ponyCellClicked());
         });
     }
 
@@ -297,13 +304,13 @@ export class KeyboardChessCtrl {
 
         return {
             content: totalOut,
-            rows: rows.length,
+            rowCount: rows.length,
         }
     }
 
     getDrumChess(rows: Line[]): {
         content: string,
-        rows: number,
+        rowCount: number,
     } {
         const getMask = (count: number): DrumChessCell[] => {
             const arr = Array(count).fill(null);
@@ -440,12 +447,38 @@ export class KeyboardChessCtrl {
 
         return {
            content: totalOut,
-           rows: rows.length,
+           rowCount: rows.length,
         }
     }
 
-    printChess(x: {content: string, rows: number}): {content: string, rows: number} {
-        const height = x.rows * rowHeightPx;
+    getPonyCol(rowCount: number): string {
+        let result = ``;
+
+        for (let i = 0; i < rowCount; i++) {
+            result += `<div 
+                style="
+                    height: ${rowHeightPx}px;
+                    width: ${cellSizePx*3}px"
+                >
+                    <div
+                        data-chess-pony-col-line-ind="${i}"                    
+                        style="
+                            display: none;
+                            margin-left: ${cellSizePx}px;
+                            width: ${cellSizePx * 2}px;
+                            border: 1px solid black;
+                            height: ${rowHeightPx}px;                            
+                            text-align: center;
+                        "
+                        ></div>
+                </div>`;
+        }
+
+        return result;
+    }
+
+    printChess(x: {content: string, rowCount: number}): {content: string, rowCount: number} {
+        const height = x.rowCount * rowHeightPx;
 
         const content = `
             <div style="display: flex; padding-left: ${cellSizePx}px;">
@@ -453,7 +486,7 @@ export class KeyboardChessCtrl {
                     ${x.content}
                 </div>
                 <div style="width: ${cellSizePx*3}px; height: ${height}px;">
-                    <!--  -->
+                    ${this.getPonyCol(x.rowCount)}
                 </div>
             </div>
         `.trim();

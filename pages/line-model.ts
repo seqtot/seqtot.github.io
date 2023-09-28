@@ -1,4 +1,5 @@
 import * as un from '../libs/muse/utils/utils-note';
+import {DEFAULT_VOLUME, getString} from '../libs/muse/utils/utils-note';
 
 export type KeyData = {
     quarterTime: number;
@@ -24,6 +25,8 @@ export type LineNote = {
 
     instCode?: string | number;
     instName?: string;
+    volume?: number;
+    slides?: string;
 };
 
 export type Cell = {
@@ -50,6 +53,16 @@ type CellCoord = {
 }
 
 export const CELL_SIZE = 10;
+
+function getSlides(val: string): string {
+    val = (val || '').trim();
+
+    val = val.replace(/\r\n/g, '\n');
+    val = val.replace(/ /g, '\n');
+    val = val.split(/\n/).filter(val => !!val).join('_');
+
+    return val;
+}
 
 export class LineModel {
     lines: Line[] = [];
@@ -642,6 +655,20 @@ export class LineModel {
         return result;
     }
 
+    getNoteById(id: string | number): LineNote {
+        for (let line of this.lines) {
+            for (let cell of line.cells) {
+                for (let note of cell.notes) {
+                    if (note.id == id) {
+                        return note;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     getNotesByOffset(offsetQ: number): LineNote[] {
         const result: LineNote[] = []
 
@@ -758,6 +785,12 @@ export class LineModel {
             const nextNote = notes[i+1];
             let durationForNext = 0;
             let pause = '';
+            let volume = `v${un.parseInteger(note.volume, DEFAULT_VOLUME)}`;
+            let slides = getSlides(note.slides);
+
+            if (slides) {
+                slides = slides.startsWith('~') ? `:${slides}` : `_${slides}`;
+            }
 
             if (nextNote) {
                 durationForNext = nextNote.startOffsetQ - note.startOffsetQ;
@@ -769,7 +802,8 @@ export class LineModel {
                 pause = `${note.startOffsetQ} `;
             }
 
-            result += `${pause} ${instName} ${note.note}=${durationForNext}=${note.durQ} `;
+            //result += `${pause} ${instName} ${note.note}=${durationForNext}=${note.durQ} `;
+            result += `${pause} ${instName} ${note.note}=${durationForNext}=${note.durQ}:${volume}${slides} `;
         });
 
         return result;

@@ -59,6 +59,7 @@ export function getPitchAndCent(val: string): {
     return result;
 }
 
+// :~1.25=count=speed
 export function buildVibratoSlides(durationQ: number, val: string): string | undefined {
     val = (val || '').trim();
 
@@ -69,14 +70,14 @@ export function buildVibratoSlides(durationQ: number, val: string): string | und
     val = val.replace(vibratoChar, '');
     const pitch = getPitchAndCent(val.split(timeCharRE)[0]);
     const count = parseInteger(val.split(timeCharRE)[1], 0);
-    const factor = parseInteger(val.split(timeCharRE)[2], 2);
+    const speedFactor = parseInteger(val.split(timeCharRE)[2], 2);
 
     if (!count || !pitch.pitchWithCent) {
         return undefined;
     }
 
     let durationByItemQ = parseInteger('' + durationQ/(count + 1));
-    let speed = factor ? parseInteger('' + durationByItemQ/factor) : 0;
+    let speed = speedFactor ? parseInteger('' + durationByItemQ/speedFactor) : 0;
     let result = '' + durationByItemQ;
     let odd = false;
 

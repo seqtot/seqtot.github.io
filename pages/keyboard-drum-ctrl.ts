@@ -57,7 +57,7 @@ export class DrumCtrl extends KeyboardCtrl {
 
     constructor(public page: KeyboardPage, public type: DrumKeyboardType) {
         super(page, type);
-        this.chess = new KeyboardChessCtrl(this.page, this.liner, this);
+        this.chess = new KeyboardChessCtrl(this, this.liner);
 
         this.board = new DrumBoard();
     }
