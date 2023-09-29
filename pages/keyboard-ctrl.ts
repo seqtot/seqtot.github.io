@@ -425,7 +425,7 @@ export class KeyboardCtrl {
         return result;
     }
 
-    deleteCell(el: HTMLElement) {
+    delete_Cell(el: HTMLElement) {
         const cellEl = getWithDataAttrValue('chess-cell-row-col', this.activeCell.rowCol)[0];
 
         if (!cellEl) return;
@@ -434,7 +434,7 @@ export class KeyboardCtrl {
 
         if (totalOffset === null) return;
 
-        this.liner.deleteCellByOffset(totalOffset);
+        this.liner.delete_CellByOffset(totalOffset);
         this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
@@ -459,7 +459,7 @@ export class KeyboardCtrl {
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
-    deleteLine() {
+    delete_Line() {
         if (!this.activeCell.rowCol) {
             return;
         }
@@ -474,7 +474,7 @@ export class KeyboardCtrl {
             }
         }
 
-        this.liner.deleteLine(this.activeCell.lineInd, line.rowInPartId);
+        this.liner.delete_Line(this.activeCell.lineInd, line.rowInPartId);
         this.setEditingItemDurationAndBlockOffsetByLines();
         this.printChess(this.liner.lines);
         this.highlightCellByRowCol(this.activeCell.rowCol);
@@ -498,7 +498,7 @@ export class KeyboardCtrl {
     }
 
     setEditingItemDurationAndBlockOffsetByLines() {
-        this.sortByPartAndRowNio(ideService.editedItems);
+        this.sort_ByPartAndRowNio(ideService.editedItems);
 
         let blockOffsetQ = 0;
 
@@ -528,7 +528,7 @@ export class KeyboardCtrl {
             return part.partNio === iPartNio;
         });
 
-        this.sortByPartAndRowNio(partRows);
+        this.sort_ByPartAndRowNio(partRows);
 
         return partRows;
     }
@@ -583,7 +583,7 @@ export class KeyboardCtrl {
                     });
                 });
 
-                this.sortByPartAndRowNio(partRows);
+                this.sort_ByPartAndRowNio(partRows);
             }
 
             if (x.resetBlockOffset) this.resetBlockOffset(partRows);
@@ -926,7 +926,7 @@ export class KeyboardCtrl {
         `.trim();
     }
 
-    removeEditingItem(rowInPartId: string) {
+    remove_EditingItem(rowInPartId: string) {
         ideService.editedItems = ideService.editedItems.filter(iItem => iItem.rowInPartId !== rowInPartId);
     }
 
@@ -938,7 +938,7 @@ export class KeyboardCtrl {
         }
     }
 
-    sortByPartAndRowNio(rows: {
+    sort_ByPartAndRowNio(rows: {
         partNio?: number,
         rowNio?: number,
         rowInPartId?: string
@@ -971,7 +971,7 @@ export class KeyboardCtrl {
         };
 
         this.addOrRemoveEditingItem(item, el);
-        this.sortByPartAndRowNio(ideService.editedItems);
+        this.sort_ByPartAndRowNio(ideService.editedItems);
         this.updateView();
     }
 
@@ -1033,7 +1033,7 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttrValue('ide-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.delRowFromPart(el.dataset['partId'], el.dataset['partNio']));
+            el.addEventListener('pointerdown', () => this.delete_RowFromPart(el.dataset['partId'], el.dataset['partNio']));
         });
     }
 
@@ -1041,7 +1041,7 @@ export class KeyboardCtrl {
         this.page.context.$f7router.navigate(`/mbox/${this.songId}/`);
     }
 
-    delRowFromPart(partId: string, partNio: number | string) {
+    delete_RowFromPart(partId: string, partNio: number | string) {
         partId = (partId || '').trim();
         partNio = un.parseInteger(partNio, 0);
 
@@ -1050,10 +1050,10 @@ export class KeyboardCtrl {
         const song = SongStore.getSong(this.songId);
         const rows = SongStore.getRowsByPart(song.dynamic, partId, partNio);
 
-        const rowNios = rows.map(item => un.getRowNio(item.rowInPartId));
-        rowNios.sort();
+        const partRowNios = rows.map(item => un.getPartRowNio(item.rowInPartId));
+        this.sort_ByPartAndRowNio(partRowNios);
 
-        const rowNioForDel = rowNios[rowNios.length - 1];
+        const rowNioForDel = partRowNios[partRowNios.length - 1].rowNio;
 
         if (!rowNioForDel) return;
 
@@ -1061,8 +1061,8 @@ export class KeyboardCtrl {
             '',
             `Удалить строку ${rowNioForDel} во всех трэках?`,
             () => {
-                SongStore.delRowFromPart(this.songId, song, partId, <number>partNio, rowNioForDel);
-                this.removeEditingItem(`${partNio}-${rowNioForDel}`)
+                SongStore.Delete_RowFromPart(this.songId, song, partId, <number>partNio, rowNioForDel);
+                this.remove_EditingItem(`${partNio}-${rowNioForDel}`)
 
                 getWithDataAttr('edit-parts-wrapper').forEach(el => {
                     el.innerHTML = this.getIdeContent();
@@ -1241,7 +1241,7 @@ export class KeyboardCtrl {
 
     subscribeEditCommands() {
         getWithDataAttrValue('edit-line-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteCell(el));
+            el.addEventListener('pointerdown', () => this.delete_Cell(el));
         });
 
         getWithDataAttrValue('edit-row-action', 'add-line', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1253,7 +1253,7 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttrValue('edit-row-action', 'delete-line', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.deleteLine());
+            el.addEventListener('pointerdown', () => this.delete_Line());
         });
     }
 
@@ -1331,7 +1331,7 @@ export class KeyboardCtrl {
             if (iNote.note === note.note) {
                 isDelete = true;
 
-                this.liner.deleteNoteByNoteAndOffset(totalOffsetQ, note.note);
+                this.liner.delete_NoteByNoteAndOffset(totalOffsetQ, note.note);
             }
         }
 
@@ -1543,13 +1543,18 @@ export class KeyboardCtrl {
 // getEmptyBpmInfo
 // getMoveButtons
 //
+//
 // CELL
 // getCellInfo  setActiveCell  getCellId  moveCell  addCellDuration
-// highlightCellByRowCol deleteCell
+// highlightCellByRowCol
 // ponyCellClicked
 
 // CHESS LINE
-// addLine insertLine deleteLine
+// addLine insertLine
+
+
+// remove_EditingItem
+// delete_Line delete_RowFromPart delete_Cell
 
 // PLAY
 // playActive playOne playBoth

@@ -149,7 +149,7 @@ export class NoteDetailsDialog {
                                 <a class="link popup-close">Close</a>
                             </div-->
                         </div>  
-                    </div>                
+                    </div>
                     <div class="page-content">
                         %content%
                     </div>

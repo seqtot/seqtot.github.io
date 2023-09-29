@@ -830,31 +830,36 @@ export class ToneCtrl extends KeyboardCtrl {
         return instruments;
     }
 
-    openInstrumentBoard() {
+    getInstrumentNavbarContent(): string {
+        const btnStl = `
+            display: inline-block;
+            margin: 0;
+            padding: .25rem;  
+            border-radius: 0.25rem;
+            border: 1px solid lightgray;
+            font-size: 1.2rem;
+            user-select: none;
+        `.trim();
+
+        return `
+            <div class="navbar">
+                <div class="navbar-bg"></div>
+                <div class="navbar-inner" style="justify-content: space-evenly;">
+                <div data-replace-instrument-action="note"   style="${btnStl}">note</div>
+                <div data-replace-instrument-action="block"  style="${btnStl}">Block</div>
+                <div data-replace-instrument-action="blocks" style="${btnStl}">BLOCKS</div>
+                <div data-close-popup style="${btnStl}">Close</div>
+            </div>
+        </div>`.trim();
+    }
+
+    open_InstrumentBoard() {
         this.boardPopup = (this.page.context.$f7 as any).popup.create({
             content: `
-                <div class="popup">
+                <div class="popup" data-instruments-popup>
                     <div class="page">
-                        <div class="page-content" data-instruments-popup>
-                            <div style="margin: 1rem 0 0 1rem;">
-                                <div 
-                                    data-replace-instrument-action="note"
-                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                                >NOTE</div>
-                                <div 
-                                    data-replace-instrument-action="block"
-                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                                >BLOCK</div>
-                                <div 
-                                    data-replace-instrument-action="blocks"                                    
-                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                                >BLOCKS</div>                            
-                                &emsp;
-                                <div
-                                    data-close-popup
-                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                                >Close</div>                        
-                            </div>
+                        ${this.getInstrumentNavbarContent()}                        
+                        <div class="page-content" >
                             <div style="margin: 1rem 2rem 0 1rem;">
                                 ${this.getInstrumentsForChoice()}
                             </div>
@@ -872,31 +877,42 @@ export class ToneCtrl extends KeyboardCtrl {
         this.boardPopup.open(false);
     }
 
-    openGuitarBoard() {
-        const content = `
-            <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
-                <div style="user-select: none; touch-action: none;">
-                    ${this.getGuitarBoard(<any>this.boardType)}
-                </div>
-                <div style="padding-left: .5rem; padding-top: .5rem;">
-                    <div 
-                        data-select-note-action
-                        style="height: 2rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                    >OK</div>
-                    <br/>
-                    <div
-                        data-close-popup
-                        style="height: 2rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                    >Close</div>
-                </div>
-        </div>`.trim();
+    getOKCloseNavbarContent(): string {
+        const btnStl = `
+            display: inline-block;
+            margin: 0;
+            padding: .25rem;  
+            border-radius: 0.25rem;
+            border: 1px solid lightgray;
+            font-size: 1.2rem;
+            user-select: none;
+        `.trim();
 
+        return `
+            <div class="navbar">
+                <div class="navbar-bg"></div>
+                <div class="navbar-inner" style="justify-content: space-evenly;">
+                <div data-select-note-action style="${btnStl}"><b>OK</b></div>
+                <div data-close-popup style="${btnStl}">Close</div>                            
+            </div>
+        </div>`.trim();
+    }
+
+    open_GuitarBoard() {
         this.boardPopup = (this.page.context.$f7 as any).popup.create({
             content: `
-                <div class="popup">
+                <div class="popup" data-dynamic-tone-board>
                     <div class="page">
-                        <div class="page-content" data-dynamic-tone-board>
-                            ${content}
+                        ${this.getOKCloseNavbarContent()}                    
+                        <div class="page-content">
+                            <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
+                                <div style="margin-top: .5rem; user-select: none; touch-action: none;">
+                                    ${this.getGuitarBoard(<any>this.boardType)}
+                                </div>
+                                <div style="margin-top: .5rem;">
+                                    <!-- content -->
+                                </div>
+                            </div>
                             <div style="margin: 1rem;">
                                 ${this.getInstrumentsForChoice()} 
                             </div>                            
@@ -915,7 +931,7 @@ export class ToneCtrl extends KeyboardCtrl {
         this.boardPopup.open(false);
     }
 
-    openHarmonicaBoard(boardType?: ToneKeyboardType) {
+    open_HarmonicaBoard(boardType?: ToneKeyboardType) {
         boardType = (
             boardType ||
             localStorage.getItem('useThisBoard') as ToneKeyboardType ||
@@ -923,26 +939,10 @@ export class ToneCtrl extends KeyboardCtrl {
 
         this.boardPopup = (this.page.context.$f7 as any).popup.create({
             content: `
-                <div class="popup">
+                <div class="popup" data-dynamic-tone-board>
                     <div class="page">
-                        <div class="navbar">
-                              <div class="navbar-bg"></div>
-                              <div class="navbar-inner sliding">
-                                
-                            </div>
-                        </div>
-                        <div class="page-content" data-dynamic-tone-board>
-                            <div style="margin: 1rem 0 0 1rem;">
-                                <div 
-                                    data-select-note-action
-                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                                >OK</div>
-                                &emsp;
-                                <div
-                                    data-close-popup
-                                    style="display: inline-block; height: 1.5rem; padding: .5rem; border: 1px solid gray; border-radius: .25rem;"
-                                >Close</div>                        
-                            </div>
+                        ${this.getOKCloseNavbarContent()}
+                        <div class="page-content" >
                             ${this.getHarmonicaBoard(boardType)}                           
                             <div style="margin: 0 1rem 0 1rem;">
                                 ${this.getInstrumentsForChoice()}
@@ -1155,7 +1155,7 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttrValue('action-tone', 'open-guitar-board', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.openGuitarBoard());
+            el.addEventListener('pointerdown', () => this.open_GuitarBoard());
         });
 
         getWithDataAttrValue('action-tone', 'fix-board-cell', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1279,16 +1279,16 @@ export class ToneCtrl extends KeyboardCtrl {
         getWithDataAttr('get-note-for-cell-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => {
                 if (this.realBoardType === 'bassGuitar' || this.realBoardType === 'guitar') {
-                    this.openGuitarBoard();
+                    this.open_GuitarBoard();
                 } else {
-                    this.openHarmonicaBoard();
+                    this.open_HarmonicaBoard();
                 }
             });
         });
 
         getWithDataAttr('get-instrument-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => {
-                this.openInstrumentBoard();
+                this.open_InstrumentBoard();
             });
         });
 
@@ -1300,7 +1300,7 @@ export class ToneCtrl extends KeyboardCtrl {
 // BOARD
 // getGuitarContent      getHarmonicaContent
 // getGuitarBoard        getHarmonicaBoard
-// openGuitarBoard       openHarmonicaBoard
+// open_GuitarBoard      open_HarmonicaBoard  open_InstrumentBoard
 // getGuitarRightSide
 // getMusicInfoContent
 //

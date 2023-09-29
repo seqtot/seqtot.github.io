@@ -447,7 +447,7 @@ export class SongStore {
         return result;
     }
 
-    static delRowFromPart(
+    static Delete_RowFromPart(
         songId: string,
         song: SongNode,
         partId: string,

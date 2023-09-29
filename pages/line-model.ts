@@ -162,7 +162,7 @@ export class LineModel {
         this.lines = rows;
     }
 
-    deleteNoteByNoteAndOffset(offset: number, note: string) {
+    delete_NoteByNoteAndOffset(offset: number, note: string) {
         const {row, cells} = this.getCellsByOffset(offset);
 
         if (!row) return;
@@ -174,7 +174,7 @@ export class LineModel {
         row.cells = row.cells.filter(cell => !!cell.notes.length);
     }
 
-    deleteCellByOffset(offsetQ: number) {
+    delete_CellByOffset(offsetQ: number) {
         const row = this.lines[this.findRowIndByOffset(offsetQ)];
 
         if (!row) return;
@@ -247,7 +247,7 @@ export class LineModel {
         };
     }
 
-    deleteLine(i: number, rowInPartId = '') {
+    delete_Line(i: number, rowInPartId = '') {
         if (this.lines.length === 1) {
             this.lines = [];
 
