@@ -291,11 +291,15 @@ export class ToneCtrl extends KeyboardCtrl {
             ${this.getMetronomeContent()}
             ${this.getRowActionsCommands()}
             
-            ${this.getDurationCommandPanel()}            
-            ${this.getMoveCommandPanel()}                                                
+            <!--${this.getDurationCommandPanel()}->            
+            <!--${this.getMoveCommandPanel()}-->
+            ${this.getEditCellCommandPanel()}
+
             <div data-name="chess-wrapper" style="width: 100%;"></div>
-            ${this.getMoveCommandPanel()}
-            ${this.getDurationCommandPanel()}
+            
+            ${this.getEditCellCommandPanel()}
+            <!--${this.getMoveCommandPanel()}-->
+            <!--${this.getDurationCommandPanel()}-->
             
             <div data-edit-parts-wrapper>
                 ${this.getRowsByPartComplexContent()}                
@@ -331,11 +335,15 @@ export class ToneCtrl extends KeyboardCtrl {
             ${this.getMetronomeContent()}            
             ${this.getRowActionsCommands()}
             
-            ${this.getDurationCommandPanel()}            
-            ${this.getMoveCommandPanel()}                        
+            <!--${this.getDurationCommandPanel()}-->            
+            <!--${this.getMoveCommandPanel()}-->
+            ${this.getEditCellCommandPanel()}
+            
             <div data-name="chess-wrapper" style="width: 100%;"></div>
-            ${this.getMoveCommandPanel()}
-            ${this.getDurationCommandPanel()}
+            
+            ${this.getEditCellCommandPanel()}
+            <!--${this.getMoveCommandPanel()}-->
+            <!--${this.getDurationCommandPanel()}-->
             
             <div data-edit-parts-wrapper>
                 ${this.getRowsByPartComplexContent()}                

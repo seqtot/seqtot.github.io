@@ -369,6 +369,40 @@ export class KeyboardCtrl {
         `.trim();
     }
 
+    getEditCellCommandPanel(hasDel = true): string {
+        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+        let delButton = hasDel
+            ? `${svg.deleteBtn('data-edit-line-action="delete-cell"')}&emsp;`
+            :'';
+
+        let result = '';
+
+        result += `
+            <div style="${rowStyle}">
+                ${svg.minusBtn('data-set-cell-duration-action="sub"', 'orange')}
+                ${svg.moveTopBtn('data-action-move-cell="top"', '', 20)}
+                ${svg.plusBtn('data-set-cell-duration-action="add"', 'green')}
+                ${svg.noteBtn('data-get-note-for-cell-action', 'blue')}
+                ${svg.copyBtn('data-copy-notes-action', 'black')}
+                ${svg.pasteBtn('data-paste-notes-action', 'black')}
+            </div>
+        `.trim();
+
+        result += `
+            <div style="${rowStyle}">
+                ${svg.moveLeftBtn('data-action-move-cell="left"', '', 20)}
+                ${svg.moveDownBtn('data-action-move-cell="bottom"', '', 20)}
+                ${svg.moveRightBtn('data-action-move-cell="right"', '', 20)}
+                ${svg.instrumentBtn('data-get-instrument-action', 'blue')}
+                ${svg.copyManyBtn('data-copy-row-action', 'black')}
+                ${svg.emptyBtn('', 20)}
+                ${delButton}
+            </div>
+        `.trim();
+
+        return result;
+    }
+
     getDurationCommandPanel() {
         const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
         let additional = '';
