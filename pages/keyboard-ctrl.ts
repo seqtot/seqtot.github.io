@@ -1424,15 +1424,13 @@ export class KeyboardCtrl {
         }
     }
 
-    addOrDelNoteClick(el: HTMLElement) {
-        console.log('addOrDelNoteClick', el);
-
+    addOrDelNoteClick(el: string | HTMLElement) {
         const rowCol = this.activeCell.rowCol;
         const totalOffsetQ = this.getTotalOffsetByRowCol(rowCol);
 
         if (totalOffsetQ === null) return;
 
-        const note = el.dataset['noteLat'];
+        const note = typeof el === 'string' ? el : el.dataset['noteLat'];
 
         if (!note) return;
 

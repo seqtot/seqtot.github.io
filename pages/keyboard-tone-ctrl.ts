@@ -703,17 +703,20 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('close-popup', parent).forEach(el => {
             el.addEventListener('pointerup', () => {
-                this.boardPopup.close(false);
-            })
+                setTimeout(() => {
+                    this.boardPopup.close(false);
+                }, 10);
+            });
         });
 
         getWithDataAttr('select-note-action', parent).forEach(el => {
             el.addEventListener('pointerup', () => {
-                if (lastNoteEl) {
-                    this.addOrDelNoteClick(lastNoteEl);
-                }
+                let note = lastNoteEl ? lastNoteEl.dataset['noteLat'] : '';
 
-                this.boardPopup.close(false);
+                setTimeout(() => {
+                    this.boardPopup.close(false);
+                    this.addOrDelNoteClick(note);
+                }, 10);
             });
         });
 
