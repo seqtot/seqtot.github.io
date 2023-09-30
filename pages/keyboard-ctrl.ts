@@ -442,14 +442,6 @@ export class KeyboardCtrl {
                     data-action-type="tick"
                     data-signature="3:8"                    
                 >3:8</span>&nbsp;
-                <!--span
-                    style="${style} color: gray;"
-                    data-action-type="stop"
-                >${sings.stop}</span>                                                    
-                <span
-                    style="${style} color: blue;"
-                    data-page-action="play-one"
-                >${sings.play}</span-->
             </div>
         `.trim();
 

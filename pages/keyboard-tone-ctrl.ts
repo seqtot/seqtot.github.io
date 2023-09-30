@@ -93,45 +93,6 @@ export class ToneCtrl extends KeyboardCtrl {
         return hlp.getVerticalKeyboard('base', boardType, boardKeys);
     }
 
-    getRecordCommandPanel(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none;`;
-        const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none; ${monoFont}`;
-        let result = '';
-
-        result = `
-            <div style="${rowStyle}">
-                <!--span 
-                    style="font-size: 1.5rem; user-select: none; touch-action: none;"
-                    data-page-action="clear"
-                >clr&nbsp;&nbsp;</span-->                
-                <span
-                    style="${style}"
-                    data-action-tone="record-mode"
-                >rec</span>&nbsp;
-                <span
-                    style="${style}"
-                    data-action-type="tick"
-                    data-signature="1:4"
-                >1:4</span>
-                <span
-                    style="${style}"
-                    data-action-type="tick"
-                    data-signature="3:8"                    
-                >3:8</span>&nbsp;
-                <span
-                    style="${style} color: gray;"
-                    data-action-type="stop"
-                >${sings.stop}</span>                                  
-                <span
-                    style="${style} color: blue;"
-                    data-page-action="play-one"
-                >${sings.play}</span>
-            </div>
-        `.trim();
-
-        return result;
-    }
-
     getBeatContent(): string {
         const actionStyle = `
             border: 1px solid lightgray;

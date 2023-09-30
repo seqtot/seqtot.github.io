@@ -243,11 +243,11 @@ export class DrumCtrl extends KeyboardCtrl {
 
         let wrapper = `
             <div style="display: flex; width: 90%; justify-content: flex-start; user-select: none; margin-bottom: .5rem;">
-                <div style="border-radius: .5rem; margin-left: .5rem; padding-left: .5rem; padding-right: .5rem; border: 1px solid lightgray;">
-                    %instruments%
-                </div>
-                <div style="margin-left: 1rem;">
+                <div style="margin-left: 1rem; margin-right: .5rem;">
                     %actions%
+                </div>            
+                <div style="border-radius: .5rem; padding-left: .5rem; padding-right: .5rem; border: 1px solid lightgray;">
+                    %instruments%
                 </div>                
             </div>
         `.trim();
@@ -305,8 +305,6 @@ export class DrumCtrl extends KeyboardCtrl {
                 ${svg.emptyBtn('', 20)}
             </div>     
             <div style="${rowStyle}">
-                <!--${svg.stopBtn('data-action-type="stop"')}-->
-                <!--${svg.playBtn('data-page-action="play-one"')}-->
                 ${svg.emptyBtn('', 20)}
                 ${svg.emptyBtn('', 20)}
                 ${svg.emptyBtn('', 20)}                
