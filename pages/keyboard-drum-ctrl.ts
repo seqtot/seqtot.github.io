@@ -393,7 +393,7 @@ export class DrumCtrl extends KeyboardCtrl {
             <div data-name="chess-wrapper" style="width: 100%;"></div>
             
             <div data-edit-parts-wrapper>
-                ${this.getIdeContent()}                
+                ${this.getRowsByPartComplexContent()}                
             </div>                                
             
             <div style="font-size: 1.5rem;">

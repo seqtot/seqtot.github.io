@@ -1,4 +1,5 @@
-import {Dialog} from 'framework7/components/dialog/dialog';
+import { Dialog } from 'framework7/components/dialog/dialog';
+import { Sheet } from 'framework7/components/sheet/sheet';
 import { ComponentContext } from 'framework7/modules/component/component';
 
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
@@ -480,15 +481,21 @@ export class KeyboardCtrl {
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
-    getBottomCommandPanel(): string {
-        const rowStyle = `width: 90%; font-family: monospace; margin: .5rem 0; padding-left: 1rem; user-select: none;`;
+    getSaveAndPlayCommandPanel(): string {
+        const blank = '<span style="width: .5rem; display: inline-block;"></span>'
+        const rowStyle = `
+            padding: .5rem 0 .25rem 1rem;            
+            user-select: none;
+            border-top: 1px solid gray;
+        `.trim();
+
         let result = '';
 
         result = `
             <div data-bottom-command-panel>
                 <div style="${rowStyle}">
-                    ${svg.saveBtn('data-ide-action="save"', '', 20)}&nbsp;
-                    ${svg.stopBtn('data-ide-action="stop"', '', 20)}&nbsp;
+                    ${svg.saveBtn('data-ide-action="save"', '', 20)}${blank}
+                    ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
                     ${svg.playBtn('data-ide-action="play-both"', '', 20)}
                 </div>
             </div>
@@ -803,7 +810,65 @@ export class KeyboardCtrl {
         return midiConfig;
     }
 
-    getIdeContent(): string {
+    getRowsByPartActions(part: un.SongPartInfo) {
+        const cmdStyle = `
+            border-radius: 0.25rem;
+            border: 1px solid lightgray;
+            font-size: 1rem;
+            user-select: none; touch-action: none;
+        `.trim();
+
+        return `
+            <span
+                style="${cmdStyle} color: green;"
+                data-ide-action="add-row"
+                data-part-nio="${part.partNio}"
+                data-part-id="${part.partId}"                    
+            >${sings.add}</span>&emsp;
+            <span
+                style="${cmdStyle} color: red;"
+                data-ide-action="delete-row"
+                data-part-nio="${part.partNio}"
+                data-part-id="${part.partId}"                    
+            >${sings.delete}</span>&emsp;
+            <!--span
+                style="${cmdStyle} color: red;"
+                data-ide-action="test-sheet"
+            >test-sheet</span-->
+        `
+    }
+
+    getRowsByPartComplexContent(): string {
+        if (!this.hasIdeItem) return '';
+
+        const cmdStyle = `
+            display: inline-block;
+            border-radius: 0.25rem;
+            border: 1px solid lightgray;
+            font-size: 1rem;
+            user-select: none; touch-action: none;
+        `.trim();
+
+        const blank = '<span style="width: .5rem; display: inline-block;"></span>'
+
+        return `
+            ${this.getSaveAndPlayCommandPanel()}
+            <div style="padding: .5rem 0 .5rem 1rem; border-top: 1px solid gray;">
+                ${svg.playBtn('data-ide-action="play-active"', '', 20)}${blank}
+                ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
+                <span
+                    style="${cmdStyle}"
+                    data-ide-action="clear"
+                >free</span>
+            </div>
+            
+            <div style="">
+                ${this.getRowsByPartContent()}
+            </div>
+        `.trim();
+    }
+
+    getRowsByPartContent(): string {
         if (!this.hasIdeItem) return '';
 
         const currentEdit = ideService.currentEdit;
@@ -856,13 +921,13 @@ export class KeyboardCtrl {
             });
         });
 
-        let editingPartsContent = '';
+        let result = '';
 
         // ФОРМИРУЕМ СПИСОК ЧАСТЕЙ
         rowsByParts.forEach(item => {
             const part = item.part;
 
-            editingPartsContent += `
+            result += `
                 <div style="padding-left: .5rem; padding-right: 1rem;">
                     <span style="margin: .5rem; font-weight: 600;"
                     >${part.partNio}-${part.ref}</span>
@@ -877,7 +942,7 @@ export class KeyboardCtrl {
                     cellCount = Math.floor((row.rowDurationByHeadQ % un.NUM_120) / 10);
                 }
 
-                editingPartsContent += `<span
+                result += `<span
                     style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0; user-select: none; touch-action: none;"
                     data-row-in-part-item
                     data-row-in-part-id="${info.partNio}-${info.rowNio}"                    
@@ -890,40 +955,13 @@ export class KeyboardCtrl {
             });
 
             if (!ideService.currentEdit.freezeStructure) {
-                editingPartsContent += `&emsp;
-                    <span
-                        style="${cmdStyle} color: green;"
-                        data-ide-action="add-row"
-                        data-part-nio="${part.partNio}"
-                        data-part-id="${part.partId}"                    
-                    >${sings.add}</span>&emsp;
-                    <span
-                        style="${cmdStyle} color: red;"
-                        data-ide-action="delete-row"
-                        data-part-nio="${part.partNio}"
-                        data-part-id="${part.partId}"                    
-                    >${sings.delete}</span>&emsp;
-                `.trim();
+                result += `&emsp;${this.getRowsByPartActions(part)}`;
             }
 
-            editingPartsContent += '</div>';
+            result += '</div>';
         });
 
-        return `
-            ${this.getBottomCommandPanel()}
-            <div style="padding-left: 1rem;">
-                ${svg.playBtn('data-ide-action="play-active"', '', 20)}&nbsp;
-                ${svg.stopBtn('data-ide-action="stop"', '', 20)}&nbsp;
-                <span
-                    style="${cmdStyle}"
-                    data-ide-action="clear"
-                >free</span>
-            </div>
-            
-            <div style="margin-top: .5rem;">
-                ${editingPartsContent}
-            </div>
-        `.trim();
+        return result;
     }
 
     remove_EditingItem(rowInPartId: string) {
@@ -1035,6 +1073,46 @@ export class KeyboardCtrl {
         getWithDataAttrValue('ide-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.delete_RowFromPart(el.dataset['partId'], el.dataset['partNio']));
         });
+
+        getWithDataAttrValue('ide-action', 'test-sheet', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => {
+                getWithDataAttr('app-header-second-row-area').forEach(el => {
+                    el.innerHTML = this.getRowsByPartContent();
+                });
+
+                // app-header-second-row-area
+                //this.delete_RowFromPart(el.dataset['partId'], el.dataset['partNio'])
+
+                // const sheet = (this.page.context.$f7 as any).sheet.create({
+                //     backdrop: false,
+                //
+                //     content: `
+                //         <div class="sheet-modal sheet-modal-top" style="height: 200px;">
+                //             <div class="toolbar toolbar-bottom">
+                //                 <div class="toolbar-inner justify-content-flex-end">
+                //                     <a  class="link sheet-close">Close</a>
+                //                 </div>
+                //             </div>
+                //             <div class="sheet-modal-inner">
+                //                 <div class="page-content">
+                //                     <div style="padding: .5rem;">
+                //                         ${this.getRowsByPartContent()}
+                //                     </div>
+                //                 </div>
+                //             </div>
+                //         </div>
+                //     `,
+                //     on: {
+                //         opened: function () {
+                //             console.log('Sheet opened')
+                //         }
+                //     }
+                // }) as Sheet.Sheet;
+                //
+                // sheet.open(true);
+
+            });
+        });
     }
 
     gotoSong() {
@@ -1065,7 +1143,7 @@ export class KeyboardCtrl {
                 this.remove_EditingItem(`${partNio}-${rowNioForDel}`)
 
                 getWithDataAttr('edit-parts-wrapper').forEach(el => {
-                    el.innerHTML = this.getIdeContent();
+                    el.innerHTML = this.getRowsByPartComplexContent();
                     this.subscribeIdeEvents();
                 });
 
@@ -1106,7 +1184,7 @@ export class KeyboardCtrl {
         SongStore.setSong(this.songId, song);
 
         getWithDataAttr('edit-parts-wrapper').forEach(el => {
-            el.innerHTML = this.getIdeContent();
+            el.innerHTML = this.getRowsByPartComplexContent();
             this.subscribeIdeEvents();
         });
 
@@ -1507,7 +1585,7 @@ export class KeyboardCtrl {
 }
 
 // CONTENT
-//  getIdeContent
+//  getRowsByPartComplexContent getRowsByPartContent
 //  getRowActionsCommands
 //  getMetronomeContent
 //  getMoveCommandPanel

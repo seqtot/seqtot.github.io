@@ -122,16 +122,27 @@ let navbar = `
 `;
 
 navbar = `
-<div app-header-container style="height: 2rem; display: flex; justify-content: space-between; align-items: center; user-select: none;">
-    <div data-app-left-header-area style="padding-left: 1rem;">
-        <a class="panel-open"
-            data-panel=".panel-left"
-            style="user-select: none; touch-action: none;"
-        ><b>MAIN</b></a>    
-    </div>
-    <div data-app-center-header-area style=""></div>  
-    <div data-app-right-header-area style="padding-right: 1rem;">
-  </div>  
+<div app-header-container style="border-bottom: 2px solid gray;">
+    <div data-app-header-first-row-area
+        style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            border-bottom: 1px solid gray;
+            height: 2rem;
+        "
+    >
+        <div data-app-left-header-area style="padding-left: 1rem;">
+            <a class="panel-open"
+                data-panel=".panel-left"
+                style="user-select: none; touch-action: none;"
+            ><b>MAIN</b></a>    
+        </div>
+            <div data-app-center-header-area style=""></div>  
+          <div data-app-right-header-area style="padding-right: 1rem;"></div>
+    </div>  
+    <div data-name="app-header-second-row-area" data-app-header-second-row-area></div>  
 </div>
 `;
 

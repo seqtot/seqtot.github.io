@@ -97,8 +97,13 @@ export class KeyboardPage implements Page {
         public context: ComponentContext
     ) {}
 
+    clearAppHeaderSecondRowArea() {
+        dyName('app-header-second-row-area').innerHTML = null;
+    }
+
     onClosePage() {
         //console.log('onClosePage');
+        this.clearAppHeaderSecondRowArea();
         this.setTrackName();
         this.addTracksLink();
         window.removeEventListener('resize', this.onWindowResize);
@@ -135,14 +140,29 @@ export class KeyboardPage implements Page {
     }
 
     addTracksLink(add = false) {
-        getWithDataAttr('app-right-header-area').forEach((el) => {
-            el.innerHTML = add ?
-                `<a class="panel-open"
-                    data-panel=".panel-right"
-                    style="user-select: none; touch-action: none;"
-                ><b>TRACKS</b></a>            
-            `.trim()
-            : null;
+        const wrapper = getWithDataAttr('app-right-header-area')[0];
+
+        if (!wrapper) return;
+
+        wrapper.innerHTML = add ?
+            `<a data-track-links style="user-select: none; touch-action: none;">
+                <b>TRACK</b>
+            </a>`.trim()
+        : null;
+
+        getWithDataAttr('track-links', wrapper).forEach(el => {
+            el.addEventListener('pointerup', () => {
+                if (getWithDataAttr('track-list-content')[0]) {
+                    const wrapper = dyName('app-header-second-row-area');
+
+                    if (wrapper) {
+                        wrapper.innerHTML = null;
+                    }
+                } else {
+                    this.setTrackListContent();
+                    this.updateTrackList();
+                }
+            });
         });
     }
 
@@ -188,15 +208,65 @@ export class KeyboardPage implements Page {
             this.setDrumsContent('drums', this.trackName);
         }
 
-        this.setRightPanelContent();
-        this.updateRightPanel();
+        //this.setRightPanelContent();
+        //this.updateRightPanel();
+
+        this.addTracksLink(true);
+        this.updateTrackList();
         this.setTrackName(track.name);
 
         setTimeout(() => {
             this.subscribeCommonPageEvents();
             this.subscribePageEvents();
-            this.subscribeRightPanelEvents();
+            //this.subscribeRightPanelEvents();
         }, 50);
+    }
+
+    setTrackListContent() {
+        let trackStyle = `
+            display: inline-block;
+            padding: .15rem;
+            margin-right: .5rem; margin-top: .5rem;
+            font-size: 1rem; font-weight: 400;
+            user-select: none; touch-action: none;
+            border: 1px solid gray; border-radius: .3rem;
+        `.trim();
+        const wrapper = dyName('app-header-second-row-area');
+
+        if (!wrapper) return;
+
+        const song = this.isMy ? SongStore.getSong(this.songId) : null;
+        const tracks = song ? song.tracks : defaultTracks;
+        let content = '';
+
+        tracks.forEach(track => {
+            content += `
+                <span 
+                    data-set-keyboard-type-action
+                    data-board-type="${track.board}"
+                    data-track-name="${track.name}"
+                    style="${trackStyle}"                                                
+                >${track.label || track.name}</span>                
+            `.trim();
+        });
+
+        wrapper.innerHTML = `
+            <div style="padding: 0 0 .5rem .5rem;" data-track-list-content>
+                ${content}
+            </div>
+        `;
+
+        getWithDataAttr('set-keyboard-type-action', wrapper).forEach((el) => {
+            el.addEventListener('pointerup', () => {
+                this.setContent(el.dataset.trackName);
+            });
+        });
+
+        //this.addTracksLink(true);
+
+        // getWithDataAttr('app-right-panel-title').forEach((el) => {
+        //     el.innerHTML = 'Tracks';
+        // });
     }
 
     setRightPanelContent() {
@@ -220,6 +290,19 @@ export class KeyboardPage implements Page {
         this.addTracksLink(true);
         getWithDataAttr('app-right-panel-title').forEach((el) => {
             el.innerHTML = 'Tracks';
+        });
+    }
+
+    updateTrackList() {
+        const wrapper = dyName('app-header-second-row-area');
+
+        if (!wrapper) return;
+
+        getWithDataAttr('set-keyboard-type-action', wrapper).forEach((el) => {
+            el.style.backgroundColor = 'white';
+            if (el.dataset.trackName === this.trackName) {
+                el.style.backgroundColor = 'lightgray';
+            }
         });
     }
 

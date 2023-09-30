@@ -298,7 +298,7 @@ export class ToneCtrl extends KeyboardCtrl {
             ${this.getDurationCommandPanel()}
             
             <div data-edit-parts-wrapper>
-                ${this.getIdeContent()}                
+                ${this.getRowsByPartComplexContent()}                
             </div>
             
             <div style="margin: 1rem;">
@@ -338,7 +338,7 @@ export class ToneCtrl extends KeyboardCtrl {
             ${this.getDurationCommandPanel()}
             
             <div data-edit-parts-wrapper>
-                ${this.getIdeContent()}                
+                ${this.getRowsByPartComplexContent()}                
             </div>
 
             <br/>            

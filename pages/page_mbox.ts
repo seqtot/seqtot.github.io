@@ -277,6 +277,15 @@ export class MBoxPage {
     }
 
     getTrackListContent(): string {
+        let trackStyle = `
+            display: inline-block;
+            padding: .15rem;
+            margin-right: .5rem; margin-top: .5rem;
+            font-size: 1rem; font-weight: 400;
+            user-select: none; touch-action: none;
+            border: 1px solid gray; border-radius: .3rem;
+        `.trim();
+
         let content = '';
 
         let actions = `
@@ -294,10 +303,7 @@ export class MBoxPage {
 
             song.tracks.forEach(track => {
                 content += `
-                    <span
-                        style="display: inline-block; margin-right: .5rem; margin-top: .5rem; font-weight: 400; user-select: none;"                  
-                        data-use-track-action="${track.name}"
-                    >
+                    <span style="${trackStyle}" data-use-track-action="${track.name}">
                         ${track.name}:${track.volume}
                     </span>            
             `.trim();
@@ -307,12 +313,9 @@ export class MBoxPage {
         } else {
             Object.keys(this.settings.dataByTracks).forEach(key => {
                 content += `
-                    <span
-                        style="display: inline-block; margin-right: .5rem; margin-top: .5rem; font-weight: 400; user-select: none;"                  
-                        data-use-track-action="${key}"
-                    >
+                    <span style="${trackStyle}" data-use-track-action="${key}">
                         ${key}
-                    </span>            
+                    </span>
             `.trim();
             });
         }
@@ -522,7 +525,7 @@ export class MBoxPage {
     updateTracksView() {
         getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
             let key = el.dataset.useTrackAction
-            el.style.fontWeight = this.excludeTrack[key] ? '400' : '700';
+            el.style.backgroundColor = this.excludeTrack[key] ? 'white' : 'lightgray';
         });
     }
 
