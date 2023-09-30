@@ -659,14 +659,13 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttr('close-popup', parent).forEach(el => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 this.boardPopup.close(false);
-
-            })
+            });
         });
 
         getWithDataAttr('replace-instrument-action', parent).forEach(el => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 this.replaceInstrument(el);
                 this.boardPopup.close(false);
             })
@@ -703,13 +702,13 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttr('close-popup', parent).forEach(el => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 this.boardPopup.close(false);
             })
         });
 
         getWithDataAttr('select-note-action', parent).forEach(el => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 if (lastNoteEl) {
                     this.addOrDelNoteClick(lastNoteEl);
                 }
@@ -1155,7 +1154,7 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttrValue('action-tone', 'open-guitar-board', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.open_GuitarBoard());
+            el.addEventListener('pointerup', () => this.open_GuitarBoard());
         });
 
         getWithDataAttrValue('action-tone', 'fix-board-cell', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1209,7 +1208,7 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttrValue('action-tone', 'record-mode', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.toggleRecord())
+            el.addEventListener('pointerup', () => this.toggleRecord())
         });
 
         const clearColor = () => {
@@ -1277,7 +1276,7 @@ export class ToneCtrl extends KeyboardCtrl {
         super.subscribeDurationCommands();
 
         getWithDataAttr('get-note-for-cell-action', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 if (this.realBoardType === 'bassGuitar' || this.realBoardType === 'guitar') {
                     this.open_GuitarBoard();
                 } else {
@@ -1287,7 +1286,7 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttr('get-instrument-action', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 this.open_InstrumentBoard();
             });
         });

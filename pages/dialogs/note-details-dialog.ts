@@ -277,11 +277,11 @@ export class NoteDetailsDialog {
         // });
 
         getWithDataAttr('edit-track-dialog-ok').forEach((el) => {
-            el.addEventListener('pointerdown', () => this.okClick());
+            el.addEventListener('pointerup', () => this.okClick());
         });
 
         getWithDataAttr('edit-track-dialog-cancel').forEach((el) => {
-            el.addEventListener('pointerdown', () => this.cancelClick());
+            el.addEventListener('pointerup', () => this.cancelClick());
         });
     }
 

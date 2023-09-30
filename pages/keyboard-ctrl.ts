@@ -1067,11 +1067,11 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttrValue('ide-action', 'add-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addRowInPart(el.dataset['partId'], el.dataset['partNio']));
+            el.addEventListener('pointerup', () => this.addRowInPart(el.dataset['partId'], el.dataset['partNio']));
         });
 
         getWithDataAttrValue('ide-action', 'delete-row', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.delete_RowFromPart(el.dataset['partId'], el.dataset['partNio']));
+            el.addEventListener('pointerup', () => this.delete_RowFromPart(el.dataset['partId'], el.dataset['partNio']));
         });
 
         getWithDataAttrValue('ide-action', 'test-sheet', this.page.pageEl).forEach((el: HTMLElement) => {
