@@ -93,7 +93,7 @@ export class ToneCtrl extends KeyboardCtrl {
         return hlp.getVerticalKeyboard('base', boardType, boardKeys);
     }
 
-    getTopCommandPanel(): string {
+    getRecordCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none;`;
         const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none; ${monoFont}`;
         let result = '';
@@ -287,23 +287,20 @@ export class ToneCtrl extends KeyboardCtrl {
             </div>
             
             ${this.getBeatContent()}
-            ${this.getTopCommandPanel()}
+            ${this.getRecordCommandPanel()}
             ${this.getMetronomeContent()}
-            ${this.getRowActionsCommands()}
-            
-            <!--${this.getDurationCommandPanel()}->            
-            <!--${this.getMoveCommandPanel()}-->
+            ${this.getPlayCommandPanel()}
+            ${this.getRowActionsCommands()}            
             ${this.getEditCellCommandPanel()}
 
             <div data-name="chess-wrapper" style="width: 100%;"></div>
             
             ${this.getEditCellCommandPanel()}
-            <!--${this.getMoveCommandPanel()}-->
-            <!--${this.getDurationCommandPanel()}-->
             
             <div data-edit-parts-wrapper>
                 ${this.getRowsByPartComplexContent()}                
             </div>
+            ${this.getPlayCommandPanel()}            
             
             <div style="margin: 1rem;">
                 use board:
@@ -331,23 +328,20 @@ export class ToneCtrl extends KeyboardCtrl {
             </div>
             
             ${this.getBeatContent()}
-            ${this.getTopCommandPanel()}
-            ${this.getMetronomeContent()}            
-            ${this.getRowActionsCommands()}
+            ${this.getRecordCommandPanel()}
+            ${this.getMetronomeContent()}
             
-            <!--${this.getDurationCommandPanel()}-->            
-            <!--${this.getMoveCommandPanel()}-->
+            ${this.getPlayCommandPanel()}
+            ${this.getRowActionsCommands()}
             ${this.getEditCellCommandPanel()}
             
             <div data-name="chess-wrapper" style="width: 100%;"></div>
             
             ${this.getEditCellCommandPanel()}
-            <!--${this.getMoveCommandPanel()}-->
-            <!--${this.getDurationCommandPanel()}-->
-            
+            ${this.getPlayCommandPanel()}            
             <div data-edit-parts-wrapper>
                 ${this.getRowsByPartComplexContent()}                
-            </div>
+            </div>            
 
             <br/>            
             ${this.getMusicInfoContent()}

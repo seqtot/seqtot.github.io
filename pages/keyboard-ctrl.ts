@@ -421,17 +421,13 @@ export class KeyboardCtrl {
         `.trim();
     }
 
-    getTopCommandPanel(): string {
+    getRecordCommandPanel(): string {
         const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1.1rem; user-select: none;`;
         const rowStyle = `margin: .5rem 0; padding-left: 1rem; width: 90%; user-select: none; ${monoFont}`;
         let result = '';
 
         result = `
             <div style="${rowStyle}">
-                <!--span 
-                    style="font-size: 1.5rem; user-select: none; touch-action: none;"
-                    data-page-action="clear"
-                >clr&nbsp;&nbsp;</span-->                
                 <span
                     style="${style}"
                     data-page-action="record"
@@ -446,14 +442,14 @@ export class KeyboardCtrl {
                     data-action-type="tick"
                     data-signature="3:8"                    
                 >3:8</span>&nbsp;
-                <span
+                <!--span
                     style="${style} color: gray;"
                     data-action-type="stop"
                 >${sings.stop}</span>                                                    
                 <span
                     style="${style} color: blue;"
                     data-page-action="play-one"
-                >${sings.play}</span>
+                >${sings.play}</span-->
             </div>
         `.trim();
 
@@ -515,7 +511,7 @@ export class KeyboardCtrl {
         this.highlightCellByRowCol(this.activeCell.rowCol);
     }
 
-    getSaveAndPlayCommandPanel(): string {
+    getPlayCommandPanel(): string {
         const blank = '<span style="width: .5rem; display: inline-block;"></span>'
         const rowStyle = `
             padding: .5rem 0 .25rem 1rem;            
@@ -529,20 +525,29 @@ export class KeyboardCtrl {
             user-select: none; touch-action: none;
         `.trim();
 
-        let result = '';
-
-        result = `
-            <div data-bottom-command-panel>
+        let result = `
+            <div data-play-command-panel>
                 <div style="${rowStyle}">
-                    ${svg.saveBtn('data-ide-action="save"', '', 20)}${blank}${blank}
-                    ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
-                    ${svg.playBtn('data-ide-action="play-solo"', '', 20)}${blank}                    
-                    ${svg.playBtn2('data-ide-action="play-both"', '', 20)}${blank}
-                    ${svg.playBtn3('data-ide-action="play-source"', '', 20)}${blank}
-                    <span style="${cmdStyle}" data-ide-action="clear">free</span>                                        
+                    %content%                                        
                 </div>
             </div>
         `.trim();
+
+        if (this.hasIdeItem) {
+            result = result.replace('%content%', `
+                ${svg.saveBtn('data-ide-action="save"', '', 20)}${blank}${blank}
+                ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
+                ${svg.playBtn('data-ide-action="play-solo"', '', 20)}${blank}
+                ${svg.playBtn2('data-ide-action="play-both"', '', 20)}${blank}
+                ${svg.playBtn3('data-ide-action="play-source"', '', 20)}${blank}
+                <span style="${cmdStyle}" data-ide-action="clear">free</span>
+            `.trim());
+        } else {
+            result = result.replace('%content%', `
+                ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
+                ${svg.playBtn('data-ide-action="play-solo"', '', 20)}${blank}
+            `.trim());
+        }
 
         return result;
     }
@@ -884,21 +889,8 @@ export class KeyboardCtrl {
     getRowsByPartComplexContent(): string {
         if (!this.hasIdeItem) return '';
 
-        const cmdStyle = `
-            display: inline-block;
-            border-radius: 0.25rem;
-            border: 1px solid lightgray;
-            font-size: 1rem;
-            user-select: none; touch-action: none;
-        `.trim();
-
-        const blank = '<span style="width: .5rem; display: inline-block;"></span>'
-
         return `
-            ${this.getSaveAndPlayCommandPanel()}            
-            <div style="">
-                ${this.getRowsByPartContent()}
-            </div>
+            ${this.getRowsByPartContent()}
         `.trim();
     }
 
@@ -978,7 +970,7 @@ export class KeyboardCtrl {
                 </div>
             `.trim();
 
-            result += '<div style="padding-left: .5rem; padding-right: 2rem;">'
+            result += '<div style="padding: 0 2rem .5rem .5rem; border-bottom: 1px solid lightgray;">'
 
             item.rows.forEach(info => {
                 const row = info.row;
@@ -1062,7 +1054,7 @@ export class KeyboardCtrl {
         getWithDataAttr('ide-content', this.page.pageEl).forEach((el: HTMLElement) => {
             el.innerHTML = null;
         });
-        getWithDataAttr('bottom-command-panel', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttr('play-command-panel', this.page.pageEl).forEach((el: HTMLElement) => {
             el.innerHTML = null;
         });
         getWithDataAttr('edit-row-actions', this.page.pageEl).forEach((el: HTMLElement) => {

@@ -293,13 +293,23 @@ export class DrumCtrl extends KeyboardCtrl {
 
         let actions = `
             <div style="${rowStyle}">
-                ${this.getMoveButtons()}
+                ${svg.emptyBtn('', 20)}
+                ${svg.moveTopBtn('data-action-move-cell="top"', '', 20)}
+                ${svg.emptyBtn('', 20)}
+                ${svg.emptyBtn('', 20)}                                                            
             </div>
             <div style="${rowStyle}">
-                ${svg.stopBtn('data-action-type="stop"')}
-                ${svg.playBtn('data-page-action="play-one"')}
+                ${svg.moveLeftBtn('data-action-move-cell="left"', '', 20)}
+                ${svg.moveDownBtn('data-action-move-cell="bottom"', '', 20)}
+                ${svg.moveRightBtn('data-action-move-cell="right"', '', 20)}
+                ${svg.emptyBtn('', 20)}
             </div>     
-            <div style="${rowStyle} display: flex; justify-content: flex-end; padding-right: 1rem;">
+            <div style="${rowStyle}">
+                <!--${svg.stopBtn('data-action-type="stop"')}-->
+                <!--${svg.playBtn('data-page-action="play-one"')}-->
+                ${svg.emptyBtn('', 20)}
+                ${svg.emptyBtn('', 20)}
+                ${svg.emptyBtn('', 20)}                
                 ${svg.deleteBtn('data-edit-line-action="delete-cell"')}
             </div>               
         `.trim();
@@ -375,23 +385,26 @@ export class DrumCtrl extends KeyboardCtrl {
 
         const content = `
             ${this.getDrumBoard(keyboardId)}
-            ${this.getTopCommandPanel()}
-            ${this.getMetronomeContent()}                
+            ${this.getRecordCommandPanel()}
+            ${this.getMetronomeContent()}
+            
+            ${this.getPlayCommandPanel()}                            
             ${this.getRowActionsCommands()}                
-            <!--${this.getMoveCommandPanel()} -->
             ${this.getDrumNotesPanel()}
             
             <div data-name="chess-wrapper" style="width: 100%;"></div>
+            
+            ${this.getPlayCommandPanel()}
             
             <div data-edit-parts-wrapper>
                 ${this.getRowsByPartComplexContent()}                
             </div>                                
             
-            <div style="font-size: 1.5rem;">
+            <div style="padding-top: 1rem; font-size: 1.5rem; border-top: 1px solid lightgray;">
                 ${drums}
             </div>
             
-            <div 
+            <div
                 data-name="drum-patterns"                
                 style="width: 90%; padding-left: 2%;"
             >
