@@ -280,6 +280,37 @@ export function playBtn(data: string, color= 'blue', size = 20) {
         </span>`.trim();
 }
 
+export function playBtn2(data: string, color= 'blue', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'blue';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 330 330" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path id="XMLID_458_" d="M315,0H15C6.716,0,0,6.716,0,15v300c0,8.284,6.716,15,15,15h300c8.284,0,15-6.716,15-15V15 C330,6.716,323.284,0,315,0z M300,300H30V30h270V300z"/>
+                <path id="XMLID_461_" d="M113.729,245.62c2.266,1.256,4.77,1.88,7.271,1.88c2.763,0,5.523-0.763,7.95-2.28l108-67.499 c4.386-2.741,7.05-7.548,7.05-12.72c0-5.172-2.664-9.979-7.05-12.72l-108-67.501c-4.623-2.891-10.453-3.043-15.222-0.4 C108.959,87.024,106,92.047,106,97.5v135C106,237.953,108.959,242.976,113.729,245.62z"/>
+            </svg>
+        </span>`.trim();
+}
+
+export function playBtn3(data: string, color= 'blue', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'blue';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 25.362 25.361" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color};"                
+            >
+                <path d="M23.861,0H1.5C0.673,0,0,0.672,0,1.5v22.361c0,0.826,0.672,1.5,1.5,1.5h22.36c0.827,0,1.5-0.674,1.5-1.5V1.5 C25.361,0.672,24.688,0,23.861,0z M7.346,19.967L7.273,5.447l11.114,7.205L7.346,19.967z"/>
+            </svg>
+        </span>`.trim();
+}
+
 export function stopBtn(data: string, color= 'gray', size = 20) {
     data = (data || '').trim();
     color = (color || '').trim() || 'gray';

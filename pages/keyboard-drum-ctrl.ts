@@ -79,16 +79,7 @@ export class DrumCtrl extends KeyboardCtrl {
     }
 
     updateView() {
-        getWithDataAttr('row-in-part-item', this.page.pageEl).forEach(el => {
-            const rowInPartId = el.dataset['rowInPartId'];
-
-            if (ideService.editedItems.find(item => item.rowInPartId === rowInPartId)) {
-                el.style.fontWeight = '600';
-            } else {
-                el.style.fontWeight = '400';
-            }
-        });
-
+        this.updateRowInPartItems();
         this.updateChess();
     }
 

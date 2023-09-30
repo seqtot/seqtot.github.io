@@ -1261,16 +1261,7 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     updateView() {
-        getWithDataAttr('row-in-part-item', this.page.pageEl).forEach(el => {
-            const rowInPartId = el.dataset['rowInPartId'];
-
-            if (ideService.editedItems.find(item => item.rowInPartId === rowInPartId)) {
-                el.style.fontWeight = '600';
-            } else {
-                el.style.fontWeight = '400';
-            }
-        });
-
+        this.updateRowInPartItems();
         this.updateChess();
         this.updateFixedCellsOnBoard();
     }
@@ -1297,7 +1288,8 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 }
 
-// getContent  getTopCommandPanel updateView
+// getContent  getTopCommandPanel
+// updateView updateRowInPartItems
 //
 // BOARD
 // getGuitarContent      getHarmonicaContent

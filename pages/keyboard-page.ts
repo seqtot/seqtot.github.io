@@ -227,7 +227,7 @@ export class KeyboardPage implements Page {
             display: inline-block;
             padding: .15rem;
             margin-right: .5rem; margin-top: .5rem;
-            font-size: 1rem; font-weight: 400;
+            font-size: .8rem; font-weight: 400;
             user-select: none; touch-action: none;
             border: 1px solid gray; border-radius: .3rem;
         `.trim();

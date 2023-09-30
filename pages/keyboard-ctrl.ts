@@ -488,15 +488,24 @@ export class KeyboardCtrl {
             user-select: none;
             border-top: 1px solid gray;
         `.trim();
+        const cmdStyle = `
+            border-radius: 0.25rem;
+            border: 1px solid lightgray;
+            font-size: 1rem;
+            user-select: none; touch-action: none;
+        `.trim();
 
         let result = '';
 
         result = `
             <div data-bottom-command-panel>
                 <div style="${rowStyle}">
-                    ${svg.saveBtn('data-ide-action="save"', '', 20)}${blank}
+                    ${svg.saveBtn('data-ide-action="save"', '', 20)}${blank}${blank}
                     ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
-                    ${svg.playBtn('data-ide-action="play-both"', '', 20)}
+                    ${svg.playBtn('data-ide-action="play-solo"', '', 20)}${blank}                    
+                    ${svg.playBtn2('data-ide-action="play-both"', '', 20)}${blank}
+                    ${svg.playBtn3('data-ide-action="play-source"', '', 20)}${blank}
+                    <span style="${cmdStyle}" data-ide-action="clear">free</span>                                        
                 </div>
             </div>
         `.trim();
@@ -852,16 +861,7 @@ export class KeyboardCtrl {
         const blank = '<span style="width: .5rem; display: inline-block;"></span>'
 
         return `
-            ${this.getSaveAndPlayCommandPanel()}
-            <div style="padding: .5rem 0 .5rem 1rem; border-top: 1px solid gray;">
-                ${svg.playBtn('data-ide-action="play-active"', '', 20)}${blank}
-                ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
-                <span
-                    style="${cmdStyle}"
-                    data-ide-action="clear"
-                >free</span>
-            </div>
-            
+            ${this.getSaveAndPlayCommandPanel()}            
             <div style="">
                 ${this.getRowsByPartContent()}
             </div>
@@ -872,13 +872,17 @@ export class KeyboardCtrl {
         if (!this.hasIdeItem) return '';
 
         const currentEdit = ideService.currentEdit;
-        const cmdStyle = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-
-        //this.page.bpmValue = currentEdit.bpmValue || 90;
+        let itemStyle = `
+            display: inline-block;
+            padding: .15rem;
+            margin-right: .5rem; margin-top: .5rem;
+            font-size: .8rem; font-weight: 400;
+            user-select: none; touch-action: none;
+            border: 1px solid gray; border-radius: .3rem;
+        `.trim();
 
         const midiConfig = this.getMidiConfig();
         const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
-
         const partHash: {
             [key: string]: {
                 part: un.SongPartInfo,
@@ -926,12 +930,21 @@ export class KeyboardCtrl {
         // ФОРМИРУЕМ СПИСОК ЧАСТЕЙ
         rowsByParts.forEach(item => {
             const part = item.part;
+            let actions = '';
+
+            if (!ideService.currentEdit.freezeStructure) {
+                actions = `&emsp;${this.getRowsByPartActions(part)}`;
+            }
 
             result += `
-                <div style="padding-left: .5rem; padding-right: 1rem;">
+                <div style="padding: .5rem 2rem 0 .5rem; border-top: 1px solid lightgray;">
                     <span style="margin: .5rem; font-weight: 600;"
                     >${part.partNio}-${part.ref}</span>
+                    ${actions}       
+                </div>
             `.trim();
+
+            result += '<div style="padding-left: .5rem; padding-right: 2rem;">'
 
             item.rows.forEach(info => {
                 const row = info.row;
@@ -943,7 +956,7 @@ export class KeyboardCtrl {
                 }
 
                 result += `<span
-                    style="padding: .25rem; margin: .25rem; display: inline-block; background-color: #d7d4f0; user-select: none; touch-action: none;"
+                    style="${itemStyle}"
                     data-row-in-part-item
                     data-row-in-part-id="${info.partNio}-${info.rowNio}"                    
                     data-song-name="${currentEdit.songId}"
@@ -953,10 +966,6 @@ export class KeyboardCtrl {
                     data-init-duration="${row.rowDurationByHeadQ}"                                                            
                 >${info.rowNio}:${rowCount + (cellCount ? '.' + cellCount : '')}</span>`;
             });
-
-            if (!ideService.currentEdit.freezeStructure) {
-                result += `&emsp;${this.getRowsByPartActions(part)}`;
-            }
 
             result += '</div>';
         });
@@ -1051,15 +1060,19 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttr('row-in-part-item', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.songRowClick(el));
+            el.addEventListener('pointerup', () => this.songRowClick(el));
         });
 
         getWithDataAttrValue('ide-action', 'clear', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.resetEditingParts());
         });
 
-        getWithDataAttrValue('ide-action', 'play-active', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('ide-action', 'play-source', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.playActive());
+        });
+
+        getWithDataAttrValue('ide-action', 'play-solo', this.page.pageEl).forEach((el: HTMLElement) => {
+            el.addEventListener('pointerdown', () => this.playOne());
         });
 
         getWithDataAttrValue('ide-action', 'stop', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1563,6 +1576,18 @@ export class KeyboardCtrl {
             noteForEdit.slides = note.slides;
 
             console.log('ponyCellClicked.dialog.ok', noteForEdit);
+        });
+    }
+
+    updateRowInPartItems() {
+        getWithDataAttr('row-in-part-item', this.page.pageEl).forEach(el => {
+            const rowInPartId = el.dataset['rowInPartId'];
+
+            if (ideService.editedItems.find(item => item.rowInPartId === rowInPartId)) {
+                el.style.backgroundColor = 'lightgray';
+            } else {
+                el.style.backgroundColor = 'white';
+            }
         });
     }
 
