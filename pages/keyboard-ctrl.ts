@@ -964,8 +964,7 @@ export class KeyboardCtrl {
                     data-row-nio="${info.rowNio}"
                     data-part-id="${part.partId}"
                     data-init-duration="${row.rowDurationByHeadQ}"                                                            
-                >${info.rowNio}</span>`;
-                //>${info.rowNio}:${rowCount + (cellCount ? '.' + cellCount : '')}</span>`;
+                >${info.rowNio}:${rowCount + (cellCount ? '.' + cellCount : '')}</span>`;
             });
 
             result += '</div>';
