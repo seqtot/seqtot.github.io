@@ -295,12 +295,12 @@ export class ToneCtrl extends KeyboardCtrl {
 
             <div data-name="chess-wrapper" style="width: 100%;"></div>
             
-            ${this.getEditCellCommandPanel()}
+            ${this.getEditCellCommandPanel()}            
+            ${this.getPlayCommandPanel()}
             
             <div data-edit-parts-wrapper>
                 ${this.getRowsByPartComplexContent()}                
-            </div>
-            ${this.getPlayCommandPanel()}            
+            </div>            
             
             <div style="margin: 1rem;">
                 use board:
@@ -338,7 +338,8 @@ export class ToneCtrl extends KeyboardCtrl {
             <div data-name="chess-wrapper" style="width: 100%;"></div>
             
             ${this.getEditCellCommandPanel()}
-            ${this.getPlayCommandPanel()}            
+            ${this.getPlayCommandPanel()}
+                        
             <div data-edit-parts-wrapper>
                 ${this.getRowsByPartComplexContent()}                
             </div>            
