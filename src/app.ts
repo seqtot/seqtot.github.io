@@ -31,10 +31,11 @@ const defRoute = isDev ? '/page/page_keyboard/' : '/set/set_all/';
 const linksToPage = [
     { href: '/mbox/setBand/', name: 'Список' },
     { href: '/mbox/setMy/', name: 'Мои вещи' },
-    { href: '/page/page_roll/', name: 'roll', isDev: true },
     { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
-    { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
-    { href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
+    //{ href: '/page/page_roll/', name: 'roll', isDev: true },
+    //{ href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
+    //{ href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
+    { href: '/page/userSettings/', name: 'userSettings', isDev: false},
 ];
 
 const linksHtml = linksToPage

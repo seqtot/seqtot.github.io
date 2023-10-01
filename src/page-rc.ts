@@ -2,6 +2,7 @@ import {Props} from 'framework7/modules/component/snabbdom/modules/props';
 import {ComponentContext} from 'framework7/modules/component/component';
 import {RollPage, KeyboardPage, MBoxPage} from '../pages';
 import {MuseEditorPage} from '../pages/page_muse_editor';
+import {UserSettingsPage} from '../pages/page_user_settings';
 //import {SamplePage} from '../pages/page_sample_editor';
 
 const pages = {
@@ -9,6 +10,7 @@ const pages = {
     page_keyboard: KeyboardPage,
     page_muse_editor: MuseEditorPage,
     mbox: MBoxPage,
+    userSettings: UserSettingsPage,
     //page_sample_editor: SamplePage,
 };
 
