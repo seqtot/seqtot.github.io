@@ -20,6 +20,11 @@ const setAll = `<div style="margin: .5rem;">
 </div>
 `.trim();
 
+const engine = `<div style="margin: .5rem;">
+    ${getInnerLink('Engine', '/mbox/engine/')} (Мотор)
+</div>
+`.trim();
+
 const billy = `<div style="margin: .5rem;">
     ${getInnerLink('Billy', '/mbox/billy/')} (Билли)
 </div>
@@ -111,6 +116,7 @@ const itsGoingGood = `<div style="margin: .5rem;">
 </div>`;
 
 const content = `
+  ${engine}
   ${billy}
   ${carcassiOp60n7}
   ${bell}

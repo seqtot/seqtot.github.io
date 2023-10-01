@@ -13,6 +13,8 @@ import partingGlass from './partingGlass';
 import billy from './billy';
 import peterGunn from './peterGunn';
 import sweetLeaf from './sweetLeaf';
+import engine from './engine';
+import threeDots from './threeDots';
 
 export default {
   set_e,
@@ -30,4 +32,6 @@ export default {
   billy,
   peterGunn,
   sweetLeaf,
+  engine,
+  threeDots,
 };
