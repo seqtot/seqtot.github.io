@@ -3,7 +3,7 @@ import dynamic from '../mbox_dynamics/billy.dynamic';
 const score = `
 <settings>
   pitchShift: 0
-_ @drums: v50; $bass: v30; $bassSolo: v100; $guit: v50; $back: v20; $solo: v50; $mark: v0;
+  @drums: v60; $bass: v60; $bassSolo: v70; $guit: v70; $back: v50; $solo: v70; $mark: v0;
 
 <out b105>
 > проход    %A

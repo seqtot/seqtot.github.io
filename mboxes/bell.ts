@@ -3,7 +3,7 @@ import dynamic from '../mbox_dynamics/bells.dynamic';
 const score = `
 <settings>
   pitchShift: 0
-_ @drums: v50; $bass: v20; $back: v10; $solo: v30;
+  @drums: v60; $bass: v60; $guit: v70; $back: v40; $solo: v70; 
 
 <out b120>
 > ИНТРО  %A # EGDAd EGAD EGDAd EADAd

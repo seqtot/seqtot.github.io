@@ -6,7 +6,7 @@ https://www.youtube.com/watch?v=DLEWBmWTfUI
 
 <settings>
   pitchShift: 0;
-_ @drums: v50; $bass: v20; $solo: v50; $____: v5; $guit: v30;
+  @drums: v70; $bass: v55; $solo: v70; $____: v20; $guit: v40;
 
 # соло  : МДСР МДСР МДСР М-СВМ
 # куплет: МДСР МДСР МДСР М-ДР-М
@@ -254,7 +254,7 @@ $solo: 480   ма=240 120 $organ*r
 > СОЛО1_1
 
 <tick b80 $>
-$tick: ме=120 ме=120 ме=90 $xylo
+$tick: ме=120 ме=120 ме=90 $xylo v90
 
 <test $>
 $1: 0    ду=60 ту=60 ру=60 му=60 до=60 то=60 ро=60 мо=60  $organ

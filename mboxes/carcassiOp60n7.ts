@@ -6,7 +6,7 @@ https://musescore.com/user/6428146/scores/1552756
 
 <settings>
   pitchShift: 0
-_ @drums: v50; $bass: v20;  $guit: v50; $____: v25;
+  @drums: v60; $bass: v60;  $guit: v70; $____: v60;
 
 # 12   24   36   48   60   72   84   96   108  120  132  144
 # 120  240  360  480  600  720  840  960  1080 1200 1320 1440
