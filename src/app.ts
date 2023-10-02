@@ -27,7 +27,7 @@ const isDev = /local/.test(window.location.href);
 // const defRoute = '/set/set_ItsMyLife/';
 
 //const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
-const defRoute = isDev ? '/page/page_keyboard/' : '/set/set_all/';
+const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
 //const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
 const linksToPage = [
