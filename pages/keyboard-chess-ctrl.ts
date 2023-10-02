@@ -4,6 +4,7 @@ import {dyName, getWithDataAttr} from '../src/utils';
 import {KeyboardCtrl, KeyboardPage} from './keyboard-ctrl';
 import {parseInteger} from '../libs/common';
 import {drumNotesInfo} from './drum-board';
+import { UserSettings, UserSettingsStore } from './user-settings-store';
 
 const rem = 'rem';
 const px = 'px';
@@ -11,6 +12,8 @@ const px = 'px';
 let cellSizePx = 0;
 let rowHeightPx = 0;
 let fontSizePx = 0;
+
+const MAX_BOARD_WIDTH = 400;
 
 type DrumChessCell = {
     noteId: number,
@@ -23,6 +26,8 @@ type DrumChessCell = {
 }
 
 export class KeyboardChessCtrl {
+    userSettings: UserSettings = UserSettingsStore.GetUserSettings();
+
     get page(): KeyboardPage {
         return this.board.page;
     }
@@ -34,7 +39,10 @@ export class KeyboardChessCtrl {
         //console.log(ideService.currentEdit);
         //console.log('getBoundingClientRect', Math.floor(this.page.pageEl.getBoundingClientRect().width / 16));
 
-        cellSizePx = Math.floor(this.page.pageEl.getBoundingClientRect().width / 16 / 2) * 2;
+        let boardWidth = this.page.pageEl.getBoundingClientRect().width;
+        boardWidth = boardWidth > MAX_BOARD_WIDTH ? MAX_BOARD_WIDTH : boardWidth;
+
+        cellSizePx = Math.floor(boardWidth / 16 / 2) * 2;
         rowHeightPx = cellSizePx + 4;
         fontSizePx = Math.floor(((cellSizePx - (cellSizePx / 3)) / 2) * 2);
     }
@@ -114,8 +122,10 @@ export class KeyboardChessCtrl {
             i: 'yellow',
         }
 
+        const noteMap = this.userSettings.useCyrillicNote ? hlp.mapNoteToCharRus : hlp.mapNoteToCharLat;
+
         result.cellId = arr[0].id;
-        result.char = hlp.mapNoteToChar[char] || '?';
+        result.char = noteMap[char] || '?';
         result.bgColor = octaveColor[octave] || 'gray';
         result.durQ = arr[0].durQ;
 

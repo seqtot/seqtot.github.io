@@ -70,6 +70,28 @@ export class UserSettingsPage {
                     </div>             
                 </div>
                 
+                <div class="list list-strong list-outline-ios list-dividers-ios">
+                    <ul>
+                        <li>
+                            <label class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">Ноты кириллицей</div>
+                                    <div class="item-after">
+                                        <div class="toggle toggle-init">
+                                            <input
+                                                data-use-сyrillic-note
+                                                type="checkbox"
+                                                ${settings.useCyrillicNote ? 'checked' : ''}
+                                            >
+                                            <span class="toggle-icon"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </li>
+                    </ul>                
+                </div>                
+                
                 <div data-save-user-settings-action style="padding: .5rem 1rem .5rem 1rem;">
                     <button class="button button-fill color-green">save</button>
                 </div>
@@ -90,6 +112,7 @@ export class UserSettingsPage {
     saveSettings() {
         let boardVolume = 70;
         let userName = '';
+        let useCyrillicNote = false;
 
         getWithDataAttr('board-volume-input', this.pageEl).forEach((el: HTMLInputElement) => {
             boardVolume = un.parseInteger(el.value, boardVolume);
@@ -99,9 +122,14 @@ export class UserSettingsPage {
             userName = (el.value || '').trim();
         });
 
+        getWithDataAttr('use-сyrillic-note', this.pageEl).forEach((el: HTMLInputElement) => {
+            useCyrillicNote = el.checked;
+        });
+
         UserSettingsStore.SetUserSettings({
             boardVolume,
             userName,
+            useCyrillicNote,
         });
     }
 }

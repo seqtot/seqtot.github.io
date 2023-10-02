@@ -16,9 +16,11 @@ import { pageRc } from './page-rc';
 
 const appEl = document.getElementById('app');
 
-const isDev =
-    /devitband/.test(window.location.href) ||
-    /local/.test(window.location.href);
+// const isDev =
+//     /devitband/.test(window.location.href) ||
+//     /local/.test(window.location.href);
+
+const isDev = /local/.test(window.location.href);
 
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
@@ -32,10 +34,10 @@ const linksToPage = [
     { href: '/mbox/setBand/', name: 'Список' },
     { href: '/mbox/setMy/', name: 'Мои вещи' },
     { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
-    //{ href: '/page/page_roll/', name: 'roll', isDev: true },
-    //{ href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
-    //{ href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
-    { href: '/page/userSettings/', name: 'userSettings', isDev: false},
+    { href: '/page/page_roll/', name: 'roll', isDev: true },
+    { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
+    { href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
+    { href: '/page/userSettings/', name: 'Settings', isDev: false},
 ];
 
 const linksHtml = linksToPage

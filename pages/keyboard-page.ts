@@ -18,6 +18,8 @@ import { SongStore, TrackInfo } from './song-store';
 //
 // console.log('getDevice', getDevice().desktop);
 
+const MAX_BOARD_WIDTH = 400;
+
 interface Page {
     bpmValue: number;
     pageEl: HTMLElement;
@@ -380,7 +382,7 @@ export class KeyboardPage implements Page {
     setDrumsContent(boardType: DrumKeyboardType, trackName: string) {
         this.drumCtrl = new DrumCtrl(this, boardType);
 
-        const content = `<div style="width: 100%; max-width: 350px;" keyboard-instanse>
+        const content = `<div style="width: 100%; max-width: ${MAX_BOARD_WIDTH}px;" keyboard-instanse>
             ${this.drumCtrl.getContent(boardType, trackName)}
         </div>`;
 
@@ -413,7 +415,7 @@ export class KeyboardPage implements Page {
     setToneContent(boardType: ToneKeyboardType, trackName: string) {
         this.toneCtrl = new ToneCtrl(this, <ToneKeyboardType>this.keyboardType);
 
-        const content = `<div style="width: 100%; max-width: 350px;" keyboard-instanse>
+        const content = `<div style="width: 100%; max-width: ${MAX_BOARD_WIDTH}px;" keyboard-instanse>
             ${this.toneCtrl.getContent(boardType, trackName)}
         </div>`;
 

@@ -375,7 +375,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
                 if (note[0] === baseChar) {
                     const octaveChar = (el.dataset['noteLat'] || '')[1];
-                    el.innerText = hlp.mapNoteToChar[baseChar];
+                    el.innerText = hlp.mapNoteToCharLat[baseChar];
                     el.style.color = hlp.octaveColor[octaveChar] || 'dimgrey';
                 }
             }

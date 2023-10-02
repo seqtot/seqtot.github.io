@@ -44,7 +44,7 @@ export const lightBgColor = '#eee';
 export const mainBgColor = '#ccc';
 export const darkBgColor = '#aaa';
 
-export const mapNoteToChar = {
+export const mapNoteToCharLat = {
     d: 'C',
     t: 't',
     r: 'D',
@@ -59,6 +59,21 @@ export const mapNoteToChar = {
     b: 'B'
 }
 
+export const mapNoteToCharRus = {
+    d: 'Д',
+    t: 'т',
+    r: 'Р',
+    n: 'н',
+    m: 'М',
+    f: 'Ф',
+    v: 'в',
+    s: 'С',
+    z: 'з',
+    l: 'Л',
+    k: 'к',
+    b: 'Б'
+}
+
 export function getGuitarСellStyles(note: string, iRow: number, iCol: number): {
     bgColor: string,
     borders: string,
@@ -70,7 +85,7 @@ export function getGuitarСellStyles(note: string, iRow: number, iCol: number): 
     let text = '&nbsp;'
 
     if (iRow === 0 || iRow === 12) {
-        text = mapNoteToChar[note[0]] || text;
+        text = mapNoteToCharLat[note[0]] || text;
     }
 
     if (iRow === 0 || iRow === 3 || iRow === 5 || iRow === 7 || iRow === 9 || iRow === 12) {
