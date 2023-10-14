@@ -1,12 +1,41 @@
 import {SongNode, SongStore, StoredRow, StoredSongNodeOld, TrackInfo} from './song-store';
 import {ideService} from './ide/ide-service';
 import {getMidiConfig, getTopOutListHash} from '../libs/muse/utils/getMidiConfig';
+import { LineModel } from './line-model';
+import { TextBlock } from '../libs/muse/utils';
+import { Sound } from '../libs/muse/sound';
 import * as un from '../libs/muse/utils';
-import {LineModel} from './line-model';
-import {TextBlock} from '../libs/muse/utils';
 
 function getOutBlock(blocks: TextBlock[]): TextBlock {
     return  blocks.find((item) => item.id === 'out');
+}
+
+const notesLat = [
+    'du', 'tu', 'ru', 'nu', 'mu', 'fu', 'vu', 'su', 'zu', 'lu', 'ku', 'bu',
+    'dy', 'ty', 'ry', 'ny', 'my', 'fy', 'vy', 'sy', 'zy', 'ly', 'ky', 'by',
+    'do', 'to', 'ro', 'no', 'mo', 'fo', 'vo', 'so', 'zo', 'lo', 'ko', 'bo',
+    'da', 'ta', 'ra', 'na', 'ma', 'fa', 'va', 'sa', 'za', 'la', 'ka', 'ba',
+    'de', 'te', 're', 'ne', 'me', 'fe', 've', 'se', 'ze', 'le', 'ke', 'be',
+    'di', 'ti', 'ri', 'ni', 'mi', 'fi', 'vi', 'si', 'zi', 'li', 'ki', 'bi',
+]
+
+function getNoteLatByOffset(noteLat: string, offset: number) {
+    offset = offset || 0;
+
+    if (!offset) return noteLat;
+
+    const i = notesLat.findIndex(item => item === noteLat);
+
+    return noteLat;
+}
+
+export function sortTracks(tracks: TrackInfo[]) {
+    tracks.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+
+        return 0;
+    });
 }
 
 export function textModelToLineModel(
@@ -314,7 +343,7 @@ export function textModelToLineModel(
                             liner.addNoteByOffset(startOffsetQ, {
                                 id: 0,
                                 durQ,
-                                note: ideService.synthesizer.getNoteLat(iNote),
+                                note: Sound.GetNoteLat(iNote),
                                 startOffsetQ: 0,
                                 char: '',
                                 slides: note.slidesText,
@@ -351,13 +380,7 @@ export function textModelToLineModel(
     console.log('softTracks', softTracks);
 
     song.tracks = [...Object.values(hardTracks), ...Object.values(softTracks)];
-
-    song.tracks.sort((a, b) => {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
-
-        return 0;
-    });
+    sortTracks(song.tracks);
 
     return song;
 }

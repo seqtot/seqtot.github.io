@@ -361,6 +361,43 @@ export class SongStore {
         };
     }
 
+    static CloneAndAddTrack(song: SongNode, trackName: string): TrackInfo | null {
+        if (!song) return null;
+
+        let itemsByTrack = song.dynamic.filter(item => item.track === trackName);
+        let track = song.tracks.find(item => item.name === trackName);
+
+        if (!track) return null;
+
+        let i = 0;
+
+        while (true) {
+            i++;
+
+            if (song.tracks.find(item => item.name === `${trackName}${i}`)) {
+                continue;
+            }
+
+            break;
+        }
+
+        trackName = `${trackName}${i}`;
+
+        itemsByTrack = JSON.parse(JSON.stringify(itemsByTrack));
+        track = JSON.parse(JSON.stringify(track));
+
+        track.name = trackName;
+        track.isHardTrack = false;
+        song.tracks.push(track);
+
+        itemsByTrack.forEach(item => {
+            item.track = trackName;
+            song.dynamic.push(item);
+        });
+
+        return track;
+    }
+
     static ClonePart(song: SongNode, sourceId: string): {name: string, id: string} | null {
         if (!song) return;
 

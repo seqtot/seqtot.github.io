@@ -294,6 +294,10 @@ export class Sound {
     }
 
     getNoteLat(val: string): string {
+        return Sound.GetNoteLat(val);
+    }
+
+    static GetNoteLat(val: string): string {
         val = (val || '').toLocaleLowerCase().trim();
         let result = noteLatByNoteHash[val];
 

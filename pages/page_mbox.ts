@@ -7,17 +7,19 @@ import { Dom7Array } from 'dom7';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils';
 import { standardTicks as ticks } from './ticks';
-import { getMidiConfig, getTopOutList, getTopOutListHash, MidiConfig } from '../libs/muse/utils/getMidiConfig';
+import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings, getPitchShiftSetting } from '../libs/muse/utils/getFileSettings';
 import { parseInteger, SongPartInfo, TextBlock } from '../libs/muse/utils/utils-note';
 import { LineModel } from './line-model';
 import { ideService } from './ide/ide-service';
-import {SongStore, SongNode, StoredRow, MY_SONG, BAND_SONG, StoredSongNodeOld, TrackInfo} from './song-store';
+import { SongStore, SongNode, StoredRow, MY_SONG } from './song-store';
 import * as svg from './svg-icons';
 import { TrackContentDialog } from './dialogs/track-content-dialog';
-import {textModelToLineModel} from './text-model-to-line-model';
+import { textModelToLineModel, sortTracks } from './text-model-to-line-model';
 import mboxes from '../mboxes';
+
+const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -333,7 +335,8 @@ export class MBoxPage {
                 ${svg.checkBtn('data-check-all-tracks-action', 'black', 24)}
                 ${svg.plusBtn('data-add-track-action', '', 24)}
                 ${svg.minusBtn('data-delete-track-action', '', 24)}
-                ${svg.editBtn('data-edit-track-action', '', 24)}
+                ${svg.editBtn('data-edit-track-action', '', 24)}${blankHalfRem}
+                ${svg.copyPasteBtn('data-clone-track-action', '', 24)}                
             </div>
         `.trim();
 
@@ -391,6 +394,12 @@ export class MBoxPage {
                 ${svg.uploadBtn('data-upload-song-action', '', 24)}&nbsp;              
                 <input style="display: none;" type="file" data-upload-song-input multiple />                                
             `.trim();
+        } else {
+            editCommands = `
+                <div style="margin-top: 1rem;">
+                    ${svg.editBtn('data-edit-selected-parts-action', '', 24)}
+                </div>            
+            `.trim();
         }
 
         fileCommands += `
@@ -403,9 +412,9 @@ export class MBoxPage {
 
         let allCommands = `
             <div>
-                ${svg.uncheckBtn('data-unselect-all-parts-action', '', 24)}            
-                ${svg.checkBtn('data-select-all-parts-action', '', 24)}            
-                ${svg.stopBtn('data-action-type="stop"', '', 24)}                                                                
+                ${svg.uncheckBtn('data-unselect-all-parts-action', '', 24)}
+                ${svg.checkBtn('data-select-all-parts-action', '', 24)}
+                ${svg.stopBtn('data-action-type="stop"', '', 24)}
                 ${svg.playBtn('data-play-all-action', '', 24)}
                 ${svg.playLoopBtn('data-loop-all-action', '', 24)}
             </div>
@@ -510,13 +519,15 @@ export class MBoxPage {
 
                 if (tracks.length > 1) return;
 
-                const trackName = tracks[0];
+                const track = ideService.songStore.data.tracks.find(track => track.name === tracks[0]);
+
+                if (!track || track.isHardTrack) return;
 
                 this.confirm = (this.context.$f7 as any).dialog.confirm(
-                    '',
-                    'Удалить?',
+                   track.name,
+                   'Удалить трэк?',
                     () => {
-                        if (SongStore.DeleteTrack(ideService.songStore.data, trackName)) {
+                        if (SongStore.DeleteTrack(ideService.songStore.data, track.name)) {
                             this.renderTracksView();
                             ideService.songStore.save();
                         }
@@ -566,6 +577,10 @@ export class MBoxPage {
                 this.update_TracksView();
                 ideService.songStore.save();
             });
+        });
+
+        getWithDataAttr('clone-track-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.cloneTrack());
         });
     }
 
@@ -906,6 +921,23 @@ export class MBoxPage {
 
         this.setPageContent();
         ideService.songStore.save();
+    }
+
+    cloneTrack() {
+        const selectedTracks = this.getSelectedTracks();
+
+        if (selectedTracks.length > 1) return;
+
+        const trackName = selectedTracks[0];
+        const song = ideService.songStore?.data;
+
+        if (!song || !trackName) return;
+
+        if (SongStore.CloneAndAddTrack(song, trackName)) {
+            sortTracks(ideService.songStore.data.tracks);
+            this.setPageContent();
+            ideService.songStore.save();
+        }
     }
 
     renamePart() {
