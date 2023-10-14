@@ -4,8 +4,8 @@ const score = `
 <settings>
   pitchShift: 1;
 _ @drums: v50;    
-_ $bass: v20;  $guit: v30; $solo: v35;
-_ $back: v5; $mark: v0;
+_ $bass: v50;  $guit: v50; $solo: v50;
+_ $back: v10; $mark: v0;
 
 # 12   24   36   48   60   72   84   96   108  120  132  144
 # 120  240  360  480  600  720  840  960  1080 1200 1320 1440
@@ -273,10 +273,10 @@ $bass: бы=60 кы=60 $cBass*s
 $back: бо=60 ко=60 $flute
 
 <СЧЁТ b120 $>
-$bass: бе=60 бе=60 бе=60 бе=60 $xylo v70
-$guit: бе=60 бе=60 бе=60 бе=60 $xylo v70
-$solo: бе=60 бе=60 бе=60 бе=60 $xylo v70
-$back: бе=60 бе=60 бе=60 бе=60 $xylo v70
+$bass: бе=60 бе=60 бе=60 бе=60 $xylo
+$guit: бе=60 бе=60 бе=60 бе=60 $xylo
+$solo: бе=60 бе=60 бе=60 бе=60 $xylo
+$back: бе=60 бе=60 бе=60 бе=60 $xylo
 
 <note>
 # абвгдеёжзийклмнопрстуфхцчшщъыьэюя
@@ -307,15 +307,16 @@ $back: бе=60 бе=60 бе=60 бе=60 $xylo v70
 const info = `
 <div style="margin: .5rem;">
 <br/><br/>
-> СЧЁТ   %_
-> ТЕМА   %A  # a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C
-> СОЛО1  %B  # a#a BDAB #fa BDAB de D#FAB     BDAB de #F#ABG #FED#C
-> ТЕМА   %C  # -
-> СОЛО2  %D  # b#A  B#CDE  D#CD#F  B#CDE  D#F#B
-> ТЕМА   %E  # -
-> КОДА   %F  # a#ab
 </div>
 `.trim();
+
+// > СЧЁТ   %_
+// > ТЕМА   %A  # a#a BDAB #fa BDAB de D#FAB #fa BDAB de #F#ABG #FED#C
+// > СОЛО1  %B  # a#a BDAB #fa BDAB de D#FAB     BDAB de #F#ABG #FED#C
+// > ТЕМА   %C  # -
+// > СОЛО2  %D  # b#A  B#CDE  D#CD#F  B#CDE  D#F#B
+// > ТЕМА   %E  # -
+// > КОДА   %F  # a#ab
 
 export default {
   content: info,

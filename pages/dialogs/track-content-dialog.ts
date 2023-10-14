@@ -138,7 +138,7 @@ export class TrackContentDialog {
                                     type="text"
                                     placeholder="Track name"
                                     value="${this.track.name}"
-                                    ${this.track.isNotEditable ? 'readonly': ''}
+                                    ${this.track.isHardTrack ? 'readonly': ''}
                                 >
                                 <span class="input-clear-button"></span>
                             </div>

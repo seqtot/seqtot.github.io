@@ -6,7 +6,7 @@ https://www.songsterr.com/a/wsa/blues-brothers-peter-gunn-theme-tab-s3601
 
 <settings>
   pitchShift: -5
-_ @drums: v40; $bass: v40; $guit: v30; $solo: v50; $mark: v50
+_ @drums: v50; $bass: v50; $guit: v50; $solo: v50; $mark: v50
 
 <out b120 v80>
 > СЧЁТ         %_
@@ -289,11 +289,11 @@ $bass: 720 *s лу=60 *f v30 ку=60 ку=60 ку=60 $cBass
 <КОНЕЦ b120 $>
 $bass:  лы=60      $eBass*b
 $guit:  лу=60      $guitar*ED
-$organ: лу+мо=1440 $organ
+$solo:  лу+мо=1440 $organ
 
 <СЧЁТ b120 $>
-$bass: ле=120 ле=120 ле=120 ле=120 $xylo v70
-$guit: ле=120 ле=120 ле=120 ле=120 $xylo v70
+$bass: ле=120 ле=120 ле=120 ле=120 $xylo
+$guit: ле=120 ле=120 ле=120 ле=120 $xylo
 
 `.trim();
 

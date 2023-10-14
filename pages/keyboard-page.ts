@@ -256,7 +256,7 @@ export class KeyboardPage implements Page {
         let content = '';
 
         tracks.forEach(track => {
-            const underline = track.isNotEditable ? 'text-decoration: underline;' : '';
+            const underline = track.isHardTrack ? 'text-decoration: underline;' : '';
             content += `
                 <span 
                     data-set-keyboard-type-action

@@ -31,12 +31,13 @@ export type TrackInfo = {
     volume: number,
 
     label?: string,
-    isNotEditable?: boolean,
+    isHardTrack?: boolean,
     isExcluded?: boolean,
 }
 
 export type SongNode = {
     bmpValue: number,
+
     content: string,
     break: string,
     drums: string,
@@ -50,6 +51,8 @@ export type SongNode = {
     ns?: string,
     nsOld?: string,
     exportToLineModel?: boolean,
+    isNewCreated?: boolean;
+    pitchShift?: number,
 };
 
 function isDrumNote(val: string): boolean {
@@ -303,12 +306,9 @@ export class SongStore {
         let text = localStorage.getItem(`[${ns}]${id}`);
 
         if (!text && create) {
-
-            console.log('notfound');
-
             song = SongStore.GetEmptySong();
             song.score = '';
-
+            song.isNewCreated = true;
         } else {
             song = SongStore.NormalizeSongNode(
                 JSON.parse(localStorage.getItem(`[${ns}]${id}`))
