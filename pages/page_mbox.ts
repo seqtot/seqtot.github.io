@@ -25,7 +25,6 @@ export class MBoxPage {
     playingTick = '';
     bpmRange: Range.Range;
     excludePartNio: number [] = [];
-    excludeTrack: {[key: string]: any} = {};
     selectedSong = '';
     selectedSongName = '';
 
@@ -96,8 +95,6 @@ export class MBoxPage {
     pageData: SongNode;
 
     getPageData(): SongNode {
-        console.log('getPageData', this.songId, mboxes[this.songId]);
-
         if (mboxes[this.songId]) {
             return mboxes[this.songId];
         }
@@ -136,7 +133,9 @@ export class MBoxPage {
                     songData = this.textModelToLineModel(this.songId, songData);
                 }
 
-                ideService.songStore = new SongStore(songId, songData.ns, songData);
+                songData.ns = this.ns;
+
+                ideService.songStore = new SongStore(songId, this.ns, songData);
             }
         }
     }
@@ -479,9 +478,11 @@ export class MBoxPage {
         const result = [];
 
         getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
-            let name = el.dataset.useTrackAction
-            if (!this.excludeTrack[name]) {
-                result.push(name);
+            let trackName = el.dataset.useTrackAction
+            let track = ideService.songStore.data.tracks.find(track => track.name === trackName);
+
+            if (track && !track?.isExcluded) {
+                result.push(track.name);
             }
         });
 
@@ -530,38 +531,50 @@ export class MBoxPage {
         getWithDataAttr('uncheck-all-tracks-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => {
                 getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
-                    let key = el.dataset.useTrackAction
-                    this.excludeTrack[key] = key;
+                    ideService.songStore.data.tracks.forEach(track => {
+                        track.isExcluded = true;
+                    });
                 });
 
                 this.update_TracksView();
+                ideService.songStore.save();
             })
         });
 
         getWithDataAttr('check-all-tracks-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => {
                 getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
-                    let key = el.dataset.useTrackAction
-                    this.excludeTrack[key] = null;
+                    ideService.songStore.data.tracks.forEach(track => {
+                        track.isExcluded = false;
+                    });
                 });
 
                 this.update_TracksView();
+                ideService.songStore.save();
             })
         });
 
         getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => {
-                let key = el.dataset.useTrackAction
-                this.excludeTrack[key] = this.excludeTrack[key] ? null: key;
+                const trackName = el.dataset.useTrackAction;
+                const track = ideService.songStore.data.tracks.find(track => track.name === trackName);
+
+                if (!track) return;
+
+                track.isExcluded = !track.isExcluded;
+
                 this.update_TracksView();
+                ideService.songStore.save();
             });
         });
     }
 
     update_TracksView() {
         getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
-            let key = el.dataset.useTrackAction
-            el.style.backgroundColor = this.excludeTrack[key] ? 'white' : 'lightgray';
+            const trackName = el.dataset.useTrackAction;
+            const track = ideService.songStore.data.tracks.find(track => track.name === trackName);
+
+            el.style.backgroundColor = track?.isExcluded ? 'white' : 'lightgray';
         });
     }
 
@@ -580,8 +593,6 @@ export class MBoxPage {
         songId = (songId || '').trim();
 
         if(!songId) return;
-
-        console.log('songId', songId); // jjkl
 
         this.context.$f7router.navigate(`/mbox/${songId}/`);
     }
@@ -1047,15 +1058,11 @@ export class MBoxPage {
 
         if (ideService?.songStore?.data) {
             ideService.songStore.data.tracks.forEach(track => {
-                dataByTracks[track.name] = `v${track.volume}`;
+                const volume = track.isExcluded ? 0: track.volume;
+
+                dataByTracks[track.name] = `v${volume}`;
             });
         }
-
-        Object.keys(dataByTracks).forEach(key => {
-            if (this.excludeTrack[key]) {
-                dataByTracks[key] = 'v0';
-            }
-        });
 
         return dataByTracks;
     }
@@ -1199,7 +1206,8 @@ export class MBoxPage {
            }
         });
 
-        song.tracks = song.tracks.filter(item => !item.isNotEditable);
+        // jjkl
+        //song.tracks = song.tracks.filter(item => !item.isNotEditable);
 
         // ТРЭКИ из settings текстовой модели
         Object.keys(songSettings.dataByTracks).forEach(trackName => {
@@ -1354,14 +1362,10 @@ export class MBoxPage {
             console.log('partReport\n', partReport);
         }
 
-        console.log('parts', parts);
-
         // ОСТАВЛЯЕМ ТОЛЬКО СТРОКИ ИЗ localStore
         song.dynamic = song.dynamic.filter(rowByTrack => {
             return song.tracks.find(item => item.name === rowByTrack.track && !item.isNotEditable);
         });
-
-        console.log('dynamicOld', dynamicOld);
 
         // DYNAMIC OLD
         Object.keys(dynamicOld).forEach(trackName => {
@@ -1471,6 +1475,8 @@ export class MBoxPage {
                 song.dynamic = [...song.dynamic, ...items];
             });
         }); // loop by parts
+
+        //console.log('SONG', song);
 
         SongStore.SetSong(songId, song, songNodeInput.ns);
 

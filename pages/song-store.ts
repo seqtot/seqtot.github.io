@@ -29,8 +29,10 @@ export type TrackInfo = {
     name: string,
     board: string,
     volume: number,
+
     label?: string,
     isNotEditable?: boolean,
+    isExcluded?: boolean,
 }
 
 export type SongNode = {
@@ -82,6 +84,9 @@ export class SongStore {
 
     save(data?: SongNode) {
         data = data || this.data;
+
+        if (!data || !this.ns) return;
+
         SongStore.SetSong(this.songId, this.data, this.ns);
         this.data = data;
     }
@@ -298,6 +303,9 @@ export class SongStore {
         let text = localStorage.getItem(`[${ns}]${id}`);
 
         if (!text && create) {
+
+            console.log('notfound');
+
             song = SongStore.GetEmptySong();
             song.score = '';
 
@@ -329,6 +337,8 @@ export class SongStore {
     }
 
     static SetSong(id: string, data: SongNode, ns: string) {
+        if (!ns || !data || !id) return;
+
         localStorage.setItem(`[${ns}]${id}`, JSON.stringify(data));
     }
 
