@@ -401,7 +401,7 @@ export class MultiPlayer {
         let addPauseToNextRowQ = 0;
 
         outBlocks.rows.forEach(row => {
-            row.noteLns.forEach(noteLn => {
+            row.trackLns.forEach(noteLn => {
                 noteLn.noteLineInfo.notes.forEach(noteInfo => {
                     noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
                     let trackName = noteLn.trackName;
@@ -459,7 +459,7 @@ export class MultiPlayer {
             durationInFullQ = durationInFullQ + (beatsByRowMs.length * un.NUM_120);
             durationInFullQMs = durationInFullQMs + beatsByRowMs.reduce((acc, item) => (acc + item), 0);
 
-            rowLoop.noteLns.forEach((noteLn) => {
+            rowLoop.trackLns.forEach((noteLn) => {
                 if (!fullRowDuration) {
                     return;
                 }

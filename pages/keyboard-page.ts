@@ -12,13 +12,15 @@ import { ToneCtrl } from './keyboard-tone-ctrl';
 import { ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards, drumBoards } from './keyboard-ctrl';
 import { ideService, defaultTracks } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
-import { SongStore, TrackInfo } from './song-store';
+import {MY_SONG, SongStore, TrackInfo} from './song-store';
 
 // import { getDevice } from 'framework7';
 //
 // console.log('getDevice', getDevice().desktop);
 
 const MAX_BOARD_WIDTH = 400;
+
+const DEF_SONG = '_empty_'
 
 interface Page {
     bpmValue: number;
@@ -57,11 +59,15 @@ export class KeyboardPage implements Page {
     }
 
     get songId(): string {
-        return ideService.currentEdit.songId;
+        return ideService.currentEdit.songId || DEF_SONG;
     }
 
     get isMy(): boolean {
         return !!(ideService.currentEdit && ideService.currentEdit.source === 'my');
+    }
+
+    get ns(): string {
+        return (ideService.currentEdit && ideService.currentEdit.ns) || '';
     }
 
     get pageId(): string {
@@ -111,7 +117,15 @@ export class KeyboardPage implements Page {
         window.removeEventListener('resize', this.onWindowResize);
     }
 
+    initData() {
+        if (this.songId === DEF_SONG) {
+            ideService.songStore = new SongStore(DEF_SONG, MY_SONG, SongStore.GetSong(DEF_SONG, MY_SONG, true));
+        }
+    }
+
     onMounted() {
+        this.initData();
+
         window.addEventListener('resize', this.onWindowResize);
 
         this.el$.html(`
@@ -132,7 +146,7 @@ export class KeyboardPage implements Page {
 
 
     getTracks(): TrackInfo[] {
-        const song = this.isMy ? SongStore.getSong(this.songId) : null;
+        const song = ideService?.songStore?.data;
 
         return song ? song.tracks : defaultTracks;
     }
@@ -229,7 +243,7 @@ export class KeyboardPage implements Page {
             display: inline-block;
             padding: .15rem;
             margin-right: .5rem; margin-top: .5rem;
-            font-size: .8rem; font-weight: 400;
+            font-size: .9rem; font-weight: 400;
             user-select: none; touch-action: none;
             border: 1px solid gray; border-radius: .3rem;
         `.trim();
@@ -237,17 +251,18 @@ export class KeyboardPage implements Page {
 
         if (!wrapper) return;
 
-        const song = this.isMy ? SongStore.getSong(this.songId) : null;
+        const song = ideService?.songStore?.data || null;
         const tracks = song ? song.tracks : defaultTracks;
         let content = '';
 
         tracks.forEach(track => {
+            const underline = track.isNotEditable ? 'text-decoration: underline;' : '';
             content += `
                 <span 
                     data-set-keyboard-type-action
                     data-board-type="${track.board}"
                     data-track-name="${track.name}"
-                    style="${trackStyle}"                                                
+                    style="${trackStyle} ${underline}"
                 >${track.label || track.name}</span>                
             `.trim();
         });
@@ -272,27 +287,27 @@ export class KeyboardPage implements Page {
     }
 
     setRightPanelContent() {
-        const song = this.isMy ? SongStore.getSong(this.songId) : null;
-        const tracks = song ? song.tracks : defaultTracks;
-        let content = '';
-
-        tracks.forEach(track => {
-            content += `
-                <p 
-                    data-set-keyboard-type-action
-                    data-board-type="${track.board}"
-                    data-track-name="${track.name}"
-                    style="user-select: none; touch-action: none; font-size: 1.1rem;"                                                
-                >${track.label || track.name}</p>                
-            `.trim();
-        });
-
-        dyName('panel-right-content').innerHTML = content;
-
-        this.addTracksLink(true);
-        getWithDataAttr('app-right-panel-title').forEach((el) => {
-            el.innerHTML = 'Tracks';
-        });
+        // const song = ideService?.song?.data || null;
+        // const tracks = song ? song.tracks : defaultTracks;
+        // let content = '';
+        //
+        // tracks.forEach(track => {
+        //     content += `
+        //         <p
+        //             data-set-keyboard-type-action
+        //             data-board-type="${track.board}"
+        //             data-track-name="${track.name}"
+        //             style="user-select: none; touch-action: none; font-size: 1.1rem;"
+        //         >${track.label || track.name}</p>
+        //     `.trim();
+        // });
+        //
+        // dyName('panel-right-content').innerHTML = content;
+        //
+        // this.addTracksLink(true);
+        // getWithDataAttr('app-right-panel-title').forEach((el) => {
+        //     el.innerHTML = 'Tracks';
+        // });
     }
 
     updateTrackList() {

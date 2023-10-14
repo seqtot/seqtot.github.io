@@ -6,18 +6,11 @@ import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Synthesizer } from '../libs/muse/synthesizer';
 import { MultiPlayer } from '../libs/muse/multi-player';
 import { Line, LineModel, CELL_SIZE, LineNote } from './line-model';
-import * as un from '../libs/muse/utils'
 import { parseInteger } from '../libs/common';
 import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
-import { SongNode, SongStore, StoredRow, StoredSongNodeOld } from './song-store';
-import {
-    createOutBlock, DEFAULT_VOLUME,
-    getOutBlocksInfo,
-    OutBlockRowInfo,
-    SongPartInfo,
-    TextBlock
-} from '../libs/muse/utils';
+import { SongNode, SongStore, StoredRow, StoredSongNodeOld, MY_SONG } from './song-store';
+import * as un from '../libs/muse/utils'
 import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 import * as svg from './svg-icons';
 
@@ -41,6 +34,7 @@ export interface KeyboardPage {
     multiPlayer: MultiPlayer;
     context: ComponentContext,
     setContent: () => void,
+    initData: () => void,
     songId: string,
 }
 
@@ -107,6 +101,14 @@ export class KeyboardCtrl {
 
     get isMy(): boolean {
         return !!(ideService.currentEdit && ideService.currentEdit.source === 'my');
+    }
+
+    get useLineModel(): boolean {
+        return !!(ideService.currentEdit && (ideService.currentEdit.useLineModel));
+    }
+
+    get ns(): string {
+        return ideService?.currentEdit?.ns || '';
     }
 
     get songId(): string {
@@ -324,7 +326,7 @@ export class KeyboardCtrl {
                 getWithDataAttrValue('chess-pony-col-line-ind', el.dataset.chessCellLineInd).forEach(el => {
                     el.style.display = 'block';
 
-                    el.innerHTML = (un.parseInteger(noteForEdit.volume, DEFAULT_VOLUME).toString() + (noteForEdit.slides ? '~' : ''));
+                    el.innerHTML = (un.parseInteger(noteForEdit.volume, un.DEFAULT_VOLUME).toString() + (noteForEdit.slides ? '~' : ''));
                 });
             }
 
@@ -532,7 +534,7 @@ export class KeyboardCtrl {
                 ${svg.playBtn('data-ide-action="play-solo"', '', 20)}${blank}
                 ${svg.playBtn2('data-ide-action="play-both"', '', 20)}${blank}
                 ${svg.playBtn3('data-ide-action="play-source"', '', 20)}${blank}
-                <span style="${cmdStyle}" data-ide-action="clear">free</span>
+                <span style="${cmdStyle}" data-clear-ide-song-action>free</span>
             `.trim());
         } else {
             result = result.replace('%content%', `
@@ -563,7 +565,7 @@ export class KeyboardCtrl {
         });
     }
 
-    getRowsForPart(song: SongNode, part: SongPartInfo): StoredRow[] {
+    getRowsForPart(song: SongNode, part: un.SongPartInfo): StoredRow[] {
         const partRows = song.dynamic.filter(row => {
             const iPartId = (row.partId || '').trim();
             const iPartNio = un.getPartNio(row.rowInPartId);
@@ -588,7 +590,7 @@ export class KeyboardCtrl {
 
     getPartsWithRows(x: {
         song: SongNode,
-        parts: SongPartInfo[],
+        parts: un.SongPartInfo[],
         resetBlockOffset: boolean,
         useEditingItems: boolean
     }): {partId: string, rows: StoredRow[][]}[] {
@@ -677,12 +679,12 @@ export class KeyboardCtrl {
     }
 
     buildBlocksForMySong(
-        blocks: TextBlock[],
+        blocks: un.TextBlock[],
         resetBlockOffset = false,
         useEditingItems = false
-    ): TextBlock[] {
-        const song = SongStore.getSong(this.songId);
-        const editingParts: SongPartInfo[] = [];
+    ): un.TextBlock[] {
+        const song = ideService.songStore.data;
+        const editingParts: un.SongPartInfo[] = [];
 
         ideService.currentEdit.editPartsNio.sort();
         ideService.currentEdit.editPartsNio.forEach(partNio => {
@@ -755,35 +757,44 @@ export class KeyboardCtrl {
         let lines = [];
         let blockOffsetQ = 0;
         const songId = this.songId;
-        const isMy = this.isMy;
+        const song = ideService.songStore.clone();
 
         ideService.editedItems.forEach(editedItem => {
             let iLines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
 
-            if (!isMy) {
-                let songNode: StoredSongNodeOld = localStorage.getItem(songId) as any;
-                if (!iLines.length && songNode) {
-                    songNode = JSON.parse(songNode as any as string);
-
-                    if (songNode[editedItem.rowInPartId]) {
-                        let items = songNode[editedItem.rowInPartId].items;
-                        let node = items.find(item => item.rowInPartId === editedItem.rowInPartId && item.type === this.boardType);
-                        if (node) {
-                            iLines = node.rows;
-                        }
+            if (!iLines.length && song) {
+                song.dynamic.forEach(item => {
+                    if (item.rowInPartId === editedItem.rowInPartId && item.track === this.trackName) {
+                        iLines = [...iLines, ...item.lines];
                     }
-                }
-
-            } else {
-                const song = (isMy ? SongStore.getSong(songId, true) : null) as SongNode;
-                if (!iLines.length && song) {
-                    song.dynamic.forEach(item => {
-                        if (item.rowInPartId === editedItem.rowInPartId && item.track === this.trackName) {
-                            iLines = [...iLines, ...item.lines];
-                        }
-                    });
-                }
+                });
             }
+
+            // if (!this.useLineModel) {
+            //     let songNode: StoredSongNodeOld = localStorage.getItem(songId) as any;
+            //     if (!iLines.length && songNode) {
+            //         songNode = JSON.parse(songNode as any as string);
+            //
+            //         if (songNode[editedItem.rowInPartId]) {
+            //             let items = songNode[editedItem.rowInPartId].items;
+            //             let node = items.find(item => item.rowInPartId === editedItem.rowInPartId && item.type === this.boardType);
+            //             if (node) {
+            //                 iLines = node.rows;
+            //             }
+            //         }
+            //     }
+            //
+            // } else {
+            //     const song = ideService.songStore.clone();
+            //
+            //     if (!iLines.length && song) {
+            //         song.dynamic.forEach(item => {
+            //             if (item.rowInPartId === editedItem.rowInPartId && item.track === this.trackName) {
+            //                 iLines = [...iLines, ...item.lines];
+            //             }
+            //         });
+            //     }
+            // }
 
             if (!iLines.length) {
                 iLines = this.liner.getLinesByMask(editedItem.duration);
@@ -809,7 +820,7 @@ export class KeyboardCtrl {
         const currentEdit = ideService.currentEdit;
         let blocks = [...currentEdit.blocks];
 
-        if (this.isMy) {
+        if (this.useLineModel) {
             blocks = this.buildBlocksForMySong(blocks, x.resetBlockOffset, x.useEditing);
         }
 
@@ -829,10 +840,10 @@ export class KeyboardCtrl {
 
         const outBlock = un.createOutBlock({
             id: 'out',
+            type: 'text',
             bpm: this.page.bpmValue,
             rows,
-            volume: 50,
-            type: 'text'
+            volume: ideService.outVolume,
         });
 
         const midiConfig: MidiConfig = {
@@ -900,17 +911,17 @@ export class KeyboardCtrl {
         `.trim();
 
         const midiConfig = this.getMidiConfig();
-        const outBlocksInfo = getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
+        const outBlocksInfo = un.getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
         const partHash: {
             [key: string]: {
                 part: un.SongPartInfo,
-                rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+                rows: {row: un.OutBlockRowInfo, partNio: number, rowNio: number}[]
             }
         } = {};
 
         const rowsByParts: {
             part: un.SongPartInfo,
-            rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+            rows: {row: un.OutBlockRowInfo, partNio: number, rowNio: number}[]
         }[] = [];
 
         // ЗАПОЛНЯЕМ ЧАСТИ
@@ -1043,6 +1054,8 @@ export class KeyboardCtrl {
     resetEditingParts() {
         ideService.currentEdit = {} as any;
         ideService.editedItems = [];
+        ideService.songStore = null;
+
         getWithDataAttr('ide-content', this.page.pageEl).forEach((el: HTMLElement) => {
             el.innerHTML = null;
         });
@@ -1053,6 +1066,7 @@ export class KeyboardCtrl {
             el.style.display = 'block';
         });
 
+        this.page.initData();
         this.page.setContent();
         //this.liner.fillLinesStructure('480');
         //this.printChess(this.liner.lines);
@@ -1081,7 +1095,7 @@ export class KeyboardCtrl {
             el.addEventListener('pointerup', () => this.songRowClick(el));
         });
 
-        getWithDataAttrValue('ide-action', 'clear', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttr('clear-ide-song-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.resetEditingParts());
         });
 
@@ -1156,8 +1170,8 @@ export class KeyboardCtrl {
 
         if (!partId && !partNio) return;
 
-        const song = SongStore.getSong(this.songId);
-        const rows = SongStore.getRowsByPart(song.dynamic, partId, partNio);
+        const song = ideService.songStore.data;
+        const rows = SongStore.GetRowsByPart(song.dynamic, partId, partNio);
 
         const partRowNios = rows.map(item => un.getPartRowNio(item.rowInPartId));
         this.sort_ByPartAndRowNio(partRowNios);
@@ -1170,7 +1184,9 @@ export class KeyboardCtrl {
             '',
             `Удалить строку ${rowNioForDel} во всех трэках?`,
             () => {
-                SongStore.Delete_RowFromPart(this.songId, song, partId, <number>partNio, rowNioForDel);
+                SongStore.Delete_RowFromPart(song, partId, <number>partNio, rowNioForDel);
+                ideService.songStore.save();
+
                 this.remove_EditingItem(`${partNio}-${rowNioForDel}`)
 
                 getWithDataAttr('edit-parts-wrapper').forEach(el => {
@@ -1194,9 +1210,9 @@ export class KeyboardCtrl {
 
         console.log(partId, partNio);
 
-        const song = SongStore.getSong(this.songId);
+        const song = ideService.songStore.clone();
 
-        const rowNios = SongStore.getRowsByPart(song.dynamic, partId, partNio).map(item => un.getRowNio(item.rowInPartId));
+        const rowNios = SongStore.GetRowsByPart(song.dynamic, partId, partNio).map(item => un.getRowNio(item.rowInPartId));
         const rowNio = (rowNios.length ? Math.max(...rowNios) : 0) + 1;
         const rowInPartId = `${partNio}-${rowNio}`;
 
@@ -1212,7 +1228,7 @@ export class KeyboardCtrl {
             track: this.trackName,
         });
 
-        SongStore.setSong(this.songId, song);
+        ideService.songStore.save(song);
 
         getWithDataAttr('edit-parts-wrapper').forEach(el => {
             el.innerHTML = this.getRowsByPartComplexContent();
@@ -1228,18 +1244,11 @@ export class KeyboardCtrl {
 
         if (!songName) return;
 
-        let songNode: any; // StoredSongNode
-
-        if (this.isMy) {
-            songNode = SongStore.getSong(songName);
-        } else {
-            songNode = localStorage.getItem(songName);
-            songNode = songNode ? JSON.parse(songNode) : songNode;
-        }
+        const songNode = ideService.songStore.data;
 
         if (!songNode) return;
 
-        let data = JSON.stringify(songNode);
+        let data = JSON.stringify(songNode, null, 2);
         //let type = 'application/json';
         let type = 'application/text';
         let name = `${songName}.txt`;
@@ -1261,10 +1270,10 @@ export class KeyboardCtrl {
         }
     }
 
-    saveEditingItemsMy() {
+    saveEditingItems() {
         if (!ideService.editedItems.length) return;
 
-        let song = SongStore.getSong(this.songId);
+        let song = ideService.songStore.clone();
         const savedItems = ideService.editedItems.map(item => item.rowInPartId);
 
         const dynamic = song.dynamic.filter(item => {
@@ -1289,56 +1298,7 @@ export class KeyboardCtrl {
 
         song.dynamic = dynamic;
 
-        SongStore.setSong(this.songId, song);
-    }
-
-    saveEditingItems() {
-        if (!ideService.editedItems.length) return;
-
-        if (this.isMy) {
-            this.saveEditingItemsMy();
-
-            return;
-        }
-
-        let songName = ideService.editedItems[0].songName;
-        let songNode: StoredSongNodeOld;
-
-        if (!localStorage.getItem(songName)) {
-            songNode = {};
-        } else {
-            songNode = JSON.parse(localStorage.getItem(songName));
-        }
-
-        ideService.editedItems.forEach(item => {
-            const rows = this.liner.lines.filter(row => row.rowInPartId === item.rowInPartId);
-            if (!rows.length) return;
-
-            let itemsNode = songNode[item.rowInPartId];
-            if (!itemsNode) {
-                itemsNode = {
-                    items: []
-                };
-                songNode[item.rowInPartId] = itemsNode;
-            }
-
-            // jjkl
-            let drumsNode = itemsNode.items.find(iItem => iItem.rowInPartId === item.rowInPartId && iItem.type === this.boardType);
-            if (!drumsNode) {
-                drumsNode = {
-                    rowInPartId: item.rowInPartId,
-                    type: this.boardType,
-                    status: 'draft',
-                    rows: [],
-                    lines: [],
-                };
-                itemsNode.items.push(drumsNode);
-            }
-
-            drumsNode.rows = rows;
-        });
-
-        localStorage.setItem(songName, JSON.stringify(songNode));
+        ideService.songStore.save(song);
     }
 
     getMetronomeContent() {
@@ -1474,7 +1434,7 @@ export class KeyboardCtrl {
         this.page.stop();
 
         const midiConfig = this.getMidiConfig({ resetBlockOffset: true });
-        const playBlock = midiConfig.playBlockOut as TextBlock;
+        const playBlock = midiConfig.playBlockOut as un.TextBlock;
         const playingRows = playBlock.rows.filter(item => {
             const part = un.getPartInfo(item);
             return !!ideService.editedItems.find(item => item.rowInPartId === part.rowInPartId);
@@ -1482,11 +1442,12 @@ export class KeyboardCtrl {
 
         if (!playingRows.length) return;
 
-        const newOutBlock = createOutBlock({
+        const newOutBlock = un.createOutBlock({
             id: 'out',
             type: 'set',
             rows: playingRows,
-            bpm: this.page.bpmValue
+            bpm: this.page.bpmValue,
+            volume: ideService.outVolume,
         });
 
 
@@ -1515,7 +1476,7 @@ export class KeyboardCtrl {
         if (!notes) return;
 
         let blocks = [
-            '<out r100>',
+            `<out r100 v${ideService.outVolume} >`,
             'temp',
             notes
         ].join('\n');
@@ -1535,7 +1496,7 @@ export class KeyboardCtrl {
 
         const midiConfig = this.getMidiConfig({ resetBlockOffset: true, useEditing: true });
         let blocks = midiConfig.blocks;
-        let playBlock = midiConfig.playBlockOut as TextBlock;
+        let playBlock = midiConfig.playBlockOut as un.TextBlock;
 
         const playingRows = playBlock.rows.filter(item => {
             const part = un.getPartInfo(item);
@@ -1543,7 +1504,7 @@ export class KeyboardCtrl {
         });
 
         playingRows.forEach(rowText => {
-            if (!this.isMy) {
+            if (!this.useLineModel) {
                 const part = un.getPartInfo(rowText);
                 let lines = this.liner.lines.filter(line => line.rowInPartId === part.rowInPartId)
                 lines = this.liner.cloneRows(lines);
@@ -1568,11 +1529,12 @@ export class KeyboardCtrl {
             }
         });
 
-        playBlock = createOutBlock({
+        playBlock = un.createOutBlock({
             id: 'out',
             type: 'set',
             rows: rowsForPlay,
-            bpm: this.page.bpmValue
+            bpm: this.page.bpmValue,
+            volume: ideService.outVolume,
         });
 
         this.page.multiPlayer.tryPlayMidiBlock({
@@ -1641,7 +1603,7 @@ export class KeyboardCtrl {
 //  subscribeMoveCommands
 //  subscribeChess
 
-//  saveEditingItems saveEditingItemsMy
+//  saveEditingItems
 //  loadFile
 //  addRowInPart
 //  resetEditingParts

@@ -10,7 +10,7 @@ import {
     PAUSE,
     toneChar,
     decorChar,
-    drumChar, 
+    drumChar,
     isPresent,
     getString,
     getPitchShiftFromString,
@@ -171,11 +171,18 @@ function getNoteFullInfo(val: string): {
 function handleNote (dx: Dx) {
     let arrSlides = dx.$item.split('_').filter(item => !!item);
     const firstSegment = arrSlides.shift() || '';
-    const note = getNoteFullInfo(firstSegment);
+    const note = getNoteFullInfo(firstSegment); // note volume pitch
 
     note.volume = isPresent(note.volume) ? note.volume : dx.currVolume;
 
+    let slidesText: string;
+
+    if (arrSlides.length) {
+        slidesText = arrSlides.join('_');
+    }
+
     if (note.vibrato) {
+        slidesText = note.vibrato;
         arrSlides = note.vibrato.split('_');
     }
 
@@ -192,6 +199,7 @@ function handleNote (dx: Dx) {
         instr: `${dx.currInstr}${note.decor ? note.decor : dx.currDecor}`,
         cent: note.cent,
         slides,
+        slidesText,
     });
 }
 

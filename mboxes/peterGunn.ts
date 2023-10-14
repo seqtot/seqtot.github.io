@@ -9,7 +9,7 @@ https://www.songsterr.com/a/wsa/blues-brothers-peter-gunn-theme-tab-s3601
 _ @drums: v40; $bass: v40; $guit: v30; $solo: v50; $mark: v50
 
 <out b120 v80>
-> СЧЁТ
+> СЧЁТ         %_
 > ИНТРО        %A
 > РИФ_1        %B
 > СОЛО_1       %C
@@ -292,7 +292,8 @@ $guit:  лу=60      $guitar*ED
 $organ: лу+мо=1440 $organ
 
 <СЧЁТ b120 $>
-$tick: ле=120 ле=120 ле=120 ле=120 $xylo
+$bass: ле=120 ле=120 ле=120 ле=120 $xylo v70
+$guit: ле=120 ле=120 ле=120 ле=120 $xylo v70
 
 `.trim();
 
@@ -312,5 +313,8 @@ export default {
   content: info,
   tracks: [],
   score,
-  dynamic
+  dynamic,
+  dynamicOld: dynamic,
+  exportToLineModel: false,
+  ns: 'band-song',
 };

@@ -12,22 +12,25 @@ import {
     parseInteger, getRepeatFromString,
     toneChar, drumChar, DEFAULT_VOLUME,
     mergeVolume, clearEndComment, nioChar,
+    partIdChar,
 } from './utils-note';
 
 import {getNoteLineInfo, isNoteWithDurationOrPause} from './getNoteLineInfo';
 
-type NoteLn = {
+export type NoteLn = {
     trackName: string,
     noteLine: string,
     parentVolume: number,
     repeat: number,
     noteLineInfo: NoteLineInfo,
     colLoopDurationQ: number,
+
+    startOffsetQ?: number,
 }
 
 
 export type OutBlockRowInfo = {
-    noteLns: NoteLn[];
+    trackLns: NoteLn[];
     headLoopRepeat: number;
     headLoopDurationQ: number;
     rowDurationByHeadQ: number;
@@ -35,6 +38,7 @@ export type OutBlockRowInfo = {
     bpm?: number,
     //mask?: string | number,
     text?: string,
+    startOffsetQ?: number,
 };
 
 type OutBlocksInfo = {
@@ -83,7 +87,7 @@ export function getNoteLineMetaAndInstr(noteLine: string, instr?: string): {
 }
 
 /**
- *  noteLns: {
+ *  trackLns: {
  *      organ-1: r1 v100 $organ до-100
  *      organ-2: r1 v100 $organ ро-100
  *  },
@@ -158,8 +162,8 @@ export function getOutBlocksInfo(
                     return acc;
                 }
 
-                if (item.startsWith('%')) {
-                    partId =  item.replace('%', '');
+                if (item.startsWith(partIdChar)) {
+                    partId =  item.replace(partIdChar, '');
 
                     return acc;
                 }
@@ -192,6 +196,9 @@ export function getOutBlocksInfo(
             let colLoopDurationQ = 0;
 
             colRepeat = parseInteger(colInfoArr[1], 0) || getRepeatFromString(colInfoStr, headLoopRepeat);
+
+            //console.log('colId', colId);
+
             block = findBlockById(blocks, colId);
 
             if (!block) {
@@ -251,7 +258,7 @@ export function getOutBlocksInfo(
         totalDurationQ = totalDurationQ + (rowDurationByHeadQ * rowRepeat);
 
         result.rows.push({
-            noteLns: rowNoteLns,
+            trackLns: rowNoteLns,
             headLoopRepeat,
             headLoopDurationQ,
             rowDurationByHeadQ,

@@ -5,9 +5,10 @@ import {Sound} from '../../libs/muse/sound';
 import {MultiPlayer} from '../../libs/muse/multi-player';
 import {Synthesizer} from '../../libs/muse/synthesizer';
 import {Ticker} from '../../libs/muse/ticker';
+import {FileSettings, getFileSettings} from '../../libs/muse/utils/getFileSettings';
+import * as un from '../../libs/muse/utils';
 import {drumBoards, KeyboardType, toneBoards} from '../keyboard-ctrl';
-import {FileSettings} from '@muse/utils/getFileSettings';
-import {TrackInfo} from '../song-store';
+import {SongStore, TrackInfo} from '../song-store';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -54,12 +55,19 @@ class IdeService extends  EventEmitter {
     private _lastTrackName: string = '';
     private _lastBoardView: KeyboardType = '' as any;
 
+    songStore: SongStore;
+    blocks: un.TextBlock[] = [];
+    settings: FileSettings = getFileSettings([]);
+    pitchShift = 0;
+
     multiPlayer = multiPlayer;
     metronome = metronome;
     synthesizer = synthesizer;
     ticker = ticker;
     boards: any = {};
     bpmValue = 90;
+
+    outVolume = 70;
 
     get lastBoardView(): KeyboardType {
         if (!this._lastBoardView) {
@@ -101,6 +109,8 @@ class IdeService extends  EventEmitter {
         freezeStructure: boolean,
         source?: 'my' | 'band' | null | undefined,
         settings: FileSettings,
+        ns: string,
+        useLineModel: boolean,
     } = { } as any;
 
     get guid(): number {

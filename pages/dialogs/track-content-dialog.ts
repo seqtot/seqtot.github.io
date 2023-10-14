@@ -14,6 +14,7 @@ export class TrackContentDialog {
     track: TrackInfo = null;
     trackSrc: TrackInfo = null;
     volumeRange: Range.Range;
+    ns: string;
 
     get trackNameFromInput(): string {
         let result = '';
@@ -37,7 +38,6 @@ export class TrackContentDialog {
 
     constructor(
         public context: ComponentContext,
-        public page: {songId: string}
     ) {
 
     }
@@ -87,19 +87,18 @@ export class TrackContentDialog {
         }, 100);
     }
 
-    openTrackDialog(trackName = '', cb: TrackContentDialog['cb']  = null) {
-        this.cb = cb;
+    openTrackDialog(song: SongNode, trackName = '', cb: TrackContentDialog['cb']  = null) {
         this.trackName = trackName;
-
-        this.song = SongStore.getSong(this.page.songId);
+        this.cb = cb;
+        this.song = song;
 
         if (!this.song) return;
 
-        this.track = this.song.tracks.find(item => item.name === trackName);
+        let track = this.song.tracks.find(item => item.name === trackName);
 
-        if (trackName && !this.track) return;
+        if (trackName && !track) return;
 
-        this.track = this.track || {name: '', board: toneBoards.guitar, volume: 30 }
+        this.track = track ? {...track} : {name: '', board: toneBoards.guitar, volume: 50 }
         this.trackSrc = {...this.track};
 
         const btnStl = `
@@ -139,6 +138,7 @@ export class TrackContentDialog {
                                     type="text"
                                     placeholder="Track name"
                                     value="${this.track.name}"
+                                    ${this.track.isNotEditable ? 'readonly': ''}
                                 >
                                 <span class="input-clear-button"></span>
                             </div>
@@ -213,8 +213,6 @@ export class TrackContentDialog {
         }
 
         this.song.tracks = this.song.tracks.filter(item => item.name && item.board);
-
-        SongStore.setSong(this.page.songId, this.song);
 
         this.dialog.close();
         this.cb && this.cb(true);

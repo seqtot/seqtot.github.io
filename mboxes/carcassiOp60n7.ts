@@ -13,14 +13,15 @@ https://musescore.com/user/6428146/scores/1552756
 # 1560 1680 1800 1920 2040 2160 2280 2400
 
 <out b150>
-> ИНТРО  %A  # A #a
-> SOLO1  %B  # ACFE DCBA D#DEF EEEE
-> SOLO2  %C  # ACFE DCBA D#DEF A
-> ИНТРО  %D  # A #a
-> SOLO3  %E  # CEAG FEDD GGAB CDEC
-> SOLO4  %F  # FED#F GFE#G AAD#F EEEE EEDcBa EEEE EEDcBa #Gf E#d Ed Cb
-> ИНТРО  %G  # A #a
-> SOLO5  %H  # ACFE DCBA DDEE F#CDE #FA#GE AEFC D#DEE A
+> СЧЁТ   %_ [04*120]
+> ИНТРО  %A [16*120_16*120]                                           # A - 1920 1920
+> SOLO1  %B [08*120_08*120_08*120_08*120_]                            # B - 960  960  960  960
+> SOLO2  %C [08*120_08*120_08*120_08*120_]                            # C - 960  960  960  960
+> ИНТРО  %D [16*120_16*120]                                           # D - 1920 1920
+> SOLO3  %E [08*120_08*120_08*120_08*120_]                            # E - 960  960  960  960
+> SOLO4  %F [08*120_08*120_08*120_08*120_08*120_08*120_08*120_08*120] # F - 960  960  960  960  960  960  960  960
+> ИНТРО  %G [16*120_16*120]                                           # G - 1920 1920
+> SOLO5  %H [08*120_08*120_08*120_08*120_08*120_08*120_08*120_08*120] # H - 960  960  960  960  960  960  960  960
 
 <ИНТРО b150 set>
 интро_бас интро_гит
@@ -457,8 +458,10 @@ $____: 720    МУ=240 $organ*r
 $bass: 720    мы=240 $cBass*s
 $guit: 720    му=60=240:*ed:v30 v60 зо=60 бо=60 ма=60 $guit*edm
 
-<tick b130 $>
-$tick: бе=120 бе=120 бе=120 бе=120 $xylo
+<СЧЁТ b130 $>
+$bass: бе=120 бе=120 бе=120 бе=120 $xylo v70
+$guit: бе=120 бе=120 бе=120 бе=120 $xylo v70
+$____: бе=120 бе=120 бе=120 бе=120 $xylo v70
 
 `.trim();
 
@@ -469,7 +472,15 @@ $tick: бе=120 бе=120 бе=120 бе=120 $xylo
 
 const info = `
 <div style="margin: .5rem;">
-
+> СЧЁТ   %_
+> ИНТРО  %A  # A #a
+> SOLO1  %B  # ACFE DCBA D#DEF EEEE
+> SOLO2  %C  # ACFE DCBA D#DEF A
+> ИНТРО  %D  # A #a
+> SOLO3  %E  # CEAG FEDD GGAB CDEC
+> SOLO4  %F  # FED#F GFE#G AAD#F EEEE EEDcBa EEEE EEDcBa #Gf E#d Ed Cb
+> ИНТРО  %G  # A #a
+> SOLO5  %H  # ACFE DCBA DDEE F#CDE #FA#GE AEFC D#DEE A
 </div>
 `.trim();
 
@@ -477,5 +488,8 @@ export default {
   content: info,
   tracks: [],
   score,
-  dynamic
+  dynamic,
+  dynamicOld: dynamic,
+  exportToLineModel: true,
+  ns: 'band-song',
 };

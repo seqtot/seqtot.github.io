@@ -1,9 +1,3 @@
-import set_e from './set_E';
-import set_battle from './set_battle';
-import set_itsMyLife from './set_ItsMyLife';
-import set_blackNight from './set_blackNight';
-import set_hardToHandle from './/set_HardToHandle';
-
 import setBand from './setBand';
 import setMy from './setMy';
 import tiriTiri from './tiriTiri';
@@ -17,21 +11,18 @@ import engine from './engine';
 import threeDots from './threeDots';
 
 export default {
-  set_e,
-  set_battle,
-  set_itsMyLife,
-  set_blackNight,
-  set_hardToHandle,
-  //
-  setBand,
-  setMy,
+  // SONG
   tiriTiri,
   bell,
   carcassiOp60n7,
   partingGlass,
   billy,
-  peterGunn,
   sweetLeaf,
   engine,
   threeDots,
+  //peterGunn,
+
+  // LIST
+  setBand,
+  setMy,
 };

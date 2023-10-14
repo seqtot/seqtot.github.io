@@ -141,3 +141,50 @@ export function getTopOutList(x: {
 
     return rows;
 }
+
+export function getTopOutListHash(x: {
+    topBlock: un.TextBlock,
+    nearestIndex?: number,
+    excludeIndex?: number[]
+}): un.SongPartInfo[] {
+    let partNio = 0;
+    let nearestIndex = x.nearestIndex | 0;
+    let excludeIndex = Array.isArray(x.excludeIndex) ? x.excludeIndex : [];
+    let result: un.SongPartInfo[] = [];
+    let rows: string[] = [];
+
+    x.topBlock.rows.forEach(item => {
+        item = un.clearEndComment(item).trim();
+
+        if (isRefLine(item)) {
+            item = item.replace('|', '>');
+            const arr = item.split('>').map(item => item.trim()).filter(item => item).map(item => `> ${item}`);
+            arr.forEach(item => rows.push(item));
+        } else {
+            rows.push(item);
+        }
+    });
+
+    result = rows.reduce((acc, item, i) => {
+        if (isRefLine(item)) {
+            partNio++;
+        }
+
+        if (!isRefLine(item) || i < nearestIndex || excludeIndex.includes(i)) {
+            return acc;
+        }
+
+        item = item.replace('>', '').trim();
+
+        if (!item) return acc;
+
+        const part = un.getPartInfo(item);
+
+        part.partNio = partNio;
+        part.rowInPartId =`${partNio}-${0}`;
+
+        return [...acc, part];
+    }, <un.SongPartInfo[]>[]);
+
+    return result;
+}

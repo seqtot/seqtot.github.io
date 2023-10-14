@@ -4,7 +4,7 @@ import {ComponentContext} from 'framework7/modules/component/component';
 
 import {dyName, getWithDataAttr } from '../../src/utils';
 import {toneBoards, drumBoards, KeyboardCtrl, KeyboardPage} from '../keyboard-ctrl';
-import {SongNode, SongStore, TrackInfo} from '../song-store';
+import {MY_SONG, SongNode, SongStore, TrackInfo} from '../song-store';
 import {LineNote} from '../line-model';
 import * as un from '../../libs/muse/utils';
 
@@ -184,84 +184,6 @@ export class NoteDetailsDialog {
                 opened: () => {
                     this.subEvents();
                     // this.updateView();
-                    this.setVolumeRange();
-                    // this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
-                }
-            }
-        });
-
-        this.dialog.open(false);
-    }
-
-    openDialogOld(trackName = '', cb: NoteDetailsDialog['cb']  = null) {
-        this.cb = cb;
-        this.trackName = trackName;
-
-        this.song = SongStore.getSong(this.page.songId);
-
-        if (!this.song) return;
-
-        this.track = this.song.tracks.find(item => item.name === trackName);
-
-        if (trackName && !this.track) return;
-
-        this.track = this.track || {name: '', board: toneBoards.guitar, volume: 30 }
-        this.trackSrc = {...this.track};
-
-        const btnStl = `
-            display: inline-block;
-            margin: 0;            
-            margin-right: .5rem;
-            margin-bottom: 1rem;            
-            border-radius: 0.25rem;
-            border: 1px solid lightgray;
-            font-size: 1.2rem;
-            user-select: none;
-        `.trim();
-
-        const wrapper = `
-            <div class="popup">
-                <div class="page">
-                    <div class="page-content">
-                        <div style="padding: 1rem 0 0 1rem;" data-edit-track-dialog-content>
-                            <span data-edit-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
-                            <span data-edit-track-dialog-cancel style="${btnStl}">Cancel</span>
-                        </div>                        
-                        %content%
-                    </div>
-                </div>
-            </div>        
-        `.trim();
-
-        const content = wrapper.replace('%content%', `
-            <div class="list" style="margin: 1rem;">
-                <ul>
-                    <li class="item-content item-input">
-                        <div class="item-inner">
-                            <div class="item-title item-label">Track name</div>
-                            <div class="item-input-wrap">
-                                <input
-                                    data-edit-track-dialog-name-input
-                                    type="text"
-                                    placeholder="Track name"
-                                    value="${this.track.name}"
-                                >
-                                <span class="input-clear-button"></span>
-                            </div>
-                      </div>
-                    </li>
-                </ul>
-            </div>
-            ${this.getVolumeContent()}
-            ${this.getBoardForChoice()}        
-        `.trim());
-
-        this.dialog = (this.context.$f7 as any).popup.create({
-            content,
-            on: {
-                opened: () => {
-                    this.subEvents();
-                    this.updateView();
                     this.setVolumeRange();
                     // this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
                 }

@@ -26,8 +26,9 @@ const isDev = /local/.test(window.location.href);
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
 
+//const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
+const defRoute = '/mbox/setBand/';
 //const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
-const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
 //const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
 const linksToPage = [
@@ -209,3 +210,9 @@ const app = new Framework7({
 //   //   }
 //   // }
 // });
+
+
+// 0 1 2 3 4 5 6 7 8 9 10 11 12
+// х с л щ ? ж ш з в ф ?  ?  й
+//                     д  ц
+// .гд..к.мнпр.т..цч..

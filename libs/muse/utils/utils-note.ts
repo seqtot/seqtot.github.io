@@ -356,7 +356,7 @@ export function getDrumQuartersInfo(arr: string[]): number[][] {
 
 // instr-index: noteLine
 export function getNoteLnsByToneInstruments(arr: string[]): NoteLineByName[] {
-    let noteLns = arr
+    let trackLns = arr
         .filter((item) => item.startsWith(toneChar))
         .reduce((acc, item, i) => {
             const arr = getString(item).split(':');
@@ -371,7 +371,7 @@ export function getNoteLnsByToneInstruments(arr: string[]): NoteLineByName[] {
             return acc;
         }, <NoteLineByName[]>[]);
 
-    return noteLns;
+    return trackLns;
 }
 
 // TODO: поддержка одноимённых инструментов
@@ -381,7 +381,7 @@ export function getNoteLnsByDrumInstruments(arr: string[]): NoteLineByName[] {
         return acc + item.length;
     }, 0);
 
-    let noteLns: NoteLineByName[] = arr
+    let trackLns: NoteLineByName[] = arr
         .filter((item) => item.startsWith(drumChar))
         .reduce((acc, item) => {
             const arr = item.split(':');
@@ -396,7 +396,7 @@ export function getNoteLnsByDrumInstruments(arr: string[]): NoteLineByName[] {
 
     let result: NoteLineByName[] = [];
 
-    noteLns.forEach(noteLn => {
+    trackLns.forEach(noteLn => {
         const beatLine = noteLn.noteLine;
         const trackName = noteLn.trackName;
         const asNote = trackName.replace(drumChar, '');
@@ -630,10 +630,11 @@ export function getNoteByOffset(
 }
 
 export type SongPartInfo = {
+    name: string,
     partNio: number,
     rowNio: number,
     partId: string,
-    info: string,
+    mask: string,
     ref: string,
     rowInPartId: string,
 };
@@ -642,10 +643,11 @@ export function getPartInfo(val: string): SongPartInfo {
     val = (val || '').trim();
     const arr = val.split(' ').filter(item => item);
 
+    let name = arr[0];
     let partId = '';
     let partNio = 0;
     let rowNio = 0;
-    let info = '';
+    let mask = '';
     let ref = '';
 
     arr.forEach(item => {
@@ -668,10 +670,10 @@ export function getPartInfo(val: string): SongPartInfo {
             return;
         }
 
-        // info
+        // mask
         if (item.startsWith('[')) {
-            if (!info) {
-               info = item.replace(/[\[\]]/g, '');
+            if (!mask) {
+               mask = item.replace(/[\[\]]/g, '');
             }
 
             return;
@@ -683,7 +685,7 @@ export function getPartInfo(val: string): SongPartInfo {
     ref = ref.trim();
 
     const result = {
-        partId, partNio, rowNio, ref, info,
+        name, partId, partNio, rowNio, ref, mask,
         rowInPartId: `${partNio}-${rowNio}`
     };
 

@@ -17,6 +17,7 @@ export type NoteInfo = {
     instr?: string,
     pitchShift?: number,
     slides?: WaveSlide[];
+    slidesText?: string;
 }
 
 export type NoteLineInfo = {

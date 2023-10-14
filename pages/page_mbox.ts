@@ -5,32 +5,32 @@ import { Dialog } from 'framework7/components/dialog/dialog';
 import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import * as un from '../libs/muse/utils/utils-note';
+import * as un from '../libs/muse/utils';
 import { standardTicks as ticks } from './ticks';
-import { getMidiConfig, getTopOutList, MidiConfig } from '../libs/muse/utils/getMidiConfig';
+import { getMidiConfig, getTopOutList, getTopOutListHash, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings, getPitchShiftSetting } from '../libs/muse/utils/getFileSettings';
 import { isPresent, parseInteger, SongPartInfo, TextBlock } from '../libs/muse/utils/utils-note';
-import { LineModel } from './line-model';
+import {Line, LineModel} from './line-model';
 import mboxes from '../mboxes';
 import { ideService } from './ide/ide-service';
-import { SongStore, SongNode, StoredRow } from './song-store';
+import {SongStore, SongNode, StoredRow, MY_SONG, BAND_SONG, StoredSongNodeOld} from './song-store';
 import * as svg from './svg-icons';
-import {toneBoards, drumBoards} from './keyboard-ctrl';
-import {TrackContentDialog} from './dialogs/track-content-dialog';
+import { toneBoards, drumBoards } from './keyboard-ctrl';
+import { TrackContentDialog } from './dialogs/track-content-dialog';
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
+
     playingTick = '';
     bpmRange: Range.Range;
-    blocks: un.TextBlock[] = [];
-    settings: FileSettings = <any>{};
-    pitchShift: number = 0;
     excludePartNio: number [] = [];
     excludeTrack: {[key: string]: any} = {};
-
     selectedSong = '';
     selectedSongName = '';
+
+    ns = '';
+    isMy = false;
 
     get bpmValue(): number {
         return ideService.bpmValue;
@@ -56,36 +56,32 @@ export class MBoxPage {
         return this.context.$el.value;
     }
 
-    get pageData(): SongNode {
-        if (mboxes[this.songId]) {
-            return mboxes[this.songId];
-        }
-
-        return SongStore.getSong(this.songId, true);
+    get dataByTracks(): {[key: string]: string} {
+        return;
     }
 
     get outBlock(): TextBlock {
         return  this.blocks.find((item) => item.id === 'out');
     }
 
-    get isMy():boolean {
-        return this.pageData.source === 'my';
+    get useLineModel():boolean {
+        return !!(this.isMy || this.pageData.exportToLineModel || false);
+    }
+
+    get blocks (): un.TextBlock[] {
+        return ideService.blocks;
+    }
+
+    get settings (): FileSettings  {
+        return ideService.settings;
     }
 
     get allSongParts(): string[] {
-        if (this.isMy) {
-            const song = this.pageData;
+        const parts = ideService.songStore?.data.parts || [];
 
-            return song.parts.map((item, i) => {
-                return `${item.name} %${item.id} №${i+1}`;
-            });
-        }
-
-        if (!Array.isArray(this.blocks) || !this.blocks.length) {
-            return [];
-        }
-
-        return getTopOutList({topBlock: this.outBlock, printN: true});
+        return parts.map((item, i) => {
+            return `${item.name} %${item.id} №${i+1}`;
+        });
     }
 
     getId(id: string): string {
@@ -97,7 +93,56 @@ export class MBoxPage {
         public context: ComponentContext,
     ) {}
 
+    pageData: SongNode;
+
+    getPageData(): SongNode {
+        console.log('getPageData', this.songId, mboxes[this.songId]);
+
+        if (mboxes[this.songId]) {
+            return mboxes[this.songId];
+        }
+
+        const song = SongStore.GetSong(this.songId, MY_SONG, true);
+        song.source = 'my';
+        song.ns = MY_SONG;
+
+        return song;
+    }
+
+    initData(force: boolean) {
+        const songId = this.songId;
+        const pageData = this.pageData = this.getPageData();
+
+        this.isMy = pageData.source === 'my';
+        this.view = pageData.isSongList ? 'list' : 'song';
+        this.ns   = pageData.ns;
+
+        //console.log('pageMbox.onMounted', pageData);
+
+        if (this.view === 'song') {
+            let songData: SongNode;
+
+            if (ideService?.songStore?.songId && ideService.songStore.songId === songId && !force) {
+                // таже самая песня
+            } else {
+                ideService.blocks = un.getTextBlocks(pageData.score) || [];
+                ideService.settings = getFileSettings(ideService.blocks);
+                ideService.pitchShift = getPitchShiftSetting(ideService.settings);
+
+                if (!mboxes[songId]) {
+                    songData = pageData;
+                } else {
+                    songData = mboxes[this.songId];
+                    songData = this.textModelToLineModel(this.songId, songData);
+                }
+
+                ideService.songStore = new SongStore(songId, songData.ns, songData);
+            }
+        }
+    }
+
     onMounted() {
+        this.initData(false);
         this.setRightPanelContent();
         this.setPageContent();
     }
@@ -132,9 +177,9 @@ export class MBoxPage {
             ></div>
         `.trim();
 
-        if (this.pageData.hideMetronome) {
-            metronomeView = '';
-        }
+        // if (this.pageData.hideMetronome) {
+        //     metronomeView = '';
+        // }
 
         return metronomeView;
     }
@@ -146,7 +191,7 @@ export class MBoxPage {
 
         if (this.isMy) {
             songListContent = '';
-            const songs = SongStore.getSongs();
+            const songs = SongStore.GetSongs(this.ns);
 
             songs.forEach(song => {
                 content += `<div class="row" style="margin: .5rem; align-items: center;">
@@ -216,12 +261,6 @@ export class MBoxPage {
     }
 
     setPageContent() {
-        this.view = this.pageData.isSongList ? 'list' : 'song';
-
-        this.blocks = un.getTextBlocks(this.pageData.score) || [];
-        this.settings = getFileSettings(this.blocks);
-        this.pitchShift = getPitchShiftSetting(this.settings);
-
         const wrapper = `
             <div
                 class="page-content"
@@ -230,9 +269,10 @@ export class MBoxPage {
                 padding-bottom: 2rem;"
             >%content%</div>
         `.trim();
+
         let content = '';
 
-        if (this.pageData.isSongList) {
+        if (this.view === 'list') {
             content = wrapper.replace('%content%', this.getSongListContent());
             this.el$.html(content);
             this.updateSongListView();
@@ -281,7 +321,7 @@ export class MBoxPage {
             display: inline-block;
             padding: .15rem;
             margin-right: .5rem; margin-top: .5rem;
-            font-size: 1rem; font-weight: 400;
+            font-size: .9rem; font-weight: 400;
             user-select: none; touch-action: none;
             border: 1px solid gray; border-radius: .3rem;
         `.trim();
@@ -298,31 +338,22 @@ export class MBoxPage {
             </div>
         `.trim();
 
-        if (this.isMy) {
-            const song = this.pageData;
+        const tracks = ideService?.songStore?.data?.tracks || [];
 
-            song.tracks.forEach(track => {
-                content += `
-                    <span style="${trackStyle}" data-use-track-action="${track.name}">
+        tracks.forEach(track => {
+            const underline = track.isNotEditable ? 'text-decoration: underline;': '';
+
+            content += `
+                    <span style="${trackStyle} ${underline}" data-use-track-action="${track.name}">
                         ${track.name}:${track.volume}
                     </span>            
             `.trim();
-            });
+        });
 
-            content += actions;
-        } else {
-            Object.keys(this.settings.dataByTracks).forEach(key => {
-                content += `
-                    <span style="${trackStyle}" data-use-track-action="${key}">
-                        ${key}
-                    </span>
-            `.trim();
-            });
-        }
+        content += actions;
 
         return content;
     }
-
 
     getSongPartsContent(): string {
         let allSongParts = this.allSongParts;
@@ -358,11 +389,14 @@ export class MBoxPage {
             }
 
             fileCommands += `
-                ${svg.uploadBtn('data-upload-song-action', '', 24)}&nbsp;
-                ${svg.saveBtn('data-save-song-action', '', 24)}&nbsp;                
+                ${svg.uploadBtn('data-upload-song-action', '', 24)}&nbsp;              
                 <input style="display: none;" type="file" data-upload-song-input multiple />                                
             `.trim();
         }
+
+        fileCommands += `
+                ${svg.saveBtn('data-save-song-action', '', 24)}&nbsp;
+        `.trim();
 
         fileCommands = `<div style="margin: 1rem;">
             ${fileCommands}
@@ -373,8 +407,8 @@ export class MBoxPage {
                 ${svg.uncheckBtn('data-unselect-all-parts-action', '', 24)}            
                 ${svg.checkBtn('data-select-all-parts-action', '', 24)}            
                 ${svg.stopBtn('data-action-type="stop"', '', 24)}                                                                
-                ${svg.playBtn('data-action-type="play-all"', '', 24)}
-                ${svg.playLoopBtn('data-action-type="play-all-loop"', '', 24)}
+                ${svg.playBtn('data-play-all-action', '', 24)}
+                ${svg.playLoopBtn('data-loop-all-action', '', 24)}
             </div>
             ${editCommands}
         `.trim();
@@ -475,13 +509,15 @@ export class MBoxPage {
 
                 if (tracks.length > 1) return;
 
+                const trackName = tracks[0];
 
                 this.confirm = (this.context.$f7 as any).dialog.confirm(
                     '',
                     'Удалить?',
                     () => {
-                        if (SongStore.deleteTrack(this.songId, tracks[0])) {
+                        if (SongStore.DeleteTrack(ideService.songStore.data, trackName)) {
                             this.renderTracksView();
+                            ideService.songStore.save();
                         }
                     },
                     () => {}, // cancel
@@ -498,7 +534,7 @@ export class MBoxPage {
                     this.excludeTrack[key] = key;
                 });
 
-                this.updateTracksView();
+                this.update_TracksView();
             })
         });
 
@@ -509,7 +545,7 @@ export class MBoxPage {
                     this.excludeTrack[key] = null;
                 });
 
-                this.updateTracksView();
+                this.update_TracksView();
             })
         });
 
@@ -517,12 +553,12 @@ export class MBoxPage {
             el.addEventListener('pointerdown', () => {
                 let key = el.dataset.useTrackAction
                 this.excludeTrack[key] = this.excludeTrack[key] ? null: key;
-                this.updateTracksView();
+                this.update_TracksView();
             });
         });
     }
 
-    updateTracksView() {
+    update_TracksView() {
         getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
             let key = el.dataset.useTrackAction
             el.style.backgroundColor = this.excludeTrack[key] ? 'white' : 'lightgray';
@@ -537,7 +573,7 @@ export class MBoxPage {
         });
 
         this.subTracksEvents();
-        this.updateTracksView();
+        this.update_TracksView();
     }
 
     gotoEditSong(songId?: string) {
@@ -566,7 +602,7 @@ export class MBoxPage {
     gotoEditPart(pPartNio?: number | string) {
         let partNio = parseInteger(pPartNio, null);
         let editPartsNio: number[] = [];
-        const isMy = this.pageData.source === 'my';
+        const isMy = this.isMy;
 
         if (partNio) {
             editPartsNio = [partNio];
@@ -586,6 +622,8 @@ export class MBoxPage {
         ideService.currentEdit.freezeStructure = !isMy;
         ideService.editedItems = [];
         ideService.currentEdit.settings = this.settings;
+        ideService.currentEdit.ns = isMy ? MY_SONG : this.pageData.ns || '';
+        ideService.currentEdit.useLineModel = isMy || this.pageData.exportToLineModel || false;
 
         //console.log('currentEdit', ideService.currentEdit);
 
@@ -717,12 +755,17 @@ export class MBoxPage {
     }
 
     movePart(offset: number) {
-        const songId = (this.songId || '').trim();
+        const songStore = ideService.songStore;
+
+        if (!songStore) return;
+
         const part = this.getOneSelectedPartInfo();
 
-        if (!songId || !part) return;
+        if (!part) return;
 
-        if (SongStore.movePart(songId, part.partId, offset)) {
+        const isChanged = SongStore.MovePart(songStore.data, part.partId, offset);
+
+        if (isChanged) {
             const allSongParts = this.allSongParts;
             this.excludePartNio = [];
 
@@ -731,13 +774,14 @@ export class MBoxPage {
                     this.excludePartNio.push(i + 1);
                 }
             });
-        }
 
-        this.setPageContent();
+            this.setPageContent();
+            ideService.songStore.save();
+        }
     }
 
     updateView() {
-        this.updateTracksView();
+        this.update_TracksView();
         this.updatePartListView();
         this.updateSongListView();
     }
@@ -770,7 +814,7 @@ export class MBoxPage {
     }
 
     moveSong(songId: string, offset: number) {
-        SongStore.moveSong(songId, offset);
+        SongStore.MoveSong(songId, offset, this.ns);
         this.setPageContent();
     }
 
@@ -778,20 +822,30 @@ export class MBoxPage {
         const cb = (ok: boolean) => {
             if (ok) {
                 this.renderTracksView();
+                ideService.songStore.save();
             }
         }
 
-        new TrackContentDialog(this.context, this).openTrackDialog(trackName, cb);
+        new TrackContentDialog(this.context).openTrackDialog(
+            ideService.songStore?.data,
+            trackName,
+            cb
+        );
     }
 
     addTrack() {
         const cb = (ok: boolean) => {
             if (ok) {
                 this.renderTracksView();
+                ideService.songStore.save();
             }
         }
 
-        new TrackContentDialog(this.context, this).openTrackDialog('', cb);
+        new TrackContentDialog(this.context).openTrackDialog(
+            ideService.songStore.data,
+            '',
+            cb
+        );
     }
 
     renameSong(songId: string) {
@@ -803,7 +857,7 @@ export class MBoxPage {
             'Название',
             'Наименование',
             (newName: string) => {
-                SongStore.renameSong(songId, newName.trim());
+                SongStore.RenameSong(songId, newName.trim(), this.ns);
                 this.setPageContent();
             },
             () => {},
@@ -822,7 +876,7 @@ export class MBoxPage {
             '',
             'Удалить?',
             () => {
-                SongStore.deleteSong(songId);
+                SongStore.DeleteSong(songId, this.ns);
                 this.setPageContent();
             },
             () => {}, // cancel
@@ -832,26 +886,15 @@ export class MBoxPage {
     }
 
     clonePart() {
-        const songId = (this.songId || '').trim();
+        const song = ideService.songStore?.data;
         const part = this.getOneSelectedPartInfo();
 
-        if (!songId || !part) return;
+        if (!song || !part) return;
 
-        const newPart = SongStore.clonePart(this.songId, part.partId);
+        const newPart = SongStore.ClonePart(song, part.partId);
+
         this.setPageContent();
-
-        console.log(songId, part, newPart);
-
-        // this.prompt = (this.context.$f7 as any).dialog.prompt(
-        //     'Название только буквами, цифрами, знаками - или _ (без пробелов)',
-        //     'Наименование',
-        //     (newName: string) => {
-        //         SongStore.renamePart(songId, part.partId, newName.trim());
-        //         this.setPageContent();
-        //     },
-        // );
-        //
-        // this.prompt.open();
+        ideService.songStore.save();
     }
 
     renamePart() {
@@ -864,9 +907,12 @@ export class MBoxPage {
             'Название только буквами, цифрами, знаками - или _ (без пробелов)',
             'Наименование',
             (newName: string) => {
-                SongStore.renamePart(songId, part.partId, newName.trim());
+                SongStore.RenamePart(ideService.songStore.data, part.partId, newName.trim());
                 this.setPageContent();
+                ideService.songStore.save();
             },
+            () => {},
+            part.name,
         );
 
         this.prompt.open();
@@ -878,7 +924,6 @@ export class MBoxPage {
         if (!part) return;
 
         const partId = part.partId;
-        const partNio = part.partNio;
 
         // https://framework7.io/docs/dialog
         // app.dialog.confirm(text, title, callbackOk, callbackCancel)- create Confirm Dialog and open it
@@ -886,8 +931,11 @@ export class MBoxPage {
             '',
             'Удалить?',
             () => {
-                SongStore.deletePart(this.songId, partId);
-                this.setPageContent();
+
+                if (SongStore.DeletePart(ideService.songStore.data, partId)) {
+                    this.setPageContent();
+                    ideService.songStore.save();
+                }
             },
             () => {}, // cancel
         );
@@ -900,13 +948,15 @@ export class MBoxPage {
     confirm: Dialog.Dialog;
 
     addSong(name: string) {
-        const song = SongStore.addSong(name);
+        const song = SongStore.AddSongToList(name, this.ns);
         this.setPageContent();
     }
 
     addPart(name: string) {
-        const part = SongStore.addPart(this.songId, name);
-        this.setPageContent();
+        if (SongStore.AddPartToSong(ideService.songStore.data, name)) {
+            this.setPageContent();
+            ideService.songStore.save();
+        }
     }
 
     subscribePageEvents() {
@@ -946,19 +996,19 @@ export class MBoxPage {
             });
         });
 
-        getWithDataAttrValue('action-type', 'stop', this.pageEl)?.forEach((el) => {
+        getWithDataAttrValue('action-type', 'stop', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.stop());
         });
 
-        getWithDataAttrValue('action-type', 'play-all', this.pageEl)?.forEach((el) => {
+        getWithDataAttr('play-all-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.playAll(0));
         });
 
-        getWithDataAttrValue('action-type', 'play-all-loop', this.pageEl)?.forEach((el) => {
+        getWithDataAttr('loop-all-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.playAll(0, 100));
         });
 
-        getWithDataAttr('select-all-parts-action', this.pageEl)?.forEach((el) => {
+        getWithDataAttr('select-all-parts-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.selectAllParts());
         });
 
@@ -993,16 +1043,10 @@ export class MBoxPage {
     }
 
     getDataByTracks(): {[key: string]: string} {
-        let dataByTracks = {
-            ...this.settings.dataByTracks
-        };
+        let dataByTracks: {[key: string]: string} = {};
 
-        if (this.isMy) {
-            const song = this.pageData;
-
-            dataByTracks = {};
-
-            song.tracks.forEach(track => {
+        if (ideService?.songStore?.data) {
+            ideService.songStore.data.tracks.forEach(track => {
                 dataByTracks[track.name] = `v${track.volume}`;
             });
         }
@@ -1013,13 +1057,15 @@ export class MBoxPage {
             }
         });
 
-        //console.log(this.settings, metaByLines);
-
         return dataByTracks;
     }
 
     buildBlocksForMySong(blocks: TextBlock[]): TextBlock[] {
-        const song = this.pageData;
+        console.log('buildBlocksForMySong.blocks', blocks);
+
+        blocks = []; // jjkl
+
+        const song = ideService.songStore.clone();
         const hash = {};
         const list: {id: string, rows: StoredRow[][]}[] = [];
         const selectedParts = this.getSelectedParts();
@@ -1134,14 +1180,309 @@ export class MBoxPage {
         });
     }
 
-    playAll(index: number | string = 0, repeatCount = 1) {
-        const isMy = this.pageData.source === 'my';
+    textModelToLineModel(songId: string, songNodeInput: SongNode): SongNode {
+        // ideService.blocks = un.getTextBlocks(songNodeInput.score) || [];
+        // ideService.settings = getFileSettings(this.blocks);
+        // ideService.pitchShift = getPitchShiftSetting(ideService.settings);
 
+        const songSettings = ideService.settings;
+        const song = SongStore.GetOldSong(songId, songNodeInput.ns, true);
+        const partsHash = getTopOutListHash({topBlock: this.outBlock});
+
+        //console.log('partsHash', partsHash);
+
+        // ЧАСТИ ПЕСНИ
+        song.parts = partsHash.map(item => {
+           return {
+               name: item.name,
+               id: item.partId
+           }
+        });
+
+        song.tracks = song.tracks.filter(item => !item.isNotEditable);
+
+        // ТРЭКИ из settings текстовой модели
+        Object.keys(songSettings.dataByTracks).forEach(trackName => {
+            const volume = un.getVolumeFromString(songSettings.dataByTracks[trackName]);
+
+            let track = song.tracks.find(item => item.name === trackName);
+
+            if (!track) {
+                song.tracks.push(
+                    {
+                        name: trackName,
+                        volume,
+                        board: un.hasDrumChar(trackName) ? 'drums' : 'guitar',
+                        isNotEditable: true,
+                    }
+                )
+            } else {
+                track.isNotEditable = true;
+            }
+        });
+
+        // ТРЭКИ из поля захордкоженного поля dynamicOld
+        //console.log('PAGE DATA', this.pageData);
+
+        (songNodeInput as any).dynamicOld = (songNodeInput as any).dynamicOld || {};
+        const dynamicOld = (songNodeInput as any).dynamicOld as {trackName: StoredSongNodeOld};
+
+        Object.keys(dynamicOld).forEach(trackName => {
+            if (!song.tracks.find(item => item.name === trackName)) {
+                song.tracks.push({
+                   name: trackName,
+                   volume: 50,
+                   isNotEditable: true,
+                   board: un.hasDrumChar(trackName) ? 'drums' : 'guitar',
+                });
+            }
+        });
+
+        let blocks = [...this.blocks];
+
+        const x = {
+            blocks,
+            currBlock: blocks.find((item) => item.id === 'out'),
+            currRowInfo: { first: 0, last: 0},
+            excludeIndex: [],
+            midiBlockOut: null as un.TextBlock,
+            playBlockOut: '' as string | un.TextBlock,
+            topBlocksOut: [],
+        };
+
+        getMidiConfig(x);
+
+        const box = un.getOutBlocksInfo(x.blocks, x.playBlockOut);
+
+        const tracksByScore: {[key: string]: string} = {}
+        const parts: {
+            partId: string,
+            durationQ: number,
+            rows: un.OutBlockRowInfo[],
+            text: string
+        }[] = [];
+
+        let partId = '';
+        let currPart: {
+            partId: string,
+            durationQ: number,
+            rows: un.OutBlockRowInfo[],
+            text: string,
+        };
+
+        // ЧАСТИ И ТРЭКИ из текстовой модели
+        box.rows.forEach(row => {
+            const partInfo = un.getPartInfo(row.text);
+
+            if (partInfo.partId !== partId) {
+                partId = partInfo.partId;
+                currPart = {
+                    partId,
+                    durationQ: row.rowDurationByHeadQ,
+                    rows: [row],
+                    text: row.text,
+                }
+                parts.push(currPart);
+            } else {
+                currPart.durationQ = currPart.durationQ + row.rowDurationByHeadQ;
+                currPart.rows.push(row);
+            }
+
+            row.trackLns.forEach(noteLn => {
+                noteLn.noteLineInfo.notes.forEach(note => {
+                    let trackName = noteLn.trackName;
+
+                    if (trackName.startsWith('@')) {
+                        trackName = '@drums';
+                        noteLn.trackName = trackName;
+                    }
+
+                    if (!tracksByScore[trackName]) {
+                        tracksByScore[trackName] = trackName;
+                    }
+                });
+            });
+        });
+
+        // TRACKS BY SCORE
+        Object.keys(tracksByScore).forEach(trackName => {
+            let track = song.tracks.find(item => item.name === trackName);
+
+            if (!track) {
+                song.tracks.push(
+                    {
+                        name: trackName,
+                        volume: 50,
+                        board: un.hasDrumChar(trackName) ? 'drums' : 'guitar',
+                        isNotEditable: true,
+                    }
+                )
+            } else {
+                track.isNotEditable = true;
+            }
+        });
+
+        // set startOffsetQ
+        parts.forEach(part => {
+            let startOffsetQ = 0;
+
+           part.rows.forEach(row => {
+                row.startOffsetQ = startOffsetQ;
+
+                row.trackLns.forEach(ln => {
+                   ln.startOffsetQ = startOffsetQ;
+                });
+
+                startOffsetQ += row.rowDurationByHeadQ;
+           });
+        });
+
+        // PART REPORT
+        {
+            let partReport = '';
+
+            parts.forEach(part => {
+                partReport += part.partId;
+
+                part.rows.forEach(row => {
+                    partReport += ` - ${row.rowDurationByHeadQ}`;
+                });
+
+                partReport += '\n';
+            });
+
+            console.log('partReport\n', partReport);
+        }
+
+        console.log('parts', parts);
+
+        // ОСТАВЛЯЕМ ТОЛЬКО СТРОКИ ИЗ localStore
+        song.dynamic = song.dynamic.filter(rowByTrack => {
+            return song.tracks.find(item => item.name === rowByTrack.track && !item.isNotEditable);
+        });
+
+        console.log('dynamicOld', dynamicOld);
+
+        // DYNAMIC OLD
+        Object.keys(dynamicOld).forEach(trackName => {
+            const oldItemsByRow = dynamicOld[trackName];
+
+            Object.keys(oldItemsByRow).forEach(oldRowInPartId => {
+                 const oldItems = oldItemsByRow[oldRowInPartId]?.items;
+                 const partInfo = un.getPartRowNio(oldRowInPartId);
+
+                 if (!Array.isArray(oldItems)) return;
+
+                const newPartNio = partInfo.partNio + 1;
+
+                 oldItems.forEach(item => {
+                     const newItem = <StoredRow>{
+                         partId: undefined, // jjkl
+                         rowNio: partInfo.rowNio,
+                         rowInPartId: `${newPartNio}-${partInfo.rowNio}`,
+                         type: 'drums',
+                         track: '@drums',
+                         lines: item.rows.map(item => {
+                             return {
+                                 ...item,
+                                 rowInPartId: `${newPartNio}-${partInfo.rowNio}`
+                             }
+                         }),
+                     }
+
+                     song.dynamic.push(newItem);
+                 });
+
+                //console.log(oldRowInPartId, oldItems);
+            });
+        });
+
+        // PART -> TRACK -> LINES -> NOTES
+        parts.forEach(part => {
+            const partInfo = un.getPartInfo(part.text);
+
+            partsHash.forEach(item => {
+                if (item.partId === partInfo.partId) {
+                    partInfo.mask = item.mask;
+                }
+            });
+
+            Object.keys(tracksByScore).forEach(trackName => {
+                const lns: un.NoteLn[] = [];
+
+                part.rows.forEach(row => {
+                    row.trackLns.forEach(ln => {
+                        if (ln.trackName === trackName) {
+                            lns.push(ln);
+                        }
+                    });
+                });
+
+                if (!lns.length) return;
+
+                let liner = new LineModel();
+                liner.setData(liner.getLinesByMask(part.durationQ));
+
+                lns.forEach(ln => {
+                    let iOffsetQ = 0;
+
+                    for (let i = 0; i < ln.repeat; i++) {
+                        ln.noteLineInfo.notes.forEach(note => {
+                            if (note.note === 'pause') {
+                                iOffsetQ += note.durationQ;
+
+                                return;
+                            }
+
+                            let startOffsetQ = ln.startOffsetQ + Math.round((iOffsetQ / 10) * 10);
+                            let durQ = Math.round((note.durationQ / 10) * 10);
+
+                            note.note.split('+').forEach(iNote => {
+                                liner.addNoteByOffset(startOffsetQ, {
+                                    id: 0,
+                                    durQ,
+                                    note: ideService.synthesizer.getNoteLat(iNote),
+                                    startOffsetQ: 0,
+                                    char: '',
+                                    slides: note.slidesText,
+                                    volume: note.volume,
+                                    instName: note.instr,
+                                    cent: note.cent,
+                                    // instCode
+                                    // headColor
+                                    // bodyColor
+                                });
+                            })
+
+                            iOffsetQ += note.durationForNextQ;
+                        });
+                    }
+                });
+
+                //console.log(trackName, lns);
+
+                const items = LineModel.SplitByMask({
+                   lines: liner.lines,
+                   type:  trackName.startsWith('$') ? 'guitar': 'drums',
+                   partInfo,
+                   track: trackName
+                });
+
+                song.dynamic = [...song.dynamic, ...items];
+            });
+        }); // loop by parts
+
+        SongStore.SetSong(songId, song, songNodeInput.ns);
+
+        return song;
+    }
+
+    playAll(index: number | string = 0, repeatCount = 1) {
         this.stop();
         index = parseInteger(index, 0);
         let currRowInfo: RowInfo = { first: index, last: index}; // индекс в текущем блоке
 
-        let blocks = isMy ? this.buildBlocksForMySong(this.blocks) : [...this.blocks];
+        let blocks = this.useLineModel ? this.buildBlocksForMySong(this.blocks) : [...this.blocks];
 
         const x = {
             blocks,
@@ -1153,16 +1494,16 @@ export class MBoxPage {
             topBlocksOut: [],
         };
 
-        if (isMy) {
+        if (this.useLineModel) {
             const rows = this.getSelectedParts().map(row => `> ${row}`);
 
             x.excludeIndex = []; // либо надо билдить ВСЕ части
             x.currBlock = un.createOutBlock({
                 id: 'out',
+                type: 'text',
                 bpm: this.bpmValue,
                 rows,
-                volume: 50,
-                type: 'text'
+                volume: ideService.outVolume,
             });
         } else {
             x.currBlock = x.blocks.find((item) => item.id === 'out');
@@ -1179,34 +1520,34 @@ export class MBoxPage {
         blocks = [...x.blocks];
 
         // DYNAMIC
-        if (!isMy && this.pageData.dynamic?.['@drums']) {
-            const map = this.pageData.dynamic?.['@drums'];
-
-            playBlock.rows.forEach((row, i) => {
-                let rowInPartId = un.getPartInfo(row).rowInPartId;
-
-                if (!rowInPartId || !map[rowInPartId] || !map[rowInPartId].items && !map[rowInPartId].items.length) {
-                    return;
-                }
-
-                let rows = map[rowInPartId].items[0].rows;
-
-                if (Array.isArray(rows)) {
-                     rows = LineModel.CloneLines(rows);
-                     rows.forEach(row => (row.blockOffsetQ = 0));
-                } else {
-                    return;
-                }
-
-                const notes = LineModel.GetDrumNotes('temp' + ideService.guid.toString(), rows);
-
-                if (notes) {
-                    const block = un.getTextBlocks(notes)[0];
-                    blocks = [...blocks, block];
-                    playBlock.rows[i] = playBlock.rows[i] + ' ' + block.id;
-                }
-            });
-        }
+        // if (!this.useLineModel && this.pageData.dynamic?.['@drums']) {
+        //     const map = this.pageData.dynamic?.['@drums'];
+        //
+        //     playBlock.rows.forEach((row, i) => {
+        //         let rowInPartId = un.getPartInfo(row).rowInPartId;
+        //
+        //         if (!rowInPartId || !map[rowInPartId] || !map[rowInPartId].items && !map[rowInPartId].items.length) {
+        //             return;
+        //         }
+        //
+        //         let rows = map[rowInPartId].items[0].rows;
+        //
+        //         if (Array.isArray(rows)) {
+        //              rows = LineModel.CloneLines(rows);
+        //              rows.forEach(row => (row.blockOffsetQ = 0));
+        //         } else {
+        //             return;
+        //         }
+        //
+        //         const notes = LineModel.GetDrumNotes('temp' + ideService.guid.toString(), rows);
+        //
+        //         if (notes) {
+        //             const block = un.getTextBlocks(notes)[0];
+        //             blocks = [...blocks, block];
+        //             playBlock.rows[i] = playBlock.rows[i] + ' ' + block.id;
+        //         }
+        //     });
+        // }
 
         //console.log('getDataByTrack', this.getDataByTracks());
 
@@ -1256,8 +1597,9 @@ export class MBoxPage {
         songNode = JSON.parse(val) as SongNode;
         //songNode = SongStore.Transform(val);
 
-        SongStore.setSong(this.songId, songNode);
+        SongStore.SetSong(this.songId, songNode, this.ns);
 
+        this.initData(true);
         this.setPageContent();
     }
 
@@ -1289,18 +1631,14 @@ export class MBoxPage {
         });
     }
 
-    saveSong() {
-        let songId = this.songId;
+    saveSong() { // save-song-action
+        const songStore = ideService.songStore;
 
-        if (!songId) return;
+        if (!songStore) return;
 
-        let songNode = this.pageData;
+        songStore.data.bmpValue = this.bpmValue
 
-        if (!songNode) return;
-
-        songNode.bmpValue = this.bpmValue
-
-        SongStore.setSong(songId, songNode);
+        songStore.save();
     }
 
     downloadFile() {
@@ -1309,18 +1647,11 @@ export class MBoxPage {
 
         if (!songId) return;
 
-        let songNode: any; // StoredSongNode
-
-        if (this.isMy) {
-            songNode = this.pageData;
-        } else {
-            songNode = localStorage.getItem(songId);
-            songNode = songNode ? JSON.parse(songNode) : songNode;
-        }
+        let songNode = ideService?.songStore?.data!;
 
         if (!songNode) return;
 
-        let data = JSON.stringify(songNode);
+        let data = JSON.stringify(songNode, null, 2);
         //let type = 'application/json';
         let type = 'application/text';
         let name = `${songId}.txt`;
@@ -1357,3 +1688,5 @@ export class MBoxPage {
 // move-part-up-action move-part-down-action rename-part-action clone-part-action delete-part-action
 
 // PLAY: playAll
+
+// SAVE: save-song-action

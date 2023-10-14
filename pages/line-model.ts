@@ -1,5 +1,7 @@
 import * as un from '../libs/muse/utils/utils-note';
 import {DEFAULT_VOLUME, getString} from '../libs/muse/utils/utils-note';
+import {SongPartInfo} from '../libs/muse/utils/utils-note';
+import {StoredRow} from './song-store';
 
 export type KeyData = {
     quarterTime: number;
@@ -18,15 +20,18 @@ export type LineNote = {
     id: number;
     durQ: number;
     note: string;
+    startOffsetQ: number;
+
+    lineOffsetQ?: number; // TODO
     headColor?: string;
     bodyColor?: string;
-    startOffsetQ: number;
-    char: string;
-
+    char?: string;
     instCode?: string | number;
     instName?: string;
     volume?: number;
     slides?: string;
+    pitchShift?: number;
+    cent?: number;
 };
 
 export type Cell = {
@@ -787,6 +792,7 @@ export class LineModel {
             let pause = '';
             let volume = `v${un.parseInteger(note.volume, DEFAULT_VOLUME)}`;
             let slides = getSlides(note.slides);
+            let cent = note.cent ? `.${note.cent}` : '';
 
             if (slides) {
                 slides = slides.startsWith('~') ? `:${slides}` : `_${slides}`;
@@ -803,7 +809,7 @@ export class LineModel {
             }
 
             //result += `${pause} ${instName} ${note.note}=${durationForNext}=${note.durQ} `;
-            result += `${pause} ${instName} ${note.note}=${durationForNext}=${note.durQ}:${volume}${slides} `;
+            result += `${pause} ${instName} ${note.note}${cent}=${durationForNext}=${note.durQ}:${volume}${slides} `;
         });
 
         return result;
@@ -981,5 +987,110 @@ export class LineModel {
 
     fillLinesStructure(mask: string | number) {
         this.lines = this.getLinesByMask(mask);
+    }
+
+    static SplitByMask(x: {track: string, type: string, partInfo: un.SongPartInfo, lines: Line[]}): StoredRow[] {
+        //console.log('SplitMask.x', x);
+
+        let result: StoredRow[] = [];
+        let mask = (x.partInfo.mask || '').trim();
+
+        let maskArr = mask.split('_');
+        let linesSrc = [...x.lines];
+
+        let rowNio = 0;
+
+        // маски нет
+        if (!maskArr[0]) {
+            rowNio++;
+
+            result = [{
+                track: x.track,
+                lines: linesSrc,
+                type: x.type,
+                rowInPartId: `${x.partInfo.partNio}-${rowNio}`,
+                rowNio: rowNio,
+                partId: x.partInfo.partId,
+                status: '',
+            }];
+
+            //console.log('SplitMask.result 1', result);
+            return result;
+        }
+
+        maskArr.forEach(maskItem => {
+            maskArr = maskItem.split('*');
+
+            let lineDurQ = 120;
+            let lineInBlock = 1;
+            let blockCount = 1;
+
+            if (maskArr.length === 1) {
+                lineDurQ = un.parseInteger(maskArr[0], 120);
+            }
+
+            if (maskArr.length === 2) {
+                lineInBlock = un.parseInteger(maskArr[0], 4);
+                lineDurQ = un.parseInteger(maskArr[1], 120);
+            }
+
+            if (maskArr.length === 3) {
+                blockCount = un.parseInteger(maskArr[0], 1);
+                lineInBlock = un.parseInteger(maskArr[1], 4);
+                lineDurQ = un.parseInteger(maskArr[2], 120);
+            }
+
+            for (let i = 0; i < blockCount; i++) {
+                if (!linesSrc.length) {
+                    break;
+                }
+
+                rowNio++;
+                let lines = linesSrc.splice(0, lineInBlock);
+                let offset = lineInBlock * lineDurQ;
+
+                linesSrc.forEach(line => {
+                    line.startOffsetQ = line.startOffsetQ - offset;
+                    line.cells.forEach(cell => {
+                        cell.startOffsetQ = cell.startOffsetQ - offset;
+                        cell.notes.forEach(note => {
+                            note.startOffsetQ = note.startOffsetQ - offset;
+                        });
+                    });
+                });
+
+                result.push({
+                    track: x.track,
+                    lines,
+                    type: x.type,
+                    rowInPartId: `${x.partInfo.partNio}-${rowNio}`,
+                    rowNio: rowNio,
+                    partId: x.partInfo.partId,
+                    status: '',
+                });
+
+                //console.log('arr', arr);
+            }
+
+            //console.log('maskItem', maskItem, blockCount, lineInBlock, lineDurQ);
+        });
+
+        if (linesSrc.length) {
+            rowNio++;
+
+            result.push({
+                track: x.track,
+                lines: linesSrc,
+                type: x.type,
+                rowInPartId: `${x.partInfo.partNio}-${rowNio}`,
+                rowNio: rowNio,
+                partId: x.partInfo.partId,
+                status: '',
+            });
+        }
+
+        //console.log('SplitMask.result 2', result);
+
+        return result;
     }
 }

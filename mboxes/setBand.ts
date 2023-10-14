@@ -126,17 +126,18 @@ const itsGoingGood = `<div style="margin: .5rem;">
 </div>`;
 
 const content = `
+  ${bell}
   ${threeDots}
   ${engine}
   ${sweetLeaf}
-  ${peterGunn}
   ${billy}
   ${carcassiOp60n7}
-  ${bell}
   ${partingGlass}
   ${tiriTiri}
   <div style="margin-bottom: 3rem;"></div>
 `.trim();
+
+// ${peterGunn}
 
 // ${peterGunn}
 // ${enterSandmen}
@@ -151,4 +152,5 @@ export default {
   content,
   tracks: [],
   isSongList: true,
+  ns: 'band-song',
 };

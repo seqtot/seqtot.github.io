@@ -13,11 +13,24 @@ export type StoredRow = {
     lines: Line[],
 }
 
+export type StoredSongNodeOld = {
+    [key: string]: {
+        items: {
+            rowInPartId: string,
+            type: string,
+            status: string,
+            rows: Line[],
+            lines: Line[]
+        }[]
+    }
+};
+
 export type TrackInfo = {
     name: string,
     board: string,
     volume: number,
     label?: string,
+    isNotEditable?: boolean,
 }
 
 export type SongNode = {
@@ -32,20 +45,9 @@ export type SongNode = {
     dynamic: StoredRow[],
     source: 'my' | 'band',
     isSongList?: boolean,
-};
-
-export type StoredItem = {
-    rowInPartId: string,
-    type: string,
-    status: string,
-    rows: Line[],
-    lines: Line[]
-}
-
-export type StoredSongNodeOld = {
-    [key: string]: {
-        items: StoredItem[]
-    }
+    ns?: string,
+    nsOld?: string,
+    exportToLineModel?: boolean,
 };
 
 function isDrumNote(val: string): boolean {
@@ -65,22 +67,44 @@ function asOrganInst(note: LineNote): boolean {
 }
 
 const DEFAULT_BPM_VALUE = 90;
+export const MY_SONG = 'my-song';
+export const BAND_SONG = 'band-song';
+export const SONG_LIST = 'song-list';
 
 export class SongStore {
-    static deletePart(songId: string, partId = '') {
-        const song = SongStore.getSong(songId);
+    constructor(
+      public songId: string,
+      public ns: string,
+      public data: SongNode)
+    {
+
+    }
+
+    save(data?: SongNode) {
+        data = data || this.data;
+        SongStore.SetSong(this.songId, this.data, this.ns);
+        this.data = data;
+    }
+
+    clone(data?: SongNode): SongNode {
+        data = data || this.data;
+
+        return JSON.parse(JSON.stringify(data));
+    }
+
+    static DeletePart(song: SongNode, partId): boolean {
         partId = (partId || '').trim();
 
-        if (!song || !partId) return;
+        if (!song || !partId) return false;
 
         song.parts = song.parts.filter(part => part.id !== partId);
         song.dynamic = song.dynamic.filter(item => item.partId !== partId)
 
-        SongStore.setSong(songId, song);
+        return true;
     }
 
-    static moveSong(songId: string, offset: number) {
-        let songs = SongStore.getSongs();
+    static MoveSong(songId: string, offset: number, ns: string) {
+        let songs = SongStore.GetSongs(ns);
         let songInd = songs.findIndex(song => song.id === songId);
 
         if (
@@ -101,12 +125,10 @@ export class SongStore {
 
         //console.log(top, bot);
 
-        SongStore.setSongs(songs);
+        SongStore.SetSongs(songs, ns);
     }
 
-    static movePart(songId: string, partId: string, offset: number): boolean {
-        let song = SongStore.getSong(songId);
-
+    static MovePart(song: SongNode, partId: string, offset: number): boolean {
         if (!song) return false;
 
         let parts = song.parts;
@@ -132,13 +154,12 @@ export class SongStore {
 
         song.parts = parts;
 
-        SongStore.reindexPartRows(song);
-        SongStore.setSong(songId, song);
+        SongStore.ReindexPartRows(song);
 
         return true;
     }
 
-    static reindexPartRows(song: SongNode) {
+    static ReindexPartRows(song: SongNode) {
         song.parts.forEach((part, i) => {
             const partNio = i + 1;
             const rows = song.dynamic.filter(item => item.partId === part.id);
@@ -157,8 +178,8 @@ export class SongStore {
         });
     }
 
-    static renameSong(songId: string, songName: string) {
-        const songs = SongStore.getSongs();
+    static RenameSong(songId: string, songName: string, ns: string) {
+        const songs = SongStore.GetSongs(ns);
 
         songs.forEach(song => {
            if (song.id === songId) {
@@ -166,12 +187,10 @@ export class SongStore {
            }
         });
 
-        SongStore.setSongs(songs);
+        SongStore.SetSongs(songs, ns);
     }
 
-    static renamePart(songId: string, partId: string, partName: string) {
-        const song = SongStore.getSong(songId);
-
+    static RenamePart(song: SongNode, partId: string, partName: string) {
         if (!song) return;
 
         song.parts.forEach(part => {
@@ -179,111 +198,141 @@ export class SongStore {
                 part.name = partName;
             }
         });
-
-        SongStore.setSong(songId, song);
     }
 
-    static renameTrack(songId: string, oldTrackName: string, newTrackName: string) {
-        const song = SongStore.getSong(songId);
+    static RenameTrack(song: SongNode, oldTrackName: string, newTrackName: string): boolean {
+        if (!song) return false;
 
-        if (!song) return;
+        let wasUpdate = false;
 
         song.tracks.forEach(item => {
             if (item.name === oldTrackName) {
+                wasUpdate = true;
                 item.name = newTrackName;
             }
         });
 
         song.dynamic.forEach(item => {
            if (item.track === oldTrackName) {
+               wasUpdate = true;
                item.track = newTrackName;
            }
         });
 
-        SongStore.setSong(songId, song);
+        return wasUpdate;
     }
 
-    static deleteSong(songId: string) {
-        let songs = SongStore.getSongs();
+    static DeleteSong(songId: string, ns: string) {
+        let songs = SongStore.GetSongs(ns);
         songs = songs.filter(song => song.id !== songId);
 
-        SongStore.setSongs(songs);
+        SongStore.SetSongs(songs, ns);
 
-        localStorage.removeItem(`[my-song]${songId}`);
+        localStorage.removeItem(`[${ns}]${songId}`);
     }
 
-    static getSongs(): {id: string, name: string}[] {
-        if (!localStorage.getItem(`my-songs`)) {
-            this.setSongs([]);
-        }
-
-        return JSON.parse(localStorage.getItem(`my-songs`));
-    }
-
-    static setSongs(songs: {id: string, name: string}[]) {
-        localStorage.setItem(`my-songs`, JSON.stringify(songs));
-    }
-
-    static getSong(id: string, create = false): SongNode {
-        function normalize(song: SongNode) {
-            if (!song) return song;
-
-            song.parts = Array.isArray(song.parts) ? song.parts : [];
-            song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
-            song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
-            song.bmpValue = song.bmpValue ? song.bmpValue : DEFAULT_BPM_VALUE;
-
-            // костыль
-            song.dynamic.forEach(item => {
-                if (!item.track && item.type === 'drums') {
-                    item.track = '@drums';
-                }
-            });
-
-            if (!song.tracks.length) {
-                song.tracks = [
-                    {
-                        name: '@drums',
-                        board: 'drums',
-                        volume: 50,
-                    },
-                    {
-                        name: '$bass',
-                        board: 'bassGuitar',
-                        volume: 30,
-                    },
-                    {
-                        name: '$guitar',
-                        board: 'guitar',
-                        volume: 50,
-                    },
-                    {
-                        name: '$organ',
-                        board: 'bassSolo34',
-                        volume: 50,
-                    },
-                ]
+    static GetSongs(ns: string): {id: string, name: string}[] {
+        if (ns === 'my-song') {
+            if (localStorage.getItem(`my-songs`)) {
+                localStorage.setItem(`[${SONG_LIST}]my-song`, localStorage.getItem(`my-songs`));
+                localStorage.removeItem('my-songs');
             }
-
-            return song;
         }
 
-        let song: SongNode = normalize(JSON.parse(localStorage.getItem(`[my-song]${id}`)));
+        if (!localStorage.getItem(`[${SONG_LIST}]${ns}`)) {
+            this.SetSongs([], ns);
+        }
+
+        return JSON.parse(localStorage.getItem(`[${SONG_LIST}]${ns}`));
+    }
+
+    static SetSongs(songs: {id: string, name: string}[], ns: string) {
+        localStorage.setItem(`[song-list]${ns}`, JSON.stringify(songs));
+    }
+
+    static NormalizeSongNode(song: SongNode): SongNode {
+        if (!song) return song;
+
+        song.parts = Array.isArray(song.parts) ? song.parts : [];
+        song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
+        song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
+        song.bmpValue = song.bmpValue ? song.bmpValue : DEFAULT_BPM_VALUE;
+
+        // костыль
+        song.dynamic.forEach(item => {
+            if (!item.track && item.type === 'drums') {
+                item.track = '@drums';
+            }
+        });
+
+        if (!song.tracks.length) {
+            song.tracks = [
+                {
+                    name: '@drums',
+                    board: 'drums',
+                    volume: 50,
+                },
+                {
+                    name: '$bass',
+                    board: 'bassGuitar',
+                    volume: 30,
+                },
+                {
+                    name: '$guitar',
+                    board: 'guitar',
+                    volume: 50,
+                },
+                {
+                    name: '$organ',
+                    board: 'bassSolo34',
+                    volume: 50,
+                },
+            ]
+        }
+
+        return song;
+    }
+
+    static GetOldSong(id: string, ns: string, create = false): SongNode {
+        let song: SongNode;
+        let text = localStorage.getItem(`[${ns}]${id}`);
+
+        if (!text && create) {
+            song = SongStore.GetEmptySong();
+            song.score = '';
+
+        } else {
+            song = SongStore.NormalizeSongNode(
+                JSON.parse(localStorage.getItem(`[${ns}]${id}`))
+            );
+        }
 
         if (song || !create) {
             return song;
         }
 
-        SongStore.setSong(id, SongStore.getEmptySong());
-
-        return normalize(JSON.parse(localStorage.getItem(`[my-song]${id}`)));
+        return null;
     }
 
-    static setSong(id: string, data: SongNode) {
-        localStorage.setItem(`[my-song]${id}`, JSON.stringify(data));
+    static GetSong(id: string, ns: string, create = false): SongNode {
+        let song: SongNode = SongStore.NormalizeSongNode(
+            JSON.parse(localStorage.getItem(`[${ns}]${id}`))
+        );
+
+        if (song || !create) {
+            return song;
+        }
+
+        SongStore.SetSong(id, SongStore.GetEmptySong(), ns);
+
+        return SongStore.NormalizeSongNode(JSON.parse(localStorage.getItem(`[${ns}]${id}`)));
     }
 
-    static getEmptySong(): SongNode {
+    static SetSong(id: string, data: SongNode, ns: string) {
+        localStorage.setItem(`[${ns}]${id}`, JSON.stringify(data));
+    }
+
+    static GetEmptySong(): SongNode {
         return {
             bmpValue: DEFAULT_BPM_VALUE,
             content: '',
@@ -302,18 +351,16 @@ export class SongStore {
         };
     }
 
-    static clonePart(songId: string, sourceId: string): {name: string, id: string} {
-        let song = SongStore.getSong(songId);
-
+    static ClonePart(song: SongNode, sourceId: string): {name: string, id: string} | null {
         if (!song) return;
 
         const sourcePart = song.parts.filter(item => item.id === sourceId)[0];
 
-        if (!sourcePart) return;
+        if (!sourcePart) return null;
 
         const name = sourcePart.name.trim();
 
-        if (!name) return;
+        if (!name) return null;
 
         let id = '';
         while (!id) {
@@ -347,14 +394,10 @@ export class SongStore {
             song.dynamic.push(item);
         });
 
-        SongStore.setSong(songId, song);
-
         return part;
     }
 
-    static deleteTrack(songId: string, name: string): boolean {
-        const song = SongStore.getSong(songId);
-
+    static DeleteTrack(song: SongNode, name: string): boolean {
         if (!song) return false;
 
         const track = song.tracks.find(item => item.name === name);
@@ -364,18 +407,15 @@ export class SongStore {
         song.tracks = song.tracks.filter(item => item.name !== name);
         song.dynamic = song.dynamic.filter(item => item.track !== name);
 
-        this.setSong(songId, song);
-
         return true;
     }
 
-    static addPart(songId: string, name: string): {name: string, id: string} {
+    static AddPartToSong(song: SongNode, name: string): {name: string, id: string} | null {
         name = (name || '').trim();
 
-        if (!name) return;
+        if (!name) return null;
 
         let id = '';
-        let song = SongStore.getSong(songId, true);
         song.parts = Array.isArray(song.parts) ? song.parts : [];
 
         while (!id) {
@@ -391,18 +431,16 @@ export class SongStore {
         const part = {name, id};
         song.parts.push(part);
 
-        SongStore.setSong(songId, song);
-
         return part;
     }
 
-    static addSong(name: string): {name: string, id: string} {
+    static AddSongToList(name: string, ns: string): {name: string, id: string} {
         name = (name || '').trim();
 
         if (!name) return;
 
         let id = '';
-        let items = SongStore.getSongs();
+        let items = SongStore.GetSongs(ns);
 
         while (!id) {
             const guid = un.guid(3);
@@ -417,12 +455,12 @@ export class SongStore {
         const song = {name, id};
         items.push(song);
 
-        SongStore.setSongs(items);
+        SongStore.SetSongs(items, ns);
 
         return song;
     }
 
-    static getRowsByPart(rows: StoredRow[], partId: string, partNio: number): StoredRow[] {
+    static GetRowsByPart(rows: StoredRow[], partId: string, partNio: number): StoredRow[] {
         const result = rows.reduce((acc, item) => {
             const iPartId = (item.partId || '').trim();
             const iPartNio = un.getPartNio(item.rowInPartId);
@@ -448,11 +486,10 @@ export class SongStore {
     }
 
     static Delete_RowFromPart(
-        songId: string,
         song: SongNode,
         partId: string,
         partNio: number,
-        rowNio: number
+        rowNio: number,
     ): SongNode {
         song.dynamic = song.dynamic.filter(item  => {
             const iPartId = (item.partId || '').trim();
@@ -472,8 +509,6 @@ export class SongStore {
 
             return false;
         });
-
-        SongStore.setSong(songId, song);
 
         return song;
     }
