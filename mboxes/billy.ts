@@ -1,8 +1,9 @@
 import dynamic from '../mbox_dynamics/billy.dynamic';
 
+
 const score = `
 <settings>
-  pitchShift: 0
+  pitchShift: -1;
   @drums: v50; $bass: v50; $bassS: v60; $guit: v50; $back: v50; $solo: v50; $mark: v0;
 
 <out b105>

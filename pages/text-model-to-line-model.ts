@@ -5,6 +5,7 @@ import { LineModel } from './line-model';
 import { TextBlock } from '../libs/muse/utils';
 import { Sound } from '../libs/muse/sound';
 import * as un from '../libs/muse/utils';
+import {FileSettings} from '@muse/utils/getFileSettings';
 
 function getOutBlock(blocks: TextBlock[]): TextBlock {
     return  blocks.find((item) => item.id === 'out');
@@ -20,13 +21,21 @@ const notesLat = [
 ]
 
 function getNoteLatByOffset(noteLat: string, offset: number) {
-    offset = offset || 0;
-
     if (!offset) return noteLat;
 
-    const i = notesLat.findIndex(item => item === noteLat);
+    noteLat = (noteLat || '').trim().toLowerCase();
 
-    return noteLat;
+    let i = notesLat.findIndex(item => item === noteLat);
+
+    if (i < 0) return noteLat;
+
+    i = i + offset;
+
+    if (i >= notesLat.length || i < 0) return noteLat;
+
+    //console.log('getNoteLatByOffset', offset, noteLat[i]);
+
+    return notesLat[i];
 }
 
 export function sortTracks(tracks: TrackInfo[]) {
@@ -38,21 +47,28 @@ export function sortTracks(tracks: TrackInfo[]) {
     });
 }
 
-export function textModelToLineModel(
+type FnInput = {
     songId: string,
     ns: string,
-    songNodeInput: SongNode
-): SongNode {
-    const songSettings = ideService.settings;
-    const song = SongStore.GetOldSong(songId, ns, true);
+    songNodeInput: SongNode,
+    settings: FileSettings,
+    blocks: TextBlock[],
+};
+
+export function textModelToLineModel(x: FnInput): SongNode {
+    const song = SongStore.GetOldSong(x.songId, x.ns, true);
 
     const partsArr = getTopOutListHash({topBlock: getOutBlock(ideService.blocks)});
     const partsHashByNio: {[partNio: string]: un.SongPartInfo} = Object.create(null);
 
     if (song.isNewCreated) {
-        song.bmpValue = un.parseInteger(songSettings.bpm[0], 90);
-        song.pitchShift = un.parseInteger(songSettings.pitchShift[0], 0);
+        song.bmpValue = un.parseInteger(x.settings.bpm[0], 90);
     }
+
+    song.pitchShiftSrc = un.parseInteger(x.settings.pitchShift[0], 0);
+    song.pitchShift = 0;
+
+    console.log('song.pitchShiftSrc', x.settings, song.pitchShiftSrc);
 
     // ЧАСТИ ПЕСНИ
     song.parts = partsArr.map(part => {
@@ -89,10 +105,10 @@ export function textModelToLineModel(
     });
 
     // ТРЭКИ из songSettings
-    console.log('songSettings.dataByTracks', songSettings.dataByTracks);
+    console.log('songSettings.dataByTracks', x.settings.dataByTracks);
 
-    Object.keys(songSettings.dataByTracks).forEach(name => {
-        const volume = un.getVolumeFromString(songSettings.dataByTracks[name]);
+    Object.keys(x.settings.dataByTracks).forEach(name => {
+        const volume = un.getVolumeFromString(x.settings.dataByTracks[name]);
 
         if (!realHardTracks[name]) {
             realHardTracks[name] = name;
@@ -109,8 +125,9 @@ export function textModelToLineModel(
     });
 
     // ТРЭКИ из поля захордкоженного поля dynamicOld
-    (songNodeInput as any).dynamicOld = (songNodeInput as any).dynamicOld || {};
-    const dynamicOld = (songNodeInput as any).dynamicOld as {trackName: StoredSongNodeOld};
+    (x.songNodeInput as any).dynamicOld = (x.songNodeInput as any).dynamicOld || {};
+    const dynamicOld = (x.songNodeInput as any).dynamicOld as {trackName: StoredSongNodeOld};
+
     console.log('dynamicOldTracks', dynamicOld);
 
     Object.keys(dynamicOld).forEach(name => {
@@ -128,9 +145,9 @@ export function textModelToLineModel(
         }
     });
 
-    let blocks = [...ideService.blocks];
+    let blocks = [...x.blocks];
 
-    const x = {
+    const midiConfig = {
         blocks,
         currBlock: blocks.find((item) => item.id === 'out'),
         currRowInfo: { first: 0, last: 0},
@@ -140,9 +157,9 @@ export function textModelToLineModel(
         topBlocksOut: [],
     };
 
-    getMidiConfig(x);
+    getMidiConfig(midiConfig);
 
-    const box = un.getOutBlocksInfo(x.blocks, x.playBlockOut);
+    const box = un.getOutBlocksInfo(x.blocks, midiConfig.playBlockOut);
 
     const tracksByScore: {[key: string]: string} = {}
     const parts: {
@@ -343,7 +360,7 @@ export function textModelToLineModel(
                             liner.addNoteByOffset(startOffsetQ, {
                                 id: 0,
                                 durQ,
-                                note: Sound.GetNoteLat(iNote),
+                                note: getNoteLatByOffset(Sound.GetNoteLat(iNote), song.pitchShiftSrc),
                                 startOffsetQ: 0,
                                 char: '',
                                 slides: note.slidesText,
@@ -380,6 +397,9 @@ export function textModelToLineModel(
     console.log('softTracks', softTracks);
 
     song.tracks = [...Object.values(hardTracks), ...Object.values(softTracks)];
+
+    song.isNewCreated = false;
+
     sortTracks(song.tracks);
 
     return song;

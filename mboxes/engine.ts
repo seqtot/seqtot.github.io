@@ -3,7 +3,7 @@
 const score = `
 
 <settings>
-  pitchShift: 2
+  pitchShift: 2;
   @drums: v50; $bass: v50;  $guitL: v50; $guitB: v50; $keys: v50;
 
 # 12   24   36   48   60   72   84   96   108  120  132  144

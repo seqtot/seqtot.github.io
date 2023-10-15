@@ -5,7 +5,7 @@ const score = `
 https://musescore.com/user/6428146/scores/1552756
 
 <settings>
-  pitchShift: 0
+  pitchShift: 0;
   @drums: v50; $bass: v50;  $guit: v50; $back: v50;
 
 # 12   24   36   48   60   72   84   96   108  120  132  144

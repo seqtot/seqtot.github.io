@@ -53,6 +53,7 @@ export type SongNode = {
     exportToLineModel?: boolean,
     isNewCreated?: boolean;
     pitchShift?: number,
+    pitchShiftSrc?: number,
 };
 
 function isDrumNote(val: string): boolean {
