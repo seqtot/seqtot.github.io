@@ -140,6 +140,8 @@ export class KeyboardCtrl {
     }
 
     addCellDuration(id: number, value: number) {
+        if (!id) return;
+
         const result = this.liner.addCellDuration(id, value);
 
         if (result) {
@@ -150,6 +152,8 @@ export class KeyboardCtrl {
     }
 
     moveCell(id: number, value: number) {
+        if (!id) return;
+
         const result = this.liner.moveCell(id, value);
 
         if (result) {
@@ -1416,6 +1420,8 @@ export class KeyboardCtrl {
     }
 
     addOrDelNoteClick(el: string | HTMLElement) {
+        if (!this.activeCell.rowCol) return;
+
         const rowCol = this.activeCell.rowCol;
         const totalOffsetQ = this.getTotalOffsetByRowCol(rowCol);
 
@@ -1547,7 +1553,7 @@ export class KeyboardCtrl {
     }
 
     ponyCellClicked() {
-        const noteForEdit = this.liner.getNoteById(this.activeCell?.id);
+        const noteForEdit = this.liner.getNoteById(this.activeCell.id);
 
         if (!noteForEdit) return;
 

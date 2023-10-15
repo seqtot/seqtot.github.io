@@ -661,6 +661,8 @@ export class LineModel {
     }
 
     getNoteById(id: string | number): LineNote {
+        if (!id) return null;
+
         for (let line of this.lines) {
             for (let cell of line.cells) {
                 for (let note of cell.notes) {
