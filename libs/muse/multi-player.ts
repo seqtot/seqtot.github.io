@@ -406,10 +406,10 @@ export class MultiPlayer {
                     noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
                     let trackName = noteLn.trackName;
 
-                    // костыль ?
-                    if (noteLn.trackName.startsWith('@')) {
-                        trackName = '@drums';
-                    }
+                    // костыль ? jjklDrums
+                    // if (noteLn.trackName.startsWith('@')) {
+                    //     trackName = '@drums';
+                    // }
 
                     // зануляем громкость исключённых линий
                     noteInfo.volume = un.mergeVolume(
@@ -465,7 +465,9 @@ export class MultiPlayer {
                 }
 
                 const noteLine = noteLn.noteLine;
-                const isDrum = un.isDrum(noteLn.noteLine); // todo: refactor
+                //const isDrum = un.isDrum(noteLn.noteLine); // todo: refactor
+                const isDrum = un.isDrum(noteLn.trackName);
+
                 const loop = this.midiPlayer.addLoopByQuarters({
                     noteLine,
                     noteLineInfo: noteLn.noteLineInfo,
@@ -505,7 +507,7 @@ export class MultiPlayer {
     /**
      * -> getLoopsInfo
      */
-    async tryPlayMidiBlock(x:{
+    async tryPlayMidiBlock(x: {
         blocks?: un.TextBlock[] | string,
         playBlock?: string | un.TextBlock,
         repeatCount?: number
@@ -536,6 +538,16 @@ export class MultiPlayer {
         let startTimeSec = x.startTimeSec || this.ctx.currentTime;
         let beatOffsetMsInRowLoop = beatOffsetMs;
 
+        // длительность одного цикла
+        let oneLoopDurationMs = 0;
+
+        for (let rowLoops of outLoops.rowLoops) {
+            oneLoopDurationMs += (rowLoops.beatsMs.reduce((acc, item) => acc + item, 0));
+        }
+
+        const startTimeInMs = new Date().getTime() + beatOffsetMsInRowLoop;
+        const endTimeInMs = startTimeInMs + (oneLoopDurationMs * outLoops.repeat);
+
         for (let i = 0; i < outLoops.repeat; i++) {
             if (breakLoop) break;
 
@@ -556,10 +568,14 @@ export class MultiPlayer {
             }
         }
 
+        let msToEnd = endTimeInMs - new Date().getTime();
+        msToEnd = msToEnd > 0 ? msToEnd: 0;
+
         if (breakLoop) {
             cb('break');
-        } else
-            cb('finish');
+        } else {
+            setTimeout(() => cb('finish'), msToEnd);
+        }
     }
 }
 

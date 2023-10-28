@@ -69,6 +69,8 @@ function getSlides(val: string): string {
     return val;
 }
 
+const DEF_DRUM_DUR = 1;
+
 export class LineModel {
     lines: Line[] = [];
 
@@ -609,6 +611,16 @@ export class LineModel {
 
         arr.forEach(item => {
             result[item.note] = item.note;
+        });
+
+        return Object.values(result);
+    }
+
+    static GetInstrNames(arr: LineNote[]): string[] {
+        const result: {[key: string]: string} = {};
+
+        arr.forEach(item => {
+            result[item.instName] = item.instName;
         })
 
         return Object.values(result);
@@ -817,17 +829,33 @@ export class LineModel {
         return result;
     }
 
-    static GetDrumNotes(name: string, rows: Line[]): string {
-        name = name || 'no_name';
-        rows = this.CloneLines(rows);
-        rows = this.RecalcAndClearBlockOffset(rows);
+    static GetDrumNotes(blockName: string, trackName: string, lines: Line[]): string {
+        blockName = blockName || 'no_name';
+        trackName = trackName || un.drumsTrack;
 
-        const totalDurQ = this.GetDurationQByLines(rows);
-        const notes = this.GetSortedNotes(rows);
-        const noteNames = this.GetNoteNames(notes);
-        const map: {[key: string]: string[]} = {};
+        lines = this.CloneLines(lines);
+        lines = this.RecalcAndClearBlockOffset(lines);
 
-        if (!totalDurQ || !notes.length || !noteNames.length) {
+        //console.log('GetDrumNotes', blockName, trackName, lines);
+
+        const totalDurQ = this.GetDurationQByLines(lines);
+        const notes = this.GetSortedNotes(lines);
+
+        notes.forEach(note => {
+           if (!note.instName) {
+               note.instName = `@${note.note}`;
+           }
+        });
+
+        //console.log('NOTES', notes);
+
+        const instrNames = this.GetInstrNames(notes).map(name => name.replace(/@/g, ''));
+        const map: {[key: string]: {
+                chars: string[],
+                lastDurQ: number
+        }} = {};
+
+        if (!totalDurQ || !notes.length || !instrNames.length) {
             return '';
         }
 
@@ -841,30 +869,51 @@ export class LineModel {
             headerLine[i*12] = '|';
         }
 
-        noteNames.forEach(note => {
-            map[note] = [...emptyLine];
-        })
+        instrNames.forEach(instrName => {
+            map[instrName] = {chars: [...emptyLine], lastDurQ: 0};
 
-        notes.forEach(note => {
-            const i = note.startOffsetQ / 10;
+            const iNotes = notes.filter(note => note.instName === `@${instrName}`);
 
-            map[note.note][i] = 'x';
+            for (let i = 0; i < iNotes.length; i++) {
+                const note = iNotes[i];
+                const nextNote = iNotes[i+1];
+
+                const j = Math.floor(note.startOffsetQ / 10);
+
+                map[instrName].chars[j] = 'x';
+
+                if (note.durQ === DEF_DRUM_DUR) {
+                    continue;
+                }
+
+                if (!nextNote) {
+                    if (note.durQ !== DEF_DRUM_DUR) {
+                        map[instrName].lastDurQ = note.durQ;
+                    } else {
+                        map[instrName].lastDurQ = 480;
+                    }
+                }
+            }
         });
 
-        let result = `<${name} @>` + '\n';
+        //console.log(map);
 
-        let noteNameLen = noteNames.reduce((acc, val) => {
+        let result = `<${blockName} @>\n`;
+
+        let noteNameLen = instrNames.reduce((acc, val) => {
             if (val.length > acc) return val.length;
 
             return acc;
         }, 0);
 
-        result += '-' + new Array(noteNameLen).fill(' ').join('') + ': ' + headerLine.join('') + ':' + '\n';
+        result += '-' + new Array(noteNameLen).fill(' ').join('') + ': ' + headerLine.join('') + `: ${trackName}` + '\n';
 
         Object.keys(map).forEach(key => {
             const emptyStr = new Array(noteNameLen - key.length).fill(' ').join('');
 
-            result += '@' + key + emptyStr + ': ' + map[key].join('') + ':' + '\n';
+            const lastDurQ = !map[key].lastDurQ ? '' : map[key].lastDurQ;
+
+            result += '@' + key + emptyStr + ': ' + map[key].chars.join('') + `: ${lastDurQ}` + '\n';
         });
 
         // <tick @>
@@ -872,14 +921,15 @@ export class LineModel {
         // @cowbell      : 1           :
         // @nil          :     2   3   :
 
+        //console.log('GetDrumNotes', result);
+
         return result;
     }
 
-    getDrumNotes(name?: string, rows?: Line[]): string {
-        name = name || 'no_name';
-        rows = Array.isArray(rows) ? rows : this.lines;
+    getDrumNotes(blockName: string, trackName: string, lines: Line[]): string {
+        lines = Array.isArray(lines) ? lines : this.lines;
 
-        return LineModel.GetDrumNotes(name, rows);
+        return LineModel.GetDrumNotes(blockName, trackName, lines);
     }
 
     static CloneLine(line: Line): Line {

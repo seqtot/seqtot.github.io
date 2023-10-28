@@ -305,7 +305,8 @@ export class MBoxPage {
             if (this.songId === ideService.currentEdit.songId) {
                 bpmValue = this.bpmValue;
             } else {
-                bpmValue = (this.isMy ? this.pageData.bmpValue : this.outBlock?.bpm) || 90;
+                //bpmValue = (this.isMy ? this.pageData.bmpValue : this.outBlock?.bpm) || 90;
+                bpmValue = ideService.songStore?.data?.bmpValue || 90;
             }
         }
 
@@ -1208,8 +1209,10 @@ export class MBoxPage {
             line.blockOffsetQ = 0;
         });
 
-        if (item.type === 'drums') {
-            return LineModel.GetDrumNotes(id, item.lines);
+        if (item.type === 'drums' || item.track.startsWith(un.drumChar)) {
+            const trackName = item.track || un.drumsTrack;
+
+            return LineModel.GetDrumNotes(id, trackName, item.lines);
         }
 
         return LineModel.GetToneNotes({

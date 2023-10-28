@@ -15,6 +15,7 @@ import { getMidiConfig, MidiConfig } from '../libs/muse/utils/getMidiConfig';
 import * as svg from './svg-icons';
 
 import { NoteDetailsDialog } from './dialogs/note-details-dialog';
+import {drumChar} from '../libs/muse/utils';
 
 export type BpmInfo = {
     bpm: number;
@@ -170,7 +171,11 @@ export class KeyboardCtrl {
 
         if (this.notesForCopy.length) {
             this.notesForCopy.forEach(note => {
-                this.addOrDelNote(note, this.activeCell.rowCol, this.activeCell.totalOffset);
+                this.addOrDelNote({
+                    note,
+                    rowCol: this.activeCell.rowCol,
+                    totalOffsetQ: this.activeCell.totalOffset,
+                });
             });
 
             return;
@@ -670,8 +675,10 @@ export class KeyboardCtrl {
         track: string,
         lines: Line[],
     }): string {
-        if (item.type === 'drums' || item.track === '@drums') {
-            return LineModel.GetDrumNotes(id, item.lines);
+        if (item.type === 'drums' || item.track.startsWith(drumChar)) {
+            const trackName = item.track || un.drumsTrack;
+
+            return LineModel.GetDrumNotes(id, trackName, item.lines);
         }
 
         return LineModel.GetToneNotes({
@@ -1331,6 +1338,8 @@ export class KeyboardCtrl {
     }
 
     getTotalOffsetByRowCol(rowCol: string): number {
+        if (!rowCol) return null;
+
         const cell = getWithDataAttrValue('chess-cell-row-col', rowCol)[0];
         if (!cell) return null;
 
@@ -1384,19 +1393,28 @@ export class KeyboardCtrl {
         this.highlightCellByRowCol(rowCol);
     }
 
-    addOrDelNote(pNote: string | LineNote, rowCol: string, totalOffsetQ: number) {
-        const note = typeof pNote === 'string' ? {note: pNote} : pNote;
+    addOrDelNote(x: {
+        note: string | LineNote,
+        rowCol: string,
+        totalOffsetQ: number,
+        durQ?: number,
+        instCode?: string | number,
+        instName?: string,
+    }) {
+        const note = typeof x.note === 'string' ? {note: x.note} : x.note;
         let noteInfo = this.getNoteInfo(note.note) as any as LineNote;
 
         noteInfo = {
             ...noteInfo,
-            durQ: 10,
-            instCode: this.instrCode,
-            instName: this.instrName,
+            durQ: x.durQ || 10,
+            instCode: x.instCode || this.instrCode,
+            instName: x.instName || this.instrName,
             ...note,
         }
 
-        const notes = this.liner.getNotesByOffset(totalOffsetQ);
+        //console.log('addOrDelNote', x, noteInfo);
+
+        const notes = this.liner.getNotesByOffset(x.totalOffsetQ);
 
         let isDelete = false;
 
@@ -1404,18 +1422,18 @@ export class KeyboardCtrl {
             if (iNote.note === note.note) {
                 isDelete = true;
 
-                this.liner.delete_NoteByNoteAndOffset(totalOffsetQ, note.note);
+                this.liner.delete_NoteByNoteAndOffset(x.totalOffsetQ, note.note);
             }
         }
 
         if (!isDelete) {
-            let info = this.liner.addNoteByOffset(totalOffsetQ, noteInfo);
+            let info = this.liner.addNoteByOffset(x.totalOffsetQ, noteInfo);
             this.printChess(this.liner.lines);
-            this.highlightCellByRowCol(rowCol);
+            this.highlightCellByRowCol(x.rowCol);
             this.activeCell.id = info.note.id;
         } else {
             this.printChess(this.liner.lines);
-            this.highlightCellByRowCol(rowCol);
+            this.highlightCellByRowCol(x.rowCol);
         }
     }
 
@@ -1431,7 +1449,12 @@ export class KeyboardCtrl {
 
         if (!note) return;
 
-        this.addOrDelNote(note, rowCol, totalOffsetQ);
+        this.addOrDelNote({
+            note,
+            rowCol,
+            totalOffsetQ,
+            durQ: 10,
+        });
     }
 
     playActive() {
@@ -1560,6 +1583,11 @@ export class KeyboardCtrl {
         new NoteDetailsDialog(this.page.context, this).openDialog(noteForEdit, (note:LineNote) => {
             noteForEdit.volume = note.volume;
             noteForEdit.slides = note.slides;
+
+            if (noteForEdit.durQ !== note.durQ) {
+                noteForEdit.durQ = note.durQ;
+                //this.updateChess();
+            }
 
             console.log('ponyCellClicked.dialog.ok', noteForEdit);
         });

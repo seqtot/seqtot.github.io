@@ -1,11 +1,11 @@
 import { Range } from 'framework7/components/range/range';
 import { Dialog } from 'framework7/components/dialog/dialog';
-import {ComponentContext} from 'framework7/modules/component/component';
+import { ComponentContext } from 'framework7/modules/component/component';
 
-import {dyName, getWithDataAttr } from '../../src/utils';
-import {toneBoards, drumBoards, KeyboardCtrl, KeyboardPage} from '../keyboard-ctrl';
-import {MY_SONG, SongNode, SongStore, TrackInfo} from '../song-store';
-import {LineNote} from '../line-model';
+import { getWithDataAttr } from '../../src/utils';
+import { toneBoards, drumBoards, KeyboardCtrl, KeyboardPage } from '../keyboard-ctrl';
+import { SongNode, TrackInfo } from '../song-store';
+import { LineNote } from '../line-model';
 import * as un from '../../libs/muse/utils';
 
 export class NoteDetailsDialog {
@@ -22,12 +22,22 @@ export class NoteDetailsDialog {
     get slidesTextFromInput(): string {
         let result = '';
 
-        getWithDataAttr('edit-note-dialog-slides-input').forEach((el: HTMLInputElement) => {
+        getWithDataAttr('note-details-dialog-slides-input').forEach((el: HTMLInputElement) => {
             result = (el.value || '').trim();
             // result = result.replace(/ /g, '');
             // result = result.replace('$', '');
             // result = result.replace('@', '');
             // result = result.trim();
+        });
+
+        return result;
+    }
+
+    get durQFromInput(): number {
+        let result = 0;
+
+        getWithDataAttr('note-details-dialog-duration-input').forEach((el: HTMLInputElement) => {
+            result = un.parseInteger(el.value, result);
         });
 
         return result;
@@ -96,15 +106,13 @@ export class NoteDetailsDialog {
 
     setVolumeRange() {
         this.volumeRange = (this.context.$f7 as any).range.create({
-            el: getWithDataAttr('edit-note-dialog-volume-range')[0],
+            el: getWithDataAttr('note-details-dialog-volume-range')[0],
             on: {
                 changed: (range: any) => {
                     this.note.volume = range.value;
                 },
             },
         });
-
-
 
         setTimeout(() => {
             this.volumeRange.setValue(this.note.volume);
@@ -160,15 +168,37 @@ export class NoteDetailsDialog {
         let content = wrapper.replace('%content%', `
             ${this.getVolumeContent()}
             <div style="margin-left: 1rem;">
+                <div>
+                    <small>длительность</small>                   
+                </div>   
+                <div
+                    class="stepper stepper-fill stepper-init"
+                    data-wraps="true"
+                    data-autorepeat="true"
+                    data-autorepeat-dynamic="true"
+                    data-manual-input-mode="true"
+                    data-note-details-dialog-duration-stepper
+                >
+                    <div class="stepper-button-minus"></div>
+                    <div class="stepper-input-wrap">
+                        <input
+                            data-note-details-dialog-duration-input
+                            type="text"
+                            value="${note.durQ}" min="1" max="10000" step="10" />
+                    </div>
+                    <div class="stepper-button-plus"></div>
+                </div>
+            </div>      
+            <!--div style="margin-left: 1rem;">
                 durationQ: ${note.durQ}
-            </div>
+            </div-->
             <div class="list" style="margin: 1rem;">
                 <ul>
                     <li class="item-content item-input">
                         <div class="item-inner">
                             <div class="item-input-wrap">
                                 <textarea
-                                    data-edit-note-dialog-slides-input
+                                    data-note-details-dialog-slides-input
                                     placeholder="Slides"
                                 >${this.note.slides || ''}</textarea>
                             </div>
@@ -191,6 +221,12 @@ export class NoteDetailsDialog {
         });
 
         this.dialog.open(false);
+
+        //console.log('EL', getWithDataAttr('duration-stepper-input'));
+
+        (this.context.$f7 as any).stepper.create({
+            el: getWithDataAttr('note-details-dialog-duration-stepper')[0],
+        });
     }
 
     subEvents() {
@@ -219,54 +255,9 @@ export class NoteDetailsDialog {
         }
 
         this.note.slides = this.slidesTextFromInput;
-
-        // let newName = this.trackNameFromInput;
-
-        // if (!newName) {
-        //     return close();
-        // }
-        //
-        // // Создание новой дорожки
-        // if (!this.trackSrc.name) {
-        //     if (this.song.tracks.find(item => item.name === newName)) {
-        //         return close();
-        //     }
-        //
-        //     this.song.tracks.push({
-        //         ...this.track,
-        //         name: newName,
-        //     });
-        // } else {
-        //     this.updateTrackInSong();
-        // }
-        //
-        // this.song.tracks = this.song.tracks.filter(item => item.name && item.board);
-        //
-        // SongStore.setSong(this.page.songId, this.song);
-        //
-        // this.dialog.close();
-        // this.cb && this.cb(true);
+        this.note.durQ = this.durQFromInput;
 
         close();
-    }
-
-    updateTrackInSong() {
-        const newName = this.trackNameFromInput;
-        const oldName = this.trackSrc.name;
-
-        this.song.tracks.forEach(item => {
-            if (item.name === oldName) {
-                item.name = newName;
-                item.board = this.track.board;
-                item.volume = this.track.volume;
-
-                this.song.dynamic.forEach(item => {
-                    if (item.track === oldName) {
-                        item.track = newName;
-                    }
-                });
-            }
-        });
     }
 
     cancelClick() {
@@ -285,7 +276,7 @@ export class NoteDetailsDialog {
             <div style="margin: 1rem; margin-bottom: 2rem;">
                 Громкость
                 <div
-                    data-edit-note-dialog-volume-range
+                    data-note-details-dialog-volume-range
                     class="range-slider"
                     data-label="true"
                     data-min="0"   
@@ -304,8 +295,8 @@ export class NoteDetailsDialog {
 }
 
 // NS
-// edit-track-dialog
-// edit-track-dialog-content
-// edit-track-dialog-ok edit-track-dialog-cancel
-// edit-track-dialog-name-input
-// edit-track-dialog-board-type
+// note-details-dialog
+// note-details-dialog-slides-input  note-details-dialog-duration-stepper
+// note-details-dialog-duration-input
+// note-details-dialog-volume-range
+//

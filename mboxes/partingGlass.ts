@@ -6,7 +6,7 @@ https://www.youtube.com/watch?v=DLEWBmWTfUI
 
 <settings>
   pitchShift: 0;
-  @drums: v50; $bass: v50; $solo: v50; $back: v30; $guit: v50;
+  @drums: v50; $bass: v50; $solo: v50; $back: v30; $guit: v50; $voice: 55;
 
 # соло  : МДСР МДСР МДСР М-СВМ
 # куплет: МДСР МДСР МДСР М-ДР-М
@@ -38,7 +38,7 @@ https://www.youtube.com/watch?v=DLEWBmWTfUI
 
 <ИНТРО b85 $>
 $solo: 90 ло=60_30_2=30  ра=30  бо=60_20_-1=20_-1=20 [ло_бо ра бо_ко_ло] $organ*r
-#solo: 90 ло=30 бо=30 ра=30 бо=20 ко=20 ло=20 $organ*r
+#solo: 90 ло=30 бо=30 ра=30 бо=20 ко=20 ло=20 $trump
 $bass: ме=60 $xylo v70
 $solo: ме=60 $xylo v70
 $guit: ме=60 $xylo v70
@@ -61,53 +61,53 @@ $bass: 480 су=30 30 сы=30 30 ру=30 му=30 су=30 30 ру=50 10 ру=50 1
 
 <соло1_1 b80 $> #960
 # ECGD
-$back: 0   М МО=240 $flute
+$back: 0   М МО=240 $organ
 $solo: 0     со=60=30 мо=60=30 бо+ма=60=30 мо=30 бо+ма=30 $organ*r
-$back: 240 Д ДО=240 $flute
+$back: 240 Д ДО=240 $organ
 #$solo: 240   до=30 да=30 бо=30 до=30 бо=30 ло=30 со=30 мо=30 $organ*r
 $solo: 240   до=30 да=60_30_-1=30 до=30 бо=60_30_-2=30 со=60_30_-3=30 $organ*r
-$back: 480 С СО=240 $flute
+$back: 480 С СО=240 $organ
 $solo: 480   ро=60=30 ро=60=30 ло+ра=60=30  ро=30  ло+ра=30 $organ*r
-$back: 720 Р РО=240 $flute
+$back: 720 Р РО=240 $organ
 $solo: 720   ло=60_30_2=15_-2=15  со=30 мо=30  со=120_30_2=30_2=30_3=30 $organ*r
 
 <соло1_2 b80 $> #960
 # ECGD
-$back: 0   М МО=240 $flute
+$back: 0   М МО=240 $organ
 $solo: 0     [&$m$m] ма=60 мо=60 бо+са=60 мо=30 бо+са=30 $organ*r
-$back: 240 Д ДО=240 $flute
+$back: 240 Д ДО=240 $organ
 $solo: 240   [h&m &h^b^] ра=90_30_2=30_3=30  ма=150_30_-2=30_-2=30_-1=30_1=30 $organ*r
-$back: 480 С СО=240 $flute
+$back: 480 С СО=240 $organ
 $solo: 480   [bv,v,] бо=60 со=60 бо+ба=60 со=30 бо+ба=30 $organ*r
-$back: 720 Р РО=240 $flute
+$back: 720 Р РО=240 $organ
 $solo: 720   ла=30 ба=30 ла=30 са=30 ла=30 са=30 ба=30 30 $organ*r
 
 <соло1_3 b80 $> #960
 # ECGD
-$back: 0   М МО=240 $flute
+$back: 0   М МО=240 $organ
 $solo: 0     са=60 ма=60 ба+ме=60 ма=30 ба+ме=30 $organ*r
-$back: 240 Д ДО=240 $flute
+$back: 240 Д ДО=240 $organ
 $solo: 240   де=30 ме=30 де=30 ба=30 де=30 ба=30 са=30 ма=30 $organ*r
-$back: 480 С СО=240 $flute
+$back: 480 С СО=240 $organ
 $solo: 480   са=120 ре=120 $organ*r
-$back: 720 Р РО=240 $flute
+$back: 720 Р РО=240 $organ
 $solo: 720   де=120 ба=120 $organ*r
 
 <соло1_4 b80 $> #960
 # EmGVEm 
-$back: 0   М  МО=240 $flute
+$back: 0   М  МО=240 $organ
 $solo: 0      са=60 ма=60 ла=60 ба=60 $organ*r
-$back: 240 СВ СО=120      ВО=120 $flute
+$back: 240 СВ СО=120      ВО=120 $organ
 $solo: 240    ба=60 бо=60 ла=60 бо=60 $organ*r
-$back: 480 М  МО=240 120 $flute
+$back: 480 М  МО=240 120 $organ
 $solo: 480    ма=90 са=30 ма=30 ра=30 бо=30 ра=30 бо=60 $organ*r
 
 <соло1_4_2 b80 $> #960
-$back: 0   М  МО=240 $flute
+$back: 0   М  МО=240 $organ
 $solo: 0      са=60 ма=60 ла=60 ба=60 $organ*r
-$back: 240 СВ СО=120      ВО=120 $flute
+$back: 240 СВ СО=120      ВО=120 $organ
 $solo: 240    ба=60 бо=60 ла=60 бо=60 $organ*r
-$back: 480 М  МО=240 $flute
+$back: 480 М  МО=240 $organ
 $solo: 480    ме=240 240 $organ*r
 
 <КУПЛЕТ b80 set>
@@ -130,45 +130,45 @@ $bass: 0   мы=30 30 мы=60 |  му=60 бы=30 мы=30  | ды=30 30 ды=60 |
 $bass: 480 сы=30 30 сы=60 |  бы=30 ру=30 мы=60  | ры=30 30 ры=60 |  лы=60 ры=30 вы=30 $cBass*f
 
 <куплетИнтро b80 $> #1080
-$solo: 0    ба=60 ла=60 $organ*r
+$voice: 0    ба=60 ла=60 $trump
 
 <куплет1 b80 $> #1080
-$back:     М му=240  $flute
-$solo:       са=120 ма=120 $organ*r
-$back: 240 Д ду=240  $flute
-$solo: 240   ма=120 ра=60 ма=60 $organ*r
-$back: 480 С су=240  $flute
-$solo: 480   са=120 са=120 $organ*r
-$back: 720 Р ру=240 $flute
-$solo: 720   ла=120 са=60 ла=60 $organ*r
+$back:     М му=240  $organ
+$voice:       са=120 ма=120 $trump
+$back: 240 Д ду=240  $organ
+$voice: 240   ма=120 ра=60 ма=60 $trump
+$back: 480 С су=240  $organ
+$voice: 480   са=120 са=120 $trump
+$back: 720 Р ру=240 $organ
+$voice: 720   ла=120 са=60 ла=60 $trump
 
 <куплет2 b80 $> #960
-$back: 0   М му=240 $flute
-$solo: 0     ба=120 ба=120 $organ*r
-$back: 240 Д ду=240 $flute
-$solo: 240   ба=60 ла=60 са=60 ла=60 $organ*r
-$back: 480 С су=240 $flute
-$solo: 480   ба=120 ра=120 $organ*r
-$back: 720 Р ру=240 $flute
-$solo: 720   ра=120 ба=60 ла=60 $organ*r
+$back: 0   М му=240 $organ
+$voice: 0     ба=120 ба=120 $trump
+$back: 240 Д ду=240 $organ
+$voice: 240   ба=60 ла=60 са=60 ла=60 $trump
+$back: 480 С су=240 $organ
+$voice: 480   ба=120 ра=120 $trump
+$back: 720 Р ру=240 $organ
+$voice: 720   ра=120 ба=60 ла=60 $trump
 
 <куплет3 b80 $> #960
-$back: 0   М му=240 $flute
-$solo: 0     са=120 ма=120 $organ*r
-$back: 240 Д ду=240 $flute
-$solo: 240   ма=120 ра=60 ма=60 $organ*r
-$back: 480 С су=240 $flute
-$solo: 480   са=120 са=120 $organ*r
-$back: 720 Р ру=240 $flute
-$solo: 720   ла=120 са=60 ла=60 $organ*r
+$back: 0   М му=240 $organ
+$voice: 0     са=120 ма=120 $trump
+$back: 240 Д ду=240 $organ
+$voice: 240   ма=120 ра=60 ма=60 $trump
+$back: 480 С су=240 $organ
+$voice: 480   са=120 са=120 $trump
+$back: 720 Р ру=240 $organ
+$voice: 720   ла=120 са=60 ла=60 $trump
 
 <куплет4 b80 $> #960
-$back: 0   М  му=240 $flute
-$solo: 0      ба=120 ме=120 $organ*r
-$back: 240 ДР ду=120      ру=120 $flute
-$solo: 240    ре=60 ба=60 ла=60 ба=60 $organ*r
-$back: 480 М  му=360 $flute
-$solo: 480    са=120 ма=120 ма=120  ба=120 $organ*r
+$back: 0   М  му=240 $organ
+$voice: 0      ба=120 ме=120 $trump
+$back: 240 ДР ду=120      ру=120 $organ
+$voice: 240    ре=60 ба=60 ла=60 ба=60 $trump
+$back: 480 М  му=360 $organ
+$voice: 480    са=120 ма=120 ма=120  ба=120 $trump
 
 <ПРИПЕВ_1 b80 set>
 припев припев_бас
@@ -185,71 +185,70 @@ $bass: 960  лы=60 мы=60 | ду=60 лы=60 | сы=60 ры=60 | бы=60 сы=6
 $bass: 1440 ду=60 ду=60 | ду=60 ду=60 | 0           | 0                 | $cBass*f
 
 <припев b80 $> #960
-$back: 0    СР су=120      ру=120 $flute
-$solo: 0       ре=60 ба=60 ре=60 ме=60 $organ*r
-$back: 240  С  су=240 $flute
-$solo: 240     ре=180 ба=60 $organ*r
-$back: 480  СР су=120      ру=120 $flute
-$solo: 480     ре=60 ба=60 ре=60 ме=60 $organ*r
-$back: 720  С  су=240 $flute
-$solo: 720     ре=180 ба=60 $organ*r
-$back: 960  Л  лу=240 $flute
-$solo: 960     де=120 ба=120 $organ*r
-$back: 1200 С  су=240 $flute
-$solo: 1200    ба=60 ла=60 са=60 ла=60 $organ*r
-$back: 1440 ДР ду=240 $flute
-$solo: 1440    ба=120 ра=120 $organ*r
+$back: 0    СР су=120      ру=120 $organ
+$voice: 0       ре=60 ба=60 ре=60 ме=60 $trump
+$back: 240  С  су=240 $organ
+$voice: 240     ре=180 ба=60 $trump
+$back: 480  СР су=120      ру=120 $organ
+$voice: 480     ре=60 ба=60 ре=60 ме=60 $trump
+$back: 720  С  су=240 $organ
+$voice: 720     ре=180 ба=60 $trump
+$back: 960  Л  лу=240 $organ
+$voice: 960     де=120 ба=120 $trump
+$back: 1200 С  су=240 $organ
+$voice: 1200    ба=60 ла=60 са=60 ла=60 $trump
+$back: 1440 ДР ду=240 $organ
+$voice: 1440    ба=120 ра=120 $trump
 
 <припевХвост1 b80 $>
-$back: ру=120 $flute
-$solo: ра=120 $organ*r
+$back: ру=120 $organ
+$voice: ра=120 $trump
 $bass: ру=60  $cBass*f
 
 <припевХвост2 b80 $>
-$back: ру=60 $flute v5
-$solo: ра=60 30 $organ*r
-#solo: 90 ло=30 бо=24 ра=24 бо=24 ко=24 ло=24 $organ*r
-$solo: 90 ло=60_30_2=30 ра=30=25 бо=60_20_-1=20_-1=20=0 $organ*r
+$back: ру=60 $organ
+$voice: ра=60 30 $trump
+$voice: 90 ло=60_30_2=30 ра=30=25 бо=60_20_-1=20_-1=20=0 $organ*r
 
 <таДа b80 $> #960
 $guit: ру=30 ну=90 $egit*drp
 
 <соло2_1 b80 $> #960
-$back: 0   E му=240 $flute
+$back: 0   E му=240 $organ
 $solo: 0     мо=90 30 ба=60 60 $organ*r
-$back: 240 C ду=240 $flute
+$back: 240 C ду=240 $organ
 $solo: 240   са=30 ма=30 ра=30 бо=30 ра=30 ма=30 са=30 ло=30 $organ*r
-$back: 480 G су=240 $flute
+$back: 480 G су=240 $organ
 $solo: 480   со=120  са+ба=60 со=30 са+ба=30 $organ*r
-$back: 720 D ру=240 $flute
+$back: 720 D ру=240 $organ
 $solo: 720   во=30 со=30 ра=30 во=30 со=30 бо=30 во=30 со=30 $organ*r
 
 <соло2_2 b80 $> #960
-$back: 0   E му=240 $flute
+$back: 0   E му=240 $organ
 $solo: 0     мо=120 бо=120 $organ*r
-$back: 240 C ду=240 $flute
+$back: 240 C ду=240 $organ
 $solo: 240   ма=120 ба=90 30 $organ*r
-$back: 480 G су=240 $flute
+$back: 480 G су=240 $organ
 $solo: 480   са=30 ла=30 са=30 ма=30 са=30 ма=30 ра=30 ма=30 $organ*r
-$back: 720 D ру=240 $flute
+$back: 720 D ру=240 $organ
 $solo: 720   ра=30 бо=30 ра=30 бо=30 ло=30 бо=30 ло=30 бо=30 $organ*r
 
 <соло2_3 b80 $> #960
-$back: 0   E му=240 $flute
+$back: 0   E му=240 $organ
 $solo: 0     со=120 ра=120 $organ*r
-$back: 240 C ду=240 $flute
+$back: 240 C ду=240 $organ
 $solo: 240   са=120 ре=120 $organ*r
-$back: 480 G су=240 $flute
+$back: 480 G су=240 $organ
 $solo: 480   ла=240 $organ*r
-$back: 720 D ру=240 $flute
+$back: 720 D ру=240 $organ
 $solo: 720   ба=240 $organ*r
 
 <соло2_4 b80 $> #960
-$back: 0   E му=240 $flute
+$back: 0   E му=240 $organ
 $solo: 0     са=60 ма=60 ла=60 ба=60 $organ*r
-$back: 240 G су=120      ву=120 $flute
+$back: 240 G су=120      ву=120 $organ
 $solo: 240   ба=120 ла=120 $organ*r
-$back: 480 E му=240 $flute
+$back: 480 E му=240 $organ
 $solo: 480   ма=240 120 $organ*r
 
 
@@ -264,8 +263,8 @@ $guit: ме=120 ме=120 $xylo
 
 <test $>
 $1: 0    ду=60 ту=60 ру=60 му=60 до=60 то=60 ро=60 мо=60  $organ
-$2: 480  ду=60 ту=60 ру=60 му=60 до=60 то=60 ро=60 мо=60  $organ*r
-$2: 960  ду=60 ту=60 ру=60 му=60 до=60 то=60 ро=60 мо=60  $flute
+$2: 480  ду=60 ту=60 ру=60 му=60 до=60 то=60 ро=60 мо=60  $trump
+$2: 960  ду=60 ту=60 ру=60 му=60 до=60 то=60 ро=60 мо=60  $organ
 $2: 1440 ду=60 ту=60 ру=60 му=60 до=60 то=60 ро=60 мо=60 $harm
 
 `.trim();

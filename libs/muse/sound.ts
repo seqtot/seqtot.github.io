@@ -283,8 +283,11 @@ export class Sound {
         Sound.AddDrumSound(drumId);
     }
 
+    // тональные или ударные ноты
     getNoteSame(val: string): string {
         val = (val || '').toLocaleLowerCase().trim();
+
+        //if (val === 'DEF' || val === 'ДЭФ') return val;
 
         let result = freqByNoteHash[val] ? val : '';
 
@@ -299,6 +302,9 @@ export class Sound {
 
     static GetNoteLat(val: string): string {
         val = (val || '').toLocaleLowerCase().trim();
+
+        //if (val === 'DEF' || val === 'ДЭФ') return 'df';
+
         let result = noteLatByNoteHash[val];
 
         result = freqByNoteHash[result] ? result : '';

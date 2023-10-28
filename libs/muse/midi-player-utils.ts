@@ -98,15 +98,17 @@ function buildSked (ind: number, dx: {
     sked: LoopAndTicksInfo,
     colLoopDurationQ: number,
 })  {
+    //console.log('buildSked', ind, dx);
 
     if (ind) {
         dx.offsetQ = dx.restFromPrevRowQ + (dx.colLoopDurationQ * ind); // dx.restForNextRow
     }
 
     dx.noteLineInfo.notes.forEach(info => {
-        //console.log('INFO', info);
+        const isDrum = un.isDrum(info.instr);
 
-        let soundInfoArr = dx.getSoundInfoArr(info.note);
+        //console.log('dx.getSoundInfoArr 1');
+        let soundInfoArr = dx.getSoundInfoArr(isDrum ? info.instr : info.note);
         let beatIndex = getBeatIndex(dx.offsetQ, dx);
 
         if (beatIndex >= dx.beatsMs.length) {
@@ -167,7 +169,7 @@ export function getSkedByQuarters(
         restForNextRowQ: number;  // добавляется только для первого цикла
         colLoopDurationQ: number; // длина одного цикла внутри которого надоходится линейка
     },
-   getSoundInfoArr: (notes: string)=> KeyInfo[]
+   getSoundInfoArr: (notes: string, ifDef?: string) => KeyInfo[]
 ): LoopAndTicksInfo {
         // все поля обязательно, но проверям их заполненность
         //console.log('getSkedByQuarters.props', props);
@@ -217,7 +219,7 @@ export function getSkedByQuarters(
         dx.sked.isHead = isHead;
         //sked.durationQ = beatsMs.length  * un.NUM_120; // sked.durationQ = noteLineInfo.durationQ;
 
-        //console.log('RESULT', dx.sked);
+        //console.log('getSkedByQuarters.sked', dx);
 
         return dx.sked;
     }

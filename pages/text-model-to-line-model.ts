@@ -1,7 +1,7 @@
 import {SongNode, SongStore, StoredRow, StoredSongNodeOld, TrackInfo} from './song-store';
 import {ideService} from './ide/ide-service';
 import {getMidiConfig, getTopOutListHash} from '../libs/muse/utils/getMidiConfig';
-import { LineModel } from './line-model';
+import {Line, LineModel} from './line-model';
 import { TextBlock } from '../libs/muse/utils';
 import { Sound } from '../libs/muse/sound';
 import * as un from '../libs/muse/utils';
@@ -61,14 +61,15 @@ export function textModelToLineModel(x: FnInput): SongNode {
     const partsArr = getTopOutListHash({topBlock: getOutBlock(ideService.blocks)});
     const partsHashByNio: {[partNio: string]: un.SongPartInfo} = Object.create(null);
 
-    if (song.isNewCreated) {
+    // это новая песня
+    if (!song.tracks.length) {
         song.bmpValue = un.parseInteger(x.settings.bpm[0], 90);
     }
 
     song.pitchShiftSrc = un.parseInteger(x.settings.pitchShift[0], 0);
     song.pitchShift = 0;
 
-    console.log('song.pitchShiftSrc', x.settings, song.pitchShiftSrc);
+    //console.log('song.pitchShiftSrc', x.settings, song.pitchShiftSrc);
 
     // ЧАСТИ ПЕСНИ
     song.parts = partsArr.map(part => {
@@ -199,10 +200,10 @@ export function textModelToLineModel(x: FnInput): SongNode {
             noteLn.noteLineInfo.notes.forEach(note => {
                 let trackName = noteLn.trackName;
 
-                if (trackName.startsWith('@')) {
-                    trackName = '@drums';
-                    noteLn.trackName = trackName;
-                }
+                // if (trackName.startsWith('@')) {
+                //     trackName = '@drums';
+                //     noteLn.trackName = trackName;
+                // }
 
                 if (!tracksByScore[trackName]) {
                     tracksByScore[trackName] = trackName;
@@ -295,15 +296,28 @@ export function textModelToLineModel(x: FnInput): SongNode {
             const part = partsHashByNio[newPartNio];
 
             oldItems.forEach(item => {
+                item = JSON.parse(JSON.stringify(item));
+
+                item.rows.forEach(line => {
+                    (line as Line).cells.forEach(cell => {
+                        cell.notes.forEach(note => {
+                           note.instName = `@${note.note}`
+                           note.durQ = 1;
+                        });
+                    })
+                });
+
+                //console.log('ITEM', item);
+
                 const newItem = <StoredRow>{
                     partId: part?.partId,
                     rowNio: partInfo.rowNio,
                     rowInPartId: `${newPartNio}-${partInfo.rowNio}`,
                     type: 'drums',
-                    track: '@drums',
-                    lines: item.rows.map(item => {
+                    track: un.drumsTrack,
+                    lines: item.rows.map(line => {
                         return {
-                            ...item,
+                            ...line,
                             rowInPartId: `${newPartNio}-${partInfo.rowNio}`
                         }
                     }),
@@ -397,8 +411,6 @@ export function textModelToLineModel(x: FnInput): SongNode {
     console.log('softTracks', softTracks);
 
     song.tracks = [...Object.values(hardTracks), ...Object.values(softTracks)];
-
-    song.isNewCreated = false;
 
     sortTracks(song.tracks);
 

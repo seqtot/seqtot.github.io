@@ -154,6 +154,19 @@ BracketLeft ~ле~0.5,
 Quote       ~ке~0.5,
 ShiftRight  ~бе~0.5,
 
+Equal        ~ди~0.5,
+BracketRight ~ти~0.5,
+noteMi       ~ри~0.5,
+noteNi       ~ни~0.5,
+noteMi       ~ми~0.5,
+noteFi       ~фи~0.5,
+noteVi       ~ви~0.5,
+noteSi       ~си~0.5,
+noteZi       ~зи~0.5,
+noteLi       ~ли~0.5,
+noteKi       ~ки~0.5,
+noteBi       ~би~0.5,
+
 `;
 
 export const keysRightToLeft = `

@@ -213,6 +213,25 @@ export class DrumCtrl extends KeyboardCtrl {
         });
     }
 
+    addOrDelNoteClick(el: string | HTMLElement) {
+        const rowCol = this.activeCell.rowCol;
+        const totalOffsetQ = this.getTotalOffsetByRowCol(rowCol);
+
+        if (totalOffsetQ === null) return;
+
+        const note = typeof el === 'string' ? el : el.dataset['noteLat'];
+
+        if (!note) return;
+
+        this.addOrDelNote({
+            note,
+            rowCol,
+            totalOffsetQ,
+            durQ: 1,
+            instName: `@${note}`,
+        });
+    }
+
     subscribeEditCommands() {
         super.subscribeEditCommands();
 

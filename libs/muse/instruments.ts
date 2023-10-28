@@ -270,7 +270,7 @@ function getIdFromArray(arr: string[]): number | null {
 export function getInstrNameByCode(val: number | string): string {
     const item = instrumentCodeAndName.find(item => item.code.toString() === val.toString());
 
-    console.log('getInstrNameByCode', val, item?.name);
+    //console.log('getInstrNameByCode', val, item?.name);
 
     return item?.name || '';
 }

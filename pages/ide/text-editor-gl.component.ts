@@ -249,6 +249,7 @@ export class TextEditorGlComponent {
 
   handleKeyEvent(evt: KeyboardEvent, type: number) {
     //console.log('handeEvent', type, evt);
+
     const inputMode = this.inputMode;
 
     if (this.isCommand(evt, type)) return;

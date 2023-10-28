@@ -50,7 +50,7 @@ export class UserSettingsPage {
                         <div class="stepper-button-minus"></div>
                         <div class="stepper-input-wrap">
                             <input
-                                data-board-volume-input                            
+                                data-board-volume-input
                                 type="text"
                                 value="${settings.boardVolume}" min="0" max="100" step="1" />
                         </div>

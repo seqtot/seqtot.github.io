@@ -1,7 +1,7 @@
 import * as un from '../libs/muse/utils/utils-note';
-import {Line, LineNote} from './line-model';
+import { Line, LineNote } from './line-model';
 import { drumCodes } from '../libs/muse/drums';
-import {guitarCodes, bassGuitarCodes} from '../libs/muse/instruments';
+import { guitarCodes, bassGuitarCodes } from '../libs/muse/instruments';
 
 export type StoredRow = {
     partId?: string,
@@ -37,7 +37,7 @@ export type TrackInfo = {
 
 export type SongNode = {
     bmpValue: number,
-
+    version: number,
     content: string,
     break: string,
     drums: string,
@@ -51,7 +51,6 @@ export type SongNode = {
     ns?: string,
     nsOld?: string,
     exportToLineModel?: boolean,
-    isNewCreated?: boolean;
     pitchShift?: number,
     pitchShiftSrc?: number,
 };
@@ -76,6 +75,35 @@ const DEFAULT_BPM_VALUE = 90;
 export const MY_SONG = 'my-song';
 export const BAND_SONG = 'band-song';
 export const SONG_LIST = 'song-list';
+
+// durQ по умолчанию = 1; instName = @note
+function transformV1(song: SongNode): SongNode {
+    const version = 1;
+
+    song.dynamic.forEach(item => {
+        item.track = item.track || '';
+        item.type  = item.type || '';
+
+        if (item.type === 'drums' || item.track.startsWith('@')) {
+            item.lines.forEach(line => {
+                line.cells.forEach(cell => {
+                    cell.notes.forEach(note => {
+                        note.durQ = 1;
+                        note.instName = `@${note.note}`;
+                    });
+                })
+            });
+        }
+    });
+
+    song.version = version;
+
+    return song;
+}
+
+const versionTransformers: ((song: SongNode) => SongNode)[] = [
+  transformV1
+];
 
 export class SongStore {
     constructor(
@@ -262,22 +290,23 @@ export class SongStore {
     static NormalizeSongNode(song: SongNode): SongNode {
         if (!song) return song;
 
+        song.version = un.parseInteger(song.version, 0);
         song.parts = Array.isArray(song.parts) ? song.parts : [];
         song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
         song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
         song.bmpValue = song.bmpValue ? song.bmpValue : DEFAULT_BPM_VALUE;
 
-        // костыль
+        // костыль ???
         song.dynamic.forEach(item => {
             if (!item.track && item.type === 'drums') {
-                item.track = '@drums';
+                item.track = un.drumsTrack;
             }
         });
 
         if (!song.tracks.length) {
             song.tracks = [
                 {
-                    name: '@drums',
+                    name: un.drumsTrack,
                     board: 'drums',
                     volume: 50,
                 },
@@ -287,12 +316,12 @@ export class SongStore {
                     volume: 30,
                 },
                 {
-                    name: '$guitar',
+                    name: '$guit',
                     board: 'guitar',
                     volume: 50,
                 },
                 {
-                    name: '$organ',
+                    name: '$keys',
                     board: 'bassSolo34',
                     volume: 50,
                 },
@@ -302,25 +331,47 @@ export class SongStore {
         return song;
     }
 
-    static GetOldSong(id: string, ns: string, create = false): SongNode {
-        let song: SongNode;
-        let text = localStorage.getItem(`[${ns}]${id}`);
+    static TransformVersion(song: SongNode): SongNode {
+        const version = un.parseInteger(song.version, 0);
 
-        if (!text && create) {
-            song = SongStore.GetEmptySong();
-            song.score = '';
-            song.isNewCreated = true;
-        } else {
-            song = SongStore.NormalizeSongNode(
-                JSON.parse(localStorage.getItem(`[${ns}]${id}`))
-            );
-        }
-
-        if (song || !create) {
+        if (version === versionTransformers.length) {
             return song;
         }
 
-        return null;
+        const transformers = versionTransformers.slice(version);
+
+        transformers.forEach(transformer => {
+            song = transformer(song);
+        });
+
+        return song;
+    }
+
+    static GetOldSong(id: string, ns: string, create = false): SongNode {
+        let song: SongNode = SongStore.NormalizeSongNode(
+            JSON.parse(localStorage.getItem(`[${ns}]${id}`))
+        );
+
+        // ПЕСНИ НЕТ и её не надо создавать
+        if (!song && !create) return null;
+
+        // НОВАЯ ПЕСНЯ
+        if (!song) {
+            song = SongStore.GetEmptySong();
+            song.score = '';
+
+            return song;
+        }
+
+        // ПЕСНЯ ЕСТЬ
+        const version = un.parseInteger(song.version, 0);
+        song = SongStore.TransformVersion(song);
+
+        if (song.version !== version) {
+            SongStore.SetSong(id, song, ns);
+        }
+
+        return song;
     }
 
     static GetSong(id: string, ns: string, create = false): SongNode {
@@ -328,13 +379,26 @@ export class SongStore {
             JSON.parse(localStorage.getItem(`[${ns}]${id}`))
         );
 
-        if (song || !create) {
+        // ПЕСНИ НЕТ и её не надо создавать
+        if(!song && !create) return null;
+
+        // ПЕСНЯ ЕСТЬ
+        if (song) {
+            const version = un.parseInteger(song.version, 0);
+            song = SongStore.TransformVersion(song);
+
+            if (song.version !== version) {
+                SongStore.SetSong(id, song, ns);
+            }
+
             return song;
         }
 
-        SongStore.SetSong(id, SongStore.GetEmptySong(), ns);
+        // НОВАЯ ПЕСНЯ
+        song = SongStore.NormalizeSongNode(SongStore.GetEmptySong());
+        SongStore.SetSong(id, song, ns);
 
-        return SongStore.NormalizeSongNode(JSON.parse(localStorage.getItem(`[${ns}]${id}`)));
+        return song;
     }
 
     static SetSong(id: string, data: SongNode, ns: string) {
@@ -344,6 +408,9 @@ export class SongStore {
     }
 
     static GetEmptySong(): SongNode {
+        // <settings>
+        // $bass: v30; $organ: v50; $guit: v50;
+
         return {
             bmpValue: DEFAULT_BPM_VALUE,
             content: '',
@@ -352,13 +419,10 @@ export class SongStore {
             tracks: [],
             hideMetronome: false,
             parts: [],
-            score: `
-            <settings>
-            $bass: v30; $organ: v50; $guit: v50;
-            <out b100>
-            `.trim(),
+            score: '',
             dynamic: [],
-            source: 'my'
+            source: 'my',
+            version: versionTransformers.length
         };
     }
 
@@ -602,7 +666,7 @@ export class SongStore {
         songNode = JSON.parse(val) as SongNode;
         const drumRows = SongStore.GetRowsByInstrument(songNode.dynamic, (note) => isDrumNote(note.note));
         drumRows.forEach(row => {
-            row.track = '@drums';
+            row.track = un.drumsTrack;
             row.type = 'drums';
         });
 

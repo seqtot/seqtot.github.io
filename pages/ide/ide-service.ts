@@ -30,7 +30,7 @@ export type EditedItem = {
 
 export const defaultTracks: TrackInfo[] = [
     {
-        name: '@drums',
+        name: un.drumsTrack,
         board: drumBoards.drums,
         volume: 50
     },

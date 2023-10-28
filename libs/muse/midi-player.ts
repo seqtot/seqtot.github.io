@@ -150,6 +150,10 @@ export class MidiPlayer extends Sound {
         cent?: number,
     }) {
         const instrCode = getInstrCodeBy(x.instrCode || DEFAULT_TONE_INSTR);
+        const isDrum = un.isDrum(instrCode);
+
+        //console.log('this.getSoundInfoArr 2');
+
         const soundInfo = this.getSoundInfoArr(x.notes);
         const instrObj = this.instruments[instrCode];
 
@@ -160,8 +164,8 @@ export class MidiPlayer extends Sound {
         return this.getSoundMidi({
             soundInfo,
             instrObj,
+            isDrum,
             durationMs: x.durationMs || 0,
-            isDrum: un.isDrum(instrCode),
             volume: un.getSafeVolume(x.volume),
             whenSec: x.whenSec || 0,
             pitchShift: x.pitchShift || 0,
@@ -197,9 +201,10 @@ export class MidiPlayer extends Sound {
             midis: [],
         }) as PlayingItem;
 
-        if (x.isDrum) {
-            durationMs = 1000; //duration * 2;
-        }
+        // jjklDrum
+        // if (x.isDrum) {
+        //     durationMs = 1000; //duration * 2;
+        // }
 
         const sounds = Array.isArray(x.soundInfo)
             ? x.soundInfo
@@ -225,16 +230,23 @@ export class MidiPlayer extends Sound {
     }
 
     // до+ре+му
+    // jjklDrums
     getSoundInfoArr(notes: string): KeyInfo[] {
         const result: KeyInfo[] = [];
 
+        //ifDef = (ifDef || '').replace(un.toneChar, '').replace(un.drumChar, '').trim();
         notes = (notes || '').trim();
+        //notes = notes === 'DEF' ? ifDef: notes;
+
         if (!notes) return [];
 
         let subArr = notes.split('+');
 
         subArr.forEach((note) => {
+            note = note.replace(un.toneChar, '').replace(un.drumChar, '').trim();
             note = this.getNoteSame(note);
+
+            //console.log('getSoundInfoArr', notes, ifDef, note, this.keysAndNotes);
 
             if (!note) return;
 
@@ -265,8 +277,6 @@ export class MidiPlayer extends Sound {
         restForNextRowQ?: number,
         colLoopDurationQ?: number, // длина одного цикла внутри которого надоходится линейка
     }): LoopAndTicksInfo {
-        //console.log('addLoopByQuarters.params', params);
-
         this.loopId++;
 
         let loopId = this.loopId;
@@ -302,6 +312,7 @@ export class MidiPlayer extends Sound {
         delete this.loops[loopId];
         this.loops[loopId] = sked;
 
+        //console.log('addLoopByQuarters.sked', sked);
         //console.log('SKED', sked);
 
         const onGetNextSound = (eeParams: { tick: number; whenSec: number }) => {

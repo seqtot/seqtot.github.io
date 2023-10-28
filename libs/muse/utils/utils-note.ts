@@ -16,6 +16,8 @@ export const vibratoChar = '~';
 export const decorChar = '*';
 export const negativeChar = '-';
 export const drumChar = '@';
+export const drumsTrack = '@drums';
+export const drumsType = 'drums';
 export const drumPrefix = 'drum_';
 export const PAUSE = 'pause';
 export const commentChar = '#';
@@ -154,7 +156,7 @@ export function getEndPointVolume(val: any, byDefault?: number): number {
     //     //valOut = ((1 - Math.sqrt(1 - (valOut * valOut))) * (100 - mid)) + mid;
     // }
     //
-    // console.log(val, valIn, valOut);
+    //console.log(val, valIn, valOut);
     //
     // return valOut;
 }
@@ -232,7 +234,7 @@ export function getTextBlocks(rows: string | string[]): TextBlock[] {
     for (let i = rows.length - 1; i > -1; i--) {
         let str = rows[i];
 
-        /^(\s)*</.test('<')
+        // /^(\s)*</.test('<')
 
         // это не тэг
         if (!/^(\s)*</.test(str)) { // startWith <
@@ -336,13 +338,19 @@ export function getBlockContent(blocks: TextBlock[], id: string, trimIt: 'trim' 
 }
 
 // return: [[25, 25, 25, 25], [50, 50]]
-export function getDrumQuartersInfo(arr: string[]): number[][] {
-    let text = arr.find((item) => item.startsWith('-')).split(':')[1];
-    text = trimLeft(text); // text.trimLeft();
-    text = text.replace(/\d\d/g, '| ');
-    text = text.replace(/\d/g, '|');
+export function getDrumQuartersInfo(arr: string[]): {
+    quarters: number[][],
+    trackName?: string,
+} {
+    const head = (arr.find((item) => item.startsWith('-')) || '').split(':');
 
-    let quarters = text
+    let quarterMap = trimLeft(head[1]);
+    let trackName = (head[2]  || '').trim() || '@drums';
+
+    quarterMap = quarterMap.replace(/\d\d/g, '| ');
+    quarterMap = quarterMap.replace(/\d/g, '|');
+
+    let quarters = quarterMap
         .replace(/\|/g, '| ')
         .split('|')
         .filter((item) => !!item);
@@ -351,7 +359,10 @@ export function getDrumQuartersInfo(arr: string[]): number[][] {
         return Array(quarter.length).fill(Math.round(NUM_120 / quarter.length));
     });
 
-    return result;
+    return {
+        quarters: result,
+        trackName
+    };
 }
 
 // instr-index: noteLine
@@ -376,48 +387,99 @@ export function getNoteLnsByToneInstruments(arr: string[]): NoteLineByName[] {
 
 // TODO: поддержка одноимённых инструментов
 export function getNoteLnsByDrumInstruments(arr: string[]): NoteLineByName[] {
-    let quarters = getDrumQuartersInfo(arr);
-    let lengtn = quarters.reduce((acc, item) => {
+    // было
+    // drums bd=60 60 bd=60 60 bd=60 60 bd=60 60
+    // trackName: "@bd"
+
+    // стало
+    // @cowbell df=60 60 df=60 60 df=60 60 df=60 60 d480
+    // trackName: @trackName
+
+    let info = getDrumQuartersInfo(arr);
+
+    let length = info.quarters.reduce((acc, item) => {
         return acc + item.length;
     }, 0);
 
-    let trackLns: NoteLineByName[] = arr
+    type Temp = {instrName: string, noteLine: string, lastNoteDurQ: number};
+
+    let trackLns: Temp[] = arr
         .filter((item) => item.startsWith(drumChar))
         .reduce((acc, item) => {
             const arr = item.split(':');
-            const name = arr[0].trim();
+            const instrName = arr[0].trim();
             let noteLine = arr[1];
-            noteLine = noteLine.substr(noteLine.length - lengtn);
+            let lastNoteDurQ = parseInteger(arr[2], 0);
 
-            acc.push({ trackName: name, noteLine})
+            noteLine = noteLine.substr(noteLine.length - length);
+
+            acc.push({ instrName, noteLine, lastNoteDurQ});
 
             return acc;
-        }, <NoteLineByName[]>[]);
+        }, <Temp[]>[]);
 
     let result: NoteLineByName[] = [];
 
     trackLns.forEach(noteLn => {
         const beatLine = noteLn.noteLine;
-        const trackName = noteLn.trackName;
-        const asNote = trackName.replace(drumChar, '');
-        let noteLine = '';
+        const instName = noteLn.instrName;
+
         let i = -1;
+        let noteLine = '';
+        let totalDurQ = 0;
+        let prevDurQ = 0;
+        let prevDurForNextQ = 0;
+        let noteNum = 0;
+        let stopCountDurQ = false;
 
-        for (let quarter of quarters) {
-            for (let durationQ of quarter) {
+        for (let quarter of info.quarters) {
+            for (let iDurationQ of quarter) {
                 i++;
+                totalDurQ += iDurationQ;
 
-                if (beatLine[i].trim()) {
-                    noteLine = noteLine + ` ${asNote}${timeChar}${durationQ}`;
+                const char = beatLine[i].trim();
+
+                if (char) {
+                    if (char === '.') {
+                        prevDurForNextQ += iDurationQ;
+                        stopCountDurQ = true;
+
+                        continue;
+                    }
+
+                    if (!noteNum) {
+                        // первая пауза
+                        if (prevDurQ) {
+                            noteLine = noteLine + ` ${prevDurQ}`;
+                        }
+
+                        prevDurQ = iDurationQ;
+                        prevDurForNextQ = iDurationQ;
+                        noteNum++;
+                    } else {
+                        noteLine = noteLine + ` ${instName}${timeChar}${prevDurForNextQ}${timeChar}${prevDurQ}`;
+                        prevDurQ = iDurationQ;
+                        prevDurForNextQ = iDurationQ;
+                        stopCountDurQ = false;
+                    }
                 } else {
-                    noteLine = noteLine + ` ${durationQ}`;
+                    prevDurForNextQ += iDurationQ;
+
+                    if (!stopCountDurQ) {
+                        prevDurQ += iDurationQ;
+                    }
                 }
             }
         }
 
+        if (noteNum) {
+            prevDurQ = noteLn.lastNoteDurQ || prevDurQ;
+            noteLine = noteLine + ` ${instName}${timeChar}${prevDurForNextQ}${timeChar}${prevDurQ}`;
+        }
+
         result.push({
-            trackName: noteLn.trackName,
-            noteLine: `drums ${noteLine.trim()}`,
+            trackName: info.trackName,
+            noteLine: `${noteLine.trim()} d${totalDurQ} ${instName}`,
         });
     });
 

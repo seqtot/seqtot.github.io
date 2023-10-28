@@ -10,7 +10,7 @@ import { ContentItem } from '../libs/gl/ts/items/content-item';
 import {LayoutManager} from '../libs/gl/ts/layout-manager';
 import { Stack } from 'libs/gl/ts/items/stack';
 
-import {ideService, ideEvents } from './ide/ide-service';
+import { ideService, ideEvents } from './ide/ide-service';
 import { EmptyGlComponent } from './ide/empty-gl.component';
 import { FileTreeGlComponent } from './ide/file-tree-gl.component';
 import { TextEditorGlComponent } from './ide/text-editor-gl.component';

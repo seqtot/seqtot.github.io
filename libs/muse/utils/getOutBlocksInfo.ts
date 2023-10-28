@@ -54,7 +54,7 @@ export function getNoteLineMetaAndInstr(noteLine: string, instr?: string): {
     meta: string,
     instr: string,
 } {
-    const arr = noteLine.split(' ');
+    const arr = noteLine.split(' ').filter(item => !!item);
 
     let i = arr.length;
 
@@ -219,10 +219,13 @@ export function getOutBlocksInfo(
                 noteLinesWithTrackName = getNoteLnsByToneInstruments(block.rows);
             }
 
-            noteLinesWithTrackName.forEach(noteLineWithTrackName => {
-                //console.log('noteLinesByName', item);
+            //console.log('noteLinesWithTrackName', noteLinesWithTrackName);
 
+            noteLinesWithTrackName.forEach(noteLineWithTrackName => {
                 const info = getNoteLineMetaAndInstr(noteLineWithTrackName.noteLine, noteLineWithTrackName.trackName);
+
+                //console.log('INFO', {...info});
+
                 const volume = getVolumeFromString(info.meta);
                 const noteLine = `${head}r${colRepeat} v${volume} ${info.instr} ${info.noteLine}`;
                 const noteLineInfo = getNoteLineInfo(noteLine);
@@ -270,7 +273,7 @@ export function getOutBlocksInfo(
 
     result.durationQ = totalDurationQ;
 
-    //console.log('RES', result);
+    console.log('getOutBlocksInfo.result', JSON.parse(JSON.stringify(result)));
 
     return result;
 }
