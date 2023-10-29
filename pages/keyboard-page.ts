@@ -13,6 +13,7 @@ import { ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards, drumBoard
 import { ideService, defaultTracks } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
 import {MY_SONG, SongStore, TrackInfo} from './song-store';
+import {UserSettings, UserSettingsStore} from './user-settings-store';
 
 // import { getDevice } from 'framework7';
 //
@@ -34,6 +35,7 @@ interface Page {
 }
 
 export class KeyboardPage implements Page {
+    userSettings: UserSettings = UserSettingsStore.GetUserSettings();
     keyboardType: KeyboardType = ideService.lastBoardView;
     trackName = ideService.lastTrackName;
 

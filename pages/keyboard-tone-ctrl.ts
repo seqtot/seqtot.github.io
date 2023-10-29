@@ -11,6 +11,7 @@ import { isT34 } from './keyboard-tone-ctrl-helper';
 import { DEFAULT_TONE_INSTR } from '../libs/muse/keyboards';
 import { getInstrNameByCode } from '../libs/muse/instruments';
 import { KeyboardChessCtrl } from './keyboard-chess-ctrl';
+import {UserSettings, UserSettingsStore} from './user-settings-store';
 
 const DOWN = 1;
 const UP = 0;
@@ -18,6 +19,7 @@ const rem = 'rem';
 const monoFont = 'font-family: monospace;';
 
 export class ToneCtrl extends KeyboardCtrl {
+    userSettings: UserSettings = UserSettingsStore.GetUserSettings();
     _instrCode = DEFAULT_TONE_INSTR;
     playingNote: { [key: string]: string } = {};
     lastPlayingNote = '';
@@ -339,6 +341,7 @@ export class ToneCtrl extends KeyboardCtrl {
     setKeysColor() {
         let baseNote = this.playingNote.base || '';
         let baseChar = baseNote[0];
+        let mapNoteToChar = this.userSettings.useCyrillicNote ? hlp.mapNoteToCharRus : hlp.mapNoteToCharLat;
 
         getWithDataAttr('note-key', this.page.pageEl).forEach((el: HTMLElement) => {
             el.style.backgroundColor = el.dataset['bgColor'] || 'white';
@@ -375,7 +378,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
                 if (note[0] === baseChar) {
                     const octaveChar = (el.dataset['noteLat'] || '')[1];
-                    el.innerText = hlp.mapNoteToCharLat[baseChar];
+                    el.innerText = mapNoteToChar[baseChar];
                     el.style.color = hlp.octaveColor[octaveChar] || 'dimgrey';
                 }
             }
