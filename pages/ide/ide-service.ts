@@ -9,7 +9,7 @@ import { DataByTracks } from '../../libs/muse/multi-player';
 import { FileSettings, getFileSettings } from '../../libs/muse/utils/getFileSettings';
 import * as un from '../../libs/muse/utils';
 import { drumBoards, KeyboardType, toneBoards } from '../keyboard-ctrl';
-import { SongStore, TrackInfo } from '../song-store';
+import { DEFAULT_OUT_VOLUME, SongNode, SongStore, TrackInfo } from '../song-store';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -57,7 +57,7 @@ class IdeService extends  EventEmitter {
     private _lastBoardView: KeyboardType = '' as any;
 
     songStore: SongStore;
-    dataByTracks: DataByTracks;
+    dataByTracks: DataByTracks = {};
 
     blocks: un.TextBlock[] = [];
     settings: FileSettings = getFileSettings([]);
@@ -70,7 +70,9 @@ class IdeService extends  EventEmitter {
     boards: any = {};
     bpmValue = 90;
 
-    outVolume = 70;
+    get outVolume (): number {
+        return un.parseInteger(this.dataByTracks?.total?.volume, DEFAULT_OUT_VOLUME);
+    }
 
     get lastBoardView(): KeyboardType {
         if (!this._lastBoardView) {
@@ -120,6 +122,43 @@ class IdeService extends  EventEmitter {
 
     reset() {
         // jjkl: todo
+    }
+
+    getDataByTracks(song: SongNode): DataByTracks {
+        let dataByTracks = {} as DataByTracks;
+
+        if (!song?.tracks) {
+            song.tracks.forEach(track => {
+                const volume = track.isExcluded ? 0: track.volume;
+                const items = track.items || [];
+
+                dataByTracks[track.name] = {
+                    volume: volume,
+                    isExcluded: track.isExcluded,
+                    items: items.reduce((acc, item) => {
+                        acc[item.name] = {
+                            volume: item.volume
+                        }
+
+                        return acc;
+                    }, {})
+                };
+            });
+        }
+
+        return dataByTracks;
+    }
+
+    setDataByTracks(song: SongNode) {
+        const dataByTracks = this.getDataByTracks(song);
+
+        Object.keys(this.dataByTracks).forEach(key => {
+           delete this.dataByTracks[key];
+        });
+
+        Object.keys(dataByTracks).forEach(key => {
+            this.dataByTracks[key] = dataByTracks[key];
+        });
     }
 }
 

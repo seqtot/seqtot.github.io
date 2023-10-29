@@ -151,18 +151,18 @@ export class NoteDetailsDialog {
                         <div class="navbar-bg"></div>
                         <div class="navbar-inner" style="justify-content: space-evenly;">
                             <span data-edit-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
-                            <span data-edit-track-dialog-cancel style="${btnStl}">Cancel</span>                        
+                            <span data-edit-track-dialog-cancel style="${btnStl}">Cancel</span>
                             <!--div class="title">Popup Title</div>
                             <div class="right">
                                 <a class="link popup-close">Close</a>
                             </div-->
-                        </div>  
+                        </div>
                     </div>
                     <div class="page-content">
                         %content%
                     </div>
                 </div>
-            </div>        
+            </div>
         `.trim();
 
         let content = wrapper.replace('%content%', `

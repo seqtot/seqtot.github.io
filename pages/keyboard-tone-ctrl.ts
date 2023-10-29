@@ -5,13 +5,11 @@ import * as un from '../libs/muse/utils/utils-note';
 import { KeyData, Line, LineModel, LineNote, CELL_SIZE } from './line-model';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
-import { sings } from './sings';
-import { SongStore } from './song-store';
 import { isT34 } from './keyboard-tone-ctrl-helper';
 import { DEFAULT_TONE_INSTR } from '../libs/muse/keyboards';
 import { getInstrNameByCode } from '../libs/muse/instruments';
 import { KeyboardChessCtrl } from './keyboard-chess-ctrl';
-import {UserSettings, UserSettingsStore} from './user-settings-store';
+import { UserSettings, UserSettingsStore } from './user-settings-store';
 
 const DOWN = 1;
 const UP = 0;
@@ -814,12 +812,12 @@ export class ToneCtrl extends KeyboardCtrl {
             <div class="navbar">
                 <div class="navbar-bg"></div>
                 <div class="navbar-inner" style="justify-content: space-evenly;">
-                <div data-replace-instrument-action="note"   style="${btnStl}">note</div>
-                <div data-replace-instrument-action="block"  style="${btnStl}">Block</div>
-                <div data-replace-instrument-action="blocks" style="${btnStl}">BLOCKS</div>
-                <div data-close-popup style="${btnStl}">Close</div>
-            </div>
-        </div>`.trim();
+                    <div data-replace-instrument-action="note"   style="${btnStl}">note</div>
+                    <div data-replace-instrument-action="block"  style="${btnStl}">Block</div>
+                    <div data-replace-instrument-action="blocks" style="${btnStl}">BLOCKS</div>
+                    <div data-close-popup style="${btnStl}">Close</div>
+                </div>
+            </div>`.trim();
     }
 
     open_InstrumentBoard() {

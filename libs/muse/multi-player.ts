@@ -12,8 +12,12 @@ const Fs: any = null;
 type SoundSourceSet = AudioBufferSourceNode[];
 
 export type DataByTracks = {
+    total?: {
+        volume?: number,
+    },
     [key: string]: {
         volume?: number,
+        isExcluded?: boolean,
         items?: {
             volume?: number,
         }
@@ -513,14 +517,7 @@ export class MultiPlayer {
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
         excludeLines?: string[]
-        dataByTracks?: {
-            [key: string]: {
-                volume?: number,
-                items?: {
-                    volume?: number,
-                }
-            }
-        },
+        dataByTracks?: DataByTracks,
     }) {
         if (!x.dontClear) {
             this.midiPlayer.stopAndClear();

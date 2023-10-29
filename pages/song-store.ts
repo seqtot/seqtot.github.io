@@ -38,6 +38,7 @@ export type TrackInfo = {
 
 export type SongNode = {
     bmpValue: number,
+    volume?: number,
     version: number,
     content: string,
     break: string,
@@ -73,6 +74,8 @@ function asOrganInst(note: LineNote): boolean {
 }
 
 const DEFAULT_BPM_VALUE = 90;
+export const DEFAULT_OUT_VOLUME = 70;
+
 export const MY_SONG = 'my-song';
 export const BAND_SONG = 'band-song';
 export const SONG_LIST = 'song-list';
@@ -414,6 +417,7 @@ export class SongStore {
 
         return {
             bmpValue: DEFAULT_BPM_VALUE,
+            volume: DEFAULT_OUT_VOLUME,
             content: '',
             break: '',
             drums: '',

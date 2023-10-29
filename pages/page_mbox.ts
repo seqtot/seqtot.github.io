@@ -139,7 +139,7 @@ export class MBoxPage {
                 songData.ns = this.ns;
 
                 ideService.songStore = new SongStore(songId, this.ns, songData);
-                ideService.dataByTracks = this.getDataByTracks();
+                ideService.setDataByTracks(ideService.songStore.data);
             }
         }
     }
@@ -646,7 +646,8 @@ export class MBoxPage {
 
         if (!editPartsNio.length) return;
 
-        ideService.dataByTracks = this.getDataByTracks(); // jjkl
+        ideService.setDataByTracks(ideService.songStore.data);
+        ideService.editedItems = [];
 
         ideService.currentEdit.songId = this.songId;
         ideService.currentEdit.allSongParts = this.allSongParts;
@@ -654,7 +655,6 @@ export class MBoxPage {
         ideService.currentEdit.editPartsNio = editPartsNio;
         ideService.currentEdit.source = this.pageData.source;
         ideService.currentEdit.freezeStructure = !isMy;
-        ideService.editedItems = [];
         ideService.currentEdit.settings = this.settings;
         ideService.currentEdit.ns = isMy ? MY_SONG : this.pageData.ns || '';
         ideService.currentEdit.useLineModel = isMy || this.pageData.exportToLineModel || false;
@@ -1106,30 +1106,6 @@ export class MBoxPage {
         return ideService.multiPlayer.tryPlayTextLine({ text, repeat });
     }
 
-    getDataByTracks(): DataByTracks {
-        let dataByTracks: DataByTracks = {};
-
-        if (ideService?.songStore?.data) {
-            ideService.songStore.data.tracks.forEach(track => {
-                const volume = track.isExcluded ? 0: track.volume;
-                const subitems = track.items || [];
-
-                dataByTracks[track.name] = {
-                    volume: volume,
-                    items: subitems.reduce((acc, item) => {
-                        acc[item.name] = {
-                            volume: item.volume
-                        }
-
-                        return acc;
-                    }, {})
-                };
-            });
-        }
-
-        return dataByTracks;
-    }
-
     buildBlocksForMySong(blocks: TextBlock[]): TextBlock[] {
         console.log('buildBlocksForMySong.blocks', blocks);
 
@@ -1351,7 +1327,7 @@ export class MBoxPage {
                     //console.log(type, data);
                 },
                 excludeLines: this.settings.exclude,
-                dataByTracks: this.getDataByTracks(), // ideService.dataByTracks,
+                dataByTracks: ideService.dataByTracks,
                 //pitchShift: getPitchShiftSetting(this.settings),
                 bpm: this.bpmValue,
                 repeatCount,

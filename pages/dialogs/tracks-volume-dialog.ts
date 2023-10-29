@@ -3,8 +3,8 @@ import { Dialog } from 'framework7/components/dialog/dialog';
 import { ComponentContext } from 'framework7/modules/component/component';
 
 import { getWithDataAttr, getWithDataAttrValue } from '../../src/utils';
-import { drumChar, isPresent } from '../../libs/muse/utils';
-import { SongNode, TrackInfo } from '../song-store';
+import { drumChar, isPresent, parseInteger } from '../../libs/muse/utils';
+import { DEFAULT_OUT_VOLUME, SongNode, TrackInfo } from '../song-store';
 import { ideService } from '../ide/ide-service';
 
 export class TracksVolumeDialog {
@@ -68,8 +68,7 @@ export class TracksVolumeDialog {
         const btnStl = `
             display: inline-block;
             margin: 0;
-            margin-right: .5rem;
-            margin-bottom: 1rem;
+            padding: .5rem;
             border-radius: 0.25rem;
             border: 1px solid lightgray;
             font-size: 1.2rem;
@@ -79,13 +78,14 @@ export class TracksVolumeDialog {
         const wrapper = `
             <div class="popup">
                 <div class="page">
-                    <div class="page-content">
-                        <div style="padding: 1rem 0 0 1rem;" data-tracks-volume-dialog-content>
-                            <span data-tracks-volume-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
-                            <span data-tracks-volume-dialog-cancel style="${btnStl}">Cancel</span>
+                    <div class="navbar">
+                        <div class="navbar-bg"></div>
+                        <div class="navbar-inner" style="justify-content: space-evenly;">
+                            <div data-tracks-volume-dialog-ok style="${btnStl}"><b>OK</b></div>
+                            <div data-tracks-volume-dialog-cancel style="${btnStl}">Cancel</div>                            
                         </div>
-                        %content%
-                    </div>
+                    </div>                
+                    <div class="page-content">%content%</div>
                 </div>
             </div>
         `.trim();
@@ -124,7 +124,13 @@ export class TracksVolumeDialog {
     }
 
     okClick() {
-        this.song.tracks = this.tracks;
+        const totalVolume = this.tracks.find(track => track.name === 'total') || {volume: 70};
+        const tracks = this.tracks.filter(track => track.name !== 'total');
+
+        this.song.volume = totalVolume.volume;
+        this.song.tracks = tracks;
+        ideService.setDataByTracks(this.song);
+
         this.dialog.close();
         this.cb && this.cb(true);
     }
@@ -158,6 +164,19 @@ export class TracksVolumeDialog {
 
     getVolumeContent(): string {
         let result = '';
+
+        this.tracks.sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return +1;
+
+            return 0;
+        });
+
+        this.tracks.unshift({
+            name: 'total',
+            volume: parseInteger(this.song.volume, DEFAULT_OUT_VOLUME),
+            board: ''
+        });
 
         this.tracks.forEach(track => {
             const subitems = [];
