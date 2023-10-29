@@ -406,9 +406,9 @@ export function textModelToLineModel(x: FnInput): SongNode {
     }); // loop by parts
 
 
-    console.log('hardTracks', hardTracks);
-    console.log('realHardTracks', realHardTracks);
-    console.log('softTracks', softTracks);
+    //console.log('hardTracks', hardTracks);
+    //console.log('realHardTracks', realHardTracks);
+    //console.log('softTracks', softTracks);
 
     song.tracks = [...Object.values(hardTracks), ...Object.values(softTracks)];
 

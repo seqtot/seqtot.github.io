@@ -6,7 +6,7 @@ import {toneBoards, drumBoards} from '../keyboard-ctrl';
 import {ComponentContext} from 'framework7/modules/component/component';
 import {SongNode, SongStore, TrackInfo} from '../song-store';
 
-export class TrackContentDialog {
+export class TrackDetailsDialog {
     dialog: Dialog.Dialog;
     cb: (ok: boolean) => void;
     trackName = '';
@@ -87,7 +87,7 @@ export class TrackContentDialog {
         }, 100);
     }
 
-    openTrackDialog(song: SongNode, trackName = '', cb: TrackContentDialog['cb']  = null) {
+    openTrackDialog(song: SongNode, trackName = '', cb: TrackDetailsDialog['cb']  = null) {
         this.trackName = trackName;
         this.cb = cb;
         this.song = song;

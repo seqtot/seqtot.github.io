@@ -1485,7 +1485,7 @@ export class KeyboardCtrl {
             playBlock: newOutBlock,
             bpm: this.page.bpmValue,
             repeatCount: 1,
-            dataByTracks: ideService.currentEdit.dataByTracks,
+            dataByTracks: ideService.dataByTracks,
             //pitchShift: getPitchShiftSetting(ideService.currentEdit?.settings)
         });
     }
@@ -1571,7 +1571,7 @@ export class KeyboardCtrl {
             playBlock,
             bpm: this.page.bpmValue,
             repeatCount: 1,
-            dataByTracks: ideService.currentEdit.dataByTracks,
+            dataByTracks: ideService.dataByTracks,
         });
     }
 

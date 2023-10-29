@@ -1,14 +1,15 @@
-import {EventEmitter} from '../../libs/common/event-emitter';
-import {DEFAULT_TONE_INSTR, defaultSynthSettings, toneAndDrumPlayerSettings} from '../../libs/muse/keyboards';
-import {TextBlock} from '../../libs/muse/utils';
-import {Sound} from '../../libs/muse/sound';
-import {MultiPlayer} from '../../libs/muse/multi-player';
-import {Synthesizer} from '../../libs/muse/synthesizer';
-import {Ticker} from '../../libs/muse/ticker';
-import {FileSettings, getFileSettings} from '../../libs/muse/utils/getFileSettings';
+import { EventEmitter } from '../../libs/common/event-emitter';
+import { DEFAULT_TONE_INSTR, defaultSynthSettings, toneAndDrumPlayerSettings } from '../../libs/muse/keyboards';
+import { TextBlock } from '../../libs/muse/utils';
+import { Sound } from '../../libs/muse/sound';
+import { MultiPlayer } from '../../libs/muse/multi-player';
+import { Synthesizer } from '../../libs/muse/synthesizer';
+import { Ticker } from '../../libs/muse/ticker';
+import { DataByTracks } from '../../libs/muse/multi-player';
+import { FileSettings, getFileSettings } from '../../libs/muse/utils/getFileSettings';
 import * as un from '../../libs/muse/utils';
-import {drumBoards, KeyboardType, toneBoards} from '../keyboard-ctrl';
-import {SongStore, TrackInfo} from '../song-store';
+import { drumBoards, KeyboardType, toneBoards } from '../keyboard-ctrl';
+import { SongStore, TrackInfo } from '../song-store';
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
@@ -56,6 +57,8 @@ class IdeService extends  EventEmitter {
     private _lastBoardView: KeyboardType = '' as any;
 
     songStore: SongStore;
+    dataByTracks: DataByTracks;
+
     blocks: un.TextBlock[] = [];
     settings: FileSettings = getFileSettings([]);
     pitchShift = 0;
@@ -102,10 +105,8 @@ class IdeService extends  EventEmitter {
     currentEdit: {
         songId: string,
         blocks: TextBlock[],
-        //bpmValue: number,
         allSongParts: string[],
         editPartsNio?: number[],
-        dataByTracks: {[key: string]: string},
         freezeStructure: boolean,
         source?: 'my' | 'band' | null | undefined,
         settings: FileSettings,

@@ -5,12 +5,20 @@ import {MidiPlayer} from './midi-player';
 import {toneAndDrumPlayerSettings, DEFAULT_TONE_INSTR} from './keyboards';
 import * as un from './utils';
 import {Ticker} from './ticker';
-import {TextBlock} from './utils';
 //import * as Fs from 'fs';
 
 const Fs: any = null;
 
 type SoundSourceSet = AudioBufferSourceNode[];
+
+export type DataByTracks = {
+    [key: string]: {
+        volume?: number,
+        items?: {
+            volume?: number,
+        }
+    }
+};
 
 // https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext
 // AudioContext: decodeAudioData,
@@ -138,7 +146,7 @@ export class MultiPlayer {
         };
         let useTick = false;
         let hasBeats = !!beatsWithOffsetMs.length;
-        let midiOut: TextBlock | string;
+        let midiOut: un.TextBlock | string;
 
         if (params.playMidiBlock && Array.isArray(params.midiTextBlocks) && params.midiTextBlocks.length) {
             midiOut = un.getOutBlock(params.playMidiBlock, params.midiTextBlocks);
@@ -352,7 +360,7 @@ export class MultiPlayer {
         beatsMs?: number[],
         bpm?: number,
         excludeLines?: string[],
-        dataByTracks?: {[key: string]: string},
+        dataByTracks?: DataByTracks,
         pitchShift?: number
     }): OutLoopsInfo {
         //console.log('getLoopsInfo.params', {...params});
@@ -363,24 +371,7 @@ export class MultiPlayer {
         let playBlock = x.playBlock || 'out';
         const allBlocks = Array.isArray(x.blocks) ? x.blocks : un.getTextBlocks(x.blocks);
         const outBlock = un.getOutBlock(playBlock, allBlocks);
-
-        //console.log('outBlock', playBlock, outBlock);
-
-        const dataByTracks = x.dataByTracks || {};
-        const volumeByTracks = Object.keys(dataByTracks).reduce((acc, key) => {
-            acc[key] = un.getVolumeFromString(dataByTracks[key]);
-
-            return acc;
-        },{});
-
-        //console.log('volumeByLines', volumeByLines);
-        //console.log('getLoopsInfo.outBlock', outBlock);
-        // call:seq
-        // tryPlayMidiBlock
-        //   getLoopsInfo
-        //     getOutBlock
-        //     getOutBlocksInfo
-
+        const dataByTracks = (x.dataByTracks || {}) as DataByTracks;
         const outBlocks = un.getOutBlocksInfo(allBlocks, <any>playBlock);
         const repeat = x.repeat || x.repeatCount || un.getRepeatFromString(outBlock.head);
 
@@ -405,16 +396,18 @@ export class MultiPlayer {
                 noteLn.noteLineInfo.notes.forEach(noteInfo => {
                     noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
                     let trackName = noteLn.trackName;
+                    let trackVolume = un.getSafeVolume(dataByTracks[trackName]?.volume);
+                    let instData = (dataByTracks[trackName]?.items && dataByTracks[trackName].items[noteInfo.instr]) as {volume: number};
 
-                    // костыль ? jjklDrums
-                    // if (noteLn.trackName.startsWith('@')) {
-                    //     trackName = '@drums';
-                    // }
+                    if (instData) {
+                        trackVolume = un.mergeVolume(
+                          trackVolume,
+                          instData.volume);
+                    }
 
-                    // зануляем громкость исключённых линий
                     noteInfo.volume = un.mergeVolume(
                         noteInfo.volume,
-                        un.getSafeVolume(volumeByTracks[trackName])
+                        un.getSafeVolume(trackVolume)
                     );
                 });
             });
@@ -520,7 +513,14 @@ export class MultiPlayer {
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
         excludeLines?: string[]
-        dataByTracks?: {[key: string]: string},
+        dataByTracks?: {
+            [key: string]: {
+                volume?: number,
+                items?: {
+                    volume?: number,
+                }
+            }
+        },
     }) {
         if (!x.dontClear) {
             this.midiPlayer.stopAndClear();

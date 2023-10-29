@@ -29,6 +29,7 @@ export type TrackInfo = {
     name: string,
     board: string,
     volume: number,
+    items?: {name: string, volume: number}[], // громкость по инструментам трека
 
     label?: string,
     isHardTrack?: boolean,

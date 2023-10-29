@@ -496,6 +496,21 @@ export function backBtn(data: string, color= 'black', size = 20) {
         </span>`.trim();
 }
 
+export function soundBtn(data: string, color= 'black', size = 20) {
+    data = (data || '').trim();
+    color = (color || '').trim() || 'black';
+
+    return `
+        <span style="${svgIconBtnStl}" ${data}>
+            <svg 
+                width="${size}px" height="${size}px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                style="fill: ${color}; stroke: none;"                
+            >
+                <path d="M15.38,4.08a1,1,0,0,0-1.09.21L10.59,8H8a2,2,0,0,0-2,2v4a2,2,0,0,0,2,2h2.59l3.7,3.71A1,1,0,0,0,15,20a.84.84,0,0,0,.38-.08A1,1,0,0,0,16,19V5A1,1,0,0,0,15.38,4.08Z"></path>
+            </svg>
+        </span>`.trim();
+}
+
 // gray lightgray
 // blue lightblue
 // green lightgreen

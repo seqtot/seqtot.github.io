@@ -1,7 +1,7 @@
 'use babel';
 
 import {Editor} from 'codemirror';
-import {MultiPlayer} from '../../libs/muse/multi-player';
+import {DataByTracks, MultiPlayer} from '../../libs/muse/multi-player';
 import {Synthesizer} from '../../libs/muse/synthesizer';
 import * as un from '../../libs/muse/utils';
 import {getInstrCodeBy} from '../../libs/muse/instruments';
@@ -141,6 +141,21 @@ class Recorder {
         this.dest = null;
         this.mediaRecorder = null;
     }
+}
+
+function getDataByTracksFromSettings(settings: FileSettings): DataByTracks {
+    const dataByTracksSrc = settings?.dataByTracks || {};
+    const dataByTracks: DataByTracks = {};
+
+    Object.keys(dataByTracksSrc).forEach(name => {
+        const volume = un.getVolumeFromString(dataByTracksSrc[name]);
+
+        dataByTracks[name] = {
+            volume
+        }
+    });
+
+    return dataByTracks;
 }
 
 export class LinePlayer {
@@ -578,7 +593,7 @@ export class LinePlayer {
                     //console.log(type, data);
                 },
                 excludeLines: this.settings.exclude,
-                dataByTracks: this.settings.dataByTracks,
+                dataByTracks: getDataByTracksFromSettings(this.settings),
                 pitchShift: un.parseInteger(this.settings.pitchShift[0]),
                 //beatsWithOffsetMs: un.getBeatsByBpmWithOffset(90, 8),
             });

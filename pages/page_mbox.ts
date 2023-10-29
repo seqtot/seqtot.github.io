@@ -11,13 +11,17 @@ import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings, getPitchShiftSetting } from '../libs/muse/utils/getFileSettings';
 import { parseInteger, SongPartInfo, TextBlock } from '../libs/muse/utils/utils-note';
+import { DataByTracks } from '../libs/muse/multi-player';
+
+import mboxes from '../mboxes';
+
 import { LineModel } from './line-model';
 import { ideService } from './ide/ide-service';
 import { SongStore, SongNode, StoredRow, MY_SONG } from './song-store';
 import * as svg from './svg-icons';
-import { TrackContentDialog } from './dialogs/track-content-dialog';
+import { TrackDetailsDialog } from './dialogs/track-details-dialog';
+import { TracksVolumeDialog } from './dialogs/tracks-volume-dialog';
 import { textModelToLineModel, sortTracks } from './text-model-to-line-model';
-import mboxes from '../mboxes';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 
@@ -55,10 +59,6 @@ export class MBoxPage {
 
     get el$(): Dom7Array {
         return this.context.$el.value;
-    }
-
-    get dataByTracks(): {[key: string]: string} {
-        return;
     }
 
     get outBlock(): TextBlock {
@@ -139,6 +139,7 @@ export class MBoxPage {
                 songData.ns = this.ns;
 
                 ideService.songStore = new SongStore(songId, this.ns, songData);
+                ideService.dataByTracks = this.getDataByTracks();
             }
         }
     }
@@ -337,7 +338,8 @@ export class MBoxPage {
                 ${svg.checkBtn('data-check-all-tracks-action', 'black', 24)}
                 ${svg.plusBtn('data-add-track-action', '', 24)}
                 ${svg.minusBtn('data-delete-track-action', '', 24)}
-                ${svg.editBtn('data-edit-track-action', '', 24)}${blankHalfRem}
+                ${svg.editBtn('data-edit-track-action', '', 24)}
+                ${svg.soundBtn('data-edit-tracks-volume-action', '', 24)}${blankHalfRem}
                 ${svg.copyPasteBtn('data-clone-track-action', '', 24)}                
             </div>
         `.trim();
@@ -505,6 +507,10 @@ export class MBoxPage {
             el.addEventListener('pointerdown', () => this.addTrack());
         });
 
+        getWithDataAttr('edit-tracks-volume-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.editTracksVolume());
+        });
+
         getWithDataAttr('edit-track-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => {
                 const tracks = this.getSelectedTracks();
@@ -640,11 +646,11 @@ export class MBoxPage {
 
         if (!editPartsNio.length) return;
 
+        ideService.dataByTracks = this.getDataByTracks(); // jjkl
+
         ideService.currentEdit.songId = this.songId;
         ideService.currentEdit.allSongParts = this.allSongParts;
         ideService.currentEdit.blocks = this.blocks;
-        //ideService.currentEdit.bpmValue = this.bpmValue;
-        ideService.currentEdit.dataByTracks = this.getDataByTracks();
         ideService.currentEdit.editPartsNio = editPartsNio;
         ideService.currentEdit.source = this.pageData.source;
         ideService.currentEdit.freezeStructure = !isMy;
@@ -846,6 +852,19 @@ export class MBoxPage {
         this.setPageContent();
     }
 
+    editTracksVolume() {
+        const cb = (ok: boolean) => {
+            if (ok) {
+                this.renderTracksView();
+                ideService.songStore.save();
+
+                console.log(ideService.songStore.data);
+            }
+        }
+
+        new TracksVolumeDialog(this.context).openTrackDialog(cb);
+    }
+
     editTrack(trackName: string) {
         const cb = (ok: boolean) => {
             if (ok) {
@@ -854,7 +873,7 @@ export class MBoxPage {
             }
         }
 
-        new TrackContentDialog(this.context).openTrackDialog(
+        new TrackDetailsDialog(this.context).openTrackDialog(
             ideService.songStore?.data,
             trackName,
             cb
@@ -869,7 +888,7 @@ export class MBoxPage {
             }
         }
 
-        new TrackContentDialog(this.context).openTrackDialog(
+        new TrackDetailsDialog(this.context).openTrackDialog(
             ideService.songStore.data,
             '',
             cb
@@ -1087,14 +1106,24 @@ export class MBoxPage {
         return ideService.multiPlayer.tryPlayTextLine({ text, repeat });
     }
 
-    getDataByTracks(): {[key: string]: string} {
-        let dataByTracks: {[key: string]: string} = {};
+    getDataByTracks(): DataByTracks {
+        let dataByTracks: DataByTracks = {};
 
         if (ideService?.songStore?.data) {
             ideService.songStore.data.tracks.forEach(track => {
                 const volume = track.isExcluded ? 0: track.volume;
+                const subitems = track.items || [];
 
-                dataByTracks[track.name] = `v${volume}`;
+                dataByTracks[track.name] = {
+                    volume: volume,
+                    items: subitems.reduce((acc, item) => {
+                        acc[item.name] = {
+                            volume: item.volume
+                        }
+
+                        return acc;
+                    }, {})
+                };
             });
         }
 
@@ -1322,7 +1351,7 @@ export class MBoxPage {
                     //console.log(type, data);
                 },
                 excludeLines: this.settings.exclude,
-                dataByTracks: this.getDataByTracks(),
+                dataByTracks: this.getDataByTracks(), // ideService.dataByTracks,
                 //pitchShift: getPitchShiftSetting(this.settings),
                 bpm: this.bpmValue,
                 repeatCount,
