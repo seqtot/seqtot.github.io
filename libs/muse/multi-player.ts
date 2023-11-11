@@ -1,30 +1,17 @@
 'use babel';
 
-import {Sound} from './sound';
-import {MidiPlayer} from './midi-player';
-import {toneAndDrumPlayerSettings, DEFAULT_TONE_INSTR} from './keyboards';
+import { Sound } from './sound';
+import { MidiPlayer } from './midi-player';
+import { toneAndDrumPlayerSettings, DEFAULT_TONE_INSTR } from './keyboards';
 import * as un from './utils';
-import {Ticker} from './ticker';
+import { Ticker } from './ticker';
+import { DEFAULT_OUT_VOLUME } from '../../pages/song-store';
+import {DataByTracks} from './utils';
 //import * as Fs from 'fs';
 
 const Fs: any = null;
 
 type SoundSourceSet = AudioBufferSourceNode[];
-
-export type DataByTracks = {
-    total?: {
-        volume?: number,
-    },
-    [key: string]: {
-        volume?: number,
-        isExcluded?: boolean,
-        items?: {
-            [key: string]: {
-                volume?: number
-            },
-        }
-    }
-};
 
 // https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext
 // AudioContext: decodeAudioData,
@@ -342,6 +329,7 @@ export class MultiPlayer {
             repeat,
             instrCode: DEFAULT_TONE_INSTR, // instrAlias[key], // MIDI_INSTR
             beatsMs: [],
+            dataByTracks: this.normalizeDataByTracks(),
         }).id;
 
         await this.midiPlayer.waitLoadingAllInstruments();
@@ -350,6 +338,19 @@ export class MultiPlayer {
             loopIdsArr: [loopId],
             beatsWithOffsetMs: []
         });
+    }
+
+
+    normalizeDataByTracks(dataByTracks?: un.DataByTracks, volume?: number): un.DataByTracks {
+        dataByTracks = dataByTracks || <DataByTracks>{};
+
+        if (!dataByTracks.total || !dataByTracks.total.volume) {
+            dataByTracks.total = {
+                volume: volume || DEFAULT_OUT_VOLUME
+            }
+        }
+
+        return  dataByTracks;
     }
 
     /**
@@ -366,7 +367,7 @@ export class MultiPlayer {
         beatsMs?: number[],
         bpm?: number,
         excludeLines?: string[],
-        dataByTracks?: DataByTracks,
+        dataByTracks?: un.DataByTracks,
         pitchShift?: number
     }): OutLoopsInfo {
         //console.log('getLoopsInfo.params', {...params});
@@ -377,8 +378,8 @@ export class MultiPlayer {
         let playBlock = x.playBlock || 'out';
         const allBlocks = Array.isArray(x.blocks) ? x.blocks : un.getTextBlocks(x.blocks);
         const outBlock = un.getOutBlock(playBlock, allBlocks);
-        const dataByTracks = (x.dataByTracks || {}) as DataByTracks;
-        const outBlocks = un.getOutBlocksInfo(allBlocks, <any>playBlock);
+        const dataByTracks = this.normalizeDataByTracks(x.dataByTracks, outBlock.volume);
+        const outBlocks = un.getOutBlocksInfo(allBlocks, playBlock);
         const repeat = x.repeat || x.repeatCount || un.getRepeatFromString(outBlock.head);
 
         //console.log('getLoopsInfo.outBlock', outBlock);
@@ -400,16 +401,13 @@ export class MultiPlayer {
         outBlocks.rows.forEach(row => {
             row.trackLns.forEach(noteLn => {
                 noteLn.noteLineInfo.notes.forEach(noteInfo => {
-
-                    // if (noteLn.trackName === '$back') {
-                    //     console.log(noteInfo);
-                    //     console.log(dataByTracks);
-                    // }
-
                     noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
                     let trackName = noteLn.trackName;
+                    let rootVolume = un.getSafeVolume(dataByTracks.total.volume, DEFAULT_OUT_VOLUME);
                     let trackVolume = un.getSafeVolume(dataByTracks[trackName]?.volume);
                     let instData = (dataByTracks[trackName]?.items && dataByTracks[trackName].items[noteInfo.instr]);
+
+                    trackVolume = un.mergeVolume(rootVolume, trackVolume);
 
                     if (instData) {
                         trackVolume = un.mergeVolume(
@@ -485,6 +483,8 @@ export class MultiPlayer {
                     restFromPrevRowQ: addPauseQ,
                     restForNextRowQ: addPauseToNextRowQ,
                     colLoopDurationQ: noteLn.colLoopDurationQ,
+                    dataByTracks,
+                    trackName: noteLn.trackName,
                 });
 
                 result.ids.push(loop.id);
@@ -525,14 +525,13 @@ export class MultiPlayer {
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
         excludeLines?: string[]
-        dataByTracks?: DataByTracks,
+        dataByTracks?: un.DataByTracks,
     }) {
-
         //console.log('tryPlayMidiBlock', x.dataByTracks);
-
         if (!x.dontClear) {
             this.midiPlayer.stopAndClear();
         }
+
         const outLoops = x.outLoops || this.getLoopsInfo(x);
         const beatOffsetMs = x.beatOffsetMs || 0;
         const cb = x.cb || (() => {}) as any;

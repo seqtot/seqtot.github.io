@@ -126,7 +126,7 @@ export class TracksVolumeDialog {
     }
 
     okClick() {
-        const totalVolume = this.tracks.find(track => track.name === 'total') || {volume: 70};
+        const totalVolume = this.tracks.find(track => track.name === 'total') || {volume: DEFAULT_OUT_VOLUME};
         const tracks = this.tracks.filter(track => track.name !== 'total');
 
         this.song.volume = totalVolume.volume;

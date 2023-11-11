@@ -1,7 +1,7 @@
 'use babel';
 
 import {Editor} from 'codemirror';
-import {DataByTracks, MultiPlayer} from '../../libs/muse/multi-player';
+import {MultiPlayer} from '../../libs/muse/multi-player';
 import {Synthesizer} from '../../libs/muse/synthesizer';
 import * as un from '../../libs/muse/utils';
 import {getInstrCodeBy} from '../../libs/muse/instruments';
@@ -23,6 +23,7 @@ import {Sound} from '../../libs/muse/sound';
 import * as wav from '../../libs/muse/utils/node-wav'
 import Fs from '../../libs/common/file-service';
 import { parseInteger } from '../../libs/muse/utils';
+import {WavRecorder} from './wav-recorder';
 
 type Nil = null | undefined;
 type InputMode = Nil | 'text' | 'beat' | 'sound' | 'voice' | 'linePlayer';
@@ -85,67 +86,9 @@ type RowInfo = {
     last: number,
 }
 
-class Recorder {
-    chunks = [];
-    ctx: AudioContext;
-    dest: MediaStreamAudioDestinationNode;
-    mediaRecorder: MediaRecorder;
-    private breakMe = false;
-
-    constructor(ctx: AudioContext) {
-        this.ctx = ctx;
-    }
-
-    start() {
-        this.chunks = [];
-        this.dest = this.ctx.createMediaStreamDestination();
-        this.mediaRecorder = new MediaRecorder(this.dest.stream);
-        Sound.masterGain.connect(this.dest);
-
-        this.mediaRecorder.ondataavailable = (evt) => {
-            this.chunks.push(evt.data);
-        };
-
-        this.mediaRecorder.onstop = async (evt) => {
-            if (this.breakMe) {
-                return;
-            }
-
-            const blob = new Blob(this.chunks, { type: "audio/ogg; codecs=opus" });
-            const buffer = await getAudioBufferFromBlob(blob);
-
-            function writeWavFile (channelData: any, sampleRate: number) {
-                let wavFile = wav.encode(channelData, {sampleRate: sampleRate, float: true, bitDepth: 32});
-                //Fs.writeFileSync('D:/motes/hello.wav', new Buffer(wavFile)); jjkl
-            }
-
-            writeWavFile([buffer.getChannelData(0), buffer.getChannelData(1)], this.ctx.sampleRate);
-        };
-
-        this.mediaRecorder.start();
-    }
-
-    stopAndSave() {
-       this.mediaRecorder.stop();
-       Sound.masterGain.disconnect(this.dest);
-       this.clear();
-    }
-
-    break() {
-        this.breakMe = true;
-        this.stopAndSave();
-    }
-
-    private clear() {
-        this.chunks = [];
-        this.dest = null;
-        this.mediaRecorder = null;
-    }
-}
-
-function getDataByTracksFromSettings(settings: FileSettings): DataByTracks {
+function getDataByTracksFromSettings(settings: FileSettings): un.DataByTracks {
     const dataByTracksSrc = settings?.dataByTracks || {};
-    const dataByTracks: DataByTracks = {};
+    const dataByTracks = {} as un.DataByTracks;
 
     Object.keys(dataByTracksSrc).forEach(name => {
         const volume = un.getVolumeFromString(dataByTracksSrc[name]);
@@ -160,7 +103,7 @@ function getDataByTracksFromSettings(settings: FileSettings): DataByTracks {
 
 export class LinePlayer {
     pitchShift: number = 0;
-    recorder: Recorder;
+    recorder: WavRecorder;
 
     isRecording = false;
     pressCount = 0;
@@ -610,7 +553,7 @@ export class LinePlayer {
                 this.recorder = null;
             }
 
-            this.recorder = new Recorder(this.synthesizer.ctx);
+            this.recorder = new WavRecorder(this.synthesizer.ctx);
             this.recorder.start();
 
             //console.log('ctrl + shift');

@@ -1,21 +1,24 @@
 'use babel';
 
-import {NoteLineInfo} from '../types';
+import { NoteLineInfo } from '../types';
 import {
     TextBlock,
     findBlockById,
     getBlockType,
-    getSafeVolume,
     getVolumeFromString,
     getNoteLnsByDrumInstruments,
     getNoteLnsByToneInstruments,
-    parseInteger, getRepeatFromString,
-    toneChar, drumChar, DEFAULT_VOLUME,
-    mergeVolume, clearEndComment, nioChar,
+    parseInteger,
+    getRepeatFromString,
+    toneChar,
+    drumChar,
+    DEFAULT_VOLUME,
+    clearEndComment,
+    nioChar,
     partIdChar,
 } from './utils-note';
 
-import {getNoteLineInfo, isNoteWithDurationOrPause} from './getNoteLineInfo';
+import { getNoteLineInfo, isNoteWithDurationOrPause } from './getNoteLineInfo';
 
 export type NoteLn = {
     trackName: string,
@@ -27,7 +30,6 @@ export type NoteLn = {
 
     startOffsetQ?: number,
 }
-
 
 export type OutBlockRowInfo = {
     trackLns: NoteLn[];
@@ -45,6 +47,21 @@ type OutBlocksInfo = {
     rows: OutBlockRowInfo[],
     durationQ: number,
 }
+
+export type DataByTracks = {
+    total: {
+        volume: number,
+    },
+    [key: string]: {
+        volume?: number,
+        isExcluded?: boolean,
+        items?: {
+            [key: string]: {
+                volume?: number
+            },
+        }
+    }
+};
 
 /**
  * meta в конце
@@ -116,8 +133,6 @@ export function getOutBlocksInfo(
         console.warn('Block OUT not found');
         return result;
     }
-
-    const rootVolume = getSafeVolume(outBlock.volume);
 
     // строки для вывода в out
     //console.log('outBlocks2', [...outBlock.rows]);
@@ -241,7 +256,7 @@ export function getOutBlocksInfo(
                     noteLine,
                     noteLineInfo,
                     repeat: colRepeat,
-                    parentVolume: mergeVolume(colVolume, rootVolume),
+                    parentVolume: colVolume,
                     colLoopDurationQ: 0,
                 })
             });

@@ -276,6 +276,8 @@ export class MidiPlayer extends Sound {
         restFromPrevRowQ?: number,
         restForNextRowQ?: number,
         colLoopDurationQ?: number, // длина одного цикла внутри которого надоходится линейка
+        dataByTracks: un.DataByTracks,
+        trackName?: string,
     }): LoopAndTicksInfo {
         this.loopId++;
 

@@ -6,12 +6,12 @@ import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils';
+import { Sound } from '../libs/muse/sound';
 import { standardTicks as ticks } from './ticks';
 import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings, getPitchShiftSetting } from '../libs/muse/utils/getFileSettings';
 import { parseInteger, SongPartInfo, TextBlock } from '../libs/muse/utils/utils-note';
-import { DataByTracks } from '../libs/muse/multi-player';
 
 import mboxes from '../mboxes';
 
@@ -22,12 +22,14 @@ import * as svg from './svg-icons';
 import { TrackDetailsDialog } from './dialogs/track-details-dialog';
 import { TracksVolumeDialog } from './dialogs/tracks-volume-dialog';
 import { textModelToLineModel, sortTracks } from './text-model-to-line-model';
+import { WavRecorder } from './ide/wav-recorder';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
 
+    recorder: WavRecorder;
     playingTick = '';
     bpmRange: Range.Range;
     excludePartNio: number [] = [];
@@ -371,7 +373,8 @@ export class MBoxPage {
         `.trim();
 
         let fileCommands = `
-            ${svg.downloadBtn('data-download-song-action', '', 24)}&nbsp;        
+            ${svg.downloadBtn('data-download-song-action', '', 24)}&emsp;        
+            ${svg.playAndSaveBtn('data-play-and-download-ogg-action', '', 24)}&emsp;
         `.trim();
 
         let editCommands = '';
@@ -557,6 +560,7 @@ export class MBoxPage {
 
                 this.update_TracksView();
                 ideService.songStore.save();
+                ideService.setDataByTracks();
             })
         });
 
@@ -570,6 +574,7 @@ export class MBoxPage {
 
                 this.update_TracksView();
                 ideService.songStore.save();
+                ideService.setDataByTracks();
             })
         });
 
@@ -584,6 +589,7 @@ export class MBoxPage {
 
                 this.update_TracksView();
                 ideService.songStore.save();
+                ideService.setDataByTracks();
             });
         });
 
@@ -721,6 +727,10 @@ export class MBoxPage {
 
         getWithDataAttr('download-song-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.downloadFile());
+        });
+
+        getWithDataAttr('play-and-download-ogg-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerdown', () => this.playAll(1, true));
         });
 
         getWithDataAttr('upload-song-action', this.pageEl).forEach((el) => {
@@ -1065,11 +1075,11 @@ export class MBoxPage {
         });
 
         getWithDataAttr('play-all-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.playAll(0));
+            el.addEventListener('pointerdown', () => this.playAll());
         });
 
         getWithDataAttr('loop-all-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.playAll(0, 100));
+            el.addEventListener('pointerdown', () => this.playAll(100));
         });
 
         getWithDataAttr('select-all-parts-action', this.pageEl).forEach((el) => {
@@ -1242,11 +1252,10 @@ export class MBoxPage {
         return song;
     }
 
-    playAll(index: number | string = 0, repeatCount = 1) {
+    playAll(repeatCount = 1, saveWav = false) {
         this.stop();
-        index = parseInteger(index, 0);
-        let currRowInfo: RowInfo = { first: index, last: index}; // индекс в текущем блоке
 
+        let currRowInfo: RowInfo = { first: 0, last: 0}; // индекс в текущем блоке
         let blocks = this.useLineModel ? this.buildBlocksForMySong(this.blocks) : [...this.blocks];
 
         const x = {
@@ -1322,7 +1331,12 @@ export class MBoxPage {
                 blocks,
                 playBlock,
                 cb: (type: string, data: any) => {
-                    if (type === 'break' || type === 'finish') {
+                    //if (type === 'break' || type === 'finish') {
+                    if (type === 'finish') {
+                        if (this.recorder) {
+                            this.recorder.stopAndSave();
+                            this.recorder = null;
+                        }
                         // this.playingWithMidi = false;
                     }
                     //console.log(type, data);
@@ -1335,6 +1349,16 @@ export class MBoxPage {
                 //beatsWithOffsetMs: un.getBeatsByBpmWithOffset(90, 8),
             });
 
+            if (saveWav) {
+                if (this.recorder) {
+                    this.recorder.break();
+                    this.recorder = null;
+                }
+
+                this.recorder = new WavRecorder(Sound.ctx);
+                this.recorder.start(this.songId);
+            }
+
             return;
         }
 
@@ -1343,6 +1367,10 @@ export class MBoxPage {
 
     stop() {
         ideService.multiPlayer.stopAndClearMidiPlayer();
+        if (this.recorder) {
+            this.recorder.break();
+            this.recorder = null;
+        }
     }
 
     async play(text: string, repeatCount?: number) {

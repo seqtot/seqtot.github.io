@@ -1,11 +1,10 @@
 import { EventEmitter } from '../../libs/common/event-emitter';
-import { DEFAULT_TONE_INSTR, defaultSynthSettings, toneAndDrumPlayerSettings } from '../../libs/muse/keyboards';
+import { DEFAULT_TONE_INSTR, toneAndDrumPlayerSettings } from '../../libs/muse/keyboards';
 import { TextBlock } from '../../libs/muse/utils';
 import { Sound } from '../../libs/muse/sound';
 import { MultiPlayer } from '../../libs/muse/multi-player';
 import { Synthesizer } from '../../libs/muse/synthesizer';
 import { Ticker } from '../../libs/muse/ticker';
-import { DataByTracks } from '../../libs/muse/multi-player';
 import { FileSettings, getFileSettings } from '../../libs/muse/utils/getFileSettings';
 import * as un from '../../libs/muse/utils';
 import { drumBoards, KeyboardType, toneBoards } from '../keyboard-ctrl';
@@ -13,12 +12,11 @@ import { DEFAULT_OUT_VOLUME, SongNode, SongStore, TrackInfo } from '../song-stor
 
 const multiPlayer = new MultiPlayer();
 const metronome = new MultiPlayer();
+const ticker = new Ticker(Sound.ctx);
 
 const synthesizer = new Synthesizer();
 synthesizer.connect({ ctx: Sound.ctx });
-synthesizer.setSettings(toneAndDrumPlayerSettings); // defaultSynthSettings
-
-const ticker = new Ticker(Sound.ctx);
+synthesizer.setSettings(toneAndDrumPlayerSettings);
 
 export type EditedItem = {
     rowInPartId: string, // partNio-rowNio
@@ -57,7 +55,7 @@ class IdeService extends  EventEmitter {
     private _lastBoardView: KeyboardType = '' as any;
 
     songStore: SongStore;
-    dataByTracks: DataByTracks = {};
+    dataByTracks = {} as un.DataByTracks;
 
     blocks: un.TextBlock[] = [];
     settings: FileSettings = getFileSettings([]);
@@ -124,8 +122,8 @@ class IdeService extends  EventEmitter {
         // jjkl: todo
     }
 
-    getDataByTracks(song: SongNode): DataByTracks {
-        let dataByTracks = {} as DataByTracks;
+    getDataByTracks(song: SongNode): un.DataByTracks {
+        let dataByTracks = {} as un.DataByTracks;
 
         if (song?.tracks) {
             song.tracks.forEach(track => {
@@ -146,10 +144,16 @@ class IdeService extends  EventEmitter {
             });
         }
 
+        dataByTracks.total = {
+            volume: song.volume || DEFAULT_OUT_VOLUME
+        }
+
         return dataByTracks;
     }
 
-    setDataByTracks(song: SongNode) {
+    setDataByTracks(song?: SongNode) {
+        song = song || this.songStore.data;
+
         const dataByTracks = this.getDataByTracks(song);
 
         Object.keys(this.dataByTracks).forEach(key => {
