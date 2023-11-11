@@ -127,7 +127,7 @@ class IdeService extends  EventEmitter {
     getDataByTracks(song: SongNode): DataByTracks {
         let dataByTracks = {} as DataByTracks;
 
-        if (!song?.tracks) {
+        if (song?.tracks) {
             song.tracks.forEach(track => {
                 const volume = track.isExcluded ? 0: track.volume;
                 const items = track.items || [];

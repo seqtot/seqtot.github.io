@@ -42,8 +42,8 @@ https://www.songsterr.com/a/wsa/black-sabbath-sweet-leaf-standard-tuning-tab-s47
 
 
 <СЧЁТ b105 $>
-$guit: ле=120 ле=120 ле=120 ле=120 $xylo
-$bass: ле=120 ле=120 ле=120 ле=120 $xylo
+$guit: ле=60 60 ле=60 60 ле=60 60 ле=60 60 $egit*drp
+$bass: ле=60 60 ле=60 60 ле=60 60 ле=60 60 $eBass*m
 
 <кода b148 $>
 $guit:  0    лу+мо=960:v50_480_0=480_0=0=480:v0 $egit*drp

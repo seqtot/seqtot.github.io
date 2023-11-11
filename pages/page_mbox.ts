@@ -1315,6 +1315,7 @@ export class MBoxPage {
         // }
 
         //console.log('getDataByTrack', this.getDataByTracks());
+        //console.log('IDE_SERVICE', ideService);
 
         if (x.playBlockOut) {
             ideService.multiPlayer.tryPlayMidiBlock({

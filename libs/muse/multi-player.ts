@@ -19,7 +19,9 @@ export type DataByTracks = {
         volume?: number,
         isExcluded?: boolean,
         items?: {
-            volume?: number,
+            [key: string]: {
+                volume?: number
+            },
         }
     }
 };
@@ -398,10 +400,16 @@ export class MultiPlayer {
         outBlocks.rows.forEach(row => {
             row.trackLns.forEach(noteLn => {
                 noteLn.noteLineInfo.notes.forEach(noteInfo => {
+
+                    // if (noteLn.trackName === '$back') {
+                    //     console.log(noteInfo);
+                    //     console.log(dataByTracks);
+                    // }
+
                     noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
                     let trackName = noteLn.trackName;
                     let trackVolume = un.getSafeVolume(dataByTracks[trackName]?.volume);
-                    let instData = (dataByTracks[trackName]?.items && dataByTracks[trackName].items[noteInfo.instr]) as {volume: number};
+                    let instData = (dataByTracks[trackName]?.items && dataByTracks[trackName].items[noteInfo.instr]);
 
                     if (instData) {
                         trackVolume = un.mergeVolume(
@@ -519,6 +527,9 @@ export class MultiPlayer {
         excludeLines?: string[]
         dataByTracks?: DataByTracks,
     }) {
+
+        //console.log('tryPlayMidiBlock', x.dataByTracks);
+
         if (!x.dontClear) {
             this.midiPlayer.stopAndClear();
         }

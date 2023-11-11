@@ -85,7 +85,9 @@ export class TracksVolumeDialog {
                             <div data-tracks-volume-dialog-cancel style="${btnStl}">Cancel</div>                            
                         </div>
                     </div>                
-                    <div class="page-content">%content%</div>
+                    <div class="page-content" style="padding-right: 3rem;">
+                        %content%
+                    </div>
                 </div>
             </div>
         `.trim();
@@ -181,32 +183,30 @@ export class TracksVolumeDialog {
         this.tracks.forEach(track => {
             const subitems = [];
 
-            if (track.name.startsWith(drumChar)) {
-                const items = this.song.dynamic.filter(iTrack => iTrack.track === track.name);
+            const items = this.song.dynamic.filter(iTrack => iTrack.track === track.name);
 
-                items.forEach(item => {
-                   item.lines.forEach(line => {
-                       line.cells.forEach(cell => {
-                           cell.notes.forEach(note => {
-                               if (!subitems.includes(note.instName)) {
-                                   subitems.push(note.instName);
-                               }
-                           })
+            items.forEach(item => {
+               item.lines.forEach(line => {
+                   line.cells.forEach(cell => {
+                       cell.notes.forEach(note => {
+                           if (!subitems.includes(note.instName)) {
+                               subitems.push(note.instName);
+                           }
                        })
                    })
+               })
+            });
+
+            subitems.sort();
+
+            const oldSubitems = track.items || [];
+            track.items = subitems.map(name => ({name, volume: 50}));
+
+            if (oldSubitems.length) {
+                track.items.forEach(newSubitem => {
+                    const oldSubitem = oldSubitems.find(oldSubitem => oldSubitem.name === newSubitem.name);
+                    newSubitem.volume = isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
                 });
-
-                subitems.sort();
-
-                const oldSubitems = track.items || [];
-                track.items = subitems.map(name => ({name, volume: 50}));
-
-                if (oldSubitems.length) {
-                    track.items.forEach(newSubitem => {
-                        const oldSubitem = oldSubitems.find(oldSubitem => oldSubitem.name === newSubitem.name);
-                        newSubitem.volume = isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
-                    });
-                }
             }
 
             result += this.getTrackVolumeContent(
