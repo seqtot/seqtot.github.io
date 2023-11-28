@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "webpack serve --config build/webpack.dev.js --open",
     "build": "webpack --config build/webpack.config.prod.js --mode production --devtool hidden-source-map",
-    "test": "jest"
+    "test": "jest",
+    "test2": "jest"
   },
   "dependencies": {
     "framework7": "6.3.9",
