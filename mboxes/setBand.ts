@@ -22,6 +22,11 @@ function getBpmLink(bpm: number): string {
 // </div>
 // `;
 
+const noSystems = `<div style="margin: .5rem;">
+    ${getInnerLink('No systems', '/mbox/noSystems/')}
+</div>
+`.trim();
+
 const threeDots = `<div style="margin: .5rem;">
     ${getInnerLink('Продолжение следует', '/mbox/threeDots/')} (Three dots)
 </div>
@@ -126,6 +131,7 @@ const itsGoingGood = `<div style="margin: .5rem;">
 </div>`;
 
 const content = `
+  ${noSystems}
   ${bell}
   ${threeDots}
   ${engine}
