@@ -213,7 +213,7 @@ export class KeyboardCtrl {
             this.updateChess();
         }
 
-        console.log(this.liner.lines);
+        //console.log(this.liner.lines);
     }
 
     copyToClipboard(type: 'notes' | 'row') {
@@ -1219,7 +1219,7 @@ export class KeyboardCtrl {
 
         if (!partId && !partNio) return;
 
-        console.log(partId, partNio);
+        //console.log(partId, partNio);
 
         const song = ideService.songStore.clone();
 
@@ -1355,7 +1355,7 @@ export class KeyboardCtrl {
         const rowCol = this.activeCell.rowCol;
         let notes:LineNote[] = [];
 
-        console.log('replaceInstrument', inArea, this.activeCell);
+        //console.log('replaceInstrument', inArea, this.activeCell);
 
         if (inArea === 'note') {
             const totalOffsetQ = this.getTotalOffsetByRowCol(rowCol);
@@ -1589,7 +1589,7 @@ export class KeyboardCtrl {
                 //this.updateChess();
             }
 
-            console.log('ponyCellClicked.dialog.ok', noteForEdit);
+            //console.log('ponyCellClicked.dialog.ok', noteForEdit);
         });
     }
 

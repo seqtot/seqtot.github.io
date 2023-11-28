@@ -6,14 +6,14 @@ import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils';
-import { Sound } from '../libs/muse/sound';
 import { standardTicks as ticks } from './ticks';
-import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
+//import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings, getPitchShiftSetting } from '../libs/muse/utils/getFileSettings';
 import { parseInteger, SongPartInfo, TextBlock } from '../libs/muse/utils/utils-note';
 
 import mboxes from '../mboxes';
+import {Muse as m} from '../libs/muse';
 
 import { LineModel } from './line-model';
 import { ideService } from './ide/ide-service';
@@ -23,8 +23,13 @@ import { TrackDetailsDialog } from './dialogs/track-details-dialog';
 import { TracksVolumeDialog } from './dialogs/tracks-volume-dialog';
 import { textModelToLineModel, sortTracks } from './text-model-to-line-model';
 import { WavRecorder } from './ide/wav-recorder';
+import {GetTrackDialog} from './dialogs/get-track-dialog';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
+
+const {
+    getMidiConfig
+} = m.parse;
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -868,7 +873,7 @@ export class MBoxPage {
                 this.renderTracksView();
                 ideService.songStore.save();
 
-                console.log(ideService.songStore.data);
+                //console.log(ideService.songStore.data);
             }
         }
 
@@ -1117,7 +1122,7 @@ export class MBoxPage {
     }
 
     buildBlocksForMySong(blocks: TextBlock[]): TextBlock[] {
-        console.log('buildBlocksForMySong.blocks', blocks);
+        //console.log('buildBlocksForMySong.blocks', blocks);
 
         blocks = []; // jjkl
 
@@ -1289,7 +1294,7 @@ export class MBoxPage {
 
         const playBlock = x.playBlockOut as TextBlock;
 
-        console.log('getMidiConfig', x);
+        //console.log('getMidiConfig', x);
 
         blocks = [...x.blocks];
 
@@ -1355,7 +1360,7 @@ export class MBoxPage {
                     this.recorder = null;
                 }
 
-                this.recorder = new WavRecorder(Sound.ctx);
+                this.recorder = new WavRecorder(m.classes.Sound.ctx);
                 this.recorder.start(this.songId);
             }
 
@@ -1435,24 +1440,64 @@ export class MBoxPage {
         songStore.save();
     }
 
-    downloadFile() {
+//     const cb = (ok: boolean) => {
+//         if (ok) {
+//             this.renderTracksView();
+//             ideService.songStore.save();
+//         }
+//     }
+//
+//     new TrackDetailsDialog(this.context).openTrackDialog(
+//         ideService.songStore.data,
+//     '',
+//     cb
+// );
+
+    async choiceTracks(): Promise<any> {
+        const songStore = ideService.songStore;
+
+        if (!songStore) return Promise.resolve(null);
+
+        return new Promise((resolve, reject) => {
+            const dlg = new GetTrackDialog(this.context);
+
+            dlg.openTrackDialog(songStore.data, (tracks) => {
+                resolve(tracks || []);
+            })
+        });
+    }
+
+    async downloadFile() {
+        const tracks: string[] = await this.choiceTracks();
+
+        if (!tracks.length) return;
+
         // https://webtips.dev/download-any-file-with-javascript
         let songId = this.songId;
 
         if (!songId) return;
 
-        let songNode = ideService?.songStore?.data!;
+        let song = ideService?.songStore?.data!;
 
-        if (!songNode) return;
+        if (!song) return;
 
-        let data = JSON.stringify(songNode, null, 2);
+        song = JSON.parse(JSON.stringify(song));
+        song.tracks = song.tracks.filter(track => tracks.includes(track.name));
+        song.dynamic = song.dynamic.filter(item => tracks.includes(item.track));
+
+        let data = JSON.stringify(song, null, 2);
         //let type = 'application/json';
         let type = 'application/text';
         let name = `${songId}.txt`;
 
         //console.log('songNode', songNode);
 
-        downloader(data, type, name)
+        function downloadURI(uri, name) {
+            let link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            link.click();
+        }
 
         function downloader(data, type, name) {
             let blob = new Blob([data], {type});
@@ -1461,12 +1506,7 @@ export class MBoxPage {
             (window as any).URL.revokeObjectURL(url);
         }
 
-        function downloadURI(uri, name) {
-            let link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            link.click();
-        }
+        downloader(data, type, name)
     }
 }
 

@@ -2,6 +2,7 @@ import * as un from '../libs/muse/utils/utils-note';
 import { Line, LineNote } from './line-model';
 import { drumCodes } from '../libs/muse/drums';
 import { guitarCodes, bassGuitarCodes } from '../libs/muse/instruments';
+import {isPresent, parseInteger} from '../libs/muse/utils/utils-note';
 
 export type StoredRow = {
     partId?: string,
@@ -55,6 +56,7 @@ export type SongNode = {
     exportToLineModel?: boolean,
     pitchShift?: number,
     pitchShiftSrc?: number,
+    songNodeHard?: any,
 };
 
 function isDrumNote(val: string): boolean {
@@ -703,5 +705,58 @@ export class SongStore {
         //songNode.dynamic = [...guitarRows];
 
         return songNode;
+    }
+
+    static GetTracksNodeBySong(song: SongNode): TrackInfo[] {
+        if (!song) return [];
+
+        const tracks = song.tracks || [];
+
+        tracks.sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return +1;
+
+            return 0;
+        });
+
+        if (!tracks.find(item => item.name === 'total')) {
+            tracks.unshift({
+                name: 'total',
+                volume: parseInteger(song.volume, DEFAULT_OUT_VOLUME),
+                board: ''
+            });
+        }
+
+        tracks.forEach(track => {
+            const instSubitems = [];
+
+            const items = song.dynamic.filter(iTrack => iTrack.track === track.name);
+
+            items.forEach(item => {
+                item.lines.forEach(line => {
+                    line.cells.forEach(cell => {
+                        cell.notes.forEach(note => {
+                            if (!instSubitems.includes(note.instName)) {
+                                instSubitems.push(note.instName);
+                            }
+                        })
+                    })
+                })
+            });
+
+            instSubitems.sort();
+
+            const oldInstSubitems = track.items || [];
+            track.items = instSubitems.map(name => ({name, volume: 50}));
+
+            if (oldInstSubitems.length) {
+                track.items.forEach(newSubitem => {
+                    const oldSubitem = oldInstSubitems.find(oldSubitem => oldSubitem.name === newSubitem.name);
+                    newSubitem.volume = isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
+                });
+            }
+        });
+
+        return song.tracks;
     }
 }

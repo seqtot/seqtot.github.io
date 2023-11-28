@@ -115,7 +115,7 @@ export class TextEditorGlComponent {
 
 
   constructor(glContainer: GlComponentContainer, itemConfig?: ResolvedComponentItemConfig) {
-    console.log('textEditorGl.ctor.itemConfig', itemConfig);
+    //console.log('textEditorGl.ctor.itemConfig', itemConfig);
 
     this.glContainer = glContainer;
     this.createCmEditor(itemConfig);

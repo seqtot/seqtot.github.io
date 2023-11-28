@@ -1,4 +1,4 @@
-import dynamic from '../mbox_dynamics/tiriTiri.dynamic';
+import songNodeHard from '../mbox_dynamics/tiriTiri.dynamic';
 
 const score = `
 <settings>
@@ -310,8 +310,7 @@ export default {
   content: info,
   tracks: [],
   score,
-  dynamic,
-  dynamicOld: dynamic,
+  songNodeHard,
   exportToLineModel: true,
   ns: 'band-song',
 };

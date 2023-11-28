@@ -70,7 +70,7 @@ function glBindComponentEventListener(
     container: ComponentContainer,
     itemConfig: ResolvedComponentItemConfig
 ): ComponentContainer.BindableComponent {
-    console.log('glBindComponentEventListener', itemConfig);
+    //console.log('glBindComponentEventListener', itemConfig);
 
     const state = itemConfig.componentState as any;
     state.guid = guid++;
@@ -103,7 +103,7 @@ function glBindComponentEventListener(
 }
 
 function glUnbindComponentEventListener(container: ComponentContainer) {
-    console.log('glUnbindComponentEventListener', container);
+    //console.log('glUnbindComponentEventListener', container);
 
     //this.handleUnbindComponentEvent(container);
 }

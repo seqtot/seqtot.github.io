@@ -1,4 +1,4 @@
-import dynamic from '../mbox_dynamics/carcassiOp60n7.dynamic';
+import songNodeHard from '../mbox_dynamics/carcassiOp60n7.dynamic';
 
 const score = `
 <info>
@@ -489,8 +489,7 @@ export default {
   content: info,
   tracks: [],
   score,
-  dynamic,
-  dynamicOld: dynamic,
+  songNodeHard,
   exportToLineModel: true,
   ns: 'band-song',
 };

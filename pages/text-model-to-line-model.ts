@@ -18,7 +18,7 @@ const notesLat = [
     'da', 'ta', 'ra', 'na', 'ma', 'fa', 'va', 'sa', 'za', 'la', 'ka', 'ba',
     'de', 'te', 're', 'ne', 'me', 'fe', 've', 'se', 'ze', 'le', 'ke', 'be',
     'di', 'ti', 'ri', 'ni', 'mi', 'fi', 'vi', 'si', 'zi', 'li', 'ki', 'bi',
-]
+];
 
 function getNoteLatByOffset(noteLat: string, offset: number) {
     if (!offset) return noteLat;
@@ -56,6 +56,8 @@ type FnInput = {
 };
 
 export function textModelToLineModel(x: FnInput): SongNode {
+    //console.log('textModelToLineModel', x);
+
     const song = SongStore.GetOldSong(x.songId, x.ns, true);
 
     const partsArr = getTopOutListHash({topBlock: getOutBlock(ideService.blocks)});
@@ -106,7 +108,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
     });
 
     // ТРЭКИ из songSettings
-    console.log('songSettings.dataByTracks', x.settings.dataByTracks);
+    //console.log('songSettings.dataByTracks', x.settings.dataByTracks);
 
     Object.keys(x.settings.dataByTracks).forEach(name => {
         const volume = un.getVolumeFromString(x.settings.dataByTracks[name]);
@@ -125,26 +127,27 @@ export function textModelToLineModel(x: FnInput): SongNode {
         }
     });
 
-    // ТРЭКИ из поля захордкоженного поля dynamicOld
-    (x.songNodeInput as any).dynamicOld = (x.songNodeInput as any).dynamicOld || {};
-    const dynamicOld = (x.songNodeInput as any).dynamicOld as {trackName: StoredSongNodeOld};
+    // ТРЭКИ ИЗ поля songNodeHard
+    if ((x.songNodeInput as any).songNodeHard) {
+        const subSong = (x.songNodeInput as any).songNodeHard as SongNode;
+        const tracks = (subSong?.tracks || []) as TrackInfo[];
+        const dynamic = (subSong?.dynamic || []) as StoredRow[];
 
-    console.log('dynamicOldTracks', dynamicOld);
+        dynamic.forEach(item => {
+            if (!realHardTracks[item.track]) {
+                realHardTracks[item.track] = item.track;
+            }
+        })
 
-    Object.keys(dynamicOld).forEach(name => {
-        if (!realHardTracks[name]) {
-            realHardTracks[name] = name;
-        }
-
-        if (!hardTracks[name]) {
-            hardTracks[name]= {
-                name,
-                volume: 50,
-                isHardTrack: true,
-                board: un.hasDrumChar(name) ? 'drums' : 'guitar',
-            };
-        }
-    });
+        tracks.forEach(track => {
+            if (!hardTracks[track.name]) {
+                hardTracks[track.name]= {
+                    ...track,
+                    isHardTrack: true
+                };
+            }
+        });
+    }
 
     let blocks = [...x.blocks];
 
@@ -213,7 +216,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
     });
 
 
-    console.log('tracksByScore', tracksByScore);
+    //console.log('tracksByScore', tracksByScore);
 
     // TRACKS BY SCORE
     Object.keys(tracksByScore).forEach(name => {
@@ -260,7 +263,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
             partReport += '\n';
         });
 
-        console.log('partReport\n', partReport);
+        //console.log('partReport\n', partReport);
     }
 
     // ЕСЛИ В softTracks оказались элементы из hardTracks то их удаляем
@@ -280,54 +283,6 @@ export function textModelToLineModel(x: FnInput): SongNode {
     // ОСТАВЛЯЕМ ТОЛЬКО СТРОКИ ИЗ softTracks
     song.dynamic = song.dynamic.filter(rowByTrack => {
         return !!softTracks[rowByTrack.track];
-    });
-
-    // DYNAMIC OLD
-    Object.keys(dynamicOld).forEach(trackName => {
-        const oldItemsByRow = dynamicOld[trackName];
-
-        Object.keys(oldItemsByRow).forEach(oldRowInPartId => {
-            const oldItems = oldItemsByRow[oldRowInPartId]?.items;
-            const partInfo = un.getPartRowNio(oldRowInPartId);
-
-            if (!Array.isArray(oldItems)) return;
-
-            const newPartNio = partInfo.partNio + 1;
-            const part = partsHashByNio[newPartNio];
-
-            oldItems.forEach(item => {
-                item = JSON.parse(JSON.stringify(item));
-
-                item.rows.forEach(line => {
-                    (line as Line).cells.forEach(cell => {
-                        cell.notes.forEach(note => {
-                           note.instName = `@${note.note}`
-                           note.durQ = 1;
-                        });
-                    })
-                });
-
-                //console.log('ITEM', item);
-
-                const newItem = <StoredRow>{
-                    partId: part?.partId,
-                    rowNio: partInfo.rowNio,
-                    rowInPartId: `${newPartNio}-${partInfo.rowNio}`,
-                    type: 'drums',
-                    track: un.drumsTrack,
-                    lines: item.rows.map(line => {
-                        return {
-                            ...line,
-                            rowInPartId: `${newPartNio}-${partInfo.rowNio}`
-                        }
-                    }),
-                }
-
-                song.dynamic.push(newItem);
-            });
-
-            //console.log(oldRowInPartId, oldItems);
-        });
     });
 
     // PART -> TRACK -> LINES -> NOTES
@@ -405,6 +360,13 @@ export function textModelToLineModel(x: FnInput): SongNode {
         });
     }); // loop by parts
 
+    // СТРОКИ ИЗ поля songNodeHard
+    if ((x.songNodeInput as any).songNodeHard) {
+        const subSong = (x.songNodeInput as any).songNodeHard as SongNode;
+        const items = (subSong?.dynamic || []) as StoredRow[];
+
+        song.dynamic = [...song.dynamic, ...items];
+    }
 
     //console.log('hardTracks', hardTracks);
     //console.log('realHardTracks', realHardTracks);

@@ -1,4 +1,4 @@
-import dynamic from '../mbox_dynamics/partingGlass.dynamic';
+import songNodeHard from '../mbox_dynamics/partingGlass.dynamic';
 
 const score = `
 <info>
@@ -282,8 +282,7 @@ export default {
   content: info,
   tracks: [],
   score,
-  dynamic,
-  dynamicOld: dynamic,
+  songNodeHard,
   exportToLineModel: true,
   ns: 'band-song',
 };
