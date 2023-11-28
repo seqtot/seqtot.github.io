@@ -5,7 +5,7 @@ import {Line, LineModel} from './line-model';
 import { TextBlock } from '../libs/muse/utils';
 import { Sound } from '../libs/muse/sound';
 import * as un from '../libs/muse/utils';
-import {FileSettings} from '@muse/utils/getFileSettings';
+import {FileSettings} from '../libs/muse/utils/getFileSettings';
 
 function getOutBlock(blocks: TextBlock[]): TextBlock {
     return  blocks.find((item) => item.id === 'out');

@@ -8,9 +8,9 @@ module.exports = (env) => {
     resolve: {
       extensions: ['.js', '.ts'],
       alias: {
-        '@src': path.resolve(__dirname, 'src'),
-        '@muse': path.resolve(__dirname, 'libs/muse'),
-        '@data': path.resolve(__dirname, 'sets'),
+        //'@src': path.resolve(__dirname, 'src'),
+        //'@muse': path.resolve(__dirname, 'libs/muse'),
+        //'@data': path.resolve(__dirname, 'sets'),
         // '@components': path.resolve(__dirname, 'src_au/components'),
         // '@style': path.resolve(__dirname, 'src_au/common/style'),
         // '@util': path.resolve(__dirname, 'src_au/common/util'),
@@ -97,7 +97,7 @@ module.exports = (env) => {
       }),
     ],
     output: {
-      path: path.join(__dirname, './dist'),
+      path: path.join(__dirname, '../dist'),
       publicPath: '', // / route в заголовке
       filename: '[name].js',
     },

@@ -17,14 +17,7 @@
     "noImplicitAny": false,
     "baseUrl": ".",
     "typeRoots": ["node_modules/@types"],
-    "paths": {
-      "@src/*": ["src/*"],
-      "@muse/*": ["libs/muse/*"],
-      "@data/*": ["sets/*"]
-    }
   },
-  "include": [
-    "mboxes",
-    "libs/muse", "src"],
+  "include": ["mboxes","libs/muse", "src"],
   "files": ["index.ts"]
 }

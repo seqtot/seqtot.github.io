@@ -87,9 +87,13 @@ export class MBoxPage {
     get allSongParts(): string[] {
         const parts = ideService.songStore?.data.parts || [];
 
-        return parts.map((item, i) => {
+        const result = parts.map((item, i) => {
             return `${item.name} %${item.id} №${i+1}`;
         });
+
+        console.log('allSongParts\n', result.join('\n'));
+
+        return result;
     }
 
     getId(id: string): string {
