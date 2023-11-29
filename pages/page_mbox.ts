@@ -7,7 +7,6 @@ import { Dom7Array } from 'dom7';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import * as un from '../libs/muse/utils';
 import { standardTicks as ticks } from './ticks';
-//import { getMidiConfig } from '../libs/muse/utils/getMidiConfig';
 import { RowInfo } from '../libs/muse/utils/getMidiConfig';
 import { FileSettings, getFileSettings, getPitchShiftSetting } from '../libs/muse/utils/getFileSettings';
 import { parseInteger, SongPartInfo, TextBlock } from '../libs/muse/utils/utils-note';
@@ -23,7 +22,7 @@ import { TrackDetailsDialog } from './dialogs/track-details-dialog';
 import { TracksVolumeDialog } from './dialogs/tracks-volume-dialog';
 import { textModelToLineModel, sortTracks } from './text-model-to-line-model';
 import { WavRecorder } from './ide/wav-recorder';
-import {GetTrackDialog} from './dialogs/get-track-dialog';
+import { GetTrackDialog } from './dialogs/get-track-dialog';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 
@@ -159,6 +158,24 @@ export class MBoxPage {
         this.initData(false);
         this.setRightPanelContent();
         this.setPageContent();
+
+        // fetch(`motes/bandit/a.txt`)
+        //     .then( res => {
+        //         return res.text();
+        //         //return res.json();
+        //         //return res.blob();
+        //     } )
+        //     .catch(err => {
+        //         console.log('catch');
+        //         return null;
+        //     })
+        //     .then( data => {
+        //         console.log('data2', data);
+        //         //reader.readAsDataURL(blob);
+        //         // https://learn.javascript.ru/blob
+        //         // var file = window.URL.createObjectURL(blob);
+        //         // window.location.assign(file);
+        //     });
     }
 
     setRightPanelContent() {

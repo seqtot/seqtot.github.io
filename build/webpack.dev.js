@@ -15,18 +15,12 @@ module.exports = (env) =>
         mode: 'development',
         devtool: 'eval',
         devServer: {
-            // contentBase: path.join(__dirname, 'dist'),
-            // contentBase: [
-            //   path.join(__dirname, 'public'),
-            //   path.join(__dirname, 'assets'),
-            // ],
-            //inline: true,
+            static: [Path.join(__dirname, '..'),],
             hot: true,
             host: 'localhost',
             port: 5500,
             historyApiFallback: true,
             // заменить на setupMiddlewares
-            //before: backendApi, setupMiddlewares
             setupMiddlewares: backendApi,
         },
 });
