@@ -1,0 +1,114 @@
+<MIDI>
+
+<info>
+https://musescore.com/user/27361010/scores/5940320
+Xx хэт
+Oo бочка
+Qq хэт+бочка
+Vv ведущий
+Aa хэт+ведущий
+Ww всё
+
+
+<settings>
+  volume: 100, bpm: 80, handle: both
+
+<all set b60>
+Q_xoA_q_Qvx_A_q_Qox_A_xoXvq_A_xv
+Q_xoA_xvXoq_A_x_Q_xoA_xvXoq_A_q_
+Q_q_Aoq_X_q_A_xvQ_x_AoxoX_qoA_xv
+
+<melody$ b60 $>
+$organ: 840 да-120
+
+<Q_xoA_xvXoq_A_x_Q_xoA_xvXoq_A_q_ b60 @>
+#  |QvX-|QvX-|
+#  |-xox|-xoq|
+#  |x-q-|x-q-|
+#  |oA-A|oA-A|
+#     Q_xoA_xvXoq_A_x_Q_xoA_xvXoq_A_q_|
+#     |               |               |
+-   : 1   2   3   4   5   6   7   8   :
+@hc : x x x x x x x x x x x x x x x x :
+@sn :     x  x    x       x  x    x   :
+@bd : x  x     xx     x  x     xx   x :
+@nil: x               x               :
+
+<Q_xoA_q_Qvx_A_q_Qox_A_xoXvq_A_xv b60 @>
+#  Q-Q-   QoXv
+#  -qvq   oxvx
+#  x-x-   x-q-
+#  oA-A   -A-A
+#    Q_xoA_q_Qvx_A_q_Qox_A_xoXvq_A_xv|
+#    |               |               |
+-  : 1   2   3   4   5   6   7   8   :
+@hc: x x x x x x x x x x x x x x x x :
+@sn:     x    x  x       x    x  x  x:
+@bd: x  x  x x     x xx     x  x     :
+
+<Q_q_Aoq_X_q_A_xvQ_x_AoxoX_qoA_xv b60 @>
+#  Q-Xv   QoXv
+#  -q-x   -x-x
+#  qoq-   xoq-
+#  -A-A   -AoA
+#    Q_q_Aoq_X_q_A_xvQ_x_AoxoX_qoA_xv|
+-  : 1   2   3   4   5   6   7   8   :
+@hc: x x x x x x x x x x x x x x x x :
+@sn:     x       x  x    x       x  x:
+@bd: x x  xx   x     x    x x  xx    :
+
+<QoxoAoq_Xoq_A_xvQ_qAoxoX_x_A_xv b60 @>
+#  350
+#  Q-Xv   QoXv
+#  oqox   -x-x
+#  xoq-   qox-
+#  oA-A   -A-A
+#    Q_q_Aoq_X_q_A_xvQ_x_AoxoX_qoA_xv|
+-   : 1   2   3   4   5   6   7   8   :
+@hc : x x x x x x x x x x x x x x x x :
+@sn :     x       x  x    x       x  x:
+@bd : xx x xx  xx     x x  x x        :
+@nil: x               x               :
+
+<simple44 b90 @>
+-  : 1   2   3   4   :
+@hc: xxxxxxxxxxxxxxxx:
+@sn:     2       4   :
+@bd: 1       3       :
+
+
+<temp>
+!{ лы          ру ру     ду                     ру 
+!} лу ло+ма лу ро+ло+ра  до со+да  до ро ло+ра  ро до со+да
+!{ лы          ру ру     ду                     ру 
+!} лу ло+ма лу ро+ло+ра  до со+да  до ро ло+ра  ро до со+да
+!{ лы          ру ру     ду                     ру 
+!} лу ло+ма лу ро+ло+ра  до со+да  до ро ло+ра  ро до со+да
+!{ лы          ру ру     ду     лы ду ру му му ру ду 
+!} лу ло+ма лу ро+ло+ра  со+да  
+#   *        *      **         **         *         ---  #
+# *---       ---    ---       ---       ----*       ---  #
+#  ---       ---    ---       ---*      ---         ---  #
+#             *       *       ---       --*         ---  #
+!{ лы        ду               му        зу
+!} ло ма ло  да са  да ма ба  ма за ре  за ба фе  ба
+!{ лы        ру           ду           сы
+!} ме ре де  ре де ла са  де ла са ма  са ма ра да
+
+<temp2 b120 $>
+$organ: лу-120 ло+ма-60 лу-60 ро+ло+ра-180 до-120 со+да-60  до-60 ро-60 ло+ра-60 ро-60 до-60 со+да-60$organ: лу-120 ло+ма-60 лу-60 ро+ло+ра-180 до-120 со+да-60  до-60 ро-60 ло+ра-60 ро-60 до-60 со+да-60
+
+<tick b90 @>
+-       : 1 2 3 4 :
+@cowbell: x x x x :
+
+
+<notes>
+!%*()
+
+~!@#$%^&*()_+
+Ё!"№;%:?*()_+
+
+
+
+

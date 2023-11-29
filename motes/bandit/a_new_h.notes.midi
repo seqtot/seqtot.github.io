@@ -1,0 +1,25 @@
+<settings>
+_ boardShift: -12;
+_ $тик: v0
+
+
+<handle b80>
+> СЧЁТ
+$R:             ро $organ*r v30
+$l: до ро фо ро ра *drpm ро ро ро ро ро $egit*drp
+#
+$R:             фо $organ*r v30
+$l: до ро фо ро да *drpm ро ро ро ро ро $egit*drp
+#
+$R:             ло $organ*r v30
+$l: до ро фо ро ло *drpm ро ро ро ро ро $egit*drp
+#
+$R:             ро $organ*r v30
+$l: до ро фо лу до *drpm ро ро ро ро ро $egit*drp
+#
+
+
+<СЧЁТ b120 $>
+$guit: ре=120 ре=120 ре=30 $xylo
+
+

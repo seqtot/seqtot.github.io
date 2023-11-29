@@ -1,0 +1,207 @@
+<MIDI>
+https://www.songsterr.com/a/wsa/blues-brothers-peter-gunn-theme-tab-s3601
+
+<settings>
+volume: 100,
+
+<main b120 v5>
+#
+> pg_intro
+#{ му фу фу фу  му фу фу фу  му фу фу фу  му фу фу фу $guitar*EC
+#}
+#
+> main_riff_4
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#}
+#{ му *ED мо+бо * му му *ED мо+бо * му *ED ро мо $guitar*EDM
+#}
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#}
+#{ му *ED мо+бо * му му *ED мо+бо * му *ED ро мо $guitar*EDM
+#}
+#
+> main_riff_4
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} ра
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} бо
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} ра
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} ба фа
+#
+> main_riff_4
+#{ му $guitar*ED
+#}    бо ра ма  
+#{ фу фу фу  фу        бу        $guitar*ED
+#} фа фа фа  фа ма ра  бо ло бо   
+#{ зу *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#}
+#{ му *ED мо+бо * му му *ED мо+бо * му *ED ро мо $guitar*EDM
+!}
+#
+> main_riff_4
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} ра
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} бо
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} ра          
+#{ му *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#} ба фа
+#
+> main_riff_4
+#{ му $guitar*ED
+#}    бо ра ма  
+#{ фу фу фу    фу        бу        $guitar*ED
+#} фа фа фа    фа ма ра  бо ло бо   
+#{ зу *ED бу+мо * му му *ED бу+мо * му *ED ро мо $guitar*EDM
+#}
+#{ му *ED мо+бо * му му *ED мо+бо $guitar*EDM
+#}
+#
+# СБИВКА
+!{ 
+!} бо бо бо бо ма ра ма ра бо зо мо мо $xlphn
+#
+!{
+!} бо ма ра ло бо $xlphn
+#
+!{
+!} бо ма ра ма ра бо  зо $xlphn
+#
+!{
+!} мо со ло $xlphn
+#
+!{ му фу фу фу  му фу фу фу  му фу фу фу  му фу фу фу $guitar*EC
+!}
+#
+#  PG_to_ES_1
+!{ му му  ву му  су му  лу зу $guitar*ED
+!} 
+!{ му му  ву му  су му  лу зу $guitar*ED
+!} 
+!{ му му  ву му  су му  лу    $guitar*ED
+!} 
+!{ су+ро *EDM му ву му ву су ву $guitar*ED
+!} 
+#  PG_to_ES_2
+!{ му му  ву му  су му  лу зу $guitar*ED
+!} 
+!{ му му  ву му  су му  лу зу $guitar*ED
+!} 
+!{ му му  ву му  су му  лу    $guitar*ED
+!} 
+!{ су+ро *EDM му ву му ву су ву $guitar*ED
+!} 
+#
+#  ОмЯмШУкХУл лПУмЯмШУкХУл
+!{ му+бу  мо ку лу  му+бу мо ку лу  му+бу мо ку лу  су+ро *EDM му ву му ву су ву $guitar*ED
+!}
+!{ му+бу  мо ку лу  му+бу мо ку лу  му+бу мо ку лу  су+ро *EDM му ву му ву су ву $guitar*ED
+!}
+#
+# караван_1
+!{ му+бу мо му+мо+бо $guitar*ED 
+!} ма                фа ма бо ра ма за бо
+!{ му+бу мо му+мо+бо $guitar*ED
+!} ра                ма фа ма фа ма на бо
+!{ му+бу мо му+мо+бо                      лу+мо+ло $guitar*ED
+!} ра                ма на ра та да бо зо ло       ла
+#
+# караван_2
+!{ му+бу мо му+мо+бо $guitar*ED 
+!} ма                фа ма бо ра ма за бо
+!{ му+бу мо му+мо+бо $guitar*ED
+!} ра                ма фа ма фа ма на бо
+!{ му+бу мо му+мо+бо                      лу+мо+ло $guitar*ED
+!} ра                ма на ра та да бо зо ло       ла
+#
+@  ОмЯмШУкХУл лПУмЯмШУкХУл
+!{ му+бу  мо ку лу    му+бу мо ку лу    му+бу мо ку лу  су+ро *EDM му ву му ву су ву $guitar*ED
+!}
+!{ му+бу  мо ку лу  му+бу мо ку лу  му+бу мо ку лу  су+ро *EDM му ву му ву су ву $guitar*ED
+!}
+!{ му+бу+мо $guitar*ED
+!} мо
+
+<auto_play b120>
+> pg_intro
+> main_riff_4
+#
+> main_riff_4
+> main_riff_4
+#
+> main_riff_4
+> main_riff_3
+
+<main_riff_3 b120 set>
+pg_bass_riff       pg_guitar_riff_1-v60
+pg_bass_riff       pg_guitar_riff_2-v60
+pg_bass_riff       pg_guitar_riff_1-v60
+pg_bass_riff_short
+
+<main_riff_4 b120 set>
+pg_bass_riff pg_guitar_riff_1-v60
+pg_bass_riff pg_guitar_riff_2-v60
+pg_bass_riff pg_guitar_riff_1-v60
+pg_bass_riff pg_guitar_riff_2-v60
+
+<pg_bass_riff_short b120 $>
+$: мы-60 мы-60 вы-60 мы-60  сы-60 60  $eBass*f
+
+<pg_bass_riff_A b120 $>
+$: лы-60 лы-60 бы-60 лы-60  ду-60 лы-60  ру-60 ту-60  $eBass*f
+
+<pg_bass_riff_ddA b120 $>
+$: лы-60 лы-60 $eBass*b
+
+<pg_bass_riff b120 $>
+$: мы-60 мы-60 вы-60 мы-60  сы-60 мы-60  лы-60 зы-60 $eBass*f
+
+<pg_intro b120 $>
+$: мо-60 фо-60 фо-60 фо-60  мо-60 фо-60 фо-60 фо-60  мо-60 фо-60 фо-60 фо-60  мо-60 фо-60 фо-60 фо-60 $xlphn 
+
+<pg_xlphn_riff b120 $>
+$: мо-60 ма-60 во-60 ма-60  со-60 ма-60  ло-60 зо-60  $xlphn
+
+<pg_guitar_riff_1 b120 $>
+$: му-60 бу+мо-60 му-60 му-60 бу+мо-60 му-60 ро-60 мо-60 $guitar*ED
+
+<pg_guitar_riff_2 b120 $>
+$: му-60 мо+бо-60 му-60 му-60 мо+бо-60 му-60 ро-60 мо-60  $guitar*ED
+
+<pg_guitar_riff_22 b120 $>
+# dnvd
+dur: 60  60    60  60 60    60  60 60:
+not: му  мо+бо му  му мо+бо му  ро мо: $guitar*EDM
+vol: 50  -     -   -  -     -   -  - :
+dec: EDM ED    EDM -  ED    EDM ED - :
+
+#guitar*ED
+$guitar*EC: му-60 мо+бо-60 му-60 му-60 мо+бо-60 му-60 ро-60 мо-60
+
+
+<main_riff_complex b120 $>
+# !_._!_._!_._!_._
+dur: 60 60 60 60  60 60  60 60 :
+not: мы мы вы мы  сы мы  лы зы : $eBass
+vol: 50 -- -- --  -- --  -- -- :
+dec: f  -- -- --  -- --  s  s  :
+
+
+<tick_2T b120 set>
+tick
+tick
+
+<tick b120 @>
+-       : 1 2 3 4 :
+@cowbell: x x x x :
+
+
+<temp>
+wsx$ wsx$!
+tgb& tgb&$
+
+
+

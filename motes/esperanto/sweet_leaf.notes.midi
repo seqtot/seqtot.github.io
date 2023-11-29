@@ -1,0 +1,251 @@
+<settings>
+# boardShift: -12;
+# pitchShift: -1;
+_ @drums: v50; $bass: v30; $guit: v40;
+
+<info>
+https://lyrsense.com/black_sabbath/sweet_leaf
+https://www.songsterr.com/a/wsa/black-sabbath-sweet-leaf-standard-tuning-tab-s476149
+
+<out b148>
+> СЧЁТ
+> РИФ_1   
+> КУПЛЕТ_1
+> ПРИПЕВ_1
+
+> РИФ_1   
+> КУПЛЕТ_1
+> ПРИПЕВ_1
+
+> РИФ_1   
+> КУПЛЕТ_1
+> ПРИПЕВ_1
+> КОДА
+
+
+<КОДА b148 set>
+кода
+
+<РИФ_1 b148 set>
+риф_1_1 риф_1_1_1бас
+риф_1_2 риф_1_1_2бас
+риф_1_1 риф_1_1_3Vбас
+риф_1_1 риф_1_1_4Vбас
+
+<КУПЛЕТ_1 b148 set>
+риф_куплет_1_1 риф_1_1_1бас
+риф_куплет_1_1 риф_1_1_2бас
+риф_куплет_1_1 риф_1_1_3бас
+риф_куплет_1_1 риф_1_1_2бас
+
+риф_куплет_1_1 риф_1_1_1бас
+риф_куплет_1_1 риф_1_1_2бас
+риф_куплет_1_1 риф_1_1_3бас
+риф_куплет_1_1 риф_1_1_2бас
+
+
+<СЧЁТ b105 $>
+$tick: ле=120 ле=120 ле=120 ле=120 $xylo
+
+<кода b148 $>
+$guit:  0    лу+мо=960:v50_480_0=480_0=0=480:v0 $egit*drp
+$bass:  0    лы=480 $eBass*m
+
+<риф_1_1 b148 $>
+$guit:  0    лу+мо=120=130 лу+мо=120 120                 ро+ло=120_60_-1=60 $egit*drp
+$guit:  0    240                     лу=60:v25 лу=60:v25                    $egit*drpm
+$guit:  480  до+со=180 60                 v60  мо=60 ро=60 мо=120=130    $egit*drp
+$guit:  480  120       до=60:v25 до=60:v25                       $egit*drpm
+
+<риф_1_2 b148 $>
+$guit:  0    лу+мо=120=130 лу+мо=120 120                 ро+ло=120_60_-1=60 $egit*drp
+$guit:  0    240                     лу=60:v25 лу=60:v25                    $egit*drpm
+$guit:  480  до+со=180 60                  v60 мо=60 ро=60 мо=60 со=60=70    $egit*drp
+$guit:  480  120       до=60:v25 до=60:v25                            $egit*drpm
+
+
+<риф_куплет_1_1 b148 $>
+$guit:  0    лу+мо=120=130 лу+мо=120 120                 ро+ло=120_60_-1=60 $egit*drp
+$guit:  0    240                     лу=60:v25 лу=60:v25                    $egit*drpm
+$guit:  480  до+со=180 60                  до+со=120 ро+ло=120 $egit*drp
+$guit:  480  120       до=60:v25 до=60:v25                     $egit*drpm
+
+<риф_1_1_1бас b148 $>
+$bass:  0    лы=120 лы=120 120 ру=60 ту=60 $eBass*m
+$bass:  480  ду=120 ду=60 лу=120 лу=120 лу=60 $eBass*m
+
+<риф_1_1_2бас b148 $>
+$bass:  0    лы=120 лы=120 120 ру=60 ту=60 $eBass*m
+$bass:  480  ду=120 ду=60 му=120 му=120 му=60 $eBass*m
+
+<риф_1_1_3бас b148 $>
+$bass:  0    лы=120 лы=120 120 ру=60 ту=60 $eBass*m
+$bass:  480  ду=120 ду=60 су=120 су=120 су=60 $eBass*m
+
+<риф_1_1_3Vбас b148 $>
+$bass:  0    лы=120 лы=120 120 ру=60 ту=60 $eBass*m
+$bass:  480  ду=120 ду=60 лу=120 су=120 му=60 $eBass*m
+
+<риф_1_1_4Vбас b148 $>
+$bass:  0    лы=120 лы=120 120 ру=60 ту=60 $eBass*m v30
+$bass:  480  ду=120 ду=60 ду=120 ру=120 ду=60 $eBass*m v30
+
+
+<ПРИПЕВ_1 b148 set>
+припев_1_1 припев_1_1_бас
+припев_1_2 припев_1_2_бас
+припев_1_1 припев_1_1_бас
+припев_1_2 припев_1_4_бас
+
+припев_1_1 припев_1_1_бас
+припев_1_2 припев_1_2_бас
+припев_1_3 припев_1_1_бас
+припев_1_2 припев_1_4_бас
+
+
+<temp b148 set>
+припев_1_1 припев_1_1_бас
+припев_1_2 припев_1_2_бас
+припев_1_1 припев_1_1_бас
+припев_1_2 припев_1_4_бас
+
+<припев_1_2 b148 $>
+$guit:  0    мо+бо=180 лу+мо=60 лу+мо=720 $egit*drp
+
+<припев_1_1_бас b148 $>
+$bass:  0    лы=240 лы=240 $eBass*m
+$bass:  480  сы=240 ду=240 $eBass*m
+
+<припев_1_2_бас b148 $>
+$bass: 0      му=180 лы=60 || лы=120 | лу=60 су=60=120_30_+2=90 $eBass*m v60
+$bass: 480 60 лу=120 лу=60 || су=60=_30_+2=30 лу=60 су=60=_30_+2=30 му=60 $eBass*m v60
+
+<припев_1_4_бас b148 $>
+# *----------- | *----------- | *----------- | ------------ |
+# ------------ | ------*----- | ------------ | ------------ |
+# *----------- | *----------- | *----------- | ------------ |
+# ------------ | *-----*~~*-- | ------------ | ------------ |
+# *----------- | ------*----- | *----------- | ------------ |
+# ------------ | ------*----- | ------------ | ------------ |
+# *----------- | *~~*--*----- | *----------- | ------------ |
+# ------------ | *~~*--*----- | ------------ | ------------ |
+$bass: 0      му=180 лы=60 || лы=120 | ро=60=_30:_+2=30 ро=60=120 $eBass*m v60
+$bass: 480 60 до=120 лу=60 су=60 му=60 ру=60 ду=60 $eBass*m v60
+
+<припев_1_1 b148 $>
+$guit:  0    лу+мо=240=480  лу=60:*drpm:v15 лу=60.25:*drpm:v15 лу=60:*drpm:v15 лу=60.25:*drpm:v15 $egit*drp
+$guit:  480  су+ро=240  до+со=240 $egit*drp
+
+<припев_1_3 b148 $>
+$guit:  0    лу+мо=180=480  лу=30:*drpm:v15 лу=30:*drpm:v15 лу=60:*drpm:v15 лу=30:*drpm:v15 лу=30:*drpm:v15 лу=60:*drpm:v15 лу=30:*drpm:v15 лу=30:*drpm:v15 $egit*drp
+$guit:  480  су+ро=240  до+со=240 $egit*drp
+
+Ĉu vi scIas pri (ĝi)?  Вы знаете про(это)?
+Ĉu vi lEgis pri (ĝi)?  Вы читали про(это)?
+
+Mi ne bedAŭras, ne vOkas, ne plOru.
+Ĉio pAsos, ĉar la fUmo malapEros de la blAnkaj pomArboj.
+Mi estas kovrita per la oro de forvelkado kaj ne plu estos juna
+
+// ан бан ган дан пан тан цан чан
+// на наб наг над нап нат нац нач
+
+Sovaĝa velo blankiĝas en la nebulo de la blua maro
+Kion li serĉas en malproksima lando?
+Kion li ĵetis en sia naskiĝlando?
+
+fart~i чу́вствовать себя́, пожива́ть (о здоровье);
+fart~o самочу́вствие (bona fart~o)
+
+kIel vi fArt~as? - как ваше самочувствие (как вы пожива́ете) [as:нв]
+ĉu ni estas konatoj?
+
+
+|       зo   | 
+|       --   |
+|   но  --   |
+|   --  --   |
+|   --  --   |
+| оо--  --щ> |
+|    -  -    |
+|    -що-    |
+
+
+
+
+
+j ĵ c ĉ ŝ ĝ
+й ж ц ч ш джи
+
+Alright now! Отлично!
+Won't you listen? Ты послушаешь?
+
+el из
+en в
+
+mal~plEno - пустота
+
+
+NEni~o el nEni~e movIĝ~as en nEni-o~n
+
+sAp-o мыло ŝAŭm-o - пена
+
+rEn-o - почка
+kOnt-o счёт, учётная запись
+kOn-i - знать (быть знакомым с кем, осведломлённым о чём-то)
+sci - знать (более точно, в более узком смысле)
+
+kI-am mi ren-kOn-tis vin, mi ne scI-is
+хо лу ла на  ла  на  хо   щу ла зу  лу
+mi ne pO-vas for-gE-si vin kaj vI-an sur-prI-zon
+Vi amikIg~is mi~n kun mI-a mEnso
+Kaj lAsis min dezIri vin kaj via spEco
+
+bonOjo (mi amas vin. Ho, vi scias ĝin!)
+
+mI-a vI-vo Est-is mal-plE-na. e-tEr-ne ĉe la fUn-do | Моя жизнь была пустой, вечно на самом дне,
+ĝis vi prenis min, montris min ĉirkaŭe // Но ты взял меня и показал мне всё вокруг
+
+
+
+When I first met you, didn't realize   | Когда я впервые тебя повстречал, то не представлял,
+I can't forget you, for your surprise  | Я не могу забыть тебя и преподнесенный мне сюрприз.
+you introduced me, to my mind          | Ты подружил меня с моим разумом
+And left me wanting, you and your kind | И оставил меня желать тебя и тебе подобных.
+
+I love you, Oh you know it             | Я тебя люблю. О, ты знаешь это.
+
+My life was empty, forever on a down         | Моя жизнь была пустой, вечно на самом дне,
+Until you took me, showed me around          | Пока ты не взял меня и не показал всё вокруг
+My life is free now, my life is clear        | Теперь моя жизнь свободна, моя жизнь ясна
+I love you sweet leaf, though you can't hear | Я люблю тебя, сладкий лист, хоть ты и не слышишь.
+
+Come on now, try it out                      | Давай-ка, попробуй-ка!
+
+Straight people don't know, what you're about | Обычный люд не знает, что ты такое.
+They put you down and shut you out            | Они тебя унижают и не впускают.
+you gave to me a new belief                   | Ты дал мне новую веру,
+and soon the world will love you sweet leaf   | И скоро, сладкий лист, тебя полюбит весь мир.
+
+Come on now, try it out, baby | Давай-ка. Попробуй меня, детка!
+I love you sweet leaf         | Я люблю тебя, сладкий лист.
+
+
+kia - какой, каков; amo - любовь;  mi - я; reno - почка; kono - знание, знакомство, осведомлённость
+Tiso - река Тиса, vi- ты, вы; mi -я; ne - не, нет: scio - знание, is - окончание прош.вр.
+
+kIam mi renkOntis vin, mi ne scIis
+[кИам ми ренкОнтис вин ми не сцИиц]
+mi ne pOvas forgEsi vin kaj vIan surprIzon
+[ми не пОвас форгЕси вин кай вИан сурпрИзон]
+vi amikIgis min kun mIa mEnso
+[ви амикИгис мин кун мИа мЕнсо]
+kaj lAsis min dezIri vin kaj via spEco
+[кай лАсис мин дезИри вин кай вИа спЕцо]
+
+
+
+https://www.esperanto.mv.ru/Esp10/Esperanto_en_10_horoj.html
+http://ling.ulstu.ru/linguistics/resourses/student_works/popova/selfedu.alphabet.html
+https://rueo.ru/
+

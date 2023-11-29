@@ -1,0 +1,204 @@
+<settings>
+# boardShift: -12;
+_ @drums: v50; $bass: v30; $guit: v50; $pipe: v50
+
+<info>
+animalIHaveBecome
+Three Days Grace - Animal I Have Become
+https://www.amalgama-lab.com/songs/t/three_days_grace/animal_i_have_become.html
+https://www.songsterr.com/a/wsa/three-days-grace-animal-i-have-become-bass-tab-s466
+https://www.youtube.com/watch?v=xqds0B_meys
+
+<out b122>
+> СЧЁТ
+> ИНТРО
+
+
+<СЧЁТ b122 $>
+$tick: ле=120 ле=120 ле=120 ле=120 $xylo
+
+Ĉĉ Ĝĝ Ĥĥ Ĵĵ Ŝŝ Ŭŭ
+
+mi ne POvas esKApi ĉi TIun inFEron | I can't escape this hell
+TIom da FOJoj mi PROvis            | So many times I've tried
+sed mi EStas anKOraŭ enkaĝiGIta    | But I'm still caged inside
+lu traPAsu min ĉi TIun koŝMAron    | Somebody get me through this nightmare
+mi ne POvas  REgi_min              | I can't control myself
+
+Ĉĉ Ĝĝ Ĥĥ Ĵĵ Ŝŝ Ŭŭ
+
+KIo oKAzos, se vi VIdos MIan malLUman FLANkon?   | So what if you can see the darkest side of me?
+neNIu Iam ŜANĝus ĉi TIun BESton, KIun mi faRIĝis | No one would ever change this animal I have become
+HElpu min KREdi ĝi ne EStas la VEra mi           | Help me believe it's not the real me
+lu HELpu min malsovaĜIgi ĉi TIun BESton          | Somebody help me tame this animal
+
+
+<ИНТРО b122 set>
+риф1_1
+риф1_1
+риф1_1
+риф1_1
+
+риф1_2
+риф1_2
+риф1_2
+риф1_2
+
+риф1_2
+риф1_2
+риф1_2
+риф1_4
+
+
+
+<риф1_1 b122 $>
+$bass:  ды=60 ды=60 60 сы=60 зы=60 ру=60 зы=60 сы=60 $eBass*m
+$bass:  ду=60 ду=60 60 су=60 зу=60 ро=60 зу=60 су=60 $tuba
+
+
+<риф1_2 b122 $>
+$guit:  ду+су=60 ду+су=60 60 v40 зу=120 зу=120 су=60:*drpm $egit*drp
+#$guit:  120 [ду=60 ду=60] 60 су=60 зу=60 ро=60 зу=60 су=60 $egit*drp
+$bass:  ды=60    ды=60    60 сы=60 зы=60 ру=60 зы=60 сы=60 $eBass*m
+$pipe:  120 [ду=60 ду=60] 60 су=60 зу=60 ро=60 зу=60 су=60 $tuba
+$pipe:  120 [до=60 до=60] 60 со=60 зо=60 ра=60 зо=60 со=60 $tromb
+$pipe:  120 [со=60 со=60] 60 со=60 зо=60 ра=60 зо=60 со=60 $trump
+
+<риф1_4 b122 $>
+$bass:  ды=60    ды=60    60 сы=60 зы=60 ру=60 зы=120 $eBass*m
+#$guit:  ду+су=60 ду+су=60 60 су=60 зу=60 ро=60 зу=120 $egit*drp
+$guit:  ду+су=60 ду+су=60 60 су=60 зу=60 ро=60 v50 зу=5=120 зе=115:~1=6 $egit*drp
+$pipe:  120 [ду=60 ду=60] 60 су=60 зу=60 ро=60 зу=120 $tuba
+$pipe:  120 [до=60 до=60] 60 со=60 зо=60 ра=60 зо=120 $tromb
+$pipe:  120 [со=60 со=60] 60 со=60 зо=60 ра=60 зо=120 $trump
+
+
+mi ne PO-vas es-KAP-i ĉi TIun in-FE-ron | I can't escape this hell
+TI-om da FOj-oj mi PRO-vis              | So many times I've tried
+sed mi ES-tas an-KO-raŭ en-ka-ĝi-GI-ta  | But I'm still caged inside
+lu tra-PA-su min ĉi TIun koŝ-MA-ron     | Somebody get me through this nightmare
+mi ne PO-vas RE-gi min                  | I can't control myself
+
+
+<КУПЛЕТ b122 set>
+куплет1_1
+куплет1_2
+риф1_2
+риф1_2
+куплет1_1
+куплет1_2
+риф1_2
+риф1_2
+куплет1_1
+куплет1_2
+риф1_2
+риф1_2
+куплет1_1
+куплет1_2
+
+
+
+
+
+
+
+<куплет1_1 b122 $>
+# x-x-  x-x-  
+# --x-  --x-
+# x-x-  x-x-
+# --x-  x---
+$bass: ну=60 ну=60 60  ну=60  ну=60 ну=60  60 ну=60 $tuba
+$guit: ну=60 ну=60 60  ну=60  ну=60 ну=60  60 ну=60 $egit*drp
+$pipe: ну=60 ну=60 60  ну=60  ну=60 ну=60  60 ну=60 $tromb
+$pipe: ку=60 ку=60 60  ку=60  ку=60 ку=60  60 ку=60 $trump
+
+
+<куплет1_2 b122 $>
+$bass: ну=60 ну=60 60  ну=60  ну=60 ну=60=50  фу=120 $tuba
+$guit: ну=60 ну=60 60  ну=60  ну=60 ну=60=50  фу=120 $egit*drp
+$pipe: ну=60 ну=60 60  ну=60  ну=60 ну=60=50  фу=120 $tromb
+$pipe: ку=60 ку=60 60  ку=60  ку=60 ку=60=50  фу=120 $trump
+
+
+
+<eng>
+I can't escape this hell
+So many times I've tried
+But I'm still caged inside
+Somebody get me through this nightmare
+I can't control myself
+
+So what if you can see the darkest side of me?
+No one will ever change this animal I have become
+Help me believe it's not the real me
+Somebody help me tame this animal
+
+I can't escape myself
+So many times I've lied
+But there's still rage inside
+Somebody get me through this nightmare
+I can't control myself
+
+So what if you can see the darkest side of me?
+No one will ever change this animal I have become | Никто не изменит этого зверя, в которого я превратился.
+Help me believe it's not the real me
+Somebody help me tame this animal I have become
+Help me believe it's not the real me
+Somebody help me tame this animal
+
+Somebody help me through this nightmare
+I can't control myself
+Somebody wake me from this nightmare
+I can't escape this hell
+
+So what if you can see the darkest side of me?
+No one will ever change this animal I have become
+Help me believe it's not the real me
+Somebody help me tame this animal I have become
+
+Help me believe it's not the real me
+Somebody help me tame this animal
+This animal I have become
+
+<engRus>
+I can't escape this hell   | Я не могу выбраться из этого ада
+So many times I've tried   | Я пытался много раз
+But I'm still caged inside | Но я по-прежнему заперт внутри
+Somebody get me through this nightmare | Кто-нибудь, помогите мне пройти через этот кошмар! 
+I can't control myself     | Я не могу себя контролировать
+
+So what if you can see the darkest side of me? | А что, если ты сможешь увидеть мою самую тёмную сторону?
+No one will ever change this animal I have become | Никто не изменит этого зверя, в которого я превратился.
+Help me believe it's not the real me | Помоги мне поверить, что это не настоящий я.
+Somebody help me tame this animal | Кто-нибудь, помогите мне присмирить этого зверя!
+
+I can't escape myself         | Я не могу убежать от себя
+So many times I've lied       | Я столько лгал! 
+But there's still rage inside | Но во мне всё ещё бушует ярость.
+Somebody get me through this nightmare | Кто-нибудь, заберите меня из этого ада!
+I can't control myself        | Я не могу себя контролировать
+
+So what if you can see the darkest side of me? | А что, если ты сможешь увидеть мою самую тёмную сторону?
+No one will ever change this animal I have become | Никто не изменит этого зверя, в которого я превратился.
+Help me believe it's not the real me | Помоги мне поверить, что это не настоящий я.
+Somebody help me tame this animal I have become | Кто-нибудь, помогите мне присмирить этого зверя, которым я стал!
+Help me believe it's not the real me | Помоги мне поверить, что это не настоящий я.
+Somebody help me tame this animal | Кто-нибудь, помогите мне присмирить этого зверя!
+
+Somebody help me through this nightmare | Кто-нибудь, помогите мне выбраться из этого кошмара!
+I can't control myself | Я не могу себя контролировать.
+Somebody wake me from this nightmare | Кто-нибудь, разбудите меня от этого кошмара!
+I can't escape this hell | Я не могу выбраться из этого ада.
+
+So what if you can see the darkest side of me? | А что, если ты сможешь увидеть мою самую тёмную сторону?
+No one will ever change this animal I have become | Никто не изменит этого зверя, в которого я превратился.
+Help me believe it's not the real me | Помоги мне поверить, что это не настоящий я.
+Somebody help me tame this animal I have become | Кто-нибудь, помогите мне присмирить этого зверя, которым я стал!
+
+Help me believe it's not the real me | Помоги мне поверить, что это не настоящий я.
+Somebody help me tame this animal | Кто-нибудь, помогите мне присмирить этого зверя
+This animal I have become | Этого зверя, в которого я превратился.
+
+
+
+

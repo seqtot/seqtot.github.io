@@ -1,0 +1,40 @@
+<settings>
+_ $bass: v30; $guit: v20
+
+<testVolumeSet b120 set>
+testVolume5
+testVolume10
+testVolume50
+testVolume100
+
+<testVolume5 $>
+$organ: v1 до-120 v2 до-120 v3 до-120 v4 до-120 v5 до-120 
+
+<testVolume10 $>
+$organ: v6 до-120 v7 до-120 v8 до-120 v9 до-120 v10 до-120 
+
+<testVolume50 $>
+$organ: v10 до-120 v20 до-120 v30 до-120 v40 до-120 v50 до-120 
+
+<testVolume100 $>
+$organ: v60 до-120 v70 до-120 v80 до-120 v90 до-120 v100 до-120 
+
+<tick b120 @>
+-       : 1 2 3 4 :
+@cowbell: x x x x :
+
+<pg_guitar_riff_22 b120 $>
+# dnvd
+dur: 60  60    60  60 60    60  60 60:
+not: му  мо+бо му  му мо+бо му  ро мо: $guitar*EDM
+vol: 50  -     -   -  -     -   -  - :
+dec: EDM ED    EDM -  ED    EDM ED - :
+
+
+<main_riff_complex b120 $>
+# !_._!_._!_._!_._
+dur: 60 60 60 60  60 60  60 60 :
+not: мы мы вы мы  сы мы  лы зы : $eBass
+vol: 50 -- -- --  -- --  -- -- :
+dec: f  -- -- --  -- --  s  s  :
+

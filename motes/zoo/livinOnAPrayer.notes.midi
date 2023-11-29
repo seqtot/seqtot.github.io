@@ -1,0 +1,145 @@
+<MIDI>
+https://www.songsterr.com/a/wsa/blues-brothers-peter-gunn-theme-tab-s3601
+
+<settings>
+volume: 100,
+
+<handlePlay>
+# куплет-1
+ Em:    { му му му му }
+ CD:    { до ро }
+ Em:    { му му } 
+ Em:    { му му му му }
+ CD:    { до ро }
+ Em:    { му му }
+ CDEm:  { до ро   мо }
+ CDEm:  { до ро   мо } 
+ CDEmD: { до ро   мо ро }  
+ CD:    { до ро } 
+# припев-1
+ EmC: { му до }
+ D:   { ро }
+ GC:  { су до }
+ D:   { ро } 
+ EmC: { му до }
+ D:   { ро }
+ GC:  { су до }
+ D:   { ро } 
+ 
+# куплет-2 
+ Em:    { му му }
+ Em:    { му му му му }
+ CD:    { до ро }
+ Em:    { му му } 
+ Em:    { му му му му }
+ CD:    { до ро }
+ Em:    { му му }
+ CDEm:  { до ро   мо }
+ CDEm:  { до ро   мо } 
+ CDEmD: { до ро   мо ро }  
+ CD:    { до ро }  
+ 
+# припев-2
+ EC:  { му до }
+ D:   { ро }
+ GC:  { су до }
+ D:   { ро } 
+ EmC: { му до }
+ D:   { ро }
+ GC:  { су до }
+ D:   { ро }
+ С:   { до до }
+ 
+# solo 
+ EC:  { му до }
+ D:   { ро }
+ GC:  { су до }
+ D:   { ро } 
+ EmC: { му до }
+ D:   { ро }
+ GC:  { су до }
+ Em:  { му му }
+ 
+# after solo 
+ CD: { до ро }
+ D:  { ро }
+ C:  { до }
+ D:  { ро }
+ 
+# конец
+ D#:   { но }
+ F :   { фу }
+ A#D#: { ку ну }
+ F:    { фу }
+ 
+ GD#:  { су но }
+ F :   { фу }
+ A#D#: { ку ну }
+ F:    { фу }
+
+ GD#:  { су но }
+ F :   { фу }
+ A#D#: { ку ну }
+ F:    { фу }
+
+ GD#:  { су но }
+ F :   { фу }
+ A#D#: { ку ну }
+ F:    { фу }
+
+ GD#:  { су но }
+ F :   { фу }
+ A#D#: { ку ну }
+ F:    { фу }
+
+<chords>
+ | Em  | Em     | Em | Em |
+ | C   | D      |
+ | Em  | Em     |
+ | Em  | Em     | Em | Em
+ | C   | D      |
+ | Em  | Em     |
+ | C D | D Em   |
+ | C D | D Em   |
+ | C D | D Em D |
+ | C   | D      |  
+ 
+ | Em  C | D     | G C | D |
+ | Em  C | D     | G C | D |
+ | Em  | Em      | 
+ 
+ | Em  | Em     | Em | Em
+ | C   | D      |
+ | Em  | Em     |
+ | Em  | Em     | Em | Em
+ | C   | D      |
+ | Em  | Em     |
+ | C D | D Em   |
+ | C D | D Em   |
+ | C D | D Em D |
+ | C   | D      |  
+ 
+ | E C   | D     | G C | D |
+ | Em C  | D     | G C | D | 
+ 
+ | C | C |
+ 
+ solo
+ | Em  C | D     | G C | D  |
+ | Em  C | D     | G C | Em | Em |
+ 
+ after solo
+ |C D | D | C | D |
+ 
+ модуляция
+ | D#   | F | A# D# | F |
+ | G D# | F | A# D# | F |
+ | G D# | F | A# D# | F |
+ | G D# | F | A# D# | F |
+ | G D# | F | A# D# | F |
+ 
+ 
+ 
+ 
+
+ 

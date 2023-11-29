@@ -1,0 +1,155 @@
+# https://musescore.com/user/27361010/scores/5940320
+# head info steps items
+
+<head>
+root: 'D:/minus',
+name: 'rhythm',
+
+<info>
+Xx хэт
+Oo бочка
+Qq хэт+бочка
+Vv ведущий
+Aa хэт+ведущий
+Ww всё
+
+
+<steps>
+{
+	name: "ru_053",
+	note: 'ru_053',
+	midi: 'ru_053_out',
+},
+{
+	name: "Behroozi",
+	note: 'Lucky Chops',
+	midi: 'Behroozi',
+},
+{
+	name: "мистер Х",
+	note: 'мистер Х',
+	midi: 'Behroozi',
+},
+
+<items>
+{
+	name: 'rhythm',
+	root: 'D:/minus/rhythm',
+	head: '',
+	fractions: [
+		{name: 'tick'},
+		{name: 'midi'},
+	],
+},
+
+<ru_053_out b70>
+ru_053_1_drums ru_053_1_chords$
+ru_053_2_drums ru_053_2_chords$
+
+<ru_053_1_drums>
+#       :     1           2           3           4           :
+-       : 0   1   2   3   4   5   6   7   8   9   0   1   2   :
+@cowbell: x x x     x x x x     xxx x x     x x x x       x x :
+@nil    :       x x         x x         x x         x x x     :
+
+# Eb Bb7 Eb Bb Bb Eb Fm Bb
+
+<ru_053_1_chords$ tones tone>
+#           Eb              Bb7             Eb              Bb         #
+$organ: 100 ну+со+на+ка-300 ко+ро+фо+зо-300 ну+со+на+ка-300 ко+ро+фо-300
+
+<ru_053_2_drums>
+#       : 1           2           3           4           :
+-       : 1   2   3   4   5   6   7   8   9   0   1   2   :
+@cowbell: x     x x x x       x x x x x x x   x           :
+@nil    :   x x         x x x               x   x x x x x :
+
+<ru_053_2_chords$ tones tone>
+#       Bb           Eb              Fm           Bb
+$organ: ко+ро+фо-300 ну+со+на+ка-300 фо+зо+да-300 ко+ро+фо-300
+
+
+<Behroozi b90>
+behroozi_intro$-2
+behroozi_first_tuba$ behroozi_first_F#D_chord$ behroozi_first_1_solo$
+behroozi_first_tuba$ behroozi_first_AG_chord$ behroozi_first_2_solo$
+behroozi_first_tuba$ behroozi_first_F#D_chord$ behroozi_first_1_solo$
+
+#behroozi_first_tuba_beat
+
+<behroozi_intro$>
+# |   |   |   |   |
+# *_----*__________
+#       F#        Bm     A         D       F#        Bm     A         D    #
+$trump: те-50 100 ве-250 ме-50 100 те-250  те-50 100 ве-250 ме-50 100 те-250
+$tsax : ва-50 100 ба-250 ла-50 100 ва-250  ва-50 100 ба-250 ла-50 100 ва-250
+$tromb: ко-50 100 ра-250 та-50 100 ло-250  ко-50 100 ра-250 та-50 100 ло-250
+$tuba : ву-50 100 бу-250 лу-50 100 ро-250  ву-50 100 бу-250 лу-50 100 ру-250
+
+<behroozi_first_tuba$ v70>
+$tuba : ву-75 ву-25-50 ву-75 ву-25 ву-50 ву-50 ту-50
+
+<behroozi_first_1_solo$>
+$tsax: 50 ва-25 ва-25 ва-25 та-25 та-25 25 ма-50 та-15-35 ма-50 та-15-35
+
+<behroozi_first_2_solo$>
+$tsax: 50 ва-25 ва-25 ва-25 та-25 та-25 25 ма-50 ма-25 ва-25 ма-50 та-15-35
+
+<behroozi_first_F#D_chord$ v20>
+#    F#                     D  #
+#                              #
+#      o               t       #
+# g  j?                   j l  #
+#                              #
+$asax : те-75 те-25-50 ре-75 175
+$trump: ва-75 ва-25-50 ва-75 175
+$tromb: ко-75 ко-25-50 ло-75 175
+
+<behroozi_first_AG_chord$ v20>
+#       A              G       #
+#            )                 #
+#       y  i                   #
+#                              #
+#                              #
+$asax : ме-75 ме-25-50 ре-75 175
+$trump: ла-75 ла-25-50 са-75 175
+$tromb: та-75 та-25-50 бо-75 175
+
+<behroozi_first_tuba_beat drums>
+-       : 1   2   3   1   2   3   :
+@cowbell: x   x   x   x     x     :
+@nil    :   x   x   x   x x   x x :
+
+#         X-'x'-X-'xX-X-X-|
+#-       : 1   2   3   4   :
+#@cowbell: x  x  x  xx x x :
+#@nil    :   x x   x       :
+
+<behroozi_notes>
+вуВоКоВаТе буБоБаРаВе
+луЛоТаЛаМе роЛоВаТе
+
+вуКоВаТе буРаБаВе
+
+https://musescore.com/user/292361/scores/2812021
+
+fgy  bhj  ty&  fth
+F#   Bm   A    D?
+КоаВ РааБ ТааЛ ЛоаВ
+ВуеТ БуеВ ЛуеМ РоеТ
+
+F#   Bm   A    D?
+gj   h,   yi   tj
+ao   x;   w)   do
+
+<footer>
+#0     50  50
+#1 Eb  150 50 50 50
+#2 Bb7 150 25 25 50 50
+#3 Eb  150 50 50 50
+#4 Bb  200    50 50
+
+#5 Bb  150 50 50 50
+#6 Eb  200    50 50
+#7 Fm  50 50 50 50 100
+#8 Bb  200 _100

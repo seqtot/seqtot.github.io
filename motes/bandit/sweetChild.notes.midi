@@ -1,0 +1,290 @@
+<MIDI>
+
+<settings>
+_ $bass: v30; $bassS: v40; $backO: v25; $soloF: v40; $soloH: v60; $soloI: v50;
+
+<auto b130>
+> INTRO_0        # DCGD
+> INTRO_BassSolo # DCGD
+#
+> COUPLETE1 # 1.1 DCGD
+> COUPLETE1 # 1.2 DCGD
+#
+> REFRAIN_1_1 # ACDD
+> REFRAIN_1_2 # ACDD
+#
+> INTRO_BassSolo # DCGD
+> INTRO_BassSolo # DCGD
+#
+> REFRAIN_1_1 # ACDD
+> REFRAIN_1_2 # ACDD
+#
+> INTRO2 # DCGD
+> INTRO2 # DCGD
+> INTRO_END # DCGD
+
+<main b130>
+> INTRO1 # DCGD
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+$L: ма ре ла са се ла ве ла $flute
+$r: ДО $flute v25
+$L: ма ре ла са се ла ве ла $flute
+$r: ДО $flute v25
+$L: са ре ла са се ла ве ла $flute
+$r: СУ $flute v25
+$L: са ре ла са се ла ве ла $flute
+$r: СУ $flute v25
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+#
+> INTRO2 # DCGD
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+$L: ма ре ла са се ла ве ла $flute
+$r: ДО $flute v25
+$L: ма ре ла са се ла ве ла $flute
+$r: ДО $flute v25
+$L: са ре ла са се ла ве ла $flute
+$r: СУ $flute v25
+$L: са ре ла са се ла ве ла $flute
+$r: СУ $flute v25
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+$L: ра ре ла са се ла ве ла $flute
+$r: РО $flute v25
+#
+> COUPLETE1 # 1.1 DCGD
+$L: ло ра ва са   ва са ва $harm
+$r: ро $flute v25
+$L: ло ра ва са ва ма ла   ло бо та ра $harm
+$r: до $flute v25
+$L: на ва на ва ма   да ра на ма $harm
+$r: су $flute v25
+$L: ва ла ва ла са   ма ва са ла $harm
+$r: су $flute v25
+$L: те ба ла ба те ре  ме ре те ре те ла  ва ма   на та да бо ко $harm
+#L: те ба ка ба те  ме ре те ре те ла ва ма   на та да бо ко $harm
+$r: ро                 ро                 ро $flute v25
+#
+> COUPLETE1 # 1.2 DCGD
+$L: ло ра ва са   ва са ва $harm
+$r: ро $flute v25
+$L: ло ра ва са ва ма ла   ло бо та ра $harm
+$r: до $flute v25
+$L: на ва на ва ма   да ра на ма $harm
+$r: су $flute v25
+$L: ва ла ва ла са   ма ва са ла $harm
+$r: су $flute v25
+$L: те ба ла ба те ре  ме ре те ре те ла  ва ма   на та да бо ко $harm
+#L: те ба ка ба те  ме ре те ре те ла ва ма   на та да бо ко $harm
+$r: ро                 ро                 ро $flute v25
+#
+> REFRAIN_1 # ACDD
+$L: се ве ме $harm
+$l: се ве ме $flute v10
+$r: ЛУ $flute v15
+$L: ре де ба ла  $harm
+$l: ре де ба ла  $flute v10
+$r: ДО $flute v15
+$L: са $flute v20 ма са ла ба ре ба ла ба ла са ма $harm v50
+$l: са $flute v10
+$r: РО $flute v15
+> REFRAIN_1 # ACDD
+$L: се ве ме $harm v60
+$l: се ве ме $flute v10
+$r: ЛУ $flute v15
+$L: ре де ба ла  $harm
+$l: ре де ба ла  $flute v10
+$r: ДО $flute v15
+$L: са ла са      се $harm
+$l: са ла са  v15 се $flute v10
+$r: РО $flute v15
+#
+> INTRO2 # DCGD
+> INTRO2 # DCGD
+#
+> REFRAIN_1 # ACDD
+$L: се ве ме $harm v60
+$l: се ве ме $flute v10
+$r: ЛУ $flute v15
+$L: ре де ба ла  $harm
+$l: ре де ба ла  $flute v10
+$r: ДО $flute v15
+$L: са $flute v20 ма са ла ба ре ба ла ба ла са ма $harm v50
+$l: са $flute v10
+$r: РО $flute v15
+> REFRAIN_1 # ACDD
+$L: се ве ме $harm v60
+$l: се ве ме $flute v10
+$r: ЛУ $flute v15
+$L: ре де ба ла  $harm
+$l: ре де ба ла  $flute v10
+$r: ДО $flute v15
+$L: са ла са      се $harm
+$l: са ла са  v15 се $flute v10
+$r: РО $flute v15
+#
+> INTRO2 # DCGD
+> INTRO2 # DCGD
+> INTRO1 # DCGD
+
+<INTRO_0 set b130>
+intro1_back0 intro1_flute intro_bass0
+
+<INTRO_BassSolo set b130>
+intro1_back1 intro1_flute bass_solo1
+
+<INTRO_END set b130>
+intro1_back1 intro1_flute
+
+<INTRO2 set b130>
+intro1_bass intro1_back2 intro1_flute
+
+<intro_bass0 b130 $>
+$bassS: 3780 лу=60 $eBass*f
+
+<bass_solo1 b130 $> # DCGD
+$bassS: 0    ро=180 во=120 ро=60 во=60 со=60   $eBass*f
+$bassS: 480  ло=120 бо=60  ло=60 со=60 во=60 ро=60 ру=60 $eBass*f
+$bassS: 960  до=180 со=240 до=60 $eBass*f
+$bassS: 1440 фо=60 мо=60 до=60 фо=120 мо=60 до=60 ру-60 $eBass*f
+$bassS: 1920 су=420 ро=60 $eBass*f
+$bassS: 2400 со=420 ро=60 $eBass*f
+$bassS: 2880 со=60 во=60 ро=60 со=120 во=60 ро=480 лу-120 $eBass*f
+# 24Q 3840
+
+<intro1_bass b130 v20 $> # DCGD
+$bass: 0    *s ру=120 *f 60 ру=60 ру=120 60 ру=60 ру=120 60 ру=60 ру=120 60 ру=60 $cBass*f
+$bass: 960  *s ду=120 *f 60 ду=60 ду=120 60 ду=60 ду=120 60 ду=60 ду=120 60 ду=60 $cBass*f
+$bass: 1920 *s сы=120 *f 60 сы=60 сы=120 60 сы=60 сы=120 60 сы=60 сы=120 60 сы=60 $cBass*f
+$bass: 2880 *s ру=120 *f 60 ру=60 ру=120 60 ру=60 ру=120 60 ру=60 ру=120 60 ру=60 $cBass*f
+# 24Q 3840
+
+<intro1_back0 b130 v20 $> # DCGD
+$backO: 0       ло=960 $organ*r v10
+$backO: 960     со=960 $organ*r v15
+$backO: 1920    ро=960 $organ*r v20
+$backO: 2880    ло=960 $organ*r v25
+# 24Q 3840
+
+<intro1_back1 b130 v20 $> # DCGD
+$backO: 0       ло=960 $organ*r
+$backO: 960     со=960 $organ*r
+$backO: 1920    ро=960 $organ*r
+$backO: 2880    ло=960 $organ*r
+# 24Q 3840
+
+<intro1_back2 b130 v20 $> # DCGD
+$backO: 0       ло=960 $organ*r
+$backO: 960     со=960 $organ*r
+$backO: 1920    ро=960 $organ*r
+$backO: 2880    ло=960 $organ*r
+# 24Q 3840
+
+<intro1_flute b130 v20 r2 $> # DCGD
+$soloI: 0    ра=60=70   ре=60=70  ла=60=70  са=60=70  се=60=70  ла=60=70  ве=60=70  ла=60=70  $flute v50
+$soloI: 480  ра=60=80   ре=60=80  ла=60=80  са=60=80  се=60=80  ла=60=80  ве=60=80  ла=60=80  $flute v50
+$soloI: 960  ма=60=90   ре=60=90  ла=60=90  са=60=90  се=60=90  ла=60=90  ве=60=90  ла=60=90  $flute v50
+$soloI: 1440 ма=60=100  ре=60=100 ла=60=100 са=60=100 се=60=100 ла=60=100 ве=60=100 ла=60=100 $flute v45
+$soloI: 1920 са=60=100  ре=60=100 ла=60=100 са=60=100 се=60=100 ла=60=100 ве=60=100 ла=60=100 $flute v45
+$soloI: 2400 са=60=100  ре=60=100 ла=60=100 са=60=100 се=60=100 ла=60=100 ве=60=100 ла=60=100 $flute v45
+$soloI: 2880 ра=60=100  ре=60=100 ла=60=100 са=60=100 се=60=100 ла=60=100 ве=60=100 ла=60=100 $flute v45
+$soloI: 3360 ра=60=100  ре=60=100 ла=60=100 са=60=100 се=60=100 ла=60=100 ве=60=100 ла=60=100 $flute v45
+# 24Q   3840
+
+<COUPLETE1 b130 set>
+couplete1_bass couplete1_back couplete1_solo
+
+<couplete1_bass b130 v20 $> # DCGD
+$bass: 0    *s РУ=180=120 *f ру=60 ру=180=120 ру=60 ру=180=120 ру=60 ру=180=120 ру=60 $cBass*f
+$bass: 960  *s ДУ=180=120 *f ду=60 ду=180=120 ду=60 ду=180=120 ду=60 ду=180=120 ду=60 $cBass*f
+$bass: 1920 *s СЫ=180=120 *f сы=60 сы=180=120 сы=60 сы=180=120 сы=60 сы=180=120 сы=60 $cBass*f
+$bass: 2880 *s РУ=180=120 *f ру=60 ру=180=120 ру=60 ру=180=120 ру=60 ру=180=120 ру=60 $cBass*f
+# 24Q   3840
+
+<couplete1_solo b130 $> # DCGD
+$soloH: 0    ло=90=70 ра=90=70 ва=60=50 | са=180=190  ва=60      | ва=480=360 $organ*r
+$soloH: 960  ло=90=70 ра=90=70 ва=60=50 | са=90=100   ва=90=100 ма=60 | ла=360=300 $organ*r
+$soloH: 1800 ло=30=40 бо=30=40 та=30=40 ра=30=40 $organ*r
+$soloH: 1920 на=30=40 ва=30=40 на=30=40 ва=30=40 ма=240=120   да=30=40 ра=30=40 на=30=40 ма=30=40 $organ*r
+$soloH: 2400 ва=30=40 ла=30=40 ва=30=40 ла=30=40 са=240=120 | ма=30=40 ва=30=40 са=30=40 ла=30=40 $organ*r
+$soloH: 2880 те=30 ба=30 ла=30 ба=30 | те=30 ре=30  ме=30 ре=30 | ме=30 ре=30  те=30 ре=30 |  те=30 ре=30 те=30 ла=30  $organ*r
+$soloH: 3360 ва=180 ма=60 | на=36 та=36 да=36 бо=36 ко=36  $organ*r
+
+<couplete1_soloTest b100 $> # DCGD
+$soloH: 0    ма=30    ва=30    са=30    ла=30    $harm
+$soloH: 120  те=30    ба=30    ла=30    ба=30    $harm
+$soloH: 240  те=30    ре=30    ме=30    ре=30    $harm
+$soloH: 360  те=30    ре=30    те=30    ла=30    $harm
+$soloH: 480  те=30    ре=30    те=30    ла=30    $harm
+$soloH: 600  те=30    ре=30    те=30    ла=30    $harm
+$soloH: 720  те=30    ре=30    те=30    ла=30    $harm
+$soloH: 840  ва=120   ма=60    на=30 та=30 да=30 бо=30 ко=30  $harm
+
+
+<couplete1_back b130 v20 $> # DCGD
+$backO: 0    РО=960 $organ*r v30
+$backO: 960  ДО=960 $organ*r v30
+$backO: 1920 СУ=960 $organ*r v30
+$backO: 2880 РО=960 $organ*r v30
+# 24Q   3840
+
+<REFRAIN_1 b130 set>
+refrain1_bass refrain1_back
+
+<REFRAIN_1_FULL b130 set>
+refrain1_bass refrain1_back refrain1_solo1
+refrain1_bass refrain1_back refrain1_solo2
+
+<REFRAIN_1_1 b130 set>
+refrain1_bass refrain1_back refrain1_solo1
+
+<REFRAIN_1_2 b130 set>
+refrain1_bass refrain1_back  refrain1_solo2
+
+<REFRAIN_1_S b130 set>
+refrain1_bass_s refrain1_back_s
+
+<refrain1_solo1 b130 $> # ACDD
+$soloF: 0    се=300 ве=90 ме=90 | ре=180 де=180 ба=60 ла=60 | са=780=300 d1260 $flute
+$soloF: 0    се=300 ве=90 ме=90 | ре=180 де=180 ба=60 ла=60 | са=780=300 d1260 $harm v30
+$soloF: 1260 ма=60 са=60 ла=60 ба=60 | ре=60 ба=60 ла=60 ба=60 | ла=60 са=60 ма=60 $flute v40
+
+<refrain1_solo2 b130 $> # ACDD
+$soloF: 0    се=300 ве=90 ме=90 | ре=180 де=180 ба=60 ла=60 | са=480 се=480 d1260 $flute
+$soloF: 0    се=300 ве=90 ме=90 | ре=180 де=180 ба=60 ла=60 | са=480 се=480 d1260 $harm v30
+$bassS: 1860  лу=60 $eBass*f
+
+<refrain1_bass b130 v20 $> # ACDD
+$bass: 0    *s лы=120 *f 60 лы=60 лы=120 60 лы=60 $cBass*f #480
+$bass: 480  *s ду=120 *f 60 ду=60 ду=120 60 ду=60 $cBass*f #480
+$bass: 960  *s ру=120 *f 60 ру=60 ру=120 60 ру=60 $cBass*f #480
+$bass: 1440 *s ру=120 *f 60 ру=60 ру=120 60 ру=60 $cBass*f #480
+
+<refrain1_bass_s b130 v20 $> # ACDD
+$bass: 0    *s лы=120 *f 60 лы=60 лы=120 60 лы=60 $cBass*f #480
+$bass: 480  *s ду=120 *f 60 ду=60 ду=120 60 ду=60 $cBass*f #480
+
+<refrain1_back b130 v20 $> # ACDD
+$backO: 0    ЛУ=480 $organ*r v30
+$backO: 480  ДО=480 $organ*r v30
+$backO: 960  РО=480 $organ*r v30
+$backO: 1440 РО=480 $organ*r v30
+# 16Q   1920
+
+<refrain1_back_s b130 v20 $> # AC
+$backO: 0    ЛУ=480 $organ*r v30
+$backO: 480  ДО=480 $organ*r v30
+# 8Q    960
+
+<tick b120 @>
+-       : 1 2 3 4 :
+@cowbell: x x x x :
+

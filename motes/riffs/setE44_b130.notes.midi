@@ -1,0 +1,356 @@
+<info>
+# https://www.songsterr.com/a/wsa/nazareth-hair-of-the-dog-tab-s48270
+
+<settings>
+_ $my__: v0
+
+
+<handle b80>
+#   хо за на жу ла ма гу на ма зу ла ма гу на ма му
+$L: му бу ро му лу то му су бу му лу то му су бу су $egit*drp
+$r: мы    мы    мы    мы    мы    мы    мы    мы    $eBass*f
+#
+$L: му бу ро му лу то му су бу му лу то му су бу су $egit*drp
+$r: мы    ру    лы    мы    бы    лы    мы    бы    $eBass*f
+
+
+# zodiac hairOfTheDog bigGun suzieQ
+<auto b130>
+> zodiac
+> hairOfTheDog
+> bigGun
+> suzieQ
+
+
+<bigGun b130 r1 set>
+bigGun_intro-4
+bigGun_bass-4 bigGun_guit-4
+bigGun_intro-4
+bigGun_bass-4 bigGun_guit-4
+
+<suzieQ b130 r1 set>
+suzieQ_intro-4
+suzieQ_bass-4 suzieQ_guit-4
+suzieQ_intro-4
+suzieQ_bass-4 suzieQ_guit-4
+
+<РИФ b130 r2 set>
+интро1
+интро2
+риф_бас-v30 риф_гит
+риф_бас-v30 риф_гит
+риф_бас-v30 риф_гит
+риф_бас-v30 риф_гит
+
+<интро1 b130 r2 $>
+$бас: 0    му=60  му=180 *f лу=60 бу=120 су=60 $cBass*s
+$гар: 0    са=120 ва=120    ма=60 ра=120 ла=60 $harm
+$бас: 480  му=240     *f лу=60 бу=120 су=60 $cBass*s
+$гар: 480  ба=120 ма=120 са=60 ла=120 ба=60 $harm
+$бас: 960  му=60  му=180 *f лу=60 бу=120 су=60 $cBass*s
+$гар: 960  са=120 ва=120    ма=60 ра=120 бо=60 $harm
+$бас: 1440 му=120      ру=120 лу=60  бу=120 су=60 $cBass*f
+$гар: 1440 ма=120      бо=120 ло=60  со=120 мо=60 $harm
+
+<интро2 b130 r2 $>
+$бас: 0    му=60  му=180 *f лу=60 бу=120 су=60 $cBass*s
+$гар: 0    са=120 ва=120 ма=60 ра=120 ла=60 $harm
+$бас: 480  му=240 *f  лу=60 бу=120 су=60 $cBass*s
+$гар: 480  ба=120 ма=120 са=60 ла=120 ба=60 $harm
+$бас: 960  му=60 му=180 *f лу=60 бу=120 су=60 $cBass*s
+$гар: 960  са=120 ва=120 ма=60 ра=120 бо=60 $harm
+$бас: 1440 му=60 му=60 ру=120  $cBass*f
+$гар: 1440 ма=60 ма=60 бо=120 ло=60 ло=60 со=120 $harm
+
+<suzieQ_bass b130 r2 $>
+$bass: 0   *s мы=60 *s мы=60 му=60 мы=60 $cBass*f
+$bass: 240 лы=60 мы=60 мы=60 мы=60 $cBass*f
+$bass: 480 му=60 мы=60 мы=60 мы=60 $cBass*f
+$bass: 720 бы=60 ру=60 сы=60 су=60 $cBass*f
+
+<suzieQ_guit b130 r2 $>
+# хоЯжаЩуЛуЩуЛаХо зуЛаНаЗуЩу
+# EuDaAoGoDoEoEo  AyByDoGy
+$guit: [ДдДпп ] 0   МУ=60 МУ=60 *ED ма=60  *EDM МУ=30 МУ=30 $guitar*EDM
+$guit: [ДдДд  ] 240 ло=60 со=60 МУ=60 ро=60 $guitar*EDM
+$guit: [ДппДпп] 480 мо=60 МУ=30 МУ=30 *ED мо=60 *EDM лу=30 лу=30 $guitar*EDM
+$guit: [ДДК   ] 720 бу=60 ро=60 *ED су=120 $guitar*EDM
+$my__: мо=60 60 ме=60 60 ла=60 са=60  60 ра=60  ма=60 60 ма=60 ло=60 бо=60 ра=60 | со=120 $xylo v30
+
+<suzieQ_intro b130 r2 $>
+$бас: 0   му=960  $cBass*s
+$guit: мо=60 60 са=60 60  бо=60 ма=60 60 ма=60  ба=60 60  ма=60 ва=60   са=60 ва=60   ра=120 $xylo
+
+<bigGun b130 r4 set>
+bigGun_intro-4
+bigGun_bass-4 bigGun_guit-4
+
+<bigGun_intro b130 r2 $>
+$bass: 0   му=960  $cBass*s
+$xylo: 0   мо=60 ма=60 ба=60 $xylo
+$xylo: 180 мо=60 ма=60 ла=60 $xylo
+$xylo: 360 мо=60 ма=60 са=60 $xylo
+$xylo: 540 мо=60 ма=60 ла=60 $xylo
+$xylo: 720 мо=60 ма=60 ра=60 бо=60 $xylo
+
+<bigGun_guit b130 r2 $>
+$guit: 0   му=60 бу=60 ро=60  $guitar*EDM
+$my__: 0   120         ра=60 d180 $xylo
+$guit: 180 му=60 лу=60 то=60  $guitar*EDM
+$my__: 180 120         та=60 d180 $xylo
+$guit: 360 му=60 су=60 бу=60  $guitar*EDM
+$my__: 360 120         бо=60 d180 $xylo
+$guit: 540 му=60 лу=60 то=60 $guitar*EDM
+$my__: 540 120         та=60 d180 $xylo
+$guit: 720 му=60 су=60 бу=60 су=60 $guitar*EDM
+$my__: 720 120         бо=60 d180 $xylo
+
+<bigGun_bass b130 r2 $>
+$bass: 0   мы=120 *f ру=60  $cBass*s
+$bass: 180 мы=120 *f ту=60  $cBass*s
+$bass: 360 мы=120 *f бы=60  $cBass*s
+$bass: 540 мы=120 *f ту=60  $cBass*s
+$bass: 720 мы=120 *f бы=60 60 $cBass*s
+
+<hairOfTheDog b130 r1 set>
+hairOfTheDog_intro-2
+hairOfTheDog_bass-4 hairOfTheDog_guit-4
+hairOfTheDog_intro-2
+hairOfTheDog_bass-4 hairOfTheDog_guit-4
+
+<hairOfTheDog_intro b130 r2 $>
+# РдДддДлоДддд
+$bass: 0    му=960  $cBass*s
+$xylo: 0    мо=180 мо=60 са=60 на=60 бо=60 ма=300 ка=60 ва=60 ра=60 бо=60 $xylo
+$bass: 960  му=960  $cBass*s
+$xylo: 960  мо=180 мо=60 са=60 на=60 бо=60 ма=300 бо=60 ра=60 ло=60 со=60 $xylo
+
+<hairOfTheDog_guit b130 r2 $>
+$guit: 0 му=180 му=60 | су=60 зу=60 бу=60 мо=300 | со=60 мо=60 ро=60 мо=60  $guitar*ED
+#pipe: 0 120 ма=60 60 | 300 ма=30 30 ра=30 30 ма=30 30 | $trump
+#pipe: 0 120 ма=60 60 | 300 ма=30 30 ра=30 30 ма=30 30 | $tromb
+#pipe: 0 120 ма=60 60 | 300 ма=30 30 ра=30 30 ма=30 30 | $harm
+
+<hairOfTheDog_bass b130 r2 $>
+$bass: 0 му=180 мы=60 | сы=60 зы=60 бы=60 му=300 | сы=60 мы=60 ру=60 мы=60 $cBass*f
+
+<zodiac b130 r2 set>
+zodiacIntro-2
+zodiacRs1
+zodiacRs2
+zodiacRs3
+zodiacRs4
+zodiacRs1
+zodiacRs2
+zodiacRs3
+zodiacRs4
+zodiacIntro-2
+zodiacRs1
+zodiacRs2
+zodiacRs3
+zodiacRs4
+zodiacRs1
+zodiacRs2
+zodiacRs3
+zodiacRs4
+
+<zodiacTemp b130 r1 set>
+zodiacRs3
+zodiacRs4
+
+<zodiacRs4 b130 r2 $>
+$solo: 0   ро=180                     во=180 $flute v15
+$guit: 0   ру=60 ву=60 *ED бу=60 *EDM ву=60 бу=60 *ED ро=60 $guitar*EDM
+$b___: 0   ру=120          бы=60      вы=120          ру=60 $cBass*f
+$solo: 360 бо=180                     ра=180 $flute v15
+$guit: 360 бу=60 ро=60 *ED во=60 *EDM ро=60 во=60 *ED бо=60 $guitar*EDM
+$b___: 360 бы=120          ву=60      ру=120          бу=60 $cBass*f
+$solo: 720 ва=120      ре=120 $flute v15
+$guit: 720 во=60 бо=60 ра=60 ва=60 $guitar*ED
+$b___: 720 ву=120      ру=120 $cBass*f
+
+
+<zodiacRs3 b130 r2 $>
+$solo: 0   ва=60          60     ра=60 бо=60 $flute v30
+$guit: 0   во=60 *EDM  му=60 *ED ро=60 бу=60 $guitar*ED
+$b___: 0   вы=60       му=60     ру=60 бы=60 $cBass*f
+$guit: 240 бу=60       бу=60 бу=60 во=30 во=30 $guitar*EDM
+$b___: 240 бы=60       бу=60 бы=60 вы=60        $cBass*f
+$guit: 480 мо=30 ро=30 бу=60 бу=60 ву=30 ву=30 $guitar*EDM
+$b___: 480 мы=60       бу=60 бы=60 вы=60        $cBass*f
+$guit: 720 лу=30 лу=30 бу=60 бу=60 ву=60       $guitar*EDM
+$b___: 720 лы=60       бу=60 бы=60 вы=60        $cBass*f
+
+<zodiacRs2 b130 r2 $>
+$solo: 0    ма=60    60     са=60 ма=60 $flute v30
+$guit: 0    му=60 му=60 *ED су=60 му=60 $guitar*EDM
+$b___: 0    мы=60 му=60     сы=60 му=60 $cBass*f
+$guit: 240  му=60 му=60 му=60  ку=30 ку=30 $guitar*EDM
+$___:  240  мы=60 му=60 мы=60  кы=60 $cBass*f
+$solo: 480  120         ма=60   ва=60 $flute v30
+$guit: 480  лу=30 су=30 му=60   му=60 *ED бу=60 $guitar*EDM
+$b___: 480  лы=60 сы=60 му=60   мы=60     бы=60 $cBass*f
+$solo: 720       са=60           ва=60      ма=60     ра=60 $flute v30
+$guit: 720  *EDM му=30 му=30 *ED лу=60 *EDM му=60 *ED су=60 $guitar*EDM
+$b___: 720       мы=60           лы=60      му=60     сы=60 $cBass*f
+
+<zodiacIntro b130 r2 $>
+$b___: 0        му=960 $cBass*f
+$solo: 0        са=60    60     ба=60 ма=60 240     $xylo
+$solo: 480 120  ба=60 ла=60 са=60 ма=60 ра=60 бо=60 $xylo
+$b___: 960      му=960 $cBass*f
+$solo: 960      са=60    60     ба=60 ма=60 240     $xylo
+$solo: 1440 120 ма=60 бо=60 ло=60 бо=60 со=60 ло=60 $xylo
+
+<zodiacRs1 b130 r2 $>
+$solo: 0    ма=60    60     са=60 ма=60 $flute v30
+$guit: 0    му=60 му=60 *ED су=60 му=60 $guitar*EDM
+$b___: 0    мы=60 му=60     сы=60 му=60 $cBass*f
+$guit: 240  му=60 му=60 му=60  лу=30 лу=30 $guitar*EDM
+$b___: 240  мы=60 му=60 му=60  лы=60 $cBass*f
+$solo: 480  120               ма=60     ва=60 $flute v30
+$guit: 480  зу=30 су=30 му=60 му=60 *ED бу=60 $guitar*EDM
+$b___: 480  зы=60       му=60 мы=60     бы=60 $cBass*f
+$solo: 720       са=60           ва=60      ма=60     ра=60 $flute v30
+$guit: 720  *EDM му=30 му=30 *ED лу=60 *EDM му=60 *ED су=60 $guitar*EDM
+$b___: 720       мы=60           лы=60      му=60     сы=60 $cBass*f
+
+<tick b130 @>
+-       : 1 2 3 4 :
+@cowbell: x x x x :
+
+# Disarmonia Mundi - Nihilistic Overdrive
+# https://www.songsterr.com/a/wsa/disarmonia-mundi-nihilistic-overdrive-tab-s67502
+# му му ва ма ра та му му
+# ва ма ра та му ра та ра
+# cу cу ва ма ра та су су
+# ва ма ра та лу ра та ра
+
+
+<соснаВыход b120>
+> СоснаИнтро
+> СоснаГит
+> СоснаИнтро
+
+<СоснаИнтро b120 r2 set>
+соснаИнтро-2
+
+<соснаИнтро b120 r2 $>
+$guit: 0    де=60 за=60 фа=60 де=60 ре=60 ка=60 фа=60 ре=60 $guitar*EC
+$guit: 0    до=240                  ро=240 $guitar*ED v30
+$guit: 480  ме=60 де=60 ка=60 ме=60 де=60 бо=60 ко=60 зо=60 $guitar*EC
+$guit: 480  мо=300                        бу=60 ку=60 зу=60 $guitar*ED v30
+$guit: 960  де=60 за=60 фа=60 де=60 ре=60 ка=60 фа=60 ре=60 $guitar*EC
+$guit: 960  фу=240                  ро=240 $guitar*ED v30
+$guit: 1440 ме=60 де=60 ка=60 ме=60 де=60 бо=60 ко=60 зо=60 $guitar*EC
+$guit: 1440 мо=300                        бу=60 ку=60 зу=60 $guitar*ED v30
+
+<СоснаГит b120 set>
+соснаГит1
+соснаГит2
+
+<соснаГит2 b120 r2 $>
+# !...!_..!_._
+# DtkKD_tkD_T_
+$guit: 0    зу+но=180         ко=60 $guitar*ED
+#$solo: 0    де=180            те=60 $trump v30
+$bass: 0    зы=60 зы=60 зы=60 ку=60 $cBass*f v20
+$guit: 240  v30 ро+фо+ко=140             $guitar*ED
+$guit: 240           120 но=60 ро=60 $guitar*ED
+#$solo: 240  не=120 те=60        те=60 $trump  v30
+#$bass: 240  зы=120              зы=60  $cBass*f  v20
+$guit: 480  ку+фо+ко=120 фу+фо+ло=120  $guitar*ED v30
+#$solo: 480  де=120       ка=120 $trump  v30
+#$bass: 480  кы=120       фу=120 $cBass*f  v20
+
+# !...!...!_._
+# DtkKDtkKD_T_
+$guit: 720  зу+но=180 ко=60 $guitar*ED
+#$solo: 720  фе=60 фе=60 зе=60 фе=60 $trump v30
+#$bass: 720  ду=120      зу=60 $cBass*f v20
+$guit: 960  ро+фо+ко=140 $guitar*ED
+$guit: 960  120      но=60 ро=60 $guitar*ED
+#$solo: 960  не=60 не=60 те=60 те=60 $trump v30
+#$bass: 960  ту=120      зу=60 $cBass*f v20
+$guit: 1200 ку+фо+ко=120 фу+до+фо=120 $guitar*ED v30
+#$solo: 1200 де=120       ка=120 $trump v30
+#$bass: 1200 кы=120       фу=120   $cBass*f v20
+
+
+<соснаГит1 b120 r2 $>
+# !...!_..!_._
+# DtkKD_tkD_T_
+$guit: 0    фу=60 фу=60 *ED до+фо=60 *ED фу=60  $guitar*EDM
+#solo: 0    фе=60 фе=60     фе=60        фе=60 $trump v30
+$bass: 0    фы=60 фы=60     фу=60        фы=60  $cBass*f v20
+$guit: 240  ку=120 фо+ко=60 *ED ку=60  $guitar*ED
+#solo: 240  не=120 те=60        те=60 $trump  v30
+$bass: 240  кы=60 кы=60 ку=60   кы=60  $cBass*f  v20
+$guit: 480  зу+но+зо=120 ку+фо+ко=120  $guitar*ED v30
+#solo: 480  де=120       ка=120 $trump  v30
+$bass: 480  зы=60 зы=60 кы=60 кы=60  $cBass*f  v20
+
+# !...!...!_._
+# DtkKDtkKD_T_
+$guit: 720  фу=60 фо=60 зо=60 да=60 $guitar*ED
+#solo: 720  фе=60 фе=60 зе=60 фе=60 $trump v30
+$bass: 720  фы=60 фы=60 фу=60 ду=60 $cBass*f v20
+$guit: 960  то=60 фо=60 зо=60 да=60 $guitar*ED
+#solo: 960  не=60 не=60 те=60 те=60 $trump v30
+$bass: 960  ту=60 ту=60 зу=60 зу=60 $cBass*f v20
+$guit: 1200 ку+фо+ко=120 фу+фо+ло=120 $guitar*ED v30
+#solo: 1200 де=120       ка=120 $trump v30
+$bass: 1200 кы=60 кы=60 фы=60 фу=60   $cBass*f v20
+
+
+# !__.!_..!_._
+# D__kD_tkD_T_
+
+# !__.!_..!_._
+# D__kD_kkD_K_
+#
+
+<сосна1 b120 r2 $>
+# !...!_..!_._
+# DtkKD_tkD_T_
+$guit: 0    до=60 до=60 со+да=60 до=60  $organ*r
+$guit: 0    до=60 до=60 со+да=60 до=60  $tromb v10
+$bass: 0    ду=120                 60    ду=60  $cBass*f
+$guit: 240  зу=120 но+зо=60 зу=60  $organ*r
+$guit: 240  зо=120 но+зо=60 зо=60  $tromb v10
+$bass: 240  зы=120              зы=60  $cBass*f
+$guit: 480  ку+фо+ко=120 фу+до+фо=120  $organ*r v30
+$guit: 480  ко+фо+ко=120 фо+до+фо=120  $tromb v10
+$bass: 480  кы=120       фу=120   $cBass*f
+
+# !...!...!_._
+# DtkKDtkKD_T_
+$guit: 720  до=60 фо=60 зо=60 да=60 $organ*r
+$guit: 720  до=60 фо=60 зо=60 да=60 $tromb v10
+$guit: 960  то=60 фо=60 зо=60 да=60 $organ*r
+$guit: 960  то=60 фо=60 зо=60 да=60 $tromb v10
+$guit: 1200 ку+фо+ко=120 фу+фо+ло=120 $organ*r v30
+$guit: 1200 ко+фо+ко=120 фо+фо+ло=120 $tromb v10
+# !__.!_..!_._
+# D__kD_tkD_T_
+
+# !__.!_..!_._
+# D__kD_kkD_K_
+#
+
+<band b85 $>
+#$guit: до=600 $git*ed
+#$guit: до=120 до=120 до=120 до=120 $xylo
+#$guit: да=480_120_120=5:2_120=60:-2 $git*ed
+#$guit: му=120_60_10=5:2_10=5:-1_10=5:1_10=5:-1 $git*ed
+$solo: ло=60_30_30=0:2 ра=30 бо=60_20_20=0:-1_20=0:-1 $organ*r
+
+ку фо ко фу фо ло
+до фо зо да то фо зо да
+#pipe: 0 120 ма-60 60 | 300 ма-30 30 ра-30 30 ма-30 30 | $trump
+#pipe: 0 120 ма-60 60 | 300 ма-30 30 ра-30 30 ма-30 30 | $tromb
+#pipe: 0 120 ма-60 60 | 300 ма-30 30 ра-30 30 ма-30 30 | $harm
+
+
+
+

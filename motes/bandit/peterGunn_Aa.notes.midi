@@ -1,0 +1,346 @@
+<info>
+https://www.songsterr.com/a/wsa/blues-brothers-peter-gunn-theme-tab-s3601
+
+<settings>
+  pitchShift: -5
+_ $bass: v20; $guit: v25; $solo: v50; $mark: v0
+
+<auto b120 v80>
+> Pg_intro
+> Pg_riff
+> Pg_solo1
+> Pg_solo2
+> Pg_solo1
+> Pg_solo2s
+> Pg_break
+> Pg_intro
+> pgToEs
+> Es_1 | Es_1
+> Es_2
+> Es_1 | Es_1
+> лу
+
+<handle b120 v80>
+> pg_intro
+> pg_main_riff_4T
+> pg_solo1
+#  оНу
+$L: са ма $tromb
+$l: са ма $harm
+$l: са ма $tuba
+#  наФаШу
+$L: са  ме ка $tromb
+$l: са  ме ка $harm
+$l: са  ме ка $tuba
+#  шуНаЛа хаОО оХуЛу НуЛуЛаНу Му
+$L: ма са ла  ка ка ка  ка ла са  ма ра ма та  ло $tromb
+$l: ма са ла  ка ка ка  ка ла са  ма ра ма та  ло $harm
+$l: ма са ла  ка ка ка  ка ла са  ма ра ма та  ло $tuba
+> pg_main_riff_4T
+> pg_main_riff_4T
+#  шаНу
+$L: са ма $tromb
+$l: са ма $harm
+$l: са ма $tuba
+#  наФаШу
+$L: са  ме ка $tromb
+$l: са  ме ка $harm
+$l: са  ме ка $tuba
+#  шуНаЛа хаОО оХуЛу нуЛуЛаНу Му
+$L: ма са ла  ка ка ка  ка ла са  ма ра ма та  ло $tromb
+$l: ма са ла  ка ка ка  ка ла са  ма ра ма та  ло $harm
+$l: ма са ла  ка ка ка  ка ла са  ма ра ма та  ло $tuba
+#
+> pg_main_riff_short
+> pg_break
+> pg_intro
+> pgToEs
+#
+> es1
+> es1
+#
+> es2
+$L: ло  ко ло мо со ло та мо s12 $harm
+$l: ло  ко ло мо со ло та мо s12 $flute v10
+$L: со  ло ко ло ко ло зо мо s12 $harm
+$l: со  ло ко ло ко ло зо мо s12 $flute v10
+$L: со  ло зо со во фо мо то  ро  ра s12 $harm
+$l: со  ло зо со во фо мо то  ро  ра s12 $flute v10
+#
+$L: ло  ко ло мо со ло та мо s12 $harm
+$l: ло  ко ло мо со ло та мо s12 $flute v10
+$L: со  ло ко ло ко ло зо мо s12 $harm
+$l: со  ло ко ло ко ло зо мо s12 $flute v10
+$L: со  ло зо со во фо мо то  ро  ра s12 $harm
+$l: со  ло зо со во фо мо то  ро  ра s12 $flute v10
+#
+> es1
+> es1
+> лы
+
+
+<pgToEs b120 set>
+pgToEs_1_bass pgToEs_1_guit
+pgToEs_2_bass pgToEs_2_guit
+
+<лу b120 $>
+$bass: лы=60 $eBass*b
+$guit: лу=60 $guitar*ED
+
+<pgToEs_1_bass b120 $>
+$bass: 0       лы=60 лы=60  бы=60 лы=60  ду=60 лы=60  ру=60 ту=60   $eBass*f #480
+$bass: 480     лы=60 лы=60  бы=60 лы=60  ду=60 лы=60  ру=60 ту=60    $eBass*f #480
+$bass: 960     лы=60 лы=60  бы=60 лы=60  ду=60 лы=60  ру=60 ду=60=120 $eBass*f #480
+$bass: 1440 60 лы=60 бы=60  лы=60 бы=60  ду=60 бы=60    $eBass*f #540
+# 16Q  1860
+
+<pgToEs_2_bass b120 $>
+$mark: 0     ле=60 $xylo
+$bass: 0     лы=120 лы=60  бы=60 лы=60  ду=60 лы=60  ру=60 ту=60 $eBass*f #480
+$mark: 540   ле=60 $xylo
+$bass: 540   лы=60 лы=60  бы=60 лы=60  ду=60 лы=60  ру=60 ту=60 $eBass*f #480
+$mark: 1020  ле=60 $xylo
+$bass: 1020  лы=60 лы=60  бы=60 лы=60  ду=60 лы=60              $eBass*f #360
+$mark: 1500  ле=60 $xylo
+$bass: 1380  ру=60 ду=120 лы=60 бы=60  лы=60 бы=60  ду=60 бы=60 $eBass*f #540
+# 16Q  1860
+
+
+<pgToEs_1_guit b120 $>
+$guit: 0    лу=60 лу=60  бу=60 лу=60  до=60 лу=60  ро=60 то=60 $egit*drpm #480
+$guit: 480  лу=60 лу=60  бу=60 лу=60  до=60 лу=60  ро=60 то=60 $egit*drpm #480
+$guit: 960  лу=60 лу=60  бу=60 лу=60  до=60 лу=60  ро=60       $egit*drpm #420
+$guit: 1380 до=120:*drp  лу=60 бу=60  лу=60 бу=60  до=60 бу=60 $egit*drpm #540
+# 16Q  1860
+
+
+<pgToEs_2_guit b120 $>
+$guit: 0    лу=120 *EDM лу=60  бу=60 лу=60  до=60 лу=60  ро=60 то=60    $guitar*ED #480
+$guit: 540  лу=60 лу=60  бу=60 лу=60  до=60 лу=60  ро=60 то=60    $guitar*EDM #480
+$guit: 1020  лу=60 лу=60  бу=60 лу=60  до=60 лу=60  ро=60          $guitar*EDM #420
+$guit: 1440 *ED до=120 *EDM лу=60 бу=60  лу=60 бу=60  до=60 бу=60 $guitar*EDM #540
+# 16Q  1860
+
+# es1 --------------------------------------------------------------------------#
+<Es_1 b120 set>
+es1_bass es1_guit # es1_harm-v5
+
+<es1_bass b120 $>
+$mark:  60 ле=60 $xylo
+$bass:  0    *b v30 лы=120 * v50 лу=120 ну=60 ру=180 $eBass*f      #480
+$bass:  480  *b v30 лы=120 * v50 лу=120 ну=60 ру=180 $eBass*f      #480
+$mark:  540 ле=60 $xylo
+$bass:  960  *b v30 лы=120 * v50 лу=120 ну=60 ру=180 $eBass*f      #480
+$mark:  1020 ле=60 $xylo
+$bass:  1440 ду=120 лы=60 бы=60  лы=60 бы=60  ду=60 бы=60 $eBass*f #480
+$mark:  1500 ле=60 $xylo
+# 16Q   1920
+
+<es1_guit b120 $>
+$guit: 0    лу=120=140 ло.25=120 но=60 ро=180                   $guitar*ED #480
+$guit: 480  лу=120=140 ло.25=120 но=60 ро=180                   $guitar*ED #480
+$guit: 960  лу=120=140 ло.25=120 но=60 ро=180                   $guitar*ED #480
+$guit: 1440 до=120 *EDM лу=60 бу=60  лу=60 бу=60  до=60 бу=60 $guitar*ED #480
+# 16Q  1920
+
+<es1_harm b120 $>
+$harm: 0    лу=120 ло=120 но=60 ро=180                   $harm #480
+$harm: 480  лу=120 ло=120 но=60 ро=180                   $harm #480
+$harm: 960  лу=120 ло=120 но=60 ро=180                   $harm #480
+$harm: 1440 до=120 лу=60 бу=60  лу=60 бу=60  до=60 бу=60 $harm #480
+# 16Q  1920
+
+# es2 --------------------------------------------------------------------------#
+# 120 240 360 <480> 600 720 840 <960> 1080 1200 1320 <1440>
+
+<Es_2 b120 set>
+es2_bass1 es2_guit1 es_solo1
+es2_bass2 es2_guit2 es_solo2
+
+<es_solo1 b120 $>
+$solo: 0       ла=480 $organ*r
+$solo: 60 480  60 ка=60 ла=60 ма=60 | са=60 ла=60 те=60 ма=60 $organ*r
+$solo: 60 960  са=480 $organ*r
+$solo: 60 1440 60 ла=60 ка=60 ла=60 | ка=60 ла=60 за=60 ма=60 $organ*r
+$solo: 60 1920 са=480 $organ*r
+$solo: 60 2400 60 ла=60 за=60 са=60 | ва=60 фа=60 ма=60 та=60 $organ*r
+$solo: 60 2880 ра=420 60 ре=420 60  $organ*r
+
+<es_solo2 b120 $>
+$solo: 0  0    ла=480 $organ*r
+$solo: 0  480  60 ка=60 ла=60 ма=60 | са=60 ла=60 те=60 ма=60 $organ*r
+$solo: 0  960  са=480 $organ*r
+$solo: 0  1440 60 ла=60 ка=60 ла=60 | ка=60 ла=60 за=60 ма=60 $organ*r
+$solo: 0  1920 са=480 $organ*r
+$solo: 0  2400 60 ла=60 за=60 са=60 | ва=60 фа=60 ма=60 та=60 $organ*r
+$solo: 0  2880 ра=420 60 ре=420 60  $organ*r
+
+<es2_bass1 b120 $>
+$mark: 60    ле=60 $xylo
+$bass: 0     лы=120 лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #540
+$mark: 540   ле=60  $xylo
+$bass: 540   лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 1020  ле=60  $xylo
+$bass: 1020  лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 1500  ле=60  $xylo
+$bass: 1500  лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 1980  ле=60  $xylo
+$bass: 1980  лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 2460  ле=60  $xylo
+$bass: 2460  лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 2940  ле=60  $xylo
+$bass: 2940  ру=60 ру=60 фу=60 су=60 зу=60 лу=60 су=60  фу=60 $eBass*f #480
+$mark: 3420  ле=60  $xylo
+$bass: 3420  ру=60 ру=60 фу=60 су=60 зу=60 лу=60 су=60  фу=60 $eBass*f #480
+#      3900
+
+<es2_guit1 b120 $>
+$guit: 0     лу=120:*drp лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60 $egit*drpm #540
+$guit: 540   лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60 $egit*drpm #480
+$guit: 1020  лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60 $egit*drpm #480
+$guit: 1500  лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60 $egit*drpm #480
+$guit: 1980  лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60 $egit*drpm #480
+$guit: 2460  лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60 $egit*drpm #480
+$guit: 2940  ро=60 ро=60 фо=60 со=60 зо=60 ло=60 со=60  фо=60 $egit*drpm #480
+$guit: 3420  ро=60 ро=60 фо=60 со=60 зо=60 ло=60 со=60  фо=60 $egit*drpm #480
+#      3900
+
+<es2_bass2 b120 $>
+$mark: 0     ле=60 $xylo
+$bass: 0     лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 480   ле=60  $xylo
+$bass: 480   лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 960   ле=60  $xylo
+$bass: 960   лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 1440  ле=60  $xylo
+$bass: 1440  лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 1920  ле=60  $xylo
+$bass: 1920  лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 2400  ле=60  $xylo
+$bass: 2400  лы=60  лы=60 лы=60 лы=60 лы=60 лы=60 лы=60 кы=60 $eBass*f #480
+$mark: 2880  ле=60  $xylo
+$bass: 2880  ру=60 ру=60 фу=60 су=60 зу=60 лу=60 су=60  фу=60 $eBass*f #480
+$mark: 3360  ле=60  $xylo
+$bass: 3360  ру=60 ру=60 фу=60 су=60 зу=60 лу=60 су=60        $eBass*f #420
+#      3780
+
+<es2_guit2 b120 $>
+$guit: 0     лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60:*drp $egit*drpm #480
+$guit: 480   лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60:*drp $egit*drpm #480
+$guit: 960   лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60:*drp $egit*drpm #480
+$guit: 1440  лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60:*drp $egit*drpm #480
+$guit: 1920  лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60:*drp $egit*drpm #480
+$guit: 2400  лу=60  лу=60 лу=60 лу=60 лу=60 лу=60 лу=60 ку=60:*drp $egit*drpm #480
+$guit: 2880  ро=60 ро=60 фо=60 со=60 зо=60 ло=60 со=60  фо=60 $egit*dr #480
+$guit: 3360  ро=60 ро=60 фо=60 со=60 зо=60 ло=60 со=60        $egit*dr #420
+#      3780
+
+
+# other ------------------------------------------------------------------------#
+
+
+<Pg_riff b120 set>
+pg_bass_riff pg_guitar_riff1
+pg_bass_riff pg_guitar_riff2
+pg_bass_riff pg_guitar_riff1
+pg_bass_riff pg_guitar_riff2
+
+<Pg_solo1 b120 set>
+pg_bass_riff pg_guitar_riff1 pg_solo1_1
+pg_bass_riff pg_guitar_riff2 pg_solo1_2
+pg_bass_riff pg_guitar_riff1 pg_solo1_1
+pg_bass_riff pg_guitar_riff2 pg_solo1_4
+
+<Pg_solo2 b120 set>
+pg_bass_riff pg_guitar_riff1 pg_solo2_1
+pg_bass_riff pg_guitar_riff2 pg_solo2_2
+pg_bass_riff pg_guitar_riff1 pg_solo2_3
+pg_bass_riff pg_guitar_riff2 pg_solo2_4
+
+<Pg_riff_short b120 set>
+pg_bass_riff        pg_guitar_riff1
+pg_bass_riff        pg_guitar_riff2
+pg_bass_riff        pg_guitar_riff1
+pg_bass_riff_short  pg_guitar_riff_short
+
+<Pg_solo2s b120 set>
+pg_bass_riff pg_guitar_riff1 pg_solo2_1
+pg_bass_riff pg_guitar_riff2 pg_solo2_2
+pg_bass_riff pg_guitar_riff1 pg_solo2_3
+pg_bass_riff_short pg_guitar_riff_short pg_solo2_4
+
+<pg_solo2_1 b120 $>
+$solo: 60 ма=60 са=60 ла=60  ка=80 ка=80 ка=80 $organ*r
+
+<pg_solo2_2 b120 $>
+$solo: ка=80 ла=80 са=80  ма=80 ра=80 ма=80 $organ*r
+
+<pg_solo2_3 b120 $>
+$solo:  та=480 $organ*r
+
+<pg_solo2_4 b120 $>
+$solo:  ло=60 $organ*r
+
+<pg_solo1_1 b120 $>
+$solo: 0    са=480_480:v10_0=0=480:v50 $organ*r
+
+<pg_solo1_2 b120 $>
+$solo: ма=60 $organ*r
+
+<pg_solo1_4 b120 $>
+$solo: ме=60 ка=60 $organ*r
+
+<pg_bass_riff b120 $> #480
+$bass: лы=60 лы=60 бы=60 лы=60  ду=60 лы=60  ру=60 ту=60 $eBass*f
+$mark: ле=60 $xylo
+
+<pg_guitar_riff1 b120 $>
+$guit: лу=60 лу=60  бу=60 лу=60 до=60 лу=60  ро=60 то=60 $egit*drpm
+
+<pg_guitar_riff2 b120 $>
+$guit: лу=60 лу=60  бу=60 лу=60 до=60 лу=60  ро=60 то=60 $egit*drpm
+
+
+<pg_guitar_riff1_old b120 $>
+$guit: *EDM лу=60 *ED мо+ло=60 *EDM лу=60 лу=60 *ED мо+ло=60 *EDM лу=60 *ED со=60 ло=60 $guitar*ED
+
+<pg_guitar_riff2_old b120 $>
+$guit: *EDM лу=60 *ED ма+ла=60 *EDM лу=60 лу=60 *ED ма+ла=60 *EDM лу=60 *ED ро=60 то=60 $guitar*ED
+
+<pg_bass_riff_short b120 $> #300
+$bass: лы=60 лы=60 бы=60 лы=60 ду=60 $eBass*f
+$mark: лe=60 $xylo
+
+<pg_guitar_riff_short b120 $>
+$guit: лу=60 лу=60 бу=60 лу=60 до=60 $egit*drp
+
+<Pg_break b120 $>
+$break: 0    ма=55 5 ма=55 5 ма=55 $xylo #180
+$mark:  180  ле=60 $xylo
+$break: 180  ма=55 5 ла=55 5 са=30  ла=30 са=30 ма=30 та=60    ло=60 ло=60 60  $xylo #480
+$mark:  660  ле=60 $xylo
+$break: 660  ма=60  ла=60 са=60 ра=60 ма=60    мо=60 мо=60 60 $xylo #480
+$mark:  1140 ле=60 $xylo
+$break: 1140 ма=60  ла=60 са=30 ла=30 са=30    ма=30 та=60  ло=60 да=60 ра=60 $xylo #480
+#mark:  1620 ле=60 $xylo
+#break: 1620 ма=60  ла=60 за=60 са=60 ва=60 фа=60 ма=60 да=60 $xylo #480
+
+<Pg_intro b120 $>
+$mark: 000    ле=60 $xylo
+$bass: 000 *s лу=60 *f v30 ку=60 ку=60 ку=60 $cBass
+$bass: 240 *s лу=60 *f v30 ку=60 ку=60 ку=60 $cBass
+$mark: 480    ле=60 $xylo
+$bass: 480 *s лу=60 *f v30 ку=60 ку=60 ку=60 $cBass
+$bass: 720 *s лу=60 *f v30 ку=60 ку=60 ку=60 $cBass
+#      960
+
+<pg_introS b120 $>
+$mark: 000    ле=60 $xylo
+$bass: 000 *s лу=60 *f v30 ку=60 ку=60 ку=60 $cBass
+$bass: 240 *s лу=60 *f v30 ку=60 ку=60 ку=60 $cBass
+#      480
+
+<tick b120 @>
+-       : 1 2 3 4 :
+@cowbell: x x x x :
+
