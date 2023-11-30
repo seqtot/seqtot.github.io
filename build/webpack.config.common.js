@@ -1,7 +1,8 @@
-const path = require('path');
+const Path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
 
 module.exports = (env) => {
   return {
@@ -91,13 +92,17 @@ module.exports = (env) => {
         // favicon: './public/favicon.ico',
         hash: false,
       }),
-      new CleanWebpackPlugin(),
+      //new CleanWebpackPlugin(),
+      //new WatchIgnorePlugin(),
+      // new webpack.WatchIgnorePlugin({
+      //   paths: ['**/motes']
+      // }),
       new MiniCssExtractPlugin({
         filename: '[name].css',
       }),
     ],
     output: {
-      path: path.join(__dirname, '../dist'),
+      path: Path.join(__dirname, '../dist'),
       publicPath: '', // / route в заголовке
       filename: '[name].js',
     },

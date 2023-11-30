@@ -10,19 +10,36 @@ function writeFileSync (fname, content) {
     Fs.closeSync(fhnd);
 }
 
+//console.log('Path.resolve(__dirname)', Path.join(__dirname, '..', 'node_modules'));
+
 module.exports = (env) =>
     merge(common(env), {
         mode: 'development',
         devtool: 'eval',
         devServer: {
-            static: [Path.join(__dirname, '..'),],
+            static: [
+                {
+                    directory: Path.resolve(__dirname, '../motes'),
+                    watch: false,
+                }
+            ],
             hot: true,
             host: 'localhost',
             port: 5500,
             historyApiFallback: true,
+
             // заменить на setupMiddlewares
             setupMiddlewares: backendApi,
         },
+        //watchOptions: {
+            //ignored: ['**/motes', '**/node_modules'],
+        //     ignored: [
+        //         //Path.join(__dirname, '..', 'node_modules'),
+        //         //Path.join(__dirname, '..', 'motes'),
+        //         //Path.resolve(__dirname, '../node_modules'),
+        //         //Path.resolve(__dirname, '../motes'),
+        //     ],
+        //},
 });
 
 // https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch
