@@ -10,7 +10,7 @@ export type FileInfo = {
 class FileService {
     async readTextFile(path: string): Promise<string> {
         const dfr: Deferred = new Deferred<any>();
-        const root = 'D:/seqtot.github.io/motes'; // TODO: delete ???
+        const root = 'D:/seqtot.github.io/assets/motes'; // TODO: delete ???
 
         //const reader = new FileReader();
         fetch(`api/readFile?path=${path}&root=${root}`)
@@ -34,7 +34,7 @@ class FileService {
 
     async readdir(path: string): Promise<FileInfo[]> {
         const dfr: Deferred = new Deferred<any>();
-        const root = 'D:/seqtot.github.io/motes';
+        const root = 'D:/seqtot.github.io/assets/motes';
 
         //const reader = new FileReader();
         fetch(`api/readdir?path=${path}&root=${root}`)

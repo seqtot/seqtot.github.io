@@ -25,6 +25,7 @@ import { WavRecorder } from './ide/wav-recorder';
 import { GetTrackDialog } from './dialogs/get-track-dialog';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
+const isDev = /localhost/.test(window.location.href);
 
 const {
     getMidiConfig
@@ -118,15 +119,48 @@ export class MBoxPage {
         return song;
     }
 
-    initData(force: boolean) {
+    async initData(force: boolean) {
         const songId = this.songId;
         const pageData = this.pageData = this.getPageData();
-
         this.isMy = pageData.source === 'my';
         this.view = pageData.isSongList ? 'list' : 'song';
         this.ns   = pageData.ns;
 
-        //console.log('pageMbox.onMounted', pageData);
+        if (this.view === 'song') {
+            if (pageData['pathNotesText']) {
+                try {
+                    const url = isDev ? pageData['pathNotesText'] : `assets/${pageData['pathNotesText']}`;
+                    const res = await fetch(url); //  // motes/bandit/bell.notes.mid
+
+                    if (res.ok) {
+                        const text = await res.text(); // res.json(); res.blob();
+                        pageData.score = text;
+                    } else {
+                        throw new Error(`${res.status} ${res.statusText}`);
+                    }
+                }
+                catch (error){
+                    console.log('load notesText', error);
+                }
+            }
+
+            if (pageData['pathNotesJson']) {
+                try {
+                    const url = isDev ? pageData['pathNotesJson'] : `assets/${pageData['pathNotesJson']}`;
+                    const res = await fetch(url); //  // motes/bandit/bell.notes.json
+
+                    if (res.ok) {
+                        const json = await res.json(); // res.json(); res.blob();
+                        pageData.songNodeHard = json;
+                    } else {
+                        throw new Error(`${res.status} ${res.statusText}`);
+                    }
+                }
+                catch (error){
+                    console.log('load notesJson', error);
+                }
+            }
+        }
 
         if (this.view === 'song') {
             let songData: SongNode;
@@ -154,28 +188,11 @@ export class MBoxPage {
         }
     }
 
-    onMounted() {
-        this.initData(false);
+    async onMounted() {
+        await this.initData(false);
+
         this.setRightPanelContent();
         this.setPageContent();
-
-        // fetch(`motes/bandit/a.txt`)
-        //     .then( res => {
-        //         return res.text();
-        //         //return res.json();
-        //         //return res.blob();
-        //     } )
-        //     .catch(err => {
-        //         console.log('catch');
-        //         return null;
-        //     })
-        //     .then( data => {
-        //         console.log('data2', data);
-        //         //reader.readAsDataURL(blob);
-        //         // https://learn.javascript.ru/blob
-        //         // var file = window.URL.createObjectURL(blob);
-        //         // window.location.assign(file);
-        //     });
     }
 
     setRightPanelContent() {

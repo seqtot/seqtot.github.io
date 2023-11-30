@@ -19,7 +19,7 @@ module.exports = (env) =>
         devServer: {
             static: [
                 {
-                    directory: Path.resolve(__dirname, '../motes'),
+                    directory: Path.resolve(__dirname, '../assets'),
                     watch: false,
                 }
             ],

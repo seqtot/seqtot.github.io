@@ -20,7 +20,7 @@ const appEl = document.getElementById('app');
 //     /devitband/.test(window.location.href) ||
 //     /local/.test(window.location.href);
 
-const isDev = /local/.test(window.location.href);
+const isDev = /localhost/.test(window.location.href);
 
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';

@@ -19,6 +19,8 @@
     "typeRoots": ["node_modules/@types"],
   },
   "include": ["mboxes","libs/muse", "src"],
-  "exclude": ["motes"],
+  "exclude": [
+    "assets/motes"
+  ],
   "files": ["index.ts"]
 }
