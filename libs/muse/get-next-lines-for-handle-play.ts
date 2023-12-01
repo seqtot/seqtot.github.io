@@ -1,9 +1,9 @@
 'use babel';
 
-import {NoteInfo} from '../types';
-import * as un from './index';
-import {isRefLine} from './getMidiConfig';
-import {getFirstLastRow} from './getFirstLastRow';
+import {NoteInfo, TextBlock} from './types';
+import * as un from './utils';
+import {isRefLine} from './get-midi-config';
+import {getFirstLastRow} from './utils/getFirstLastRow';
 
 type Result = {
     notesByChannels: {
@@ -27,7 +27,7 @@ function getNotesArray(text: string): NoteInfo[] {
 }
 
 export function getNextLinesForHandlePlay(dx: {
-    block: un.TextBlock,
+    block: TextBlock,
     getNextRange: boolean,
     //isInitEvent: boolean,
     currRowInfo: Result['rowsRange'],

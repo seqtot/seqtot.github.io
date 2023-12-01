@@ -1,9 +1,10 @@
-import {CELL_SIZE, Line, LineModel, LineNote} from './line-model';
+import { Muse as m, Line, LineNote, LineModel } from '../libs/muse';
+
 import * as hlp from './keyboard-tone-ctrl-helper';
-import {dyName, getWithDataAttr} from '../src/utils';
-import {KeyboardCtrl, KeyboardPage} from './keyboard-ctrl';
-import {parseInteger} from '../libs/common';
-import {drumNotesInfo} from './drum-board';
+import { dyName, getWithDataAttr } from '../src/utils';
+import { KeyboardCtrl, KeyboardPage } from './keyboard-ctrl';
+import { parseInteger } from '../libs/common';
+import { drumNotesInfo } from './drum-board';
 import { UserSettings, UserSettingsStore } from './user-settings-store';
 
 const rem = 'rem';
@@ -230,14 +231,14 @@ export class KeyboardChessCtrl {
 
             box.cols = this.getChessLine(row.durQ / row.cellSizeQ);
             box.cols.forEach((col, i) => {
-                col.startOffsetQ = row.startOffsetQ + (CELL_SIZE * i);
+                col.startOffsetQ = row.startOffsetQ + (m.CELL_SIZE * i);
                 col.totalOffsetQ = col.startOffsetQ + row.blockOffsetQ;
             });
 
             const offsets = this.liner.getOffsetsByRow(row);
 
             for (let offset of offsets) {
-                const iCell = (offset - row.startOffsetQ) / CELL_SIZE;
+                const iCell = (offset - row.startOffsetQ) / m.CELL_SIZE;
                 const notes = this.liner.getNotesListByOffset(row, offset);
 
                 const col = box.cols[iCell];
@@ -257,7 +258,7 @@ export class KeyboardChessCtrl {
         // COL - bgColor
         boxedRows.forEach((box, iRow) => {
             box.cells.forEach(cell => {
-                let colCount = cell.durQ ? Math.floor(cell.durQ / CELL_SIZE) : 1;
+                let colCount = cell.durQ ? Math.floor(cell.durQ / m.CELL_SIZE) : 1;
                 let colInd = cell.colInd;
 
                 for (let i = iRow; i < boxedRows.length; i++) {

@@ -11,13 +11,10 @@ import '../../libs/cm-addons/addon_search_search';
 import { ComponentContainer as GlComponentContainer } from '../../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../../libs/gl/ts/config/resolved-config';
 import { Editor as CmEditor } from 'codemirror';
-import { Synthesizer } from '../../libs/muse/synthesizer';
-import { defaultSynthSettings } from '../../libs/muse/keyboards';
-import { Sound } from '../../libs/muse/sound';
+import { Muse as m, Synthesizer, Sound, MultiPlayer } from '../../libs/muse';
 import { FileInfo } from '../../libs/common/file-service';
 import Fs from '../../libs/common/file-service';
 import { LinePlayer } from './line-player';
-import {MultiPlayer} from '../../libs/muse/multi-player';
 
 const texts = {
 
@@ -131,7 +128,7 @@ export class TextEditorGlComponent {
       /*, singleBuffer*/
     });
 
-    this.synthesizer.setSettings(defaultSynthSettings);
+    this.synthesizer.setSettings(m.defaultSynthSettings);
     //this.synthesizer.addMidiSound(MIDI_INSTR); // MIDI_INSTR
   }
 

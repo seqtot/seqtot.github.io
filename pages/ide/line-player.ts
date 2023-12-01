@@ -1,10 +1,7 @@
 'use babel';
 
 import {Editor} from 'codemirror';
-import {MultiPlayer} from '../../libs/muse/multi-player';
-import {Synthesizer} from '../../libs/muse/synthesizer';
-import * as un from '../../libs/muse/utils';
-import {getInstrCodeBy} from '../../libs/muse/instruments';
+import { Muse as m, FileSettings, NoteInfo, MultiPlayer, Synthesizer, TextBlock, DataByTracks } from '../../libs/muse';
 import {
     getAllMusicKeyCodes,
     getRightKeyCodes,
@@ -13,16 +10,10 @@ import {
     unplayedKeysHash,
     skipEvent,
 } from './line-player-utils';
-import {NoteInfo} from '../../libs/muse/types';
 import { ideService } from './ide-service';
 
-import {getMidiConfig} from '../../libs/muse/utils/getMidiConfig';
-import {getFileSettings, FileSettings, getPitchShiftSetting} from '../../libs/muse/utils/getFileSettings';
-import {getNextLinesForHandlePlay} from '../../libs/muse/utils/getNextLinesForHandlePlay';
-import {Sound} from '../../libs/muse/sound';
-import * as wav from '../../libs/muse/utils/node-wav'
-import Fs from '../../libs/common/file-service';
-import { parseInteger } from '../../libs/muse/utils';
+// import * as wav from '../../libs/muse/utils/node-wav'
+// import Fs from '../../libs/common/file-service';
 import {WavRecorder} from './wav-recorder';
 
 type Nil = null | undefined;
@@ -32,7 +23,7 @@ type InputMode = Nil | 'text' | 'beat' | 'sound' | 'voice' | 'linePlayer';
 export async function decodeArrayBufferToAudio(
     arrayBuffer: ArrayBuffer
 ): Promise<AudioBuffer> {
-    return await Sound.ctx.decodeAudioData(arrayBuffer);
+    return await m.Sound.ctx.decodeAudioData(arrayBuffer);
 }
 
 export async function getAudioBufferFromBlob(blob: Blob): Promise<AudioBuffer> {
@@ -86,12 +77,12 @@ type RowInfo = {
     last: number,
 }
 
-function getDataByTracksFromSettings(settings: FileSettings): un.DataByTracks {
+function getDataByTracksFromSettings(settings: FileSettings): DataByTracks {
     const dataByTracksSrc = settings?.dataByTracks || {};
-    const dataByTracks = {} as un.DataByTracks;
+    const dataByTracks = {} as DataByTracks;
 
     Object.keys(dataByTracksSrc).forEach(name => {
-        const volume = un.getVolumeFromString(dataByTracksSrc[name]);
+        const volume = m.getVolumeFromString(dataByTracksSrc[name]);
 
         dataByTracks[name] = {
             volume
@@ -134,9 +125,9 @@ export class LinePlayer {
     bpmInfo: BpmInfo = emptyBpmInfo();
     multiPlayer: MultiPlayer;
     lastTickTime: number = 0;
-    currBlock: un.TextBlock;
+    currBlock: TextBlock;
     currRowInfo: RowInfo = { first: 0, last: 0}; // индекс в текущем блоке
-    blocks: un.TextBlock[] = [];
+    blocks: TextBlock[] = [];
     settings: FileSettings = <any>{};
     bassKeys = getLeftKeyCodes();
     instrCodeByKeyCode = getInstrCodesByKeyCodes();
@@ -244,7 +235,7 @@ export class LinePlayer {
                 id,
                 keyOrNote: note,
                 print: false,
-                instrCode: getInstrCodeBy(instrAlias),
+                instrCode: m.getInstrCodeBy(instrAlias),
                 volume: volume / 100,
                 pitchShift: pitchShift,
             });
@@ -314,7 +305,7 @@ export class LinePlayer {
         if (type === DOWN) {
             this.synthesizer.playSound({
                 keyOrNote: evt.code,
-                pitchShift: parseInteger(this.settings.boardShift[0], 0),
+                pitchShift: m.parseInteger(this.settings.boardShift[0], 0),
                 print: true,
                 onlyStop: false,
                 instrCode: ideService.useToneInstrument,
@@ -326,7 +317,7 @@ export class LinePlayer {
         if (type === UP) {
             this.synthesizer.playSound({
                 keyOrNote: evt.code,
-                pitchShift: parseInteger(this.settings.boardShift[0], 0),
+                pitchShift: m.parseInteger(this.settings.boardShift[0], 0),
                 onlyStop: true,
             });
 
@@ -478,7 +469,7 @@ export class LinePlayer {
     }
 
     getNextLinesForHandlePlay(getNextRange = true, isInitEvent = false) {
-        const data = getNextLinesForHandlePlay({
+        const data = m.getNextLinesForHandlePlay({
             block: this.currBlock,
             getNextRange: getNextRange,
             //isInitEvent: isInitEvent,
@@ -499,11 +490,11 @@ export class LinePlayer {
     getCurrBlockInfo(evt: KeyboardEvent) {
         const x = {
             blocks: this.blocks,
-            currBlock: null as un.TextBlock,
+            currBlock: null as TextBlock,
             currRowInfo: this.currRowInfo,
             excludeIndex: [],
-            midiBlockOut: null as un.TextBlock,
-            playBlockOut: '' as string | un.TextBlock,
+            midiBlockOut: null as TextBlock,
+            playBlockOut: '' as string | TextBlock,
             topBlocksOut: [],
         };
 
@@ -519,7 +510,7 @@ export class LinePlayer {
         //console.log('getCurrBlockInfo.blocks 1', [...blocks]);
 
         if (evt.ctrlKey) {
-            getMidiConfig(x);
+            m.getMidiConfig(x);
         }
 
         const playingWithMidi = this.playingWithMidi;
@@ -537,7 +528,7 @@ export class LinePlayer {
                 },
                 excludeLines: this.settings.exclude,
                 dataByTracks: getDataByTracksFromSettings(this.settings),
-                pitchShift: un.parseInteger(this.settings.pitchShift[0]),
+                pitchShift: m.parseInteger(this.settings.pitchShift[0]),
                 //beatsWithOffsetMs: un.getBeatsByBpmWithOffset(90, 8),
             });
         }
@@ -563,19 +554,19 @@ export class LinePlayer {
     onConnect() {
         let text = this.textInput.getValue() + '\n';
 
-        this.settings = getFileSettings(un.getTextBlocks(text));
-        this.pitchShift = getPitchShiftSetting(this.settings);
+        this.settings = m.getFileSettings(m.getTextBlocks(text));
+        this.pitchShift = m.getPitchShiftSetting(this.settings);
         //console.log('onConnect.settings', this.settings);
 
         if (this.settings['import'].length) {
             //text = text + uc.readFileSync(uc.dirname(this.uri) + '/' + this.settings['import'][0]); // jjkl
         }
 
-        let blocks = un.getTextBlocks(text);
+        let blocks = m.getTextBlocks(text);
 
         blocks.forEach(block => {
             block.rows = block.rows.map(text => {
-                return un.clearEndComment(text).trim();
+                return m.clearEndComment(text).trim();
             });
         });
 

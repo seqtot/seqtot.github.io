@@ -1,6 +1,8 @@
 'use babel';
 
-import { getVolumeFromString, parseInteger, isPresent, negativeChar, vibratoChar, timeCharRE } from './utils-note';
+import { parseInteger } from './parse-integer';
+
+import { getVolumeFromString, isPresent, negativeChar, vibratoChar, timeCharRE } from './utils-note';
 import { WaveSlide } from '../types';
 
 // дтрн мфвс злкб

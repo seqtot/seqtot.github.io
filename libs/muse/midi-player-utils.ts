@@ -1,25 +1,36 @@
 'use babel';
 
-import {KeyInfo } from './sound';
 import * as un from './utils';
 import {getInstrumentObj} from './instruments';
-import {WavePreset} from '../waf-player/otypes';
+import {WavePreset, WaveZone} from '../waf-player/otypes';
 import {NoteLineInfo, WaveSlide} from './types';
+import {instrName} from '../../pages/keyboard-tone-ctrl-helper';
 
-export type TicksInfo = {
-    [key: string]: {
-        notes: string; // вид исходных нот переданных для воспроизведения
-        offsetFromBeatMs?: number;
-        durationMs?: number;
-        volume: number,
-        pitchShift: number,
-        slides?: WaveSlide[],
-        cent?: number,
+type MidiCodeAndZone = {
+    code: number,
+    zone?: WaveZone,
+}
 
-        soundInfo: KeyInfo | KeyInfo[];
-        instrCodeDeprecated: number;
-        instrObj: WavePreset;
-    }[];
+/**
+ * Одиночная нота для воспроизведения
+ */
+export type NoteForTick = {
+    notes: string; // вид исходных нот переданных для воспроизведения
+    offsetFromBeatMs?: number;
+    durationMs?: number;
+    volume: number,
+    pitchShift: number,
+    slides?: WaveSlide[],
+    cent?: number,
+
+    soundsInfo: MidiCodeAndZone[];
+    instrName: string;
+    instrObj: WavePreset;
+    zone?: WaveZone
+};
+
+export type TicksInfoMap = {
+    [key: string]: NoteForTick[];
 };
 
 export type LoopInfo = {
@@ -30,9 +41,11 @@ export type LoopInfo = {
     isDrum: boolean;
     volume: number; // ??? parentVolume
     isHead?: boolean;
+    // [key]: TicksInfo
+    // [key]: TicksInfo
 };
 
-export type LoopAndTicksInfo = LoopInfo & TicksInfo;
+export type LoopAndTicksInfo = LoopInfo & TicksInfoMap;
 
 function getBeatIndex(offsetQ: number, dx: {
     restForNextRowQ: number,
@@ -87,7 +100,7 @@ function getDurationMs(
 function buildSked (ind: number, dx: {
     offsetQ: number,
     noteLineInfo: NoteLineInfo,
-    getSoundInfoArr: (notes: string)=> KeyInfo[]
+    getSoundsInfoArr: (notes: string)=> MidiCodeAndZone[]
     beatsMs: number[],
     beatsQ: number[],
     instrAny?: string | number | WavePreset,
@@ -108,7 +121,7 @@ function buildSked (ind: number, dx: {
         const isDrum = un.isDrum(info.instr);
 
         //console.log('dx.getSoundInfoArr 1');
-        let soundInfoArr = dx.getSoundInfoArr(isDrum ? info.instr : info.note);
+        let soundsInfoArr = dx.getSoundsInfoArr(isDrum ? info.instr : info.note);
         let beatIndex = getBeatIndex(dx.offsetQ, dx);
 
         if (beatIndex >= dx.beatsMs.length) {
@@ -127,7 +140,7 @@ function buildSked (ind: number, dx: {
         volume = un.mergeVolume(volume, dx.parentVolume);
         let pitchShift = info.pitchShift || 0;
 
-        if (soundInfoArr.length) {
+        if (soundsInfoArr.length) {
             dx.sked[beatIndex] = Array.isArray(dx.sked[beatIndex]) ? dx.sked[beatIndex] : [];
 
             const slides = info.slides
@@ -141,8 +154,8 @@ function buildSked (ind: number, dx: {
                 notes: info.note,
                 durationMs,
                 offsetFromBeatMs,
-                soundInfo: soundInfoArr,
-                instrCodeDeprecated: 0,
+                soundsInfo: soundsInfoArr,
+                instrName: info.instr,
                 instrObj,
                 volume,
                 pitchShift,
@@ -169,7 +182,7 @@ export function getSkedByQuarters(
         restForNextRowQ: number;  // добавляется только для первого цикла
         colLoopDurationQ: number; // длина одного цикла внутри которого надоходится линейка
     },
-   getSoundInfoArr: (notes: string, ifDef?: string) => KeyInfo[]
+   getSoundsInfoArr: (notes: string, ifDef?: string) => MidiCodeAndZone[]
 ): LoopAndTicksInfo {
         // все поля обязательно, но проверям их заполненность
         //console.log('getSkedByQuarters.props', props);
@@ -181,7 +194,7 @@ export function getSkedByQuarters(
             beatsMs: props.beatsMs,
             beatsQ: [] as number[],
             repeat: 0,
-            getSoundInfoArr,
+            getSoundsInfoArr,
             sked: {} as LoopAndTicksInfo,
             restForNextRowQ: props.restForNextRowQ || 0,
             restFromPrevRowQ: 0,

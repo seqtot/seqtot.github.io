@@ -1,5 +1,8 @@
 'use babel';
 
+import { findZone } from '../waf-player/prepare';
+import { WaveZone } from '../waf-player/otypes';
+
 import { freqByNoteHash } from './freq';
 import { Sound, PlayingItem, KeyInfo } from './sound';
 import { EventEmitter } from './ee';
@@ -8,7 +11,7 @@ import {DEFAULT_TONE_INSTR} from './keyboards';
 import {getInstrCodeBy} from './instruments';
 import {Ticker} from './ticker';
 import {getSkedByQuarters, LoopAndTicksInfo} from './midi-player-utils'
-import {NoteLineInfo, WaveSlide} from './types';
+import {NoteLineInfo, WaveSlide, DataByTracks} from './types';
 
 const QUANT = 10;
 // 10 10 10 10 10
@@ -17,6 +20,11 @@ const QUANT = 10;
 type PlayResult = {
     break: boolean,
     endTime?: number
+}
+
+type MidiCodeAndZone = {
+    code: number,
+    zone?: WaveZone,
 }
 
 const ee = new EventEmitter();
@@ -153,16 +161,18 @@ export class MidiPlayer extends Sound {
         const isDrum = un.isDrum(instrCode);
 
         //console.log('this.getSoundInfoArr 2');
-
-        const soundInfo = this.getSoundInfoArr(x.notes);
         const instrObj = this.instruments[instrCode];
 
-        if (!soundInfo.length || !instrObj) {
+        if (!instrObj) return null;
+
+        const soundsInfo = this.getSoundsInfoArr(x.notes);
+
+        if (!soundsInfo.length) {
             return null;
         }
 
         return this.getSoundMidi({
-            soundInfo,
+            soundsInfo,
             instrObj,
             isDrum,
             durationMs: x.durationMs || 0,
@@ -177,7 +187,7 @@ export class MidiPlayer extends Sound {
     // getNotesMidi
     //   getSoundMidi
     getSoundMidi(x: {
-        soundInfo: KeyInfo | KeyInfo[];
+        soundsInfo: MidiCodeAndZone | MidiCodeAndZone[];
         durationMs: number;
         isDrum?: boolean;
         volume?: number;
@@ -187,7 +197,7 @@ export class MidiPlayer extends Sound {
         slides?: WaveSlide[],
         cent?: number,
     }): any {
-        if (!x.instrObj || !x.soundInfo || !x.durationMs) {
+        if (!x.instrObj || !x.soundsInfo || !x.durationMs) {
             return;
         }
 
@@ -206,16 +216,17 @@ export class MidiPlayer extends Sound {
         //     durationMs = 1000; //duration * 2;
         // }
 
-        const sounds = Array.isArray(x.soundInfo)
-            ? x.soundInfo
-            : [x.soundInfo];
+        const sounds = Array.isArray(x.soundsInfo)
+            ? x.soundsInfo
+            : [x.soundsInfo];
 
         for (let soundInfo of sounds) {
             (item as any).midis.push(
                 this.fontPlayer.queueWaveTableSrc({
                     audioContext: this.ctx,
-                    targetNode: Sound.masterGain, // this.ctx.destination,
                     preset: x.instrObj,
+                    zone: soundInfo.zone,
+                    targetNode: Sound.masterGain, // this.ctx.destination,
                     when: x.whenSec || 0,
                     pitch: soundInfo.code + (pitchShift || 0),
                     duration: durationMs / 1000, // in sec / 1000
@@ -229,10 +240,9 @@ export class MidiPlayer extends Sound {
         return item;
     }
 
-    // до+ре+му
-    // jjklDrums
-    getSoundInfoArr(notes: string): KeyInfo[] {
-        const result: KeyInfo[] = [];
+    // до+ре+му => [{code: N}, {code: N}, {code: N}]
+    getSoundsInfoArr(notes: string): MidiCodeAndZone[] {
+        const result: MidiCodeAndZone[] = [];
 
         //ifDef = (ifDef || '').replace(un.toneChar, '').replace(un.drumChar, '').trim();
         notes = (notes || '').trim();
@@ -254,7 +264,9 @@ export class MidiPlayer extends Sound {
             const keysAndNotes = this.keysAndNotes || {}
             const soundInfo = keysAndNotes[noteLat];
 
-            result.push(soundInfo);
+            result.push({
+                code: soundInfo.code
+            });
         });
 
         return result.filter((item) => !!item);
@@ -263,7 +275,7 @@ export class MidiPlayer extends Sound {
     /**
      * Ничего не знаю про startTimeSec, offsetSec, beatOffsetMs
      */
-    addLoopByQuarters(params: {
+    addLoopByQuarters(x: {
         noteLine: string,
         noteLineInfo?: NoteLineInfo,
         repeat?: number,
@@ -276,20 +288,23 @@ export class MidiPlayer extends Sound {
         restFromPrevRowQ?: number,
         restForNextRowQ?: number,
         colLoopDurationQ?: number, // длина одного цикла внутри которого надоходится линейка
-        dataByTracks: un.DataByTracks,
+        dataByTracks: DataByTracks,
         trackName?: string,
     }): LoopAndTicksInfo {
+        //console.log('addLoopByQuarter.params', x);
+
         this.loopId++;
 
         let loopId = this.loopId;
-        let { noteLine, isDrum, instrCode } = params;
-        let beatsMs = Array.isArray(params.beatsMs) ? params.beatsMs : [];
-        let repeat = params.repeat === Infinity ? 1000000 : params.repeat;
-        let noteLineInfo = params.noteLineInfo || un.getNoteLineInfo(noteLine);
+        let { noteLine, isDrum, instrCode } = x;
+        let beatsMs = Array.isArray(x.beatsMs) ? x.beatsMs : [];
+        let repeat = x.repeat === Infinity ? 1000000 : x.repeat;
+        let noteLineInfo = x.noteLineInfo || un.getNoteLineInfo(noteLine);
         let beat = -1;
         let repeated = 0;
-        let parentVolume = un.getSafeVolume(params.parentVolume);
+        let parentVolume = un.getSafeVolume(x.parentVolume);
 
+        //console.log('addLoopByQuarter.dataByTracks', params.dataByTracks);
         //console.log('addLoopByQuarter.noteLineInfo', noteLineInfo);
         //console.log('addLoopByQuarter.repeat', repeat);
         //console.log('addLoopByQuarter.beatsMs', beatsMs);
@@ -303,32 +318,63 @@ export class MidiPlayer extends Sound {
                 repeat,
                 beatsMs: [...beatsMs],
                 parentVolume,
-                restFromPrevRowQ: params.restFromPrevRowQ,
-                restForNextRowQ: params.restForNextRowQ,
-                colLoopDurationQ: params.colLoopDurationQ,
+                restFromPrevRowQ: x.restFromPrevRowQ,
+                restForNextRowQ: x.restForNextRowQ,
+                colLoopDurationQ: x.colLoopDurationQ,
             },
-            (val: string) => this.getSoundInfoArr(val)
+            (val: string) => this.getSoundsInfoArr(val)
         );
 
         sked.id = loopId;
         delete this.loops[loopId];
         this.loops[loopId] = sked;
 
+        //console.log('addLoopByQuarter.sked', sked);
+
+        // подбор зоны для ноты
+        Object.values(sked).forEach(item => {
+            if (!Array.isArray(item)) return;
+
+            item.forEach(item => {
+                if (!Array.isArray(item.soundsInfo) || !item.instrObj) return;
+
+                item.soundsInfo.forEach(sound => {
+                    sound.zone = sound.code ? findZone(
+                        Sound.ctx,
+                        item.instrObj,
+                        sound.code + (item.instrObj.pitchShift || 0) + (item.pitchShift || 0)
+                    ): undefined;
+                });
+            });
+        });
+
         //console.log('addLoopByQuarters.sked', sked);
-        //console.log('SKED', sked);
+
+        const DEFAULT_OUT_VOLUME = 70;
 
         const onGetNextSound = (eeParams: { tick: number; whenSec: number }) => {
             beat++;
-
             if (Array.isArray(sked[beat])) {
                 for (const item of sked[beat]) {
+                    let instVolume = (x.dataByTracks[x.trackName]?.items && x.dataByTracks[x.trackName].items[item.instrName]);
+                    let volume = un.mergeVolume(
+                        un.getSafeVolume(x.dataByTracks.total.volume, DEFAULT_OUT_VOLUME),
+                        un.getSafeVolume(x.dataByTracks[x.trackName]?.volume)
+                    );
+
+                    if (instVolume) {
+                        volume = un.mergeVolume(volume, instVolume.volume);
+                    }
+
+                    volume = un.mergeVolume(item.volume, un.getSafeVolume(volume));
+
                     this.getSoundMidi({
                         durationMs: item.durationMs,
-                        isDrum: params.isDrum,
+                        isDrum: x.isDrum,
                         instrObj: item.instrObj,
-                        soundInfo: item.soundInfo,
+                        soundsInfo: item.soundsInfo,
                         whenSec: eeParams.whenSec + ( item.offsetFromBeatMs / 1000),
-                        volume: item.volume,
+                        volume,
                         pitchShift: item.pitchShift,
                         slides: item.slides,
                         cent: item.cent,

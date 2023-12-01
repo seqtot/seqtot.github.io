@@ -1,27 +1,18 @@
 'use babel';
 
-import * as un from './utils-note';
+import {TextBlock, FileSettings} from '../types';
+import { parseInteger } from './parse-integer';
 import {drumChar, toneChar} from './utils-note';
-
-export type FileSettings = {
-    import: string[],
-    exclude: string[],
-    dataByTracks: {[key: string]: string},
-    pitchShift: string[],
-    boardShift: string[],
-    bpm: string[],
-    //[key: string]: any,
-};
 
 export function getPitchShiftSetting(settings: any): number {
     if (!Array.isArray((settings as FileSettings)?.pitchShift)) {
         return 0;
     }
 
-    return un.parseInteger((settings as FileSettings).pitchShift[0], 0);
+    return parseInteger((settings as FileSettings).pitchShift[0], 0);
 }
 
-export function getFileSettings(blocks: un.TextBlock[] ): FileSettings {
+export function getFileSettings(blocks: TextBlock[] ): FileSettings {
     const result: FileSettings = {
         import: [],
         exclude: [],

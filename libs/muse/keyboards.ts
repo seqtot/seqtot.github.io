@@ -2,7 +2,7 @@
 
 import {drumKeysRight, drumInfo, drumCodes} from './drums';
 
-export const DEFAULT_TONE_INSTR = 162;
+export const DEFAULT_TONE_INSTR: number = 162;
 
 // # bass 370
 // # Acoustic Bass: 366 - 374

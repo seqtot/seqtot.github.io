@@ -5,27 +5,23 @@ import {Range} from 'framework7/components/range/range';
 import {Dom7Array} from 'dom7';
 
 import { byId, dyName } from '../src/utils';
-import { Sound } from '../libs/muse/sound';
-import { MultiPlayer } from '../libs/muse/multi-player';
-import { Synthesizer } from '../libs/muse/synthesizer';
-import * as un from '../libs/muse/utils/utils-note';
-import { defaultSynthSettings } from '../libs/muse/keyboards';
+import { Muse as m } from '../libs/muse';
 import mboxes from '../mboxes';
 
-const multiPlayer = new MultiPlayer();
-const metronome = new MultiPlayer();
-const synthesizer = new Synthesizer();
-synthesizer.connect({ ctx: Sound.ctx });
-synthesizer.setSettings(defaultSynthSettings);
+const multiPlayer = new m.MultiPlayer();
+const metronome = new m.MultiPlayer();
+const synthesizer = new m.Synthesizer();
+synthesizer.connect({ ctx: m.Sound.ctx });
+synthesizer.setSettings(m.defaultSynthSettings);
 
-Sound.AddSound(366); // bass
-Sound.AddSound(697); // sax
-Sound.AddSound(776); // flute
-Sound.AddSound(762); // piccolo
-Sound.AddSound(790); // Pan Flute
-Sound.AddSound(781); // Recorder
-Sound.AddSound(320); // gdm guidar drive mute
-Sound.AddSound(137); // xlph xylophone
+m.Sound.AddSound(366); // bass
+m.Sound.AddSound(697); // sax
+m.Sound.AddSound(776); // flute
+m.Sound.AddSound(762); // piccolo
+m.Sound.AddSound(790); // Pan Flute
+m.Sound.AddSound(781); // Recorder
+m.Sound.AddSound(320); // gdm guidar drive mute
+m.Sound.AddSound(137); // xlph xylophone
 
 function getWithDataAttr<T extends HTMLElement = HTMLElement>(
     name: string,
@@ -263,7 +259,7 @@ export class MBoxOldPage {
     if (el) {
       el.addEventListener('click', () => {
         const val =
-            un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
+            m.getRandomElement('dtrnmfvszlkb') + m.getRandomElement('uoa');
 
         const key = dyName(
             `note-key-${val}`,
@@ -286,7 +282,7 @@ export class MBoxOldPage {
         }
 
         let baseNote = wrapper.dataset.relativeKeyboardBase || 'do';
-        let note = un.getNoteByOffset(baseNote, el.dataset.relativeKey);
+        let note = m.getNoteByOffset(baseNote, el.dataset.relativeKey);
 
         if (!note) {
           return;

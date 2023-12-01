@@ -2,8 +2,8 @@ import { Range } from 'framework7/components/range/range';
 import { Dialog } from 'framework7/components/dialog/dialog';
 import { ComponentContext } from 'framework7/modules/component/component';
 
+import { Muse as m } from '../../libs/muse';
 import { getWithDataAttr, getWithDataAttrValue } from '../../src/utils';
-import { drumChar, isPresent, parseInteger } from '../../libs/muse/utils';
 import { DEFAULT_OUT_VOLUME, SongNode, TrackInfo } from '../song-store';
 import { ideService } from '../ide/ide-service';
 
@@ -176,7 +176,7 @@ export class TracksVolumeDialog {
 
         this.tracks.unshift({
             name: 'total',
-            volume: parseInteger(this.song.volume, DEFAULT_OUT_VOLUME),
+            volume: m.parseInteger(this.song.volume, DEFAULT_OUT_VOLUME),
             board: ''
         });
 
@@ -205,7 +205,7 @@ export class TracksVolumeDialog {
             if (oldSubitems.length) {
                 track.items.forEach(newSubitem => {
                     const oldSubitem = oldSubitems.find(oldSubitem => oldSubitem.name === newSubitem.name);
-                    newSubitem.volume = isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
+                    newSubitem.volume = m.isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
                 });
             }
 

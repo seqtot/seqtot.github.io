@@ -1,11 +1,9 @@
-import {SongNode, SongStore, StoredRow, StoredSongNodeOld, TrackInfo} from './song-store';
-import {ideService} from './ide/ide-service';
-import {getMidiConfig, getTopOutListHash} from '../libs/muse/utils/getMidiConfig';
-import {Line, LineModel} from './line-model';
-import { TextBlock } from '../libs/muse/utils';
-import { Sound } from '../libs/muse/sound';
-import * as un from '../libs/muse/utils';
-import {FileSettings} from '../libs/muse/utils/getFileSettings';
+import { StoredRow, SongNode, TrackInfo, TextBlock, FileSettings, SongPartInfo } from './types';
+import { parseInteger, getVolumeFromString, OutBlockRowInfo, hasDrumChar, getOutBlocksInfo, getPartInfo, NoteLn } from './utils';
+
+import { getMidiConfig, getTopOutListHash } from './get-midi-config';
+import { LineModel } from './line-model';
+import { Sound } from './sound';
 
 function getOutBlock(blocks: TextBlock[]): TextBlock {
     return  blocks.find((item) => item.id === 'out');
@@ -50,25 +48,26 @@ export function sortTracks(tracks: TrackInfo[]) {
 type FnInput = {
     songId: string,
     ns: string,
-    songNodeInput: SongNode,
     settings: FileSettings,
     blocks: TextBlock[],
+    sourceSong: SongNode,
+    targetSong: SongNode,
 };
 
 export function textModelToLineModel(x: FnInput): SongNode {
     //console.log('textModelToLineModel', x);
 
-    const song = SongStore.GetOldSong(x.songId, x.ns, true);
+    const song = x.targetSong;
 
-    const partsArr = getTopOutListHash({topBlock: getOutBlock(ideService.blocks)});
-    const partsHashByNio: {[partNio: string]: un.SongPartInfo} = Object.create(null);
+    const partsArr = getTopOutListHash({topBlock: getOutBlock(x.blocks)});
+    const partsHashByNio: {[partNio: string]: SongPartInfo} = Object.create(null);
 
     // это новая песня
     if (!song.tracks.length) {
-        song.bmpValue = un.parseInteger(x.settings.bpm[0], 90);
+        song.bmpValue = parseInteger(x.settings.bpm[0], 90);
     }
 
-    song.pitchShiftSrc = un.parseInteger(x.settings.pitchShift[0], 0);
+    song.pitchShiftSrc = parseInteger(x.settings.pitchShift[0], 0);
     song.pitchShift = 0;
 
     //console.log('song.pitchShiftSrc', x.settings, song.pitchShiftSrc);
@@ -111,7 +110,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
     //console.log('songSettings.dataByTracks', x.settings.dataByTracks);
 
     Object.keys(x.settings.dataByTracks).forEach(name => {
-        const volume = un.getVolumeFromString(x.settings.dataByTracks[name]);
+        const volume = getVolumeFromString(x.settings.dataByTracks[name]);
 
         if (!realHardTracks[name]) {
             realHardTracks[name] = name;
@@ -121,15 +120,15 @@ export function textModelToLineModel(x: FnInput): SongNode {
             hardTracks[name] = {
                   name,
                   volume,
-                  board: un.hasDrumChar(name) ? 'drums' : 'guitar',
+                  board: hasDrumChar(name) ? 'drums' : 'guitar',
                   isHardTrack: true,
             };
         }
     });
 
     // ТРЭКИ ИЗ поля songNodeHard
-    if ((x.songNodeInput as any).songNodeHard) {
-        const subSong = (x.songNodeInput as any).songNodeHard as SongNode;
+    if ((x.sourceSong as any).songNodeHard) {
+        const subSong = (x.sourceSong as any).songNodeHard as SongNode;
         const tracks = (subSong?.tracks || []) as TrackInfo[];
         const dynamic = (subSong?.dynamic || []) as StoredRow[];
 
@@ -156,20 +155,20 @@ export function textModelToLineModel(x: FnInput): SongNode {
         currBlock: blocks.find((item) => item.id === 'out'),
         currRowInfo: { first: 0, last: 0},
         excludeIndex: [],
-        midiBlockOut: null as un.TextBlock,
-        playBlockOut: '' as string | un.TextBlock,
+        midiBlockOut: null as TextBlock,
+        playBlockOut: '' as string | TextBlock,
         topBlocksOut: [],
     };
 
     getMidiConfig(midiConfig);
 
-    const box = un.getOutBlocksInfo(x.blocks, midiConfig.playBlockOut);
+    const box = getOutBlocksInfo(x.blocks, midiConfig.playBlockOut);
 
     const tracksByScore: {[key: string]: string} = {}
     const parts: {
         partId: string,
         durationQ: number,
-        rows: un.OutBlockRowInfo[],
+        rows: OutBlockRowInfo[],
         text: string
     }[] = [];
 
@@ -177,13 +176,13 @@ export function textModelToLineModel(x: FnInput): SongNode {
     let currPart: {
         partId: string,
         durationQ: number,
-        rows: un.OutBlockRowInfo[],
+        rows: OutBlockRowInfo[],
         text: string,
     };
 
     // ЧАСТИ И ТРЭКИ из текстовой модели
     box.rows.forEach(row => {
-        const partInfo = un.getPartInfo(row.text);
+        const partInfo = getPartInfo(row.text);
 
         if (partInfo.partId !== partId) {
             partId = partInfo.partId;
@@ -228,7 +227,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
             hardTracks[name] = {
                 name,
                 volume: 50,
-                board: un.hasDrumChar(name) ? 'drums' : 'guitar',
+                board: hasDrumChar(name) ? 'drums' : 'guitar',
                 isHardTrack: true,
             }
         }
@@ -287,7 +286,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
 
     // PART -> TRACK -> LINES -> NOTES
     parts.forEach(part => {
-        const partInfo = un.getPartInfo(part.text);
+        const partInfo = getPartInfo(part.text);
 
         partsArr.forEach(item => {
             if (item.partId === partInfo.partId) {
@@ -296,7 +295,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
         });
 
         Object.keys(tracksByScore).forEach(trackName => {
-            const lns: un.NoteLn[] = [];
+            const lns: NoteLn[] = [];
 
             part.rows.forEach(row => {
                 row.trackLns.forEach(ln => {
@@ -361,8 +360,8 @@ export function textModelToLineModel(x: FnInput): SongNode {
     }); // loop by parts
 
     // СТРОКИ ИЗ поля songNodeHard
-    if ((x.songNodeInput as any).songNodeHard) {
-        const subSong = (x.songNodeInput as any).songNodeHard as SongNode;
+    if ((x.sourceSong as any).songNodeHard) {
+        const subSong = (x.sourceSong as any).songNodeHard as SongNode;
         const items = (subSong?.dynamic || []) as StoredRow[];
 
         song.dynamic = [...song.dynamic, ...items];

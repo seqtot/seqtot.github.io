@@ -5,8 +5,8 @@ import Fs from '../../libs/common/file-service';
 
 import { WebAudioFontLoader } from '../../libs/waf-player/loader';
 import { getInstrumentTitles } from '../../libs/waf-player/instrument-titles';
-import {parseInteger} from '../../libs/common';
-import {Sound} from '../../libs/muse/sound';
+import { parseInteger } from '../../libs/common';
+import { Sound } from '../../libs/muse';
 
 type FileInfo = {
     path: string,

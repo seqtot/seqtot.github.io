@@ -12,6 +12,7 @@ import * as un from './utils';
 import { DEFAULT_TONE_INSTR } from './keyboards';
 import { drumCodes } from './drums';
 import { hardcodedInstruments, instruments as instruments2 } from './instruments';
+import {WaveZone} from '../waf-player/otypes';
 
 export const instruments = instruments2;
 const loadingInstruments: { [code: number]: boolean } = {};
@@ -33,6 +34,8 @@ export type KeyInfo = {
 
     isDrum?: boolean;
     freq?: number;
+
+    zone?: WaveZone;
 };
 
 export type PlayingItem = {

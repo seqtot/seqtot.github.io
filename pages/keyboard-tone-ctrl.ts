@@ -1,13 +1,10 @@
 import { Dialog } from 'framework7/components/dialog/dialog';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { ideService } from './ide/ide-service';
-import * as un from '../libs/muse/utils/utils-note';
-import { KeyData, Line, LineModel, LineNote, CELL_SIZE } from './line-model';
+import { Muse as m, KeyData, Line, LineModel } from '../libs/muse';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { isT34 } from './keyboard-tone-ctrl-helper';
-import { DEFAULT_TONE_INSTR } from '../libs/muse/keyboards';
-import { getInstrNameByCode } from '../libs/muse/instruments';
 import { KeyboardChessCtrl } from './keyboard-chess-ctrl';
 import { UserSettings, UserSettingsStore } from './user-settings-store';
 
@@ -18,7 +15,7 @@ const monoFont = 'font-family: monospace;';
 
 export class ToneCtrl extends KeyboardCtrl {
     userSettings: UserSettings = UserSettingsStore.GetUserSettings();
-    _instrCode = DEFAULT_TONE_INSTR;
+    _instrCode = m.DEFAULT_TONE_INSTR;
     playingNote: { [key: string]: string } = {};
     lastPlayingNote = '';
     offset = 0;
@@ -45,7 +42,7 @@ export class ToneCtrl extends KeyboardCtrl {
     lastNoteCellGuid = '';
 
     get instrName(): string {
-        const name = getInstrNameByCode(this.instrCode);
+        const name = m.getInstrNameByCode(this.instrCode);
 
         return name ? '$' + name : '';
     }
@@ -612,7 +609,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('instrument-code', parent).forEach(el => {
             el.addEventListener('pointerdown', () => {
-                this._instrCode = un.parseInteger(el.dataset.instrumentCode, DEFAULT_TONE_INSTR);
+                this._instrCode = m.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
                 this.updatePopupBoard();
 
                 ideService.synthesizer.playSound({
@@ -655,7 +652,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('instrument-code', parent).forEach(el => {
             el.addEventListener('pointerdown', () => {
-                this._instrCode = un.parseInteger(el.dataset.instrumentCode, DEFAULT_TONE_INSTR);
+                this._instrCode = m.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
                 this.updatePopupBoard();
 
                 ideService.synthesizer.playSound({
@@ -1039,7 +1036,7 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     setStringCount(stringCount: number | string) {
-        stringCount = un.parseInteger(stringCount, 6);
+        stringCount = m.parseInteger(stringCount, 6);
         let settings = this.getGuitarSettings();
         settings.stringCount = stringCount;
         this.setGuitarSettings(settings);
@@ -1200,7 +1197,7 @@ export class ToneCtrl extends KeyboardCtrl {
         if (el) {
             el.addEventListener('click', () => {
                 const val =
-                    un.getRandomElement('dtrnmfvszlkb') + un.getRandomElement('uoa');
+                    m.getRandomElement('dtrnmfvszlkb') + m.getRandomElement('uoa');
 
                 const key = dyName(
                     `note-key-${val}`,

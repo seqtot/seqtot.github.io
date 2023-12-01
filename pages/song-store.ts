@@ -1,18 +1,4 @@
-import * as un from '../libs/muse/utils/utils-note';
-import { Line, LineNote } from './line-model';
-import { drumCodes } from '../libs/muse/drums';
-import { guitarCodes, bassGuitarCodes } from '../libs/muse/instruments';
-import {isPresent, parseInteger} from '../libs/muse/utils/utils-note';
-
-export type StoredRow = {
-    partId?: string,
-    rowNio?: number, // jjkl
-    rowInPartId: string,
-    type: string,
-    track: string,
-    status: string,
-    lines: Line[],
-}
+import { Muse as m, LineNote, Line, StoredRow } from '../libs/muse';
 
 export type StoredSongNodeOld = {
     [key: string]: {
@@ -60,15 +46,15 @@ export type SongNode = {
 };
 
 function isDrumNote(val: string): boolean {
-    return !!drumCodes[val];
+    return !!m.drumCodes[val];
 }
 
 function isBassGuitarInst(val: string | number): boolean {
-    return !!bassGuitarCodes[val];
+    return !!m.bassGuitarCodes[val];
 }
 
 function isGuitarInst(val: string | number): boolean {
-    return !!guitarCodes[val];
+    return !!m.guitarCodes[val];
 }
 
 function asOrganInst(note: LineNote): boolean {
@@ -208,12 +194,12 @@ export class SongStore {
             const rows = song.dynamic.filter(item => item.partId === part.id);
 
             rows.forEach(row => {
-                const rowNio = row.rowNio || un.getPartInfo(row.rowInPartId).rowNio;
+                const rowNio = row.rowNio || m.getPartInfo(row.rowInPartId).rowNio;
 
                 row.rowInPartId = `${partNio}-${rowNio}`;
 
                 row.lines.forEach(line => {
-                    const rowNio = un.getPartInfo(line.rowInPartId).rowNio;
+                    const rowNio = m.getPartInfo(line.rowInPartId).rowNio;
 
                    line.rowInPartId = `${partNio}-${rowNio}`;
                 });
@@ -296,7 +282,7 @@ export class SongStore {
     static NormalizeSongNode(song: SongNode): SongNode {
         if (!song) return song;
 
-        song.version = un.parseInteger(song.version, 0);
+        song.version = m.parseInteger(song.version, 0);
         song.parts = Array.isArray(song.parts) ? song.parts : [];
         song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
         song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
@@ -305,14 +291,14 @@ export class SongStore {
         // костыль ???
         song.dynamic.forEach(item => {
             if (!item.track && item.type === 'drums') {
-                item.track = un.drumsTrack;
+                item.track = m.drumsTrack;
             }
         });
 
         if (!song.tracks.length) {
             song.tracks = [
                 {
-                    name: un.drumsTrack,
+                    name: m.drumsTrack,
                     board: 'drums',
                     volume: 50,
                 },
@@ -338,7 +324,7 @@ export class SongStore {
     }
 
     static TransformVersion(song: SongNode): SongNode {
-        const version = un.parseInteger(song.version, 0);
+        const version = m.parseInteger(song.version, 0);
 
         if (version === versionTransformers.length) {
             return song;
@@ -370,7 +356,7 @@ export class SongStore {
         }
 
         // ПЕСНЯ ЕСТЬ
-        const version = un.parseInteger(song.version, 0);
+        const version = m.parseInteger(song.version, 0);
         song = SongStore.TransformVersion(song);
 
         if (song.version !== version) {
@@ -390,7 +376,7 @@ export class SongStore {
 
         // ПЕСНЯ ЕСТЬ
         if (song) {
-            const version = un.parseInteger(song.version, 0);
+            const version = m.parseInteger(song.version, 0);
             song = SongStore.TransformVersion(song);
 
             if (song.version !== version) {
@@ -483,7 +469,7 @@ export class SongStore {
 
         let id = '';
         while (!id) {
-            const guid = un.guid(2);
+            const guid = m.guid(2);
 
             let parts = song.parts.filter(item => item.id === guid);
 
@@ -501,7 +487,7 @@ export class SongStore {
         let items = song.dynamic.filter(item => item.partId === sourceId);
 
         items.forEach(item => {
-            const rowNio = un.getRowNio(item.rowInPartId);
+            const rowNio = m.getRowNio(item.rowInPartId);
             const rowInPartId = `${partNio}-${rowNio}`;
 
             item = JSON.parse(JSON.stringify(item));
@@ -538,7 +524,7 @@ export class SongStore {
         song.parts = Array.isArray(song.parts) ? song.parts : [];
 
         while (!id) {
-            const guid = un.guid(2);
+            const guid = m.guid(2);
 
             let parts = song.parts.filter(item => item.id === guid);
 
@@ -562,7 +548,7 @@ export class SongStore {
         let items = SongStore.GetSongs(ns);
 
         while (!id) {
-            const guid = un.guid(3);
+            const guid = m.guid(3);
 
             let songs = items.filter(item => item.id === guid);
 
@@ -582,8 +568,8 @@ export class SongStore {
     static GetRowsByPart(rows: StoredRow[], partId: string, partNio: number): StoredRow[] {
         const result = rows.reduce((acc, item) => {
             const iPartId = (item.partId || '').trim();
-            const iPartNio = un.getPartNio(item.rowInPartId);
-            const iRowNio = un.getRowNio(item.rowInPartId);
+            const iPartNio = m.getPartNio(item.rowInPartId);
+            const iRowNio = m.getRowNio(item.rowInPartId);
 
             if (partId && iPartId && partId !== iPartId) {
                 return acc;
@@ -612,8 +598,8 @@ export class SongStore {
     ): SongNode {
         song.dynamic = song.dynamic.filter(item  => {
             const iPartId = (item.partId || '').trim();
-            const iPartNio = un.getPartNio(item.rowInPartId);
-            const iRowNio = un.getRowNio(item.rowInPartId);
+            const iPartNio = m.getPartNio(item.rowInPartId);
+            const iRowNio = m.getRowNio(item.rowInPartId);
 
             if (partId && iPartId && partId !== iPartId) {
                 return true;
@@ -673,7 +659,7 @@ export class SongStore {
         songNode = JSON.parse(val) as SongNode;
         const drumRows = SongStore.GetRowsByInstrument(songNode.dynamic, (note) => isDrumNote(note.note));
         drumRows.forEach(row => {
-            row.track = un.drumsTrack;
+            row.track = m.drumsTrack;
             row.type = 'drums';
         });
 
@@ -722,7 +708,7 @@ export class SongStore {
         if (!tracks.find(item => item.name === 'total')) {
             tracks.unshift({
                 name: 'total',
-                volume: parseInteger(song.volume, DEFAULT_OUT_VOLUME),
+                volume: m.parseInteger(song.volume, DEFAULT_OUT_VOLUME),
                 board: ''
             });
         }
@@ -752,7 +738,7 @@ export class SongStore {
             if (oldInstSubitems.length) {
                 track.items.forEach(newSubitem => {
                     const oldSubitem = oldInstSubitems.find(oldSubitem => oldSubitem.name === newSubitem.name);
-                    newSubitem.volume = isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
+                    newSubitem.volume = m.isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
                 });
             }
         });

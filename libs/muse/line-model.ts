@@ -1,55 +1,6 @@
-import * as un from '../libs/muse/utils/utils-note';
-import {DEFAULT_VOLUME, getString} from '../libs/muse/utils/utils-note';
-import {SongPartInfo} from '../libs/muse/utils/utils-note';
-import {StoredRow} from './song-store';
-
-export type KeyData = {
-    quarterTime: number;
-    quarterNio: number;
-    code: string;
-    note: string;
-    down: number;
-    up: number;
-    next: number;
-    color: string;
-    color2: string;
-    char: string;
-};
-
-export type LineNote = {
-    id: number;
-    durQ: number;
-    note: string;
-    startOffsetQ: number;
-
-    lineOffsetQ?: number; // TODO
-    headColor?: string;
-    bodyColor?: string;
-    char?: string;
-    instCode?: string | number;
-    instName?: string;
-    volume?: number;
-    slides?: string;
-    pitchShift?: number;
-    cent?: number;
-};
-
-export type Cell = {
-    id: number;
-    startOffsetQ: number;
-    notes: LineNote[]
-}
-
-export type Line = {
-    //nio: number,
-    durQ: number,
-    startOffsetQ: number,
-    blockOffsetQ: number,
-    rowInPartId: string,
-    cellSizeQ: number,
-    cells: Cell[],
-    endLine?: boolean,
-}
+import {DEFAULT_VOLUME, NUM_120, drumsTrack} from './utils/utils-note';
+import { StoredRow, Line, LineNote, Cell, KeyData, SongPartInfo } from './types';
+import { parseInteger } from './utils';
 
 type CellCoord = {
     row: number,
@@ -429,11 +380,11 @@ export class LineModel {
                 char: item.char,
             }
 
-            const startOffsetQ = Math.floor((item.down - firstTime) / qms * un.NUM_120 / 10) * 10;
+            const startOffsetQ = Math.floor((item.down - firstTime) / qms * NUM_120 / 10) * 10;
 
             itemNew.startOffsetQ = startOffsetQ;
             itemNew.durQ = Math.floor(
-                (item.up - item.down) / qms * un.NUM_120 / 10
+                (item.up - item.down) / qms * NUM_120 / 10
             ) * 10 || 10;
             itemNew.headColor = item.color;
             itemNew.note = item.note;
@@ -520,11 +471,11 @@ export class LineModel {
                 char: item.char,
             }
 
-            const startOffsetQ = Math.floor((item.down - firstTime) / qms * un.NUM_120 / 10) * 10;
+            const startOffsetQ = Math.floor((item.down - firstTime) / qms * NUM_120 / 10) * 10;
 
             itemNew.startOffsetQ = startOffsetQ;
             itemNew.durQ = Math.floor(
-                (item.up - item.down) / qms * un.NUM_120 / 10
+                (item.up - item.down) / qms * NUM_120 / 10
             ) * 10 || 10;
             itemNew.headColor = item.color;
             itemNew.note = item.note;
@@ -804,7 +755,7 @@ export class LineModel {
             const nextNote = notes[i+1];
             let durationForNext = 0;
             let pause = '';
-            let volume = `v${un.parseInteger(note.volume, DEFAULT_VOLUME)}`;
+            let volume = `v${parseInteger(note.volume, DEFAULT_VOLUME)}`;
             let slides = getSlides(note.slides);
             let cent = note.cent ? `.${note.cent}` : '';
 
@@ -831,7 +782,7 @@ export class LineModel {
 
     static GetDrumNotes(blockName: string, trackName: string, lines: Line[]): string {
         blockName = blockName || 'no_name';
-        trackName = trackName || un.drumsTrack;
+        trackName = trackName || drumsTrack;
 
         lines = this.CloneLines(lines);
         lines = this.RecalcAndClearBlockOffset(lines);
@@ -964,10 +915,10 @@ export class LineModel {
         const rows: Line[] = [];
         let startOffsetQ = 0;
 
-        if (un.parseInteger(pMask, 0)) {
-            const durQ = un.parseInteger(pMask);
-            const fullLineCount = Math.floor(durQ / un.NUM_120);
-            const endLineDurQ = durQ % un.NUM_120;
+        if (parseInteger(pMask, 0)) {
+            const durQ = parseInteger(pMask);
+            const fullLineCount = Math.floor(durQ / NUM_120);
+            const endLineDurQ = durQ % NUM_120;
 
             for (let i = 0; i < fullLineCount; i++) {
                 rows.push({
@@ -1004,16 +955,16 @@ export class LineModel {
         let topArr = pMask.split('_');
         topArr.forEach(row => {
             const arr = row.split('*');
-            const durQ = un.parseInteger(arr[arr.length-1], 0);
+            const durQ = parseInteger(arr[arr.length-1], 0);
             let blockCount = 1;
             let rowInBlock = 1;
 
             if (arr.length === 3 ) {
-                blockCount = un.parseInteger(arr[0], 0);
-                rowInBlock = un.parseInteger(arr[1], 0);
+                blockCount = parseInteger(arr[0], 0);
+                rowInBlock = parseInteger(arr[1], 0);
             }
             else if (arr.length === 2) {
-                rowInBlock = un.parseInteger(arr[0], 0);
+                rowInBlock = parseInteger(arr[0], 0);
             }
 
             for (let i = 0; i < blockCount; i++) {
@@ -1041,7 +992,7 @@ export class LineModel {
         this.lines = this.getLinesByMask(mask);
     }
 
-    static SplitByMask(x: {track: string, type: string, partInfo: un.SongPartInfo, lines: Line[]}): StoredRow[] {
+    static SplitByMask(x: {track: string, type: string, partInfo: SongPartInfo, lines: Line[]}): StoredRow[] {
         //console.log('SplitMask.x', x);
 
         let result: StoredRow[] = [];
@@ -1078,18 +1029,18 @@ export class LineModel {
             let blockCount = 1;
 
             if (maskArr.length === 1) {
-                lineDurQ = un.parseInteger(maskArr[0], 120);
+                lineDurQ = parseInteger(maskArr[0], 120);
             }
 
             if (maskArr.length === 2) {
-                lineInBlock = un.parseInteger(maskArr[0], 4);
-                lineDurQ = un.parseInteger(maskArr[1], 120);
+                lineInBlock = parseInteger(maskArr[0], 4);
+                lineDurQ = parseInteger(maskArr[1], 120);
             }
 
             if (maskArr.length === 3) {
-                blockCount = un.parseInteger(maskArr[0], 1);
-                lineInBlock = un.parseInteger(maskArr[1], 4);
-                lineDurQ = un.parseInteger(maskArr[2], 120);
+                blockCount = parseInteger(maskArr[0], 1);
+                lineInBlock = parseInteger(maskArr[1], 4);
+                lineDurQ = parseInteger(maskArr[2], 120);
             }
 
             for (let i = 0; i < blockCount; i++) {

@@ -1,12 +1,7 @@
 'use babel';
 
-import * as un from './index';
-import {TextBlock} from './index';
-
-export type RowInfo = {
-    first: number,
-    last: number,
-}
+import {TextBlock, SongPartInfo} from './types';
+import * as un from './utils';
 
 export function isRefLine(val: string): boolean {
     return /^\s*>/.test(val)
@@ -87,7 +82,7 @@ export function getMidiConfig(x: MidiConfig) {
 }
 
 export function getTopOutList(x: {
-    topBlock: un.TextBlock,
+    topBlock: TextBlock,
     nearestIndex?: number,
     excludeIndex?: number[]
     printN?: boolean,
@@ -143,14 +138,14 @@ export function getTopOutList(x: {
 }
 
 export function getTopOutListHash(x: {
-    topBlock: un.TextBlock,
+    topBlock: TextBlock,
     nearestIndex?: number,
     excludeIndex?: number[]
-}): un.SongPartInfo[] {
+}): SongPartInfo[] {
     let partNio = 0;
     let nearestIndex = x.nearestIndex | 0;
     let excludeIndex = Array.isArray(x.excludeIndex) ? x.excludeIndex : [];
-    let result: un.SongPartInfo[] = [];
+    let result: SongPartInfo[] = [];
     let rows: string[] = [];
 
     x.topBlock.rows.forEach(item => {
@@ -184,7 +179,7 @@ export function getTopOutListHash(x: {
         part.rowInPartId =`${partNio}-${0}`;
 
         return [...acc, part];
-    }, <un.SongPartInfo[]>[]);
+    }, <SongPartInfo[]>[]);
 
     return result;
 }

@@ -1,9 +1,10 @@
 'use babel';
 
+import {parseInteger} from './parse-integer';
+
 import {
     getVolumeFromString,
     clearNoteLine,
-    parseInteger,
     getDurationFromString,
     getRepeatFromString,
     getBpmFromString,

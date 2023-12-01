@@ -1,12 +1,10 @@
-import {Props} from 'framework7/types/modules/component/snabbdom/modules/props';
-import {ComponentContext} from 'framework7/modules/component/component';
-import {Dom7Array} from 'dom7';
+import { Props } from 'framework7/types/modules/component/snabbdom/modules/props';
+import { ComponentContext } from 'framework7/modules/component/component';
+import { Dom7Array } from 'dom7';
 import { byId, dyName } from '../src/utils';
-import {Synthesizer} from '../libs/muse/synthesizer';
-import {KeyInfo, Sound} from '../libs/muse/sound';
-import {defaultSynthSettings} from '../libs/muse/keyboards';
-import {WavePreset} from '../libs/waf-player/otypes';
-import {Anchors} from '../sample-editor/a-wave-form-component';
+import { Muse as m, Synthesizer, KeyInfo, Sound } from '../libs/muse';
+import { WavePreset } from '../libs/waf-player/otypes';
+import { Anchors } from '../sample-editor/a-wave-form-component';
 
 // SAMPLE EDITOR
 import { SampleEditorWc} from '../sample-editor/a-sample-editor-wc';
@@ -156,7 +154,7 @@ export class SamplePage {
         }
 
         this.synthesizer.connect({ ctx: Sound.ctx });
-        this.synthesizer.setSettings(defaultSynthSettings);
+        this.synthesizer.setSettings(m.defaultSynthSettings);
 
         voiceInstr = {};
         // Object.keys(rawVoiceInst).map(key => {

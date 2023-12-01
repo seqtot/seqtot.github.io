@@ -1,7 +1,7 @@
 'use babel';
 
-import {Sound} from '../../libs/muse/sound';
-import * as wav from '../../libs/muse/utils/node-wav'
+import { Sound } from '../../libs/muse';
+//import * as wav from '../../libs/muse/utils/node-wav'
 
 // https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext
 export async function decodeArrayBufferToAudio(

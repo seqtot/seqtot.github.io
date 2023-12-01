@@ -5,31 +5,31 @@ import { Dialog } from 'framework7/components/dialog/dialog';
 import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import * as un from '../libs/muse/utils';
 import { standardTicks as ticks } from './ticks';
-import { RowInfo } from '../libs/muse/utils/getMidiConfig';
-import { FileSettings, getFileSettings, getPitchShiftSetting } from '../libs/muse/utils/getFileSettings';
-import { parseInteger, SongPartInfo, TextBlock } from '../libs/muse/utils/utils-note';
+
+import {
+    Muse as m,
+    FileSettings,
+    TextBlock,
+    SongPartInfo,
+    RowInfo,
+    LineModel,
+    StoredRow,
+
+} from '../libs/muse';
 
 import mboxes from '../mboxes';
-import {Muse as m} from '../libs/muse';
 
-import { LineModel } from './line-model';
 import { ideService } from './ide/ide-service';
-import { SongStore, SongNode, StoredRow, MY_SONG } from './song-store';
+import { SongStore, SongNode, MY_SONG } from './song-store';
 import * as svg from './svg-icons';
 import { TrackDetailsDialog } from './dialogs/track-details-dialog';
 import { TracksVolumeDialog } from './dialogs/tracks-volume-dialog';
-import { textModelToLineModel, sortTracks } from './text-model-to-line-model';
 import { WavRecorder } from './ide/wav-recorder';
 import { GetTrackDialog } from './dialogs/get-track-dialog';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 const isDev = /localhost/.test(window.location.href);
-
-const {
-    getMidiConfig
-} = m.parse;
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -76,7 +76,7 @@ export class MBoxPage {
         return !!(this.isMy || this.pageData.exportToLineModel || false);
     }
 
-    get blocks (): un.TextBlock[] {
+    get blocks (): TextBlock[] {
         return ideService.blocks;
     }
 
@@ -168,8 +168,8 @@ export class MBoxPage {
             if (ideService?.songStore?.songId && ideService.songStore.songId === songId && !force) {
                 // таже самая песня
             } else {
-                ideService.blocks = un.getTextBlocks(pageData.score) || [];
-                ideService.settings = getFileSettings(ideService.blocks);
+                ideService.blocks = m.getTextBlocks(pageData.score) || [];
+                ideService.settings = m.getFileSettings(ideService.blocks);
                 //ideService.pitchShift = getPitchShiftSetting(ideService.settings);
                 ideService.pitchShift = 0;
 
@@ -474,7 +474,7 @@ export class MBoxPage {
         allCommands = commandsWrapper.replace('%content%', allCommands);
 
         let tracks = allSongParts.reduce((acc, item, i) => {
-            const info = un.getPartInfo(item);
+            const info = m.getPartInfo(item);
 
             acc = acc + `
                 <div class="row" style="margin: .5rem; align-items: center;">
@@ -683,7 +683,7 @@ export class MBoxPage {
     }
 
     gotoEditPart(pPartNio?: number | string) {
-        let partNio = parseInteger(pPartNio, null);
+        let partNio = m.parseInteger(pPartNio, null);
         let editPartsNio: number[] = [];
         const isMy = this.isMy;
 
@@ -811,7 +811,7 @@ export class MBoxPage {
 
         if (!partNio) return null;
 
-        return un.getPartInfo(parts[partNio - 1]);
+        return m.getPartInfo(parts[partNio - 1]);
     }
 
     selectAllParts() {
@@ -827,7 +827,7 @@ export class MBoxPage {
     }
 
     selectPart(partNio: number | string) {
-        partNio = parseInteger(partNio, null);
+        partNio = m.parseInteger(partNio, null);
 
         if (!partNio) return;
 
@@ -857,7 +857,7 @@ export class MBoxPage {
             this.excludePartNio = [];
 
             allSongParts.forEach((item, i) => {
-                if (un.getPartInfo(item).partId !== part.partId) {
+                if (m.getPartInfo(item).partId !== part.partId) {
                     this.excludePartNio.push(i + 1);
                 }
             });
@@ -875,7 +875,7 @@ export class MBoxPage {
 
     updatePartListView() {
         getWithDataAttr('part-item', this.pageEl).forEach(el => {
-            const partNio = parseInteger(el.dataset.partNio, 0);
+            const partNio = m.parseInteger(el.dataset.partNio, 0);
 
             if (this.excludePartNio.includes(partNio)) {
                 el.style.fontWeight = '400';
@@ -1008,7 +1008,7 @@ export class MBoxPage {
         if (!song || !trackName) return;
 
         if (SongStore.CloneAndAddTrack(song, trackName)) {
-            sortTracks(ideService.songStore.data.tracks);
+            m.sortTracks(ideService.songStore.data.tracks);
             this.setPageContent();
             ideService.songStore.save();
         }
@@ -1170,10 +1170,10 @@ export class MBoxPage {
         const selectedParts = this.getSelectedParts();
 
         selectedParts.forEach(partStr => {
-            const part = un.getPartInfo(partStr);
+            const part = m.getPartInfo(partStr);
             const partRows = song.dynamic.filter(row => {
                 const iPartId = (row.partId || '').trim();
-                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
+                const iPartNio = m.parseInteger(row.rowInPartId.split('-')[0], 0);
 
                 if (part.partId && iPartId) {
                     return part.partId === iPartId;
@@ -1183,8 +1183,8 @@ export class MBoxPage {
             });
 
             partRows.sort((a, b) => {
-                const iRowNioA = un.parseInteger(a.rowInPartId.split('-')[1], 0);
-                const iRowNioB = un.parseInteger(b.rowInPartId.split('-')[1], 0);
+                const iRowNioA = m.parseInteger(a.rowInPartId.split('-')[1], 0);
+                const iRowNioB = m.parseInteger(b.rowInPartId.split('-')[1], 0);
 
                 if (iRowNioA < iRowNioB) return -1;
                 if (iRowNioA > iRowNioB) return 1;
@@ -1193,8 +1193,8 @@ export class MBoxPage {
             });
 
             partRows.forEach(row => {
-                const iPartNio = un.parseInteger(row.rowInPartId.split('-')[0], 0);
-                const iRowNio = un.parseInteger(row.rowInPartId.split('-')[1], 0);
+                const iPartNio = m.parseInteger(row.rowInPartId.split('-')[0], 0);
+                const iRowNio = m.parseInteger(row.rowInPartId.split('-')[1], 0);
 
                 if (!hash[iPartNio]) {
                     hash[iPartNio] = {
@@ -1235,7 +1235,7 @@ export class MBoxPage {
                         notes = `<${guid} $>\n$organ: ${durQ}`;
                     }
 
-                    const block = un.getTextBlocks(notes)[0];
+                    const block = m.getTextBlocks(notes)[0];
 
                     blocks = [...blocks, block];
 
@@ -1244,7 +1244,7 @@ export class MBoxPage {
                     rowRefs.push(guid);
                 });
 
-                const headBlock = un.getTextBlocks(`<${headGuid} $>\n$organ: ${maxDurQ}`)[0];
+                const headBlock = m.getTextBlocks(`<${headGuid} $>\n$organ: ${maxDurQ}`)[0];
 
                 blocks = [...blocks, headBlock];
 
@@ -1255,7 +1255,7 @@ export class MBoxPage {
         });
 
         topOutBlocks.forEach(part => {
-            const partBlock = un.getTextBlocks(part.join('\n'))[0];
+            const partBlock = m.getTextBlocks(part.join('\n'))[0];
             blocks = [...blocks, partBlock];
         });
 
@@ -1267,8 +1267,8 @@ export class MBoxPage {
             line.blockOffsetQ = 0;
         });
 
-        if (item.type === 'drums' || item.track.startsWith(un.drumChar)) {
-            const trackName = item.track || un.drumsTrack;
+        if (item.type === 'drums' || item.track.startsWith(m.drumChar)) {
+            const trackName = item.track || m.drumsTrack;
 
             return LineModel.GetDrumNotes(id, trackName, item.lines);
         }
@@ -1282,12 +1282,15 @@ export class MBoxPage {
     }
 
     textModelToLineModel(songId: string, songNodeInput: SongNode): SongNode {
-        const song  = textModelToLineModel({
+        const ns = songNodeInput.ns;
+
+        const song = m.textModelToLineModel({
             songId,
-            ns: songNodeInput.ns,
+            ns,
             settings: ideService.settings,
             blocks: ideService.blocks,
-            songNodeInput: songNodeInput,
+            sourceSong: songNodeInput,
+            targetSong: SongStore.GetOldSong(songId, ns, true)
         });
 
         SongStore.SetSong(songId, song, songNodeInput.ns);
@@ -1303,11 +1306,11 @@ export class MBoxPage {
 
         const x = {
             blocks,
-            currBlock: null as un.TextBlock,
+            currBlock: null as TextBlock,
             currRowInfo: currRowInfo,
             excludeIndex: this.excludePartNio,
-            midiBlockOut: null as un.TextBlock,
-            playBlockOut: '' as string | un.TextBlock,
+            midiBlockOut: null as TextBlock,
+            playBlockOut: '' as string | TextBlock,
             topBlocksOut: [],
         };
 
@@ -1315,7 +1318,7 @@ export class MBoxPage {
             const rows = this.getSelectedParts().map(row => `> ${row}`);
 
             x.excludeIndex = []; // либо надо билдить ВСЕ части
-            x.currBlock = un.createOutBlock({
+            x.currBlock = m.createOutBlock({
                 id: 'out',
                 type: 'text',
                 bpm: this.bpmValue,
@@ -1328,7 +1331,7 @@ export class MBoxPage {
 
         //console.log('BLOCK', blocks);
 
-        getMidiConfig(x);
+        m.getMidiConfig(x);
 
         const playBlock = x.playBlockOut as TextBlock;
 
@@ -1398,7 +1401,7 @@ export class MBoxPage {
                     this.recorder = null;
                 }
 
-                this.recorder = new WavRecorder(m.classes.Sound.ctx);
+                this.recorder = new WavRecorder(m.Sound.ctx);
                 this.recorder.start(this.songId);
             }
 

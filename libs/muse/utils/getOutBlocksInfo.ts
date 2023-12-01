@@ -2,13 +2,11 @@
 
 import { NoteLineInfo } from '../types';
 import {
-    TextBlock,
     findBlockById,
     getBlockType,
     getVolumeFromString,
     getNoteLnsByDrumInstruments,
     getNoteLnsByToneInstruments,
-    parseInteger,
     getRepeatFromString,
     toneChar,
     drumChar,
@@ -17,6 +15,9 @@ import {
     nioChar,
     partIdChar,
 } from './utils-note';
+
+import {parseInteger} from './parse-integer'
+import {TextBlock} from '../types'
 
 import { getNoteLineInfo, isNoteWithDurationOrPause } from './getNoteLineInfo';
 
@@ -47,21 +48,6 @@ type OutBlocksInfo = {
     rows: OutBlockRowInfo[],
     durationQ: number,
 }
-
-export type DataByTracks = {
-    total: {
-        volume: number,
-    },
-    [key: string]: {
-        volume?: number,
-        isExcluded?: boolean,
-        items?: {
-            [key: string]: {
-                volume?: number
-            },
-        }
-    }
-};
 
 /**
  * meta в конце

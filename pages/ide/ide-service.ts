@@ -1,22 +1,15 @@
 import { EventEmitter } from '../../libs/common/event-emitter';
-import { DEFAULT_TONE_INSTR, toneAndDrumPlayerSettings } from '../../libs/muse/keyboards';
-import { TextBlock } from '../../libs/muse/utils';
-import { Sound } from '../../libs/muse/sound';
-import { MultiPlayer } from '../../libs/muse/multi-player';
-import { Synthesizer } from '../../libs/muse/synthesizer';
-import { Ticker } from '../../libs/muse/ticker';
-import { FileSettings, getFileSettings } from '../../libs/muse/utils/getFileSettings';
-import * as un from '../../libs/muse/utils';
+import { Muse as m, Synthesizer, TextBlock, DataByTracks, FileSettings } from '../../libs/muse';
 import { drumBoards, KeyboardType, toneBoards } from '../keyboard-ctrl';
 import { DEFAULT_OUT_VOLUME, SongNode, SongStore, TrackInfo } from '../song-store';
 
-const multiPlayer = new MultiPlayer();
-const metronome = new MultiPlayer();
-const ticker = new Ticker(Sound.ctx);
+const multiPlayer = new m.MultiPlayer();
+const metronome = new m.MultiPlayer();
+const ticker = new m.Ticker(m.Sound.ctx);
 
 const synthesizer = new Synthesizer();
-synthesizer.connect({ ctx: Sound.ctx });
-synthesizer.setSettings(toneAndDrumPlayerSettings);
+synthesizer.connect({ ctx: m.Sound.ctx });
+synthesizer.setSettings(m.toneAndDrumPlayerSettings);
 
 export type EditedItem = {
     rowInPartId: string, // partNio-rowNio
@@ -29,7 +22,7 @@ export type EditedItem = {
 
 export const defaultTracks: TrackInfo[] = [
     {
-        name: un.drumsTrack,
+        name: m.drumsTrack,
         board: drumBoards.drums,
         volume: 50
     },
@@ -55,10 +48,10 @@ class IdeService extends  EventEmitter {
     private _lastBoardView: KeyboardType = '' as any;
 
     songStore: SongStore;
-    dataByTracks = {} as un.DataByTracks;
+    dataByTracks = {} as DataByTracks;
 
-    blocks: un.TextBlock[] = [];
-    settings: FileSettings = getFileSettings([]);
+    blocks: TextBlock[] = [];
+    settings: FileSettings = m.getFileSettings([]);
     pitchShift = 0;
 
     multiPlayer = multiPlayer;
@@ -69,7 +62,7 @@ class IdeService extends  EventEmitter {
     bpmValue = 90;
 
     get outVolume (): number {
-        return un.parseInteger(this.dataByTracks?.total?.volume, DEFAULT_OUT_VOLUME);
+        return m.parseInteger(this.dataByTracks?.total?.volume, DEFAULT_OUT_VOLUME);
     }
 
     get lastBoardView(): KeyboardType {
@@ -101,7 +94,7 @@ class IdeService extends  EventEmitter {
     editedItems: EditedItem[] = [];
 
     private _guid = 1;
-    useToneInstrument: number = DEFAULT_TONE_INSTR;
+    useToneInstrument: number = m.DEFAULT_TONE_INSTR;
     currentEdit: {
         songId: string,
         blocks: TextBlock[],
@@ -122,8 +115,8 @@ class IdeService extends  EventEmitter {
         // jjkl: todo
     }
 
-    getDataByTracks(song: SongNode): un.DataByTracks {
-        let dataByTracks = {} as un.DataByTracks;
+    getDataByTracks(song: SongNode): DataByTracks {
+        let dataByTracks = {} as DataByTracks;
 
         if (song?.tracks) {
             song.tracks.forEach(track => {

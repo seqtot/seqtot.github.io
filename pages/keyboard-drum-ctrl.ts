@@ -1,8 +1,6 @@
-import { drumInfo } from '../libs/muse/drums';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import { LineModel, Line, LineNote, KeyData } from './line-model';
+import { Muse as m, LineModel, Line, KeyData } from '../libs/muse';
 
-import { ideService } from './ide/ide-service';
 import { DrumBoard, drumNotesInfo } from './drum-board';
 import { KeyboardCtrl, BpmInfo, KeyboardPage, DrumKeyboardType } from './keyboard-ctrl';
 import * as svg from './svg-icons';
@@ -389,8 +387,8 @@ export class DrumCtrl extends KeyboardCtrl {
     getContent(keyboardId: string, trackName: string): string {
         this.trackName = trackName; // jjkl сделать в ToneCtrl
 
-        let drums = Object.keys(drumInfo).reduce((acc, key) => {
-            const info = drumInfo[key];
+        let drums = Object.keys(m.drumInfo).reduce((acc, key) => {
+            const info = m.drumInfo[key];
             const label = key === info.noteLat ? key: `${key}:${info.noteLat}`;
 
             acc = acc + `

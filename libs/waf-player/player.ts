@@ -113,6 +113,7 @@ export  class WebAudioFontPlayer {
 		audioContext: AudioContext,
 		targetNode: AudioNode,
 		preset: WavePreset,
+		zone?: WaveZone,
 		when: number,
 		pitch: number,
 		duration: number,
@@ -121,14 +122,14 @@ export  class WebAudioFontPlayer {
 		cent?: number,
 		asdf?: boolean,
 	}): WaveBox | null {
-		//console.log('cent', x.cent);
+		//console.log(x.pitch, x.zone);
 
 		let pitch = x.pitch + x.preset.pitchShift;
 		let volume = this.limitVolume(x.volume);
 		let cent = x.cent || 0;
 
 		this.resumeContext(x.audioContext);
-		var zone: WaveZone | null = findZone(x.audioContext, x.preset, pitch);
+		var zone: WaveZone = x.zone || findZone(x.audioContext, x.preset, pitch);
 
 		if (!zone) {
 			return null;

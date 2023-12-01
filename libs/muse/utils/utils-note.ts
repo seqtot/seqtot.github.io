@@ -1,6 +1,7 @@
 'use babel';
+import {TextBlock, BlockType, SongPartInfo} from '../types'
+import { parseInteger } from './parse-integer';
 
-export type StringHash = {[key: string]: string};
 export const DEFAULT_BPM = 120;
 export const DEFAULT_VOLUME = 50;
 export const NUM_100 = 100;
@@ -25,8 +26,6 @@ export const refChar = '>';
 export const nioChar = '№';
 export const partIdChar = '%';
 
-
-type BlockType = 'text' | 'drums' | 'tones' | 'set';
 
 type NoteLineByName = {
     trackName: string,
@@ -71,19 +70,6 @@ export class Deferred<T = any> {
         });
     }
 }
-
-export type TextBlock = {
-    id: string;
-    head: string,
-    rows: string[];
-    nio: number;
-    startRow: number;
-    endRow: number;
-    type: BlockType;
-    repeat?: number;
-    bpm?: number;
-    volume?: number;
-};
 
 export function getString(str: any): string {
     return isNil(str) ? '' : str.toString();
@@ -600,17 +586,6 @@ export function getBlockType(val: string): BlockType {
     return <any>'';
 }
 
-export function parseInteger(val: string | number, ifError: number = 0): number {
-    if (typeof val === 'number') {
-        return val;
-    }
-
-    val = (val || '').toString().trim();
-    const num = parseInt(val, 10);
-
-    return isNaN(num) ? ifError : num;
-}
-
 /**
  * Массив битов (четрвертей). Первый элемент задержка перед стартом
  *
@@ -690,16 +665,6 @@ export function getNoteByOffset(
 
     return noteOrder[index + offset] || '';
 }
-
-export type SongPartInfo = {
-    name: string,
-    partNio: number,
-    rowNio: number,
-    partId: string,
-    mask: string,
-    ref: string,
-    rowInPartId: string,
-};
 
 export function getPartInfo(val: string): SongPartInfo {
     val = (val || '').trim();

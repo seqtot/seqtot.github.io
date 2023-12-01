@@ -4,8 +4,7 @@ import { Range } from 'framework7/components/range/range';
 import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import { Synthesizer } from '../libs/muse/synthesizer';
-import { MultiPlayer } from '../libs/muse/multi-player';
+import { Synthesizer, MultiPlayer } from '../libs/muse';
 import { standardTicks as ticks } from './ticks';
 import { DrumCtrl } from './keyboard-drum-ctrl';
 import { ToneCtrl } from './keyboard-tone-ctrl';

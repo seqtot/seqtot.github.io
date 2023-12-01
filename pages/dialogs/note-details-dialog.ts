@@ -5,8 +5,7 @@ import { ComponentContext } from 'framework7/modules/component/component';
 import { getWithDataAttr } from '../../src/utils';
 import { toneBoards, drumBoards, KeyboardCtrl, KeyboardPage } from '../keyboard-ctrl';
 import { SongNode, TrackInfo } from '../song-store';
-import { LineNote } from '../line-model';
-import * as un from '../../libs/muse/utils';
+import { Muse as m, LineNote } from '../../libs/muse';
 
 export class NoteDetailsDialog {
     dialog: Dialog.Dialog;
@@ -37,7 +36,7 @@ export class NoteDetailsDialog {
         let result = 0;
 
         getWithDataAttr('note-details-dialog-duration-input').forEach((el: HTMLInputElement) => {
-            result = un.parseInteger(el.value, result);
+            result = m.parseInteger(el.value, result);
         });
 
         return result;
@@ -126,7 +125,7 @@ export class NoteDetailsDialog {
             ...note
         };
 
-        this.note.volume = un.parseInteger(this.note.volume, un.DEFAULT_VOLUME);
+        this.note.volume = m.parseInteger(this.note.volume, m.DEFAULT_VOLUME);
 
         // durQ:60
         // id: 2

@@ -1,5 +1,3 @@
-import * as un from '../libs/muse/utils';
-
 export type UserSettings  = {
     boardVolume: number;
     userName: string;

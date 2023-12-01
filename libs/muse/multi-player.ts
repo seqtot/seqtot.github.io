@@ -3,10 +3,10 @@
 import { Sound } from './sound';
 import { MidiPlayer } from './midi-player';
 import { toneAndDrumPlayerSettings, DEFAULT_TONE_INSTR } from './keyboards';
-import * as un from './utils';
 import { Ticker } from './ticker';
 import { DEFAULT_OUT_VOLUME } from '../../pages/song-store';
-import {DataByTracks} from './utils';
+import {TextBlock, DataByTracks} from './types';
+import * as u from './utils';
 //import * as Fs from 'fs';
 
 const Fs: any = null;
@@ -118,8 +118,8 @@ export class MultiPlayer {
         beatOffsetMs?: number,
         beatsWithOffsetMs?: number[],
         startDelaySec?: number,
-        playMidiBlock?: string | un.TextBlock,
-        midiTextBlocks?: string | un.TextBlock[],
+        playMidiBlock?: string | TextBlock,
+        midiTextBlocks?: string | TextBlock[],
     }) {
         //console.log('play.files', files);
         let files = params.files;
@@ -139,10 +139,10 @@ export class MultiPlayer {
         };
         let useTick = false;
         let hasBeats = !!beatsWithOffsetMs.length;
-        let midiOut: un.TextBlock | string;
+        let midiOut: TextBlock | string;
 
         if (params.playMidiBlock && Array.isArray(params.midiTextBlocks) && params.midiTextBlocks.length) {
-            midiOut = un.getOutBlock(params.playMidiBlock, params.midiTextBlocks);
+            midiOut = u.getOutBlock(params.playMidiBlock, params.midiTextBlocks);
         }
 
         this.soundSourceSet = [];
@@ -319,8 +319,8 @@ export class MultiPlayer {
         text = (text || '').trim();
 
         this.midiPlayer.stopAndClear();
-        const noteLine = un.clearNoteLine(text);
-        const bpm = un.getBpmFromString(noteLine);
+        const noteLine = u.clearNoteLine(text);
+        const bpm = u.getBpmFromString(noteLine);
 
         const loopId = this.midiPlayer.addLoopByQuarters({
             noteLine,
@@ -341,7 +341,7 @@ export class MultiPlayer {
     }
 
 
-    normalizeDataByTracks(dataByTracks?: un.DataByTracks, volume?: number): un.DataByTracks {
+    normalizeDataByTracks(dataByTracks?: DataByTracks, volume?: number): DataByTracks {
         dataByTracks = dataByTracks || <DataByTracks>{};
 
         if (!dataByTracks.total || !dataByTracks.total.volume) {
@@ -359,15 +359,15 @@ export class MultiPlayer {
      * un.getOutBlocksInfo
      */
     getLoopsInfo(x: {
-        blocks?: un.TextBlock[] | string,
-        playBlock?: un.TextBlock | string,
+        blocks?: TextBlock[] | string,
+        playBlock?: TextBlock | string,
         repeat?: number, // jjkl delete ?
         repeatCount?: number, // jjkl delete ?
         beatOffsetMs?: number, // jjkl delete ?
         beatsMs?: number[],
         bpm?: number,
         excludeLines?: string[],
-        dataByTracks?: un.DataByTracks,
+        dataByTracks?: DataByTracks,
         pitchShift?: number
     }): OutLoopsInfo {
         //console.log('getLoopsInfo.params', {...params});
@@ -376,17 +376,17 @@ export class MultiPlayer {
         const excludeLines = x.excludeLines || [];
         let beatsMs: number[] = Array.isArray(x.beatsMs) ? [...x.beatsMs]: [];
         let playBlock = x.playBlock || 'out';
-        const allBlocks = Array.isArray(x.blocks) ? x.blocks : un.getTextBlocks(x.blocks);
-        const outBlock = un.getOutBlock(playBlock, allBlocks);
+        const allBlocks = Array.isArray(x.blocks) ? x.blocks : u.getTextBlocks(x.blocks);
+        const outBlock = u.getOutBlock(playBlock, allBlocks);
         const dataByTracks = this.normalizeDataByTracks(x.dataByTracks, outBlock.volume);
-        const outBlocks = un.getOutBlocksInfo(allBlocks, playBlock);
-        const repeat = x.repeat || x.repeatCount || un.getRepeatFromString(outBlock.head);
+        const outBlocks = u.getOutBlocksInfo(allBlocks, playBlock);
+        const repeat = x.repeat || x.repeatCount || u.getRepeatFromString(outBlock.head);
 
         //console.log('getLoopsInfo.outBlock', outBlock);
         console.log('getLoopsInfo.outBlocks', outBlocks);
 
         let startRowBeatIndex = 0;
-        let bpm = x.bpm || un.getBpmFromString(outBlock.head, 0);
+        let bpm = x.bpm || u.getBpmFromString(outBlock.head, 0);
 
         if (!bpm) {
             console.warn('getLoopsInfo.bpm is zero or undefined', bpm);
@@ -402,23 +402,25 @@ export class MultiPlayer {
             row.trackLns.forEach(noteLn => {
                 noteLn.noteLineInfo.notes.forEach(noteInfo => {
                     noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
-                    let trackName = noteLn.trackName;
-                    let rootVolume = un.getSafeVolume(dataByTracks.total.volume, DEFAULT_OUT_VOLUME);
-                    let trackVolume = un.getSafeVolume(dataByTracks[trackName]?.volume);
-                    let instData = (dataByTracks[trackName]?.items && dataByTracks[trackName].items[noteInfo.instr]);
 
-                    trackVolume = un.mergeVolume(rootVolume, trackVolume);
-
-                    if (instData) {
-                        trackVolume = un.mergeVolume(
-                          trackVolume,
-                          instData.volume);
-                    }
-
-                    noteInfo.volume = un.mergeVolume(
-                        noteInfo.volume,
-                        un.getSafeVolume(trackVolume)
-                    );
+                    // SET VOLUME
+                    // let trackName = noteLn.trackName;
+                    // let rootVolume = u.getSafeVolume(dataByTracks.total.volume, DEFAULT_OUT_VOLUME);
+                    // let trackVolume = u.getSafeVolume(dataByTracks[trackName]?.volume);
+                    // let instData = (dataByTracks[trackName]?.items && dataByTracks[trackName].items[noteInfo.instr]);
+                    //
+                    // trackVolume = u.mergeVolume(rootVolume, trackVolume);
+                    //
+                    // if (instData) {
+                    //     trackVolume = u.mergeVolume(
+                    //       trackVolume,
+                    //       instData.volume);
+                    // }
+                    //
+                    // noteInfo.volume = u.mergeVolume(
+                    //     noteInfo.volume,
+                    //     u.getSafeVolume(trackVolume)
+                    // );
                 });
             });
         });
@@ -437,10 +439,10 @@ export class MultiPlayer {
             const addPauseQ = addPauseToNextRowQ;
             const fullRowDuration = (rowLoop.rowDurationByHeadQ * rowLoop.rowRepeat) + addPauseQ;
             let beatsByRowMs: number[];
-            let rowBeatCountCeil = Math.ceil(fullRowDuration  / un.NUM_120);
-            let rowBeatCountFloor = Math.floor(fullRowDuration / un.NUM_120);
+            let rowBeatCountCeil = Math.ceil(fullRowDuration  / u.NUM_120);
+            let rowBeatCountFloor = Math.floor(fullRowDuration / u.NUM_120);
 
-            addPauseToNextRowQ = fullRowDuration - (rowBeatCountFloor * un.NUM_120);
+            addPauseToNextRowQ = fullRowDuration - (rowBeatCountFloor * u.NUM_120);
 
             //console.log('negOffsetQ',
             //     rowLoop.rowDurationQ,
@@ -451,7 +453,7 @@ export class MultiPlayer {
             // );
 
             if (bpm && !beatsMs.length) {
-                beatsByRowMs = un.getBeatsByBpm(bpm, rowBeatCountFloor ? rowBeatCountFloor : fullRowDuration ? 1 : 0);
+                beatsByRowMs = u.getBeatsByBpm(bpm, rowBeatCountFloor ? rowBeatCountFloor : fullRowDuration ? 1 : 0);
             } else {
                 let endRowBeatIndex = startRowBeatIndex + rowBeatCountFloor;
                 beatsByRowMs = beatsMs.slice(startRowBeatIndex, endRowBeatIndex);
@@ -459,7 +461,7 @@ export class MultiPlayer {
             }
 
             result.beatsMs = beatsByRowMs;
-            durationInFullQ = durationInFullQ + (beatsByRowMs.length * un.NUM_120);
+            durationInFullQ = durationInFullQ + (beatsByRowMs.length * u.NUM_120);
             durationInFullQMs = durationInFullQMs + beatsByRowMs.reduce((acc, item) => (acc + item), 0);
 
             rowLoop.trackLns.forEach((noteLn) => {
@@ -469,7 +471,7 @@ export class MultiPlayer {
 
                 const noteLine = noteLn.noteLine;
                 //const isDrum = un.isDrum(noteLn.noteLine); // todo: refactor
-                const isDrum = un.isDrum(noteLn.trackName);
+                const isDrum = u.isDrum(noteLn.trackName);
 
                 const loop = this.midiPlayer.addLoopByQuarters({
                     noteLine,
@@ -513,8 +515,8 @@ export class MultiPlayer {
      * -> getLoopsInfo
      */
     async tryPlayMidiBlock(x: {
-        blocks?: un.TextBlock[] | string,
-        playBlock?: string | un.TextBlock,
+        blocks?: TextBlock[] | string,
+        playBlock?: string | TextBlock,
         repeatCount?: number
         beatOffsetMs?: number,
         beatsWithOffsetMs?: number[],
@@ -525,7 +527,7 @@ export class MultiPlayer {
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
         excludeLines?: string[]
-        dataByTracks?: un.DataByTracks,
+        dataByTracks?: DataByTracks,
     }) {
         //console.log('tryPlayMidiBlock', x.dataByTracks);
         if (!x.dontClear) {

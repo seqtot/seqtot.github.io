@@ -1,7 +1,6 @@
 'use babel';
 
-import {TextBlock} from './utils-note';
-import * as un from './index';
+import {TextBlock} from '../types';
 
 export function getFirstLastRow(dx: {
     block: TextBlock,

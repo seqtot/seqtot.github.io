@@ -1,7 +1,7 @@
 import { Props } from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
 import { Dom7Array } from 'dom7';
-import * as un from '../libs/muse/utils';
+import { Muse as m } from '../libs/muse';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { UserSettingsStore } from './user-settings-store';
 
@@ -115,7 +115,7 @@ export class UserSettingsPage {
         let useCyrillicNote = false;
 
         getWithDataAttr('board-volume-input', this.pageEl).forEach((el: HTMLInputElement) => {
-            boardVolume = un.parseInteger(el.value, boardVolume);
+            boardVolume = m.parseInteger(el.value, boardVolume);
         });
 
         getWithDataAttr('user-name-input', this.pageEl).forEach((el: HTMLInputElement) => {
