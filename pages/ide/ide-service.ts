@@ -115,11 +115,11 @@ class IdeService extends  EventEmitter {
         // jjkl: todo
     }
 
-    getDataByTracks(song: SongNode): DataByTracks {
+    getDataByTracks(tracks: TrackInfo[], totalVolume?: number): DataByTracks {
         let dataByTracks = {} as DataByTracks;
 
-        if (song?.tracks) {
-            song.tracks.forEach(track => {
+        if (tracks) {
+            tracks.forEach(track => {
                 const volume = track.isExcluded ? 0: track.volume;
                 const items = track.items || [];
 
@@ -138,16 +138,16 @@ class IdeService extends  EventEmitter {
         }
 
         dataByTracks.total = {
-            volume: song.volume || DEFAULT_OUT_VOLUME
+            volume: m.isPresent(totalVolume) ? totalVolume : DEFAULT_OUT_VOLUME
         }
 
         return dataByTracks;
     }
 
-    setDataByTracks(song?: SongNode) {
-        song = song || this.songStore.data;
+    setDataByTracks(x?: {tracks: TrackInfo[], volume?: number }) {
+        const song = x || this.songStore.data;
 
-        const dataByTracks = this.getDataByTracks(song);
+        const dataByTracks = this.getDataByTracks(song.tracks, song.volume);
 
         Object.keys(this.dataByTracks).forEach(key => {
            delete this.dataByTracks[key];

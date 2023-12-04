@@ -11,10 +11,8 @@ export class TracksVolumeDialog {
     dialog: Dialog.Dialog;
     cb: (ok: boolean) => void;
     song: SongNode = null;
-    track: TrackInfo = null;
-    ns: string;
-
     tracks: TrackInfo[] = null;
+    tracksSrc: TrackInfo[] = null;
 
     get root(): HTMLElement {
         return getWithDataAttr('edit-track-dialog-content')[0];
@@ -27,14 +25,22 @@ export class TracksVolumeDialog {
     }
 
     setVolumeRange() {
+        const setDataByTracks = () => {
+            const totalVolume = this.tracks.find(track => track.name === 'total') || {volume: DEFAULT_OUT_VOLUME};
+
+            ideService.setDataByTracks({
+                tracks: this.tracks,
+                volume: totalVolume.volume,
+            });
+        }
+
         this.tracks.forEach(track => {
             (this.context.$f7 as any).range.create({
                 el: getWithDataAttrValue('tracks-volume-dialog-item', track.name)[0],
                 on: {
                     changed: (range: {value: number}) => {
                         track.volume = range.value;
-
-                        //console.log(track);
+                        setDataByTracks();
                     },
                 },
             });
@@ -46,6 +52,7 @@ export class TracksVolumeDialog {
                         on: {
                             changed: (range: {value: number}) => {
                                 subtrack.volume = range.value;
+                                setDataByTracks();
                             },
                         },
                     });
@@ -61,6 +68,7 @@ export class TracksVolumeDialog {
 
         this.song = ideService.songStore.data;
         this.tracks = JSON.parse(JSON.stringify(this.song.tracks));
+        this.tracksSrc = JSON.parse(JSON.stringify(this.song.tracks));
 
         //console.log('SONG', this.song);
         //console.log('IDESERVICE', ideService);
@@ -121,6 +129,11 @@ export class TracksVolumeDialog {
     }
 
     cancelClick() {
+        const tracks = this.tracksSrc.filter(track => track.name !== 'total');
+
+        this.song.tracks = tracks;
+        ideService.setDataByTracks(this.song);
+
         this.dialog.close();
         this.cb && this.cb(false);
     }
