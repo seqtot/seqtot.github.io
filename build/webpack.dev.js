@@ -68,9 +68,16 @@ function backendApi(middlewares, devServer) {
 
     // https://stackoverflow.com/questions/33997263/express-js-use-variables-in-routes-path
     app.get('/api/readdir', function(req, res) {
+
+        console.log('query:path', req.query.path);
+        console.log('query:root', req.query.root);
+
         let folder = req.query.path || '';
-        folder = folder ? '/' + folder :  '';
-        folder = `${req.query.root}${folder}`;
+        let root = req.query.root || '';
+        
+        folder = Path.join(__dirname, '..', root, folder);
+
+        console.log('read folder', folder);
 
         function readDir(path, result) {
             const files = Fs.readdirSync(path);

@@ -34,7 +34,7 @@ class FileService {
 
     async readdir(path: string): Promise<FileInfo[]> {
         const dfr: Deferred = new Deferred<any>();
-        const root = 'D:/seqtot.github.io/assets/motes';
+        const root = 'assets';
 
         console.log('Path', path);
 

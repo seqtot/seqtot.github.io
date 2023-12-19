@@ -92,7 +92,7 @@ export class FileTreeGlComponent {
         this.rootEl.appendChild(updateTreeEl);
 
         // загрузка дерева
-        this.fileTree = await Fs.readdir('');
+        this.fileTree = await Fs.readdir('motes');
 
         // каталоги верхнего уровня
         this.fileTree.forEach((item, i) => {
