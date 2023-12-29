@@ -143,7 +143,7 @@ export class Sound {
     }
 
     static AddToneSound(id: number) {
-        //console.log('AddToneSound', id);
+        //console.log('Sound.AddToneSound', id);
 
         if (!id) {
             return;
@@ -192,7 +192,8 @@ export class Sound {
         fontLoader.startLoad(
             Sound.ctx,
             fontInfo.url,
-            fontInfo.variable
+            fontInfo.variable,
+            id
         );
 
         fontLoader.waitLoad(() => {
@@ -249,7 +250,8 @@ export class Sound {
         fontLoader.startLoad(
             Sound.ctx,
             drumInfo.url,
-            drumInfo.variable
+            drumInfo.variable,
+            id
         );
 
         fontLoader.waitLoad(() => {

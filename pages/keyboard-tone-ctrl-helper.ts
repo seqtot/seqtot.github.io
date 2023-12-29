@@ -415,7 +415,7 @@ export function getVerticalKeyboard(
     keyboardId = keyboardId || '';
 
     const isT34Type = isT34(type);
-    const size = 1.8;
+    const size = 1.9;
 
     const getKey = getKeyFn({
         keyboardId,

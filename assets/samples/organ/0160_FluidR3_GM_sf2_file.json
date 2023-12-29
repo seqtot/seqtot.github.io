@@ -1,6 +1,7 @@
 {
 	"name": "organ 162",
 	"var": "tone_0160_FluidR3_GM_sf2_file",
+	"id": 162,
 	"zones": [
 		{
 			"midi": 16,

@@ -1,6 +1,7 @@
 {
 	"var": "_tone_0170_SoundBlasterOld_sf2",
 	"name": "porgan 176",
+	"id": 176,
 	"zones": [
 		{
 			"midi": 17,

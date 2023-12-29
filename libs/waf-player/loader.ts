@@ -4,6 +4,13 @@ import { preparePreset } from './prepare';
 import { getInstrumentTitles } from './instrument-titles';
 import { parseInteger } from '../common';
 
+const localSamples = {
+	162: 'samples/organ/0160_FluidR3_GM_sf2_file.json', // organ:162:_tone_0160_FluidR3_GM_sf2_file
+    176: 'samples/organ/0170_SoundBlasterOld_sf2.json', // organ*p:176:_tone_0170_SoundBlasterOld_sf2
+    182: 'samples/organ/0180_FluidR3_GM_sf2_file.json', // 'organ*r:182:_tone_0180_FluidR3_GM_sf2_file'
+};
+
+
 export class WebAudioFontLoader {
 	cached: CachedPreset[] = [];
 	player: WebAudioFontPlayer;
@@ -12,11 +19,15 @@ export class WebAudioFontLoader {
 	choosenInfos: NumPair[] = [];
 	drumNamesArray: string[] = [];
 	drumKeyArray: string[] = [];
+
 	constructor(player: WebAudioFontPlayer) {
 		this.player = player;
 	}
 
-	startLoad(audioContext: AudioContext, filePath: string, variableName: string) {
+	async startLoad(audioContext: AudioContext, filePath: string, variableName: string, id?: string | number) {
+		//console.log('startLoad', filePath, variableName, id);
+
+
 		if (window[variableName]) {
 			return;
 		}
@@ -29,12 +40,35 @@ export class WebAudioFontLoader {
 			filePath: filePath,
 			variableName: variableName
 		});
+
+		if (localSamples[id]) {
+                try {
+                    const url = `${localSamples[id]}`;
+                    const res = await fetch(url);
+
+                    if (res.ok) {
+                        const json = await res.json();
+
+						window[variableName] = json;
+
+						this.decodeAfterLoading(audioContext, variableName);
+                    } else {
+                        throw new Error(`${res.status} ${res.statusText}`);
+                    }
+                }
+                catch (error){
+                    console.log('load sampleJson', error);
+                }
+
+				return;
+		}
+
 		var r: HTMLScriptElement = document.createElement('script');
 		r.setAttribute("type", "text/javascript");
 		r.setAttribute("src", filePath);
 		document.getElementsByTagName("head")[0].appendChild(r);
 		this.decodeAfterLoading(audioContext, variableName);
-	};
+	}
 
 	setInstrumentOnWindow(text: string) {
 
@@ -49,7 +83,8 @@ export class WebAudioFontLoader {
 				var: variableName,
 			});
 		});
-	};
+	}
+
 	waitOrFinish(variableName: string, onFinish: () => void) {
 		if (window[variableName]) {
 			onFinish();
@@ -59,7 +94,8 @@ export class WebAudioFontLoader {
 				me.waitOrFinish(variableName, onFinish);
 			}, 111);
 		}
-	};
+	}
+
 	loaded(variableName: string): boolean {
 		if (!(window[variableName])) {
 			return false;
@@ -71,7 +107,8 @@ export class WebAudioFontLoader {
 			}
 		}
 		return true;
-	};
+	}
+
 	progress(): number {
 		if (this.cached.length > 0) {
 			for (var k = 0; k < this.cached.length; k++) {
@@ -83,7 +120,8 @@ export class WebAudioFontLoader {
 		} else {
 			return 1;
 		}
-	};
+	}
+
 	waitLoad(onFinish: () => void) {
 		var me = this;
 		if (this.progress() >= 1) {
@@ -344,7 +382,7 @@ export class WebAudioFontLoader {
 			title: this.instrumentTitles()[p],
 			pitch: -1
 		};
-	};
+	}
 
 	getInstrumentsByGroup(group: number | string): { variable: string, url: string, title: string, pitch: number, index: number}[] {
 		const result = [];
@@ -433,7 +471,8 @@ export class WebAudioFontLoader {
 		}
 		console.log('program', program, 'not found');
 		return 0;
-	};
+	}
+
 	drumTitles(): string[] {
 		if (this.drumNamesArray.length == 0) {
 			var drumNames: string[] = [];
@@ -487,7 +526,8 @@ export class WebAudioFontLoader {
 			this.drumNamesArray = drumNames;
 		}
 		return this.drumNamesArray;
-	};
+	}
+
 	drumKeys(): string[] {
 		if (this.drumKeyArray.length == 0) {
 			this.drumKeyArray = [
@@ -646,7 +686,8 @@ export class WebAudioFontLoader {
 			];
 		}
 		return this.drumKeyArray;
-	};
+	}
+
 	drumInfo(n: number): PresetInfo {
 		var key = this.drumKeys()[n];
 		var p = 1 * parseInt(key.substring(0, 2));
@@ -657,7 +698,8 @@ export class WebAudioFontLoader {
 			pitch: p,
 			title: this.drumTitles()[p]
 		};
-	};
+	}
+
 	findDrum(nn: number): number {
 		for (var i = 0; i < this.drumKeys().length; i++) {
 			if (nn == 1 * parseInt(this.drumKeys()[i].substring(0, 2))) {
