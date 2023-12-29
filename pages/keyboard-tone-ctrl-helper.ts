@@ -431,13 +431,13 @@ export function getVerticalKeyboard(x: {
         minWidth = `min-width: ${size * x.keys[0].length + 0.1}rem;`;
     }
 
+    // padding: 0.5rem 0 0.5rem 0.5rem;"
     let keyboard = `
         <div style="
             font-family: monospace;
             user-select: none;
             touch-action: none;
-            ${minWidth}    
-            padding: 0.5rem 0 0.5rem 0.5rem;"            
+            ${minWidth}                
             data-name="keyboard-${keyboardId}"
         >%tpl%</div>
     `.trim();

@@ -205,10 +205,13 @@ export class ToneCtrl extends KeyboardCtrl {
             soloKeys = hlp.harmonicaKeys.slice(3);
         }
 
+        const size = 2.5;
+        const rows = Math.max(soloKeys.length, baseKeys.length);
+
         return `
             <div style="
                 margin: 0;
-                padding: 1rem 1rem 1rem .5rem;
+                padding: 1rem 1rem 1rem 1rem;
                 user-select: none;
                 touch-action: none;
                 display: flex;
@@ -216,6 +219,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 position: relative;"
             >
                 ${hlp.getVerticalKeyboard({keyboardId: 'solo', type: boardType, keys: soloKeys, size: 2.5})}
+                <div style="width: 1rem; height: {size*rows}rem; user-select: none; touch-action: none;"></div>
                 ${hlp.getVerticalKeyboard({keyboardId: 'base', type: boardType, keys: baseKeys, size: 2.5})}
                 <div
                     style="font-size: 2rem;
