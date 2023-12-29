@@ -10,6 +10,7 @@ const localSamples = {
     182: 'samples/organ/0180_FluidR3_GM_sf2_file.json', // 'organ*r:182:_tone_0180_FluidR3_GM_sf2_file'
 };
 
+const isDev = /localhost/.test(window.location.href);
 
 export class WebAudioFontLoader {
 	cached: CachedPreset[] = [];
@@ -43,7 +44,7 @@ export class WebAudioFontLoader {
 
 		if (localSamples[id]) {
                 try {
-                    const url = `${localSamples[id]}`;
+                    const url = isDev ? `${localSamples[id]}` : `assets/${localSamples[id]}`;
                     const res = await fetch(url);
 
                     if (res.ok) {
