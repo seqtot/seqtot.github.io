@@ -87,7 +87,12 @@ export class ToneCtrl extends KeyboardCtrl {
            return row.slice(firstString, stringCount + firstString);
         });
 
-        return hlp.getVerticalKeyboard('base', boardType, boardKeys);
+        return hlp.getVerticalKeyboard({
+            keyboardId: 'base',
+            type: boardType,
+            keys: boardKeys,
+            size: 1.8,
+        });
     }
 
     getBeatContent(): string {
@@ -210,8 +215,8 @@ export class ToneCtrl extends KeyboardCtrl {
                 justify-content: space-between;
                 position: relative;"
             >
-                ${hlp.getVerticalKeyboard('solo', boardType, soloKeys)}
-                ${hlp.getVerticalKeyboard('base', boardType, baseKeys)}
+                ${hlp.getVerticalKeyboard({keyboardId: 'solo', type: boardType, keys: soloKeys, size: 2.2})}
+                ${hlp.getVerticalKeyboard({keyboardId: 'base', type: boardType, keys: baseKeys, size: 2.2})}
                 <div
                     style="font-size: 2rem;
                     font-family: monospace;

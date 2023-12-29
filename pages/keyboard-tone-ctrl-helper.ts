@@ -407,15 +407,16 @@ export function isT34(val: any): boolean {
     return val === 'bassSolo34' || val === 'soloSolo34' || val === 'bassBass34' || val === 'bass34' || val === 'solo34';
 }
 
-export function getVerticalKeyboard(
+export function getVerticalKeyboard(x: {
     keyboardId: number | string,
     type: ToneKeyboardType,
     keys: string[][],
-): string {
-    keyboardId = keyboardId || '';
+    size?: number,
+}): string {
+    const keyboardId = x.keyboardId || '';
 
-    const isT34Type = isT34(type);
-    const size = 2; // было 1.8
+    const isT34Type = isT34(x.type);
+    const size = x.size || 1.8;
 
     const getKey = getKeyFn({
         keyboardId,
@@ -426,8 +427,8 @@ export function getVerticalKeyboard(
 
     let minWidth = '';
 
-    if (keys[0] && keys[0].length) {
-        minWidth = `min-width: ${size * keys[0].length + 0.1}rem;`;
+    if (x.keys[0] && x.keys[0].length) {
+        minWidth = `min-width: ${size * x.keys[0].length + 0.1}rem;`;
     }
 
     let keyboard = `
@@ -442,7 +443,7 @@ export function getVerticalKeyboard(
     `.trim();
 
     let tpl = '';
-    keys.forEach((row, iRow) => {
+    x.keys.forEach((row, iRow) => {
         tpl = tpl + '<div>';
 
         row.forEach((note, iCol) => {
