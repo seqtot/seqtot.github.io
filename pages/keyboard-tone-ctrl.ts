@@ -218,9 +218,9 @@ export class ToneCtrl extends KeyboardCtrl {
                 justify-content: space-between;
                 position: relative;"
             >
-                ${hlp.getVerticalKeyboard({keyboardId: 'solo', type: boardType, keys: soloKeys, size: 2.3})}
+                ${hlp.getVerticalKeyboard({keyboardId: 'base', type: boardType, keys: baseKeys, size: 2.2})}            
                 <div style="width: 1rem; height: {size*rows}rem; user-select: none; touch-action: none;"></div>
-                ${hlp.getVerticalKeyboard({keyboardId: 'base', type: boardType, keys: baseKeys, size: 2.3})}
+                ${hlp.getVerticalKeyboard({keyboardId: 'solo', type: boardType, keys: soloKeys, size: 2.2})}
                 <div
                     style="font-size: 2rem;
                     font-family: monospace;

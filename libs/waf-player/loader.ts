@@ -12,6 +12,38 @@ const localSamples = {
 
 const isDev = /localhost/.test(window.location.href);
 
+async function loadFromLocal (fileName: string): Promise<null | string> {
+	let resolve: any;
+	let promise = new Promise<any>((_resolve) => {
+		resolve = _resolve;
+	});
+
+	if (!isDev) {
+		resolve(null);
+
+		return promise;
+	}
+
+	const path = `D:/audio/webaudiofontdata/sound/${fileName}`;
+
+	try {
+		const res = await fetch(`api/readFile?path=${path}`);
+
+		if (res.ok) {
+			const text = await res.text();
+
+			resolve(text);
+		} else {
+			resolve(null);
+		}
+	}
+	catch (error) {
+		resolve(null);
+	}
+
+	return promise;
+}
+
 export class WebAudioFontLoader {
 	cached: CachedPreset[] = [];
 	player: WebAudioFontPlayer;
@@ -26,17 +58,20 @@ export class WebAudioFontLoader {
 	}
 
 	async startLoad(audioContext: AudioContext, filePath: string, variableName: string, id?: string | number) {
-		//console.log('startLoad', filePath, variableName, id);
+		const fileName = filePath.split('/').pop();
 
+		//console.log('startLoad', fileName, filePath, variableName, id);
 
 		if (window[variableName]) {
 			return;
 		}
+
 		for (var i = 0; i < this.cached.length; i++) {
 			if (this.cached[i].variableName == variableName) {
 				return;
 			}
 		}
+
 		this.cached.push({
 			filePath: filePath,
 			variableName: variableName
@@ -64,11 +99,35 @@ export class WebAudioFontLoader {
 				return;
 		}
 
-		var r: HTMLScriptElement = document.createElement('script');
-		r.setAttribute("type", "text/javascript");
-		r.setAttribute("src", filePath);
-		document.getElementsByTagName("head")[0].appendChild(r);
-		this.decodeAfterLoading(audioContext, variableName);
+		loadFromLocal(fileName).then(result => {
+			if (result) {
+				var s = document.createElement('script');
+				s.type = 'text/javascript';
+				var code = result;
+
+				try {
+					s.appendChild(document.createTextNode(code));
+					document.body.appendChild(s);
+				} catch (e) {
+					s.text = code;
+					document.body.appendChild(s);
+				}
+
+				return true;
+			}
+
+			return false;
+		}).then(result => {
+			if (!result) {
+				var r: HTMLScriptElement = document.createElement('script');
+
+				r.setAttribute("type", "text/javascript");
+				r.setAttribute("src", filePath);
+				document.getElementsByTagName("head")[0].appendChild(r);
+			}
+
+			this.decodeAfterLoading(audioContext, variableName);
+		});
 	}
 
 	setInstrumentOnWindow(text: string) {
