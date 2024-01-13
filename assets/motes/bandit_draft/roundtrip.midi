@@ -1,0 +1,90 @@
+<settings>
+# boardShift: -12;
+  pitchShift: 0;
+_ @drums: v50; $bass: v30; $guit: v40; $Z: v70;
+
+# $egit*drpm
+
+<out b135>
+> СЧЁТ       %_  [4*120]
+
+> пассаж_1   %A  [2*4*120]
+> арпеджио_2 %B  [2*4*120]
+> арпеджио_3 %C  [4*4*120]
+> арпеджио_4 %D  [4*4*120]
+> арпеджио_4 %E  [4*4*120]
+
+> арпеджио_5_1  %F  [4*4*120]
+> арпеджио_5_2  %G  [3*4*120]
+
+> арпеджио_4 %H  [4*4*120]
+> арпеджио_4 %I  [4*4*120]
+> арпеджио_3 %J  [4*4*120]
+> арпеджио_2 %K  [2*4*120]
+> пассаж_1   %L  [2*4*120]
+
+> КОНЕЦ      %y  [4*4*120]
+> ТИШИНА     %z  [1*4*120]
+
+
+<пассаж_1 b130 $>
+$guit: 0    ла=40 за=40 ва=40  ма=40 на=40 та=40 $egit*drp
+$guit: 240  да=40 та=40 на=40  та=40 да=40 зо=40 $egit*drp
+$guit: 480  ло=40 зо=40 во=40  мо=40 но=40 то=40 $egit*drp
+$guit: 720  до=40 то=40 но=40  то=40 до=40 зу=40 $egit*drp
+
+<арпеджио_2 b130 $>
+$guit: 0    но=40 до=40 зу=40  до=40 но=40 во=40 $egit*drpm
+$guit: 240  ло=40 во=40 но=40  до=40 но=40 во=40 $egit*drpm
+$guit: 480  да=40 ло=40 во=40  но=40 во=40 ло=40 $egit*drpm
+$guit: 720  на=240:~.50=25=0 $egit*drp
+
+<арпеджио_3 b130 $>
+$guit: 0    to=40 zo=40 ta=40  vo=40 zo=40 ta=40 $egit*drp
+$guit: 240  mo=40 zo=40 ta=40  no=40 zo=40 da=40 $egit*drp
+$guit: 480  to=40 zo=40 ta=40  ly=40 zo=40 ta=40 $egit*drp
+$guit: 720  zy=40 zo=40 ta=40  vy=40 zo=40 da=40 $egit*drp
+
+$guit: 960  to=40 zo=40 ta=40  vo=40 zo=40 ta=40 $egit*drp
+$guit: 1200 mo=40 zo=40 ta=40  no=40 zo=40 da=40 $egit*drp
+$guit: 1440 to=40 zo=40 ta=40  ly=40 zo=40 ta=40 $egit*drp
+$guit: 1680 zy=40 zo=40 ta=40  vy=40 zo=40 da=40 $egit*drp
+
+<арпеджио_4 b130 $>
+$guit: 0    to=40 mo=40 to=40  zo=40 mo=40 to=40 $egit*drp
+$guit: 240  bo=40 mo=40 to=40  ta=40 mo=40 to=40 $egit*drp
+$guit: 480  ma=40 mo=40 to=40  ta=40 mo=40 to=40 $egit*drp
+$guit: 720  bo=40 mo=40 to=40  zo=40 mo=40 to=40 $egit*drp
+
+$guit: 960  do=40 no=40 vo=40  lo=40 da=40 na=40 $egit*drp
+$guit: 1200 za=40 va=40 na=40  da=40 lo=40 vo=40 $egit*drp
+$guit: 1440 no=40 do=40 ly=40  zy=40 vy=40 sy=40 $egit*drp
+$guit: 1680 zy=40 my=40 vy=40  sy=40 zy=40 my=40 $egit*drp
+
+<арпеджио_5_1 b130 $>
+$guit: 0    to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$guit: 240  to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$guit: 480  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$guit: 720  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$guit: 960  by=40 na=40 bo=40  by=40 ko=40 bo=40 $egit*drp
+$guit: 1200 by=40 na=40 bo=40  by=40 ko=40 bo=40 $egit*drp
+$guit: 1440 mo=40 za=40 ma=40  mo=40 na=40 ma=40 $egit*drp
+$guit: 1680 mo=40 za=40 ma=40  mo=40 na=40 ma=40 $egit*drp
+
+<арпеджио_5_2 b130 $>
+$guit: 0    to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$guit: 240  to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$guit: 480  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$guit: 720  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$guit: 960  zo=40 de=40 za=40  zo=40 va=40 za=40 $egit*drp
+$guit: 1200 zo=40 de=40 za=40  zo=40 va=40 ma=40 $egit*drp
+
+<КОНЕЦ b138 $>
+$guit: to+zo+ta=1920_1920_0=960=960:v0 $egit*drp
+
+
+<СЧЁТ b138 $>
+$Z: ли=120=60 ли=120=60 ли=120=60 ли=120=60 $xylo
+
+<ТИШИНА b138 $>
+$Z: 480 d480 $xylo
