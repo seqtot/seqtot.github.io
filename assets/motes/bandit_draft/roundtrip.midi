@@ -38,15 +38,14 @@ $guit: 720  do=40 to=40 no=40  to=40 do=40 zy=40 $egit*drp
 $bass: 720  dy=120             ty=120            $cBass*f
 
 <арпеджио_2 b130 $>
-$guit: 0    но=40 до=40 зу=40  до=40 но=40 во=40 $egit*drpm
+$guit: 0    но=40 до=40 зу=40  до=40 но=40 во=40 $egit*drp
 $bass: 0    ny=120             dy=120            $cBass*f
-$guit: 240  ло=40 во=40 но=40  до=40 но=40 во=40 $egit*drpm
+$guit: 240  ло=40 во=40 но=40  до=40 но=40 во=40 $egit*drp
 $bass: 240  ly=120             dy=120            $cBass*f
-$guit: 480  да=40 ло=40 во=40  но=40 во=40 ло=40 $egit*drpm
+$guit: 480  да=40 ло=40 во=40  но=40 во=40 ло=40 $egit*drp
 $bass: 480  do=120             ny=120            $cBass*f
-$guit: 720  на=240:~.50=25=0 $egit*drp
-$bass: 720  no=240 $cBass*f
-
+$guit: 720  на=240:~.50=25=0                     $egit*drp
+$bass: 720  no=240                               $cBass*f
 
 <арпеджио_3 b130 $>
 $guit: 0    to=40 zo=40 ta=40  vo=40 zo=40 ta=40 $egit*drp
