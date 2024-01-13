@@ -2,6 +2,7 @@ const Path = require('path');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.config.common.js');
 const Fs = require('fs');
+const Os = require('os');
 
 function writeFileSync (fname, content) {
     fname = Path.resolve(fname);
@@ -60,7 +61,11 @@ function backendApi(middlewares, devServer) {
 
         //const filePath = `${__dirname}/public/${req.query.path}`;
         //const filePath = `${req.query.root}/${req.query.path}`;
-        const filePath = `${req.query.path}`;
+        let filePath = `${req.query.path}`;
+
+        if (Os.type() === 'Linux') {
+            filePath = filePath.replace('D:', `${Os.homedir()}/d`);
+        }
 
         //res.json({file});
         res.download(filePath); // Set disposition and send it.
@@ -74,7 +79,7 @@ function backendApi(middlewares, devServer) {
 
         let folder = req.query.path || '';
         let root = req.query.root || '';
-        
+
         folder = Path.join(__dirname, '..', root, folder);
 
         console.log('read folder', folder);

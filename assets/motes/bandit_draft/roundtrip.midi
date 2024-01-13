@@ -1,7 +1,7 @@
 <settings>
 # boardShift: -12;
   pitchShift: 0;
-_ @drums: v50; $bass: v30; $guit: v40; $Z: v70;
+_ $bass: v25; $guit: v50; $Z: v50;
 
 # $egit*drpm
 
@@ -15,7 +15,7 @@ _ @drums: v50; $bass: v30; $guit: v40; $Z: v70;
 > арпеджио_4 %E  [4*4*120]
 
 > арпеджио_5_1  %F  [4*4*120]
-> арпеджио_5_2  %G  [3*4*120]
+> арпеджио_5_2  %G  [4*4*120]
 
 > арпеджио_4 %H  [4*4*120]
 > арпеджио_4 %I  [4*4*120]
@@ -28,60 +28,104 @@ _ @drums: v50; $bass: v30; $guit: v40; $Z: v70;
 
 
 <пассаж_1 b130 $>
-$guit: 0    ла=40 за=40 ва=40  ма=40 на=40 та=40 $egit*drp
-$guit: 240  да=40 та=40 на=40  та=40 да=40 зо=40 $egit*drp
-$guit: 480  ло=40 зо=40 во=40  мо=40 но=40 то=40 $egit*drp
-$guit: 720  до=40 то=40 но=40  то=40 до=40 зу=40 $egit*drp
+$guit: 0    la=40 za=40 va=40  ma=40 na=40 ta=40 $egit*drp
+$bass: 0    lo=120             mo=120            $cBass*f
+$guit: 240  da=40 ta=40 na=40  ta=40 da=40 zo=40 $egit*drp
+$bass: 240  do=120             to=120            $cBass*f
+$guit: 480  lo=40 zo=40 vo=40  mo=40 no=40 to=40 $egit*drp
+$bass: 480  ly=120             my=120            $cBass*f
+$guit: 720  do=40 to=40 no=40  to=40 do=40 zy=40 $egit*drp
+$bass: 720  dy=120             ty=120            $cBass*f
 
 <арпеджио_2 b130 $>
 $guit: 0    но=40 до=40 зу=40  до=40 но=40 во=40 $egit*drpm
+$bass: 0    ny=120             dy=120            $cBass*f
 $guit: 240  ло=40 во=40 но=40  до=40 но=40 во=40 $egit*drpm
+$bass: 240  ly=120             dy=120            $cBass*f
 $guit: 480  да=40 ло=40 во=40  но=40 во=40 ло=40 $egit*drpm
+$bass: 480  do=120             ny=120            $cBass*f
 $guit: 720  на=240:~.50=25=0 $egit*drp
+$bass: 720  no=240 $cBass*f
+
 
 <арпеджио_3 b130 $>
 $guit: 0    to=40 zo=40 ta=40  vo=40 zo=40 ta=40 $egit*drp
+$bass: 0    ty=120             vy=120            $cBass*f
 $guit: 240  mo=40 zo=40 ta=40  no=40 zo=40 da=40 $egit*drp
+$bass: 240  my=120             ny=120            $cBass*f
 $guit: 480  to=40 zo=40 ta=40  ly=40 zo=40 ta=40 $egit*drp
+$bass: 480  ty=120             ly=120            $cBass*f
 $guit: 720  zy=40 zo=40 ta=40  vy=40 zo=40 da=40 $egit*drp
+$bass: 720  zu=120             vu=120            $cBass*f
 
 $guit: 960  to=40 zo=40 ta=40  vo=40 zo=40 ta=40 $egit*drp
+$bass: 960  ty=120             vy=120            $cBass*f
 $guit: 1200 mo=40 zo=40 ta=40  no=40 zo=40 da=40 $egit*drp
+$bass: 1200 my=120             ny=120            $cBass*f
 $guit: 1440 to=40 zo=40 ta=40  ly=40 zo=40 ta=40 $egit*drp
+$bass: 1440 ty=120             lu=120            $cBass*f
 $guit: 1680 zy=40 zo=40 ta=40  vy=40 zo=40 da=40 $egit*drp
+$bass: 1680 zu=120             vu=120            $cBass*f
 
 <арпеджио_4 b130 $>
 $guit: 0    to=40 mo=40 to=40  zo=40 mo=40 to=40 $egit*drp
+$bass: 0    ty=120             zy=120            $cBass*f
 $guit: 240  bo=40 mo=40 to=40  ta=40 mo=40 to=40 $egit*drp
+$bass: 240  by=120             to=120            $cBass*f
 $guit: 480  ma=40 mo=40 to=40  ta=40 mo=40 to=40 $egit*drp
+$bass: 480  mo=120             to=120            $cBass*f
 $guit: 720  bo=40 mo=40 to=40  zo=40 mo=40 to=40 $egit*drp
+$bass: 720  by=120             zy=120            $cBass*f
 
 $guit: 960  do=40 no=40 vo=40  lo=40 da=40 na=40 $egit*drp
+$bass: 960  dy=120             ly=120            $cBass*f
 $guit: 1200 za=40 va=40 na=40  da=40 lo=40 vo=40 $egit*drp
+$bass: 1200 zo=120             lo=120            $cBass*f
 $guit: 1440 no=40 do=40 ly=40  zy=40 vy=40 sy=40 $egit*drp
+$bass: 1440 ny=120             zu=120            $cBass*f
 $guit: 1680 zy=40 my=40 vy=40  sy=40 zy=40 my=40 $egit*drp
+$bass: 1680 zu=120             su=120            $cBass*f
 
 <арпеджио_5_1 b130 $>
 $guit: 0    to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$bass: 0    ty=120             ty=120            $cBass*f
 $guit: 240  to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$bass: 240  ty=120             ty=120            $cBass*f
 $guit: 480  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$bass: 480  vy=120             vy=120            $cBass*f
 $guit: 720  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$bass: 720  vy=120             vy=120            $cBass*f
+
 $guit: 960  by=40 na=40 bo=40  by=40 ko=40 bo=40 $egit*drp
+$bass: 960  bu=120             bu=120            $cBass*f
 $guit: 1200 by=40 na=40 bo=40  by=40 ko=40 bo=40 $egit*drp
+$bass: 1200 bu=120             bu=120            $cBass*f
 $guit: 1440 mo=40 za=40 ma=40  mo=40 na=40 ma=40 $egit*drp
+$bass: 1440 my=120             my=120            $cBass*f
 $guit: 1680 mo=40 za=40 ma=40  mo=40 na=40 ma=40 $egit*drp
+$bass: 1680 my=120             my=120            $cBass*f
 
 <арпеджио_5_2 b130 $>
 $guit: 0    to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$bass: 0    ty=120             ty=120            $cBass*f
 $guit: 240  to=40 ma=40 ta=40  to=40 bo=40 ta=40 $egit*drp
+$bass: 240  ty=120             ty=120            $cBass*f
 $guit: 480  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$bass: 480  vy=120             vy=120            $cBass*f
 $guit: 720  vo=40 la=40 va=40  vo=40 ma=40 va=40 $egit*drp
+$bass: 720  vy=120             vy=120            $cBass*f
 $guit: 960  zo=40 de=40 za=40  zo=40 va=40 za=40 $egit*drp
-$guit: 1200 zo=40 de=40 za=40  zo=40 va=40 ma=40 $egit*drp
+$bass: 960  zy=120             zy=120            $cBass*f
+$guit: 1200 zo=40 de=40 za=40  zo=40 va=40 za=40 $egit*drp
+$bass: 1200 zy=120             zy=120            $cBass*f
+$guit: 1440 zo=40 de=40 za=40  zo=40 va=40 za=40 $egit*drp
+$bass: 1440 zy=120             zy=120            $cBass*f
+$guit: 1680 zo=40 de=40 za=40  zo=40 va=40 ma=40 $egit*drp
+$bass: 1680 zy=120             zy=120            $cBass*f
 
 <КОНЕЦ b138 $>
 $guit: to+zo+ta=1920_1920_0=960=960:v0 $egit*drp
-
+$bass: ty=1920_1920_0=960=960:v0       $cBass*f
 
 <СЧЁТ b138 $>
 $Z: ли=120=60 ли=120=60 ли=120=60 ли=120=60 $xylo
