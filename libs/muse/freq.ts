@@ -34,7 +34,7 @@ export const stepListRus = 'дтрнмфвсзлкб'.split('');
 
 // http://midi.teragonaudio.com/tutr/notefreq.htm
 export const freqList: { value: number; code: number }[] = [
-  /* КОНТРОКТАВА 1 */
+  /* КОНТРОКТАВА 1 Ы */
   { code: 24, value: 32.7 }, //  д
   { code: 25, value: 34.65 }, // т
   { code: 26, value: 36.71 }, // р
@@ -47,7 +47,7 @@ export const freqList: { value: number; code: number }[] = [
   { code: 33, value: 55.0 }, //  л
   { code: 34, value: 58.27 }, // к
   { code: 35, value: 61.74 }, // б
-  /* БОЛЬШАЯ */
+  /* БОЛЬШАЯ У */
   { code: 36, value: 65.41 },
   { code: 37, value: 69.3 },
   { code: 38, value: 73.42 },
@@ -60,7 +60,7 @@ export const freqList: { value: number; code: number }[] = [
   { code: 45, value: 110.0 },
   { code: 46, value: 116.54 },
   { code: 47, value: 123.47 },
-  /* МАЛАЯ */
+  /* МАЛАЯ О */
   { code: 48, value: 130.82 },
   { code: 49, value: 138.59 },
   { code: 50, value: 146.83 },
@@ -73,7 +73,7 @@ export const freqList: { value: number; code: number }[] = [
   { code: 57, value: 220.0 },
   { code: 58, value: 233.08 },
   { code: 59, value: 246.94 },
-  /* ПЕРВАЯ */
+  /* ПЕРВАЯ А */
   { code: 60, value: 261.63 },
   { code: 61, value: 277.18 },
   { code: 62, value: 293.66 },
@@ -313,7 +313,7 @@ export const noteByKeyHash = {
 };
 
 function isPresent(val: any) {
-  return val !== null || val !== undefined;
+  return val !== null && val !== undefined;
 }
 
 export function getNoteByStepAndOctave(

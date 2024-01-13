@@ -33,6 +33,7 @@ const defRoute = '/mbox/setBand/';
 
 const linksToPage = [
     { href: '/mbox/setBand/', name: 'Список' },
+    { href: '/mbox/setBandDraft/', name: 'Черновики' },
     { href: '/mbox/setMy/', name: 'Мои вещи' },
     { href: '/page/page_keyboard/', name: 'keyboard', isDev: false },
     { href: '/page/page_roll/', name: 'roll', isDev: true },

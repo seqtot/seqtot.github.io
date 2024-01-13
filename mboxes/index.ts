@@ -1,4 +1,3 @@
-import setBand from './setBand';
 import setMy from './setMy';
 import tiriTiri from './tiriTiri';
 import bell from './bell';
@@ -10,6 +9,12 @@ import sweetLeaf from './sweetLeaf';
 import engine from './engine';
 import threeDots from './threeDots';
 import noSystems from './noSystems';
+
+import glass from './glass';
+import butterflyEffect from './butterflyEffect';
+
+import setBand from './setBand';
+import setBandDraft from './setBandDraft';
 
 export default {
   // SONG
@@ -24,7 +29,12 @@ export default {
   noSystems,
   //peterGunn,
 
+  // DRAFT
+  glass,
+  butterflyEffect,
+
   // LIST
   setBand,
+  setBandDraft,
   setMy,
 };

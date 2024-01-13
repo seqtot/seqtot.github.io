@@ -231,7 +231,7 @@ export function dyName<T extends HTMLElement = HTMLElement>(
 }
 
 export function isPresent(val: any) {
-  return val !== null || val !== undefined;
+  return val !== null && val !== undefined;
 }
 
 export function getRandomElement(arr: any[] | string): any {
