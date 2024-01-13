@@ -17,10 +17,16 @@ const roundtrip = `<div style="margin: .5rem;">
 </div>
 `.trim();
 
+const abt1 = `<div style="margin: .5rem;">
+    ${getInnerLink('Abt 1 (вокализ)', '/mbox/abt1/')}
+</div>
+`.trim();
+
 const content = `
   ${glass}
   ${butterflyEffect}
   ${roundtrip}
+  ${abt1}  
   <div style="margin-bottom: 3rem;"></div>
 `.trim();
 

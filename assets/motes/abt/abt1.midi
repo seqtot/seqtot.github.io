@@ -1,22 +1,31 @@
 # https://musescore.com/user/385716/scores/5607115
 
 <settings>
-  # boardShift: -12;
+  boardShift: -12;
   pitchShift: 0
-  $bass: v50; $guit: v50; $voic: v0;
+  $guit: v50; $voic: v50; $Z: v50;
 
 <out b120>
-> СЧЁТ
-> миРеДо_
-> реМиФаМи_ 
-> сольЛяСи_
-> ляСольВаСоль_
+> СЧЁТ       %_ [1*4*120]
+> ИНТРО      %A [2*4*120] # Д
+> ИНТРО      %B [2*4*120] # Д
+> моШуШу     %C [2*4*120] # Д
+> шаШаСаСу   %D [2*4*120] # СД
+> наШаШа     %E [2*4*120] # ДТР
+> шуШуСуСа   %F [2*4*120] # РС
+> моШаШаСа   %G [2*4*120] # С
+> суШуШуШуСу %H [2*4*120] # СЗЛ
+> моШуШаСаШа %I [2*4*120] # ФС
+> моШуСуШуШу %J [4*4*120] # СД
+> ИНТРО      %K [2*4*120] # Д
+> КОНЕЦ      %L [2*4*120] # Д
+> ТИШИНА     %y [1*4*120] #
 
 # й--щx | л    | щв-х |
 #       |  9   |      |
 #       |   -х |      |
 #       |      |      |
-<миРеДо_ b90 $> #960
+<моШуШу b90 $> #960
 $voic: 0   ма=240 ра=240 да=480 $trump
 $guit: 0   до+да+ма=60 *drpm  до=60 до=60 до=60           $egit*drp
 $guit: 240 до+фо+ра=60 *drpm  до=60 до=60 до=60           $egit*drp
@@ -28,7 +37,7 @@ $guit: 720 *drpm до=60 до=60 *drp до+мо+да=60 *drpm до=60 $egit*drp
 #          |       - |       х |       |
 #      х   |       - |      н  |       |
 # щ--.н-.  | л--.--. | з--.--. |       |
-<реМиФаМи_ b90 $> #960
+<шаШаСаСу b90 $> #960
 $voic: 0   ра=240 ма=120 фа=120 ма=240 240 $trump
 $guit: 0   су+бо+ра=60 *drpm су=60 су=60 су=60                    $egit*drp
 $guit: 240 су+да+ма=60  *drpm  су=60 *drp су+ра+фа=60 *drpm су=60 $egit*drp
@@ -39,7 +48,7 @@ $guit: 720 *drpm до=60 до=60 *drp до+да+ма=60 *drpm до=60         $e
 #    -  | ж   -х |        |
 #    -  | -   -  | л      |
 #    -х | .--.ш  | .--.щх |
-<сольЛяСи_ b90 $> #960
+<наШаШа b90 $> #960
 $voic: 0   са=240 ла=240 ба=480 $trump
 $guit: 0   до+ма+са=60 *drpm до=60 до=60 до=60            $egit*drp
 $guit: 240 то+ма+ла=60 *drpm то=60 то=60 то=60            $egit*drp
@@ -50,16 +59,56 @@ $guit: 720 *drpm ро=60 ро=60 *drp ро+са+ба=60 *drpm ро=60 $egit*drp
 #     .-х  |       |       |         |
 #  р--.--  | 9--.- | в-в.х |         |
 #          |  -в-х |       | щ--.в-х |
-<ляСольВаСоль_ b90 $> #960
+<шуШуСуСа b90 $> #960
 $voic: 0   ла=240 са=120 ва=120 са=240 240 $trump
 $guit: 0   ро+да+ла=60 *drpm ро=60 ро=60 ро=60                  $egit*drp
 $guit: 240 ро+бо+са=60 *drpm ро=60 *drp ро+ко+ва=60 *drpm ро=60 $egit*drp
 $guit: 480 су+бо+са=60 *drpm су=60 су=60 *drp су+бо+са=60       $egit*drp
 $guit: 720 *drpm су=60 су=60 *drp су+бо+са=60 *drpm су=60       $egit*drp
 
+<моШаШаСа b90 $> #960
+$voic: 0   sa=240 la=120 ba=120 de=360 ba=60 la=60 $trump
+$guit: 0   so+bo+fa+sa=60 *drpm sy=60 sy=60 sy=60 $egit*drp
+$guit: 240 so+ra+fa+la=60 *drpm sy=60 *drp so+ra+fa+ba=60 *drpm sy=60 $egit*drp
+$guit: 480 so+ma+sa+de=60 *drpm sy=60 sy=60 *drp so+ma+sa+de=60       $egit*drp
+$guit: 720 *drpm sy=60 sy=60 *drp so+ma+sa+de=60 *drpm sy=60       $egit*drp
 
-#bass: 0 вы=240    бы=120    сы=120 $cBass*f
-#solo: 0 зе=40 ве=40 ме=40  ме=80 те=40  ба=40 те=40 ме=40  зе=40 ба=40 те=40 $trump
+<суШуШуШуСу b90 $> #960
+$voic: 0   sa=240 fa=240 ma=240 240 $trump
+$guit: 0   sy+bo+sa=60 *drpm sy=60 sy=60 sy=60            $egit*drp
+$guit: 240 zy+zo+fa=60 *drpm zy=60 zy=60 zy=60            $egit*drp
+$guit: 480 ly+lo+ma=60 *drpm ly=60 ly=60 *drp ly+lo+ma=60 $egit*drp
+$guit: 720 *drpm ly=60 ly=60 *drp ly+lo+ma=60 *drpm ly=60 $egit*drp
+
+<моШуШаСаШа b120 $> #960
+$voic: 0    ma=120 ra=120 ma=120 fa=120 $trump
+$guit: 0    fy+lo+da=60 fy=60:*drpm fy+lo+ra=60 fy=60:*drpm $egit*drp
+$guit: 240  fy+lo+da=60 fy=60:*drpm fy+lo+fa=60 fy=60:*drpm $egit*drp
+$voic: 480  sa=480 $trump
+$guit: 480  sy+ma+sa=60 sy=60:*drpm sy=60:*drpm sy+ma+sa=60 $egit*drp
+$guit: 720  sy=60:*drpm sy=60:*drpm sy+ma+sa=60 sy=60:*drpm $egit*drp
+
+<моШуСуШуШу b120 $> #960
+$voic: 0     sa=120 fa=120 ma=120 ra=120 $trump
+$guit: 0     sy+bo+sa=60 sy=60:*drpm sy+lo+fa=60 sy=60:*drpm $egit*drp
+$guit: 240   sy+do+ma=60 sy=60:*drpm sy+fo+ra=60 sy=60:*drpm $egit*drp
+$voic: 480   da=480 $trump
+$guit: 480   do+so+da=60 do=60:*drpm do=60:*drpm do+so+da=60 $egit*drp
+$guit: 720   do=60:*drpm do=60:*drpm do+so+da=60 do=60:*drpm $egit*drp
+$guit: 960   do+so+da=60 so+da=60 ko=60=70:*drpm so+da=60 $egit*drp
+$guit: 1200  lo=60=70:*drpm so+da=60 zo=60=70:*drpm so+da=60 $egit*drp
+
+<ИНТРО b120 $> #960
+$guit: 0   do+so+da=60 do=60:*drpm do=60:*drpm do+so+da=60 $egit*drp
+$guit: 240 do=60:*drpm do=60:*drpm do+so+da=60 do=60:*drpm $egit*drp
+$guit: 480 do+so+da=60 so+da=60 ko=60=70:*drpm so+da=60 $egit*drp
+$guit: 720 lo=60=70:*drpm so+da=60 zo=60=70:*drpm so+da=60 $egit*drp
+
+<КОНЕЦ b120 $> #960 [2*4*120]
+$guit: 0   do+so+da=960_960_0=480=480:v0 $egit*drp
+
+<ТИШИНА b120 $> #960
+$Z: 480 d480 $xylo
 
 <СЧЁТ b90 $>
-$guit: 0 ди=60 60 ди=60 60 ди=60 60 ди=60 60 $xylo
+$Z: 0 ди=60 60 ди=60 60 ди=60 60 ди=60 60 $xylo
