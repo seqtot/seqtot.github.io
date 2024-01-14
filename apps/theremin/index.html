@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Violent Theremin</title>
+    <link href="styles/normalize.css" rel="stylesheet" type="text/css" />
+    <link href="styles/app.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div class="app-contents" data="top-props">
+
+      <div data-board-container style="position: relative; padding-top: 1rem;">
+        <div>
+          <button data-clear-action>clear</button>
+          <button data-test-action>test</button>
+        </div>
+
+        <div data-board-canvas-container style="cursor: crosshair;"></div>
+
+        <div>
+          <button data-clear-action>clear</button>
+          <button data-test-action>test</button>
+          <input data-settings-input type="text" style="font-size: 1.5rem;" value="b60 r8 p4"/>
+        </div>
+      </div>
+      
+      <br/>
+      <br/>
+
+      <!--div data-text style="padding-left: 2rem; font-size: 2rem;">
+        ммМоШаСаШаХоЛуХо - ммШаСаШаЛу<br/>
+        <br/>
+        ммШуНуСу_су_ммШуНуШуШаНа<br/>
+        ммСаНаШа_шу_ммШуШуСа_ва_ммШуНуШу_ша_ммЩуСаЩу
+      </div-->
+
+      <!-- де ма са ба ла за са ма , ра на ма до -->
+      <!-- https://www.youtube.com/watch?v=xHpZVCtvyTM -->
+      <div style="padding-left: 2rem; font-size: 2rem;">Xmaj7(0434 - моЩаНаЩа): моВуНаЩаШуСуСуНу_шуСаСаЩу</div>
+      <div style="padding-left: 2rem; font-size: 2rem;">Xmaj7(0434 - моЩаНаЩа): моЩаНаЩа_ЩуНуЩу_шаШаШуЛу_лаШаШуЛу__лаШаШуЛу_хоНаНу_наХоЛуЛа</div>
+
+
+      <br/>
+      <br/>
+
+      <div style="padding-left: 2rem;">
+        <input
+          data-note-input type="text" style="font-size: 1.5rem;"
+          value="la de la ma fa ma da lo"
+        />
+        <!-- la de la ma fa ma da lo -->
+        <button data-note-input-button>run</button>
+      </div>
+
+      <div data-board-container2 style="position: relative; padding-top: 1rem;">
+        <!--div>
+          <button data-clear-action>clear</button>
+          <button data-test-action>test</button>
+        </div-->
+
+        <div data-board-canvas-container2 style="cursor: crosshair;"></div>
+
+        <!--div>
+          <button data-clear-action>clear</button>
+          <button data-test-action>test</button>
+          <input data-settings-input type="text" style="font-size: 1.5rem;" value="b60 r20 p4"/>
+        </div-->
+      </div>
+
+    </div>
+
+    <!-- Below is your custom application script -->
+    <script src="scripts/cowbell.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/ticker.js"></script>
+    <script src="scripts/wave-source.js"></script>
+    <script src="scripts/waf.js"></script>
+    <script src="scripts/board.js"></script>
+    <script src="scripts/app.js"></script>
+  </body>
+</html>
