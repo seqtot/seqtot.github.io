@@ -367,18 +367,18 @@ export class ToneCtrl extends KeyboardCtrl {
             };
             const note = data.noteLat || '';
 
-            if (isT34(this.realBoardType) && baseNote) {
-                el.style.boxShadow = null;
-            }
-
-            if (data.keyboardId === 'solo') {
-                if (note[0] === baseChar) {
-                    el.style.boxShadow = 'inset 0px 0px 3px black';
-                }
-                if (note === baseNote) {
-                    el.style.boxShadow = 'inset 0px 0px 3px blue';
-                }
-            }
+            // if (isT34(this.realBoardType) && baseNote) {
+            //     el.style.boxShadow = null;
+            // }
+            //
+            // if (data.keyboardId === 'solo') {
+            //     if (note[0] === baseChar) {
+            //         el.style.boxShadow = 'inset 0px 0px 3px black';
+            //     }
+            //     if (note === baseNote) {
+            //         el.style.boxShadow = 'inset 0px 0px 3px blue';
+            //     }
+            // }
 
             // GUITAR
             if (this.realBoardType === 'bassGuitar' || this.realBoardType === 'guitar') {
@@ -1075,25 +1075,29 @@ export class ToneCtrl extends KeyboardCtrl {
                 keyId = el.dataset.noteCellGuid;
             }
 
+            const id = `${keyboardId}-${keyOrNote}`;
+
             el.addEventListener('pointerdown', (evt: MouseEvent) => {
+                //console.log(keyboardId, keyId, keyOrNote, evt);
+
                 evt.preventDefault();
                 evt.stopImmediatePropagation();
 
                 const instrCode = this.instrCode;
 
                 ideService.synthesizer.playSound({
-                    keyOrNote: this.playingNote[keyId],
-                    id: keyId,
+                    keyOrNote: this.playingNote[id],
+                    id: id,
                     onlyStop: true,
                 });
 
-                this.playingNote[keyId] = keyOrNote;
+                this.playingNote[id] = keyOrNote;
                 this.lastPlayingNote = keyOrNote;
                 this.lastNoteCellGuid = el?.dataset?.noteCellGuid || '';
 
                 ideService.synthesizer.playSound({
                     keyOrNote,
-                    id: keyId,
+                    id: id,
                     instrCode,
                 });
 
@@ -1110,11 +1114,11 @@ export class ToneCtrl extends KeyboardCtrl {
 
                 ideService.synthesizer.playSound({
                     keyOrNote,
-                    id: keyId,
+                    id: id,
                     onlyStop: true,
                 });
 
-                this.playingNote[keyId] = undefined;
+                this.playingNote[id] = undefined;
             });
         });
     }
