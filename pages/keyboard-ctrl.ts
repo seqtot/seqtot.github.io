@@ -1488,11 +1488,13 @@ export class KeyboardCtrl {
     }
 
     async playOne() {
-        this.page.stop();
-
         const repeatCount = 1000;
 
+        this.page.stop();
+
         for (let i = 0; i < repeatCount; i++) {
+
+
             const notes = this.getNotes(
                 'temp',
                 {
@@ -1514,6 +1516,8 @@ export class KeyboardCtrl {
                 blocks,
                 bpm: this.page.bpmValue,
             });
+
+            this.page.stop();
 
             if (result === 'break') {
                 return;
