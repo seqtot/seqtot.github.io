@@ -7,6 +7,7 @@ import { Ticker } from './ticker';
 import { DEFAULT_OUT_VOLUME } from '../../pages/song-store';
 import {TextBlock, DataByTracks} from './types';
 import * as u from './utils';
+import {Deferred} from './utils';
 //import * as Fs from 'fs';
 
 const Fs: any = null;
@@ -580,11 +581,22 @@ export class MultiPlayer {
         let msToEnd = endTimeInMs - new Date().getTime();
         msToEnd = msToEnd > 0 ? msToEnd: 0;
 
+        const dfr = new Deferred();
+
         if (breakLoop) {
             cb('break');
+            dfr.resolve('break');
         } else {
-            setTimeout(() => cb('finish'), msToEnd);
+            setTimeout(
+                () => {
+                    cb('finish');
+                    dfr.resolve('finish');
+                },
+                msToEnd
+            );
         }
+
+        return dfr.promise;
     }
 }
 

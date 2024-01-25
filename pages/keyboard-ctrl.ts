@@ -537,7 +537,7 @@ export class KeyboardCtrl {
             result = result.replace('%content%', `
                 ${svg.saveBtn('data-ide-action="save"', '', 20)}${blank}${blank}
                 ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
-                ${svg.playBtn('data-ide-action="play-solo"', '', 20)}${blank}
+                ${svg.playBtn('data-ide-action="play-solo-action"', '', 20)}${blank}
                 ${svg.playBtn2('data-ide-action="play-both"', '', 20)}${blank}
                 ${svg.playBtn3('data-ide-action="play-source"', '', 20)}${blank}
                 <span style="${cmdStyle}" data-clear-ide-song-action>free</span>
@@ -545,7 +545,7 @@ export class KeyboardCtrl {
         } else {
             result = result.replace('%content%', `
                 ${svg.stopBtn('data-ide-action="stop"', '', 20)}${blank}
-                ${svg.playBtn('data-ide-action="play-solo"', '', 20)}${blank}
+                ${svg.playBtn('data-ide-action="play-solo-action"', '', 20)}${blank}
             `.trim());
         }
 
@@ -1111,7 +1111,7 @@ export class KeyboardCtrl {
             el.addEventListener('pointerdown', () => this.playActive());
         });
 
-        getWithDataAttrValue('ide-action', 'play-solo', this.page.pageEl).forEach((el: HTMLElement) => {
+        getWithDataAttrValue('ide-action', 'play-solo-action', this.page.pageEl).forEach((el: HTMLElement) => {
             el.addEventListener('pointerdown', () => this.playOne());
         });
 
@@ -1487,30 +1487,38 @@ export class KeyboardCtrl {
         });
     }
 
-    playOne() {
+    async playOne() {
         this.page.stop();
 
-        const notes = this.getNotes(
-            'temp',
-            {
-                track: this.trackName || '$unknown',
-                type: this.boardType,
-                lines: this.liner.lines,
+        const repeatCount = 1000;
+
+        for (let i = 0; i < repeatCount; i++) {
+            const notes = this.getNotes(
+                'temp',
+                {
+                    track: this.trackName || '$unknown',
+                    type: this.boardType,
+                    lines: this.liner.lines,
+                }
+            );
+
+            if (!notes) return;
+
+            let blocks = [
+                `<out r1 v${ideService.outVolume} >`,
+                'temp',
+                notes
+            ].join('\n');
+
+            const result = await this.page.multiPlayer.tryPlayMidiBlock({
+                blocks,
+                bpm: this.page.bpmValue,
+            });
+
+            if (result === 'break') {
+                return;
             }
-        );
-
-        if (!notes) return;
-
-        let blocks = [
-            `<out r100 v${ideService.outVolume} >`,
-            'temp',
-            notes
-        ].join('\n');
-
-        this.page.multiPlayer.tryPlayMidiBlock({
-            blocks,
-            bpm: this.page.bpmValue,
-        });
+        }
     }
 
     playBoth() {

@@ -356,10 +356,14 @@ export class MidiPlayer extends Sound {
             beat++;
             if (Array.isArray(sked[beat])) {
                 for (const item of sked[beat]) {
-                    let instVolume = (x.dataByTracks[x.trackName]?.items && x.dataByTracks[x.trackName].items[item.instrName]);
+                    let dataByTrack = x.dataByTracks[x.trackName] || {};
+
+                    if (dataByTrack.isExcluded) return;
+
+                    let instVolume = (dataByTrack?.items && dataByTrack.items[item.instrName]);
                     let volume = un.mergeVolume(
-                        un.getSafeVolume(x.dataByTracks.total.volume, DEFAULT_OUT_VOLUME),
-                        un.getSafeVolume(x.dataByTracks[x.trackName]?.volume)
+                        un.getSafeVolume(x.dataByTracks.total?.volume, DEFAULT_OUT_VOLUME),
+                        un.getSafeVolume(dataByTrack.volume)
                     );
 
                     if (instVolume) {
@@ -429,6 +433,7 @@ export class MidiPlayer extends Sound {
         ee.emit('clear');
         this.loopId = 0;
         this.loops = {};
+        this.fontPlayer.cancelQueue(this.ctx);
     }
 
     /**
