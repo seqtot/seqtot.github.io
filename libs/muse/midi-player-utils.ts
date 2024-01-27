@@ -5,6 +5,7 @@ import {getInstrumentObj} from './instruments';
 import {WavePreset, WaveZone} from '../waf-player/otypes';
 import {NoteLineInfo, WaveSlide} from './types';
 import {instrName} from '../../pages/keyboard-tone-ctrl-helper';
+import {PAUSE} from './utils';
 
 type MidiCodeAndZone = {
     code: number,
@@ -120,8 +121,14 @@ function buildSked (ind: number, dx: {
     dx.noteLineInfo.notes.forEach(info => {
         const isDrum = un.isDrum(info.instr);
 
-        //console.log('dx.getSoundInfoArr 1');
-        let soundsInfoArr = dx.getSoundsInfoArr(isDrum ? info.instr : info.note);
+        let soundsInfoArr: MidiCodeAndZone[];
+
+        if (info.note === PAUSE) {
+            soundsInfoArr = [];
+        } else {
+            soundsInfoArr = dx.getSoundsInfoArr(isDrum ? info.instr : info.note);
+        }
+
         let beatIndex = getBeatIndex(dx.offsetQ, dx);
 
         if (beatIndex >= dx.beatsMs.length) {

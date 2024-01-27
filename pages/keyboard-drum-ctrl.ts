@@ -86,7 +86,7 @@ export class DrumCtrl extends KeyboardCtrl {
         const pageEl = this.page.pageEl;
 
         getWithDataAttrValue('page-action', 'play-one', pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.playOne());
+            el.addEventListener('pointerdown', () => this.playSolo());
         });
 
         getWithDataAttrValue('page-action', 'get-bpm-or-stop', pageEl).forEach((el: HTMLElement) => {

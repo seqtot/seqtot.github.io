@@ -1112,7 +1112,7 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttrValue('ide-action', 'play-solo-action', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.playOne());
+            el.addEventListener('pointerdown', () => this.playSolo());
         });
 
         getWithDataAttrValue('ide-action', 'stop', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1487,14 +1487,12 @@ export class KeyboardCtrl {
         });
     }
 
-    async playOne() {
+    async playSolo() {
         const repeatCount = 1000;
 
         this.page.stop();
 
         for (let i = 0; i < repeatCount; i++) {
-
-
             const notes = this.getNotes(
                 'temp',
                 {

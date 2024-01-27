@@ -1151,7 +1151,7 @@ export class ToneCtrl extends KeyboardCtrl {
         });
 
         getWithDataAttrValue('page-action', 'play-one', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.playOne());
+            el.addEventListener('pointerdown', () => this.playSolo());
         });
 
         getWithDataAttrValue('action-tone', 'memo-mode', pageEl).forEach((el: HTMLElement) => {
