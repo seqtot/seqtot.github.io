@@ -40,6 +40,7 @@ const linksToPage = [
     { href: '/page/page_sample_editor/', name: 'sampleEditor', isDev: true },
     { href: '/page/page_muse_editor/', name: 'museEditor', isDev: true },
     { href: '/page/userSettings/', name: 'Settings', isDev: false},
+    { href: '/page/theremin/', name: 'Theremin', isDev: false},
 ];
 
 const linksHtml = linksToPage
@@ -127,7 +128,7 @@ let navbar = `
 `;
 
 navbar = `
-<div app-header-container style="border-bottom: 2px solid gray;">
+<div data-app-header-container style="border-bottom: 2px solid gray;">
     <div data-app-header-first-row-area
         style="
             display: flex;

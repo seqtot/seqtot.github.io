@@ -307,16 +307,6 @@ export class DrumBoard {
 
                 <div style="${rowStyle}">
                     <div 
-                        style="background-color: ${info.hc.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.hc.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.hc.bodyColor}"
-                        data-color2="${info.hc.headColor}"
-                        data-char="${info.hc.char}"                                                                
-                    >         
-                        <br/>${info.hc.vocalism}
-                    </div>
-                    <div 
                         style="background-color: ${info.sn.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
                         data-action-drum-key="${info.sn.note}"
                         data-keyboard-id="${keyboardId}-${ind++}"
@@ -325,6 +315,16 @@ export class DrumBoard {
                         data-char="${info.sn.char}"                                                                
                     >         
                         <br/>${info.sn.vocalism}
+                    </div>                
+                    <div 
+                        style="background-color: ${info.hc.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${info.hc.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${info.hc.bodyColor}"
+                        data-color2="${info.hc.headColor}"
+                        data-char="${info.hc.char}"                                                                
+                    >         
+                        <br/>${info.hc.vocalism}
                     </div>
                     <div 
                         style="background-color: ${info.bd.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"

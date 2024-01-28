@@ -3,6 +3,7 @@ import {ComponentContext} from 'framework7/modules/component/component';
 import {RollPage, KeyboardPage, MBoxPage} from '../pages';
 import {MuseEditorPage} from '../pages/page_muse_editor';
 import {UserSettingsPage} from '../pages/page_user_settings';
+import {ThereminPage} from '../pages/theremin/theremin.page';
 //import {SamplePage} from '../pages/page_sample_editor';
 
 const pages = {
@@ -11,6 +12,7 @@ const pages = {
     page_muse_editor: MuseEditorPage,
     mbox: MBoxPage,
     userSettings: UserSettingsPage,
+    theremin: ThereminPage,
     //page_sample_editor: SamplePage,
 };
 
