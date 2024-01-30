@@ -123,7 +123,7 @@ class Board {
 
     wave: WaveSource2;
 
-    isSmoothMode = true;
+    isSmoothMode = false;
 
     constructor(public type: 'bass' | 'solo') {
     }
@@ -300,14 +300,17 @@ class Board {
         this.canvasCtxTop = this.canvasTop.getContext("2d");
     }
 
-    update(e: TouchEvent) {
+    update(e: PointerEvent) {
         const gutter = this.gutter;
         const cellSize = this.sizes.cellSize;
         const halfSize = this.sizes.halfSize;
         const sizes = this.sizes;
 
-        const offsetX = e.touches[0].clientX - this.sizes.boardLeftOffset;
-        const offsetY = e.touches[0].clientY - this.sizes.boardTopOffset;
+        // const offsetX = e.touches[0].clientX - this.sizes.boardLeftOffset;
+        // const offsetY = e.touches[0].clientY - this.sizes.boardTopOffset;
+
+        const offsetX = e.offsetX;
+        const offsetY = e.offsetY;
 
         if (offsetX <= gutter ||
             offsetX >= (sizes.width - gutter) ||
@@ -414,25 +417,76 @@ class Board {
         // }
     } // update
 
+    pointerId: any;
+
     subscribe() {
         const pos = getPosition(this.canvasTop);
         this.sizes.boardTopOffset = pos.y;
         this.sizes.boardLeftOffset = pos.x;
 
-        this.canvasTop.addEventListener('touchmove', (e) => {
+        this.canvasTop.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             e.stopPropagation();
 
-            this.update(e);
-        })
+            if (!this.pointerId) {
+                this.pointerId = e.pointerId;
+                this.update(e);
+            }
+        });
 
-        // this.canvasTop.onmousemove = (e: MouseEvent) => {
-        //     e.preventDefault();
-        //     e.stopPropagation();
-        //
-        //     console.log(e);
-        //     //this.update(e);
-        // }
+        this.canvasTop.addEventListener('pointerenter', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!this.pointerId && e.buttons) {
+                this.pointerId = e.pointerId;
+            }
+
+            if (e.pointerId === this.pointerId && e.buttons) {
+                this.update(e);
+            }
+        });
+
+        this.canvasTop.addEventListener('pointermove', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!this.pointerId && e.buttons) {
+                this.pointerId = e.pointerId;
+            }
+
+            if (e.pointerId === this.pointerId && e.buttons) {
+                this.update(e);
+            }
+
+        });
+
+        this.canvasTop.addEventListener('pointerup', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.pointerId === this.pointerId) {
+                this.pointerId = null;
+            }
+        });
+
+        this.canvasTop.addEventListener('pointerleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.pointerId === this.pointerId && e.buttons) {
+                this.pointerId = null;
+            }
+        });
+
+        this.canvasTop.addEventListener('pointercancel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.pointerId === this.pointerId) {
+                this.pointerId = null;
+            }
+        });
     }
 }
 

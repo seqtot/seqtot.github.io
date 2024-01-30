@@ -3,7 +3,7 @@
 <settings>
   boardShift: -12;
   pitchShift: 0
-  $guit: v50; $voic: v50; $Z: v50;
+  $guit: v40; $voic: v50; $bass: v40; $Z: v50; $H: v20;
 
 <out b120>
 > СЧЁТ       %_ [1*4*120]
@@ -27,10 +27,18 @@
 #       |      |      |
 <моШуШу b90 $> #960
 $voic: 0   ма=240 ра=240 да=480 $trump
+$H:    0   do+da+ma=240 $organ
 $guit: 0   до+да+ма=60 *drpm  до=60 до=60 до=60           $egit*drp
+$bass: 0   dy=60 mu=60 su=60 dy=60 $cBass*f
+$H:    240 do+fo+ra=240 $organ
 $guit: 240 до+фо+ра=60 *drpm  до=60 до=60 до=60           $egit*drp
+$bass: 240 dy=60 fu=60 su=60 bu=60 $cBass*f
+$H:    480 do+ma+da=240 $organ
 $guit: 480 до+мо+да=60 *drpm до=60 до=60 *drp до+мо+да=60 $egit*drp
+$bass: 480 dy=60 mu=60 su=60 bu=60 $cBass*f
+$H:    720 do+ma+da=240 $organ
 $guit: 720 *drpm до=60 до=60 *drp до+мо+да=60 *drpm до=60 $egit*drp
+$bass: 720 dy=60 bu=60 su=60 mu=60 $cBass*f
 
 
 #          |      щх |         | й--щх |
@@ -39,9 +47,13 @@ $guit: 720 *drpm до=60 до=60 *drp до+мо+да=60 *drpm до=60 $egit*drp
 # щ--.н-.  | л--.--. | з--.--. |       |
 <шаШаСаСу b90 $> #960
 $voic: 0   ра=240 ма=120 фа=120 ма=240 240 $trump
+$H:    0   so+bo+ra=240 $organ
 $guit: 0   су+бо+ра=60 *drpm су=60 су=60 су=60                    $egit*drp
+$H:    240 so+da+ma=120 so+ra+fa=120 $organ
 $guit: 240 су+да+ма=60  *drpm  су=60 *drp су+ра+фа=60 *drpm су=60 $egit*drp
+$H:    480 do+da+ma=240 $organ
 $guit: 480 до+да+ма=60 *drpm до=60 до=60 *drp до+да+ма=60         $egit*drp
+$H:    720 do+da+ma=240 $organ
 $guit: 720 *drpm до=60 до=60 *drp до+да+ма=60 *drpm до=60         $egit*drp
 
 # й--з  |        |        |
