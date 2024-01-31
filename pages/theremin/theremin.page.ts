@@ -69,9 +69,8 @@ function getSizes(x: {
     let height = x.height - (headerHeight * 2); //window.innerHeight;
     // let boardWidth = pageWidth - 64;
     // let boardHeight = 0;
-    let cellSize = Math.floor(height / (x.cellCount + 2)) ;
-    let halfSize = cellSize / 2;
-    cellSize = cellSize + 1;
+    let halfSize = Math.floor((((height - (x.cellCount + 2)) / (x.cellCount + 2))) / 2);
+    let cellSize = (halfSize * 2) + 1;
 
     let boardSoloWidth = Math.floor(width / cellSize);
     boardSoloWidth = boardSoloWidth - 3;
@@ -164,12 +163,12 @@ class Board {
             //   canvasCtx.strokeStyle = 'gray';
             // }
 
-            // if (item.step === 'd' && this.type === 'freqAndVol') {
-            //     ctx.lineWidth = 2;
-            //     ctx.strokeStyle = 'red';
-            //     ctx.fillRect(zeroX + (i * cellSize) + cellSize/2, gutter/2 , 2, 2);
-            //     ctx.fillRect(zeroX + (i * cellSize) + cellSize/2, gutter + height + gutter/2 , 2, 2);
-            // }
+            if (item.step === 'd' || item.step === 'm' || item.step === 'z') { // && this.type === 'freqAndVol'
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'red';
+                ctx.fillRect(gutter/2, zeroY + (i * cellSize) + cellSize/2, 2, 2);
+                ctx.fillRect(gutter + width + gutter/2 , zeroY + (i * cellSize) + cellSize/2, 2, 2);
+            }
 
             ctx.strokeStyle = defStroke;
             ctx.lineWidth = .5;
@@ -576,6 +575,7 @@ export class ThereminPage {
 
         this.soloBoard = new Board('solo');
         this.soloBoard.setFreqList(freqList, 'do', 'be');
+
         this.soloBoard.createCanvas({
                 ...sizes,
                 width: sizes.boardSoloWidth
@@ -589,3 +589,5 @@ export class ThereminPage {
         this.soloBoard.subscribe();
     }
 }
+
+// дтрнмфвсзлкбдтрнмфвсзлкбдтрнмфвсзлкб
