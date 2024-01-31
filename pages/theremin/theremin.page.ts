@@ -6,14 +6,14 @@ import 'dom7';
 import { getWithDataAttr } from '../../src/utils';
 import { freqList, FreqItem } from './utils';
 import { WaveSource2 } from './wave-source';
-import {Sound} from '../../libs/muse';
+import { Sound } from '../../libs/muse';
 import { getEndPointVolume } from '../../libs/muse/utils';
 
-const outVol = 70;
+const outVol = 80;
 
 function getPosition(element) {
-    var xPosition = 0;
-    var yPosition = 0;
+    let xPosition = 0;
+    let yPosition = 0;
 
     while(element) {
         xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
@@ -72,12 +72,14 @@ function getSizes(x: {
     let halfSize = Math.floor((((height - (x.cellCount + 2)) / (x.cellCount + 2))) / 2);
     let cellSize = (halfSize * 2) + 1;
 
-    let boardSoloWidth = Math.floor(width / cellSize);
-    boardSoloWidth = boardSoloWidth - 3;
-    boardSoloWidth = boardSoloWidth * cellSize;
+    const halfWidth = Math.floor(width / cellSize / 2) * cellSize;
+
+    let boardSoloWidth = halfWidth; //Math.floor(width / cellSize);
+    //boardSoloWidth = boardSoloWidth - 3;
+    //boardSoloWidth = boardSoloWidth * cellSize;
     let boardBassLeft = 0;
-    let boardBassWidth = cellSize * 3;
-    let boardSoloLeft = cellSize * 3;
+    let boardBassWidth = halfWidth; // cellSize * 3;
+    let boardSoloLeft = width - 1 - halfWidth; // cellSize * 3;
 
     let boardHeight = (x.cellCount * cellSize) + (cellSize * 2);
 
@@ -124,7 +126,7 @@ class Board {
 
     isSmoothMode = false;
 
-    constructor(public type: 'bass' | 'solo') {
+    constructor(public type: 'bass' | 'solo', public volDirection: 'rightToLeft' | 'leftToRight') {
     }
 
     clearCanvasTop() {
@@ -336,10 +338,10 @@ class Board {
             changed = true;
 
             const locY = curY - gutter;
-            const indSolo = Math.floor(locY / cellSize);
+            const indFreq = Math.floor(locY / cellSize);
 
-            if (this.freqList[indSolo]) {
-                this.lastFreqObj = this.freqList[indSolo];
+            if (this.freqList[indFreq]) {
+                this.lastFreqObj = this.freqList[indFreq];
             }
 
             let freqVal = this.lastFreqObj.value;
@@ -350,8 +352,8 @@ class Board {
                 let botFRange = this.lastFreqObj.midF  - this.lastFreqObj.botF;
                 let topFRange = this.lastFreqObj.topF - this.lastFreqObj.midF;
 
-                let topY = (cellSize * indSolo);
-                let botY = (cellSize * (indSolo + 1)) - 1;
+                let topY = (cellSize * indFreq);
+                let botY = (cellSize * (indFreq + 1)) - 1;
                 let midY = topY + halfSize + 1;
 
                 let botFact = botFRange / (botY - midY);
@@ -382,22 +384,45 @@ class Board {
             changed = true;
 
             let vol = 0;
+            let lastVolVal = 0;
+            let freqVol = 0;
 
-            if (curX <= (gutter + cellSize + cellSize)) {
-                vol = 100;
-            }
-            else if (curX >= (sizes.width - gutter - cellSize - cellSize)) {
-                vol = 0;
-            }
-            else {
-                const width = sizes.width - (gutter*2) - (cellSize*4);
-                const locX = curX - gutter - (cellSize*2);
-                vol = (1 - (locX / width)) * 100;
+            if (this.volDirection === 'rightToLeft') {
+                if (curX <= (gutter + cellSize + cellSize)) {
+                    vol = 100;
+                }
+                else if (curX >= (sizes.width - gutter - cellSize - cellSize)) {
+                    vol = 0;
+                }
+                else {
+                    const width = sizes.width - (gutter*2) - (cellSize*4);
+                    const locX = curX - gutter - (cellSize*2);
+                    vol = (1 - (locX / width)) * 100;
+                }
+
+                //console.log(outVol, vol, getEndPointVolume(vol) * (outVol/100));
+                freqVol = this.lastFreqObj ? this.lastFreqObj.volume : 0;
             }
 
-            //console.log(outVol, vol, getEndPointVolume(vol) * (outVol/100));
-            let freqVol = this.lastFreqObj ? this.lastFreqObj.volume : 0;
-            let lastVolVal = vol * freqVol;
+            if (this.volDirection === 'leftToRight') {
+                if (curX <= (gutter + cellSize + cellSize)) {
+                    vol = 0;
+                }
+                else if (curX >= (sizes.width - gutter - cellSize - cellSize)) {
+                    vol = 100;
+                }
+                else {
+                    const width = sizes.width - (gutter * 2) - (cellSize * 4);
+                    const locX = curX - gutter - (cellSize * 2);
+                    vol = ((locX / width)) * 100;
+                }
+
+                //console.log(outVol, vol, getEndPointVolume(vol) * (outVol/100));
+                freqVol = this.lastFreqObj ? this.lastFreqObj.volume : 0;
+            }
+
+
+            lastVolVal = vol * freqVol;
             this.lastVolVal = lastVolVal;
 
             this.wave.setVol(
@@ -520,15 +545,32 @@ export class ThereminPage {
 
     setContent() {
         const stl = 'position: absolute; box-sizing: border-box; user-select: none; touch-action: none;'
+        const stl2 = 'style="box-sizing: border-box; user-select: none; touch-action: none;"';
 
         this.el$.html(`
-            <div data-board-bass-container style="${stl}">
-                <div data-board-bass-canvas-container style="${stl}"></div>                
+            <div data-boards-container style="${stl2}">
+                <div data-board-bass-container style="${stl}">
+                    <div data-board-bass-canvas-container style="${stl}"></div>                
+                </div>
+                
+                <div data-board-solo-container style="${stl}">
+                    <div data-board-solo-canvas-container style="${stl}"></div>                
+                </div>
             </div>
-            
-            <div data-board-solo-container style="${stl}">
-                <div data-board-solo-canvas-container style="${stl}"></div>                
-            </div>                
+            <div style="${stl2}">
+                <span style="${stl2}">Д</span>
+                <span style="${stl2}">т</span>
+                <span style="${stl2}">Р</span>
+                <span style="${stl2}">н</span>
+                <span style="${stl2}">М</span>
+                <span style="${stl2}">Ф</span>                
+                <span style="${stl2}">в</span>
+                <span style="${stl2}">С</span>
+                <span style="${stl2}">з</span>                
+                <span style="${stl2}">Л</span>                
+                <span style="${stl2}">к</span>
+                <span style="${stl2}">Б</span>                                
+            </div>
         `);
 
         const sizes = getSizes({
@@ -536,6 +578,12 @@ export class ThereminPage {
             height: Math.floor(this.el$.height()),
             cellCount: 36
         });
+
+        //console.log('sizes', sizes);
+
+        let boardsEl = getWithDataAttr('boards-container')[0];
+        boardsEl.style.width = `${sizes.width}px`;
+        boardsEl.style.height = `${sizes.boardHeight}px`;
 
         let boardBassEl = getWithDataAttr('board-bass-container')[0];
         boardBassEl.style.top = `0px`;
@@ -561,8 +609,9 @@ export class ThereminPage {
         canvasSoloEl.style.width = `${sizes.boardSoloWidth}px`;
         canvasSoloEl.style.height = `${sizes.boardHeight}px`;
 
-        this.bassBoard = new Board('bass');
-        this.bassBoard.setFreqList(freqList, 'dy', 'ba');
+        // BASS BOARD
+        this.bassBoard = new Board('bass', 'leftToRight');
+        this.bassBoard.setFreqList(freqList, 'do', 'be');
         this.bassBoard.createCanvas({
                 ...sizes,
                 width: sizes.boardBassWidth
@@ -571,11 +620,13 @@ export class ThereminPage {
         );
         this.bassBoard.drawCells();
         this.bassBoard.wave = new WaveSource2();
+        this.bassBoard.wave.connect(Sound.ctx.destination);
+        this.bassBoard.wave.start();
         this.bassBoard.subscribe();
 
-        this.soloBoard = new Board('solo');
-        this.soloBoard.setFreqList(freqList, 'do', 'be');
-
+        // SOLO BOARD
+        this.soloBoard = new Board('solo', 'rightToLeft');
+        this.soloBoard.setFreqList(freqList, 'da', 'bi');
         this.soloBoard.createCanvas({
                 ...sizes,
                 width: sizes.boardSoloWidth

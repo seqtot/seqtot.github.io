@@ -235,18 +235,18 @@ const freqListSrc = [
   { step: 'b', code: 95, value: 1975.533203, octave: 'e', volume: 0.41 },
 
   /* ЧЕТВЁРТАЯ */
-  // { step: 'd', code: 96,  value: 2093.004639 },
-  // { step: 't', code: 97,  value: 2217.460938 },
-  // { step: 'r', code: 98,  value: 2349.318115 },
-  // { step: 'n', code: 99,  value: 2489.015869 },
-  // { step: 'm', code: 100, value: 2637.020508 },
-  // { step: 'f', code: 101, value: 2793.825928 },
-  // { step: 'v', code: 102, value: 2959.955322 },
-  // { step: 's', code: 103, value: 3135.963379 },
-  // { step: 'z', code: 104, value: 3322.437500 },
-  // { step: 'l', code: 105, value: 3520.000000 },
-  // { step: 'k', code: 106, value: 3729.310059 },
-  // { step: 'b', code: 107, value: 3951.066406 },
+  { step: 'd', code: 96,  value: 2093.004639, octave: 'i', volume: 0.40 },
+  { step: 't', code: 97,  value: 2217.460938, octave: 'i', volume: 0.39 },
+  { step: 'r', code: 98,  value: 2349.318115, octave: 'i', volume: 0.38 },
+  { step: 'n', code: 99,  value: 2489.015869, octave: 'i', volume: 0.37 },
+  { step: 'm', code: 100, value: 2637.020508, octave: 'i', volume: 0.36 },
+  { step: 'f', code: 101, value: 2793.825928, octave: 'i', volume: 0.35 },
+  { step: 'v', code: 102, value: 2959.955322, octave: 'i', volume: 0.34 },
+  { step: 's', code: 103, value: 3135.963379, octave: 'i', volume: 0.33 },
+  { step: 'z', code: 104, value: 3322.437500, octave: 'i', volume: 0.32 },
+  { step: 'l', code: 105, value: 3520.000000, octave: 'i', volume: 0.31 },
+  { step: 'k', code: 106, value: 3729.310059, octave: 'i', volume: 0.30 },
+  { step: 'b', code: 107, value: 3951.066406, octave: 'i', volume: 0.29 },
 ];
 
 
