@@ -2,7 +2,7 @@
 
 //import '../waf-fonts';
 import { parseInteger } from './utils';
-import { drumCodes } from './drums';
+import { drumIdByAlias } from './drums';
 import { WavePreset } from '../waf-player/otypes';
 
 const toneChar = '$';
@@ -277,7 +277,7 @@ export function getInstrNameByCode(val: number | string): string {
 
 const instrCodeByAlias = {
     ...toneCodeByAlias,
-    ...drumCodes,
+    ...drumIdByAlias,
 } as const;
 
 export function getInstrCodeBy(val: number | string): number | string {

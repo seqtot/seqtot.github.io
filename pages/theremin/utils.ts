@@ -1,3 +1,4 @@
+
 // 'use strict';
 //
 // const audioCtx = new AudioContext();
@@ -143,6 +144,7 @@ export type FreqItem = {
     octave: string;
     volume: number;
     noteLat: string;
+    noteRus: string;
     relatives: number[];
     index: number;
 

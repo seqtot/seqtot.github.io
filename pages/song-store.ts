@@ -46,7 +46,7 @@ export type SongNode = {
 };
 
 function isDrumNote(val: string): boolean {
-    return !!m.drumCodes[val];
+    return !!m.drumIdByAlias[val];
 }
 
 function isBassGuitarInst(val: string | number): boolean {

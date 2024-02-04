@@ -21,7 +21,7 @@ import {
 
 } from './utils-note';
 import { NoteLineInfo } from '../types';
-import { noteLatByNote } from '../freq';
+import { noteLatByNoteHash } from '../freq';
 import { getSlides, buildVibratoSlides } from './getSlides';
 
 // дтрн мфвс злкб
@@ -75,7 +75,7 @@ export function isNoteWithDurationOrPause(val: any): boolean {
     if (note.startsWith(toneChar) || note.startsWith(decorChar)) {
         result = false;
     }
-    else if (noteLatByNote[note]) {
+    else if (noteLatByNoteHash[note]) {
         result = true;
     }
     else if (timeCharRE.test(str) || str.includes('+')) {

@@ -41,7 +41,7 @@ import { getSlides, buildVibratoSlides, getPitchAndCent } from './utils/getSlide
 import { Sound } from './sound';
 import { Ticker, tickOnTime } from './ticker';
 
-import {drumCodes, drumInfo} from './drums';
+import {drumIdByAlias, drumInfo} from './drums';
 import { guitarCodes, bassGuitarCodes, getInstrNameByCode, getInstrCodeBy, getInstrumentObj } from './instruments';
 import { LineModel, CELL_SIZE } from './line-model';
 import { Synthesizer } from './synthesizer';
@@ -75,7 +75,7 @@ export const Muse = {
     // const
     toneChar,
     drumsTrack,
-    drumCodes,
+    drumIdByAlias,
     drumChar,
     guitarCodes,
     bassGuitarCodes,

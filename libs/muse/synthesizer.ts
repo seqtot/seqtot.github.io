@@ -126,7 +126,7 @@ export class Synthesizer extends Sound {
         let volume = x.volume;
         let pitchShift = x.pitchShift || 0;
 
-        let note = this.getNoteSame(x.keyOrNote);
+        let note = Sound.GetNoteSame(x.keyOrNote);
         const noteLat = this.getNoteLat(note);
 
         if (!soundInfo && !note) {

@@ -26,7 +26,7 @@
 // orange
 // purple
 // magenta
-import { codeByNoteHash, noteLatByNote } from '../muse/freq';
+import { noteLatByNoteHash } from '../muse/freq';
 import cm from '../cm/codemirror.js';
 
 //console.log('codeByNoteHash', noteLatByNote);
@@ -290,7 +290,7 @@ cm.defineMode('musa', function () {
 
                             //console.log('note', note);
 
-                            note = noteLatByNote[note];
+                            note = noteLatByNoteHash[note];
 
                             if (note) {
                                 returnType = 'step-' + note;

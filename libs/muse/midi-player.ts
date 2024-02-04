@@ -1,17 +1,15 @@
-'use babel';
-
 import { findZone } from '../waf-player/prepare';
-import { WaveZone } from '../waf-player/otypes';
 
 import { freqByNoteHash } from './freq';
 import { Sound, PlayingItem, KeyInfo } from './sound';
 import { EventEmitter } from './ee';
 import * as un from './utils';
-import {DEFAULT_TONE_INSTR} from './keyboards';
-import {getInstrCodeBy} from './instruments';
-import {Ticker} from './ticker';
-import {getSkedByQuarters, LoopAndTicksInfo} from './midi-player-utils'
-import {NoteLineInfo, WaveSlide, DataByTracks} from './types';
+import { DEFAULT_TONE_INSTR } from './keyboards';
+import { getInstrCodeBy } from './instruments';
+import { Ticker } from './ticker';
+import { getSkedByQuarters, LoopAndTicksInfo } from './midi-player-utils'
+import { NoteLineInfo, WaveSlide, DataByTracks } from './types';
+import { getSoundsInfoArr, MidiCodeAndZone } from './get-sound-info-arr';
 
 const QUANT = 10;
 // 10 10 10 10 10
@@ -20,11 +18,6 @@ const QUANT = 10;
 type PlayResult = {
     break: boolean,
     endTime?: number
-}
-
-type MidiCodeAndZone = {
-    code: number,
-    zone?: WaveZone,
 }
 
 const ee = new EventEmitter();
@@ -165,7 +158,7 @@ export class MidiPlayer extends Sound {
 
         if (!instrObj) return null;
 
-        const soundsInfo = this.getSoundsInfoArr(x.notes);
+        const soundsInfo = getSoundsInfoArr(x.notes);
 
         if (!soundsInfo.length) {
             return null;
@@ -176,7 +169,7 @@ export class MidiPlayer extends Sound {
             instrObj,
             isDrum,
             durationMs: x.durationMs || 0,
-            volume: un.getSafeVolume(x.volume),
+            volume: x.volume,
             whenSec: x.whenSec || 0,
             pitchShift: x.pitchShift || 0,
             slides: x.slides,
@@ -203,24 +196,18 @@ export class MidiPlayer extends Sound {
 
         let { durationMs, volume, pitchShift } = x;
 
-        // volume = un.getSafeVolume(volume);
-        volume = un.getEndPointVolume(volume);
-
         const item = (<any>{
             isSound: true,
             midis: [],
         }) as PlayingItem;
-
-        // jjklDrum
-        // if (x.isDrum) {
-        //     durationMs = 1000; //duration * 2;
-        // }
 
         const sounds = Array.isArray(x.soundsInfo)
             ? x.soundsInfo
             : [x.soundsInfo];
 
         for (let soundInfo of sounds) {
+            const volume = un.getEndPointVolume(un.mergeVolume(x.volume, soundInfo.volume));
+
             (item as any).midis.push(
                 this.fontPlayer.queueWaveTableSrc({
                     audioContext: this.ctx,
@@ -238,38 +225,6 @@ export class MidiPlayer extends Sound {
         }
 
         return item;
-    }
-
-    // до+ре+му => [{code: N}, {code: N}, {code: N}]
-    getSoundsInfoArr(notes: string): MidiCodeAndZone[] {
-        const result: MidiCodeAndZone[] = [];
-
-        //ifDef = (ifDef || '').replace(un.toneChar, '').replace(un.drumChar, '').trim();
-        notes = (notes || '').trim();
-        //notes = notes === 'DEF' ? ifDef: notes;
-
-        if (!notes) return [];
-
-        let subArr = notes.split('+');
-
-        subArr.forEach((note) => {
-            note = note.replace(un.toneChar, '').replace(un.drumChar, '').trim();
-            note = this.getNoteSame(note);
-
-            //console.log('getSoundInfoArr', notes, ifDef, note, this.keysAndNotes);
-
-            if (!note) return;
-
-            const noteLat = this.getNoteLat(note);
-            const keysAndNotes = this.keysAndNotes || {}
-            const soundInfo = keysAndNotes[noteLat];
-
-            result.push({
-                code: soundInfo.code
-            });
-        });
-
-        return result.filter((item) => !!item);
     }
 
     /**
@@ -321,8 +276,7 @@ export class MidiPlayer extends Sound {
                 restFromPrevRowQ: x.restFromPrevRowQ,
                 restForNextRowQ: x.restForNextRowQ,
                 colLoopDurationQ: x.colLoopDurationQ,
-            },
-            (val: string) => this.getSoundsInfoArr(val)
+            }
         );
 
         sked.id = loopId;

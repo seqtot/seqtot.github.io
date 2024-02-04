@@ -1,5 +1,3 @@
-'use babel';
-
 export type DrumType =
     | 'hiHatOpened'
     | 'hiHatPedal'
@@ -112,94 +110,102 @@ export const Drums: Record<DrumType, number> = {
 // bd
 // sn
 // tl tm th
-export const drumCodes = {
-    'hc': 'drum_42',
-    'ho': 'drum_46',
-    'hp': 'drum_44',
 
-    'bd': 'drum_35',
-    'bd1': 'drum_36',
-    'bd2': 'drum_35',
 
-    'sn': 'drum_40',
-    'sn1': 'drum_38',
-    'sn2': 'drum_40',
+export const drumMidiCodeByAlias: {[key: string]: number} = {
+    'hc': 42,
+    'ho': 46,
+    'hp': 44,
 
-    'sideRimshot': 'drum_37',
-    'sr': 'drum_37',
+    'bd': 35,
+    'bd1': 36,
+    'bd2': 35,
 
-    'handClap': 'drum_39',
-    'tambourine': 'drum_54',
-    'vibraSlap': 'drum_58',
-    'rideBell': 'drum_53',
-    'cowbell': 'drum_56',
+    'sn': 40,
+    'sn1': 38,
+    'sn2': 40,
 
-    'tl': 'drum_41',
-    'lowTom2': 'drum_41',
-    'tl2': 'drum_41',
-    'lowTom1': 'drum_43',
-    'tl1': 'drum_43',
+    'sideRimshot': 37,
+    'sr': 37,
 
-    'tm': 'drum_45',
-    'midTom2': 'drum_45',
-    'tm2': 'drum_45',
-    'midTom1': 'drum_47',
-    'tm1': 'drum_47',
+    'handClap': 39,
+    'tambourine': 54,
+    'vibraSlap': 58,
+    'rideBell': 53,
+    'cowbell': 56,
 
-    'th': 'drum_50',
-    'highTom2': 'drum_48',
-    'th2': 'drum_48',
-    'highTom1': 'drum_50',
-    'th1': 'drum_50',
+    'tl': 41,
+    'lowTom2': 41,
+    'tl2': 41,
+    'lowTom1': 43,
+    'tl1': 43,
 
-    'cc': 'drum_57',
-    'crashCymbal2': 'drum_57',
-    'cc2': 'drum_57',
-    'crashCymbal1': 'drum_49',
-    'cc1': 'drum_49',
+    'tm': 45,
+    'midTom2': 45,
+    'tm2': 45,
+    'midTom1': 47,
+    'tm1': 47,
 
-    'rc': 'drum_59',
-    'rideCymbal2': 'drum_59',
-    'rc2': 'drum_59',
-    'rideCymbal1': 'drum_51',
-    'rc1': 'drum_51',
+    'th': 50,
+    'highTom2': 48,
+    'th2': 48,
+    'highTom1': 50,
+    'th1': 50,
 
-    'splashCymbal': 'drum_55',
-    'chineseCymbal': 'drum_52',
+    'cc': 57,
+    'crashCymbal2': 57,
+    'cc2': 57,
+    'crashCymbal1': 49,
+    'cc1': 49,
 
-    'highBongo': 'drum_60',
-    'lowBongo': 'drum_61',
+    'rc': 59,
+    'rideCymbal2': 59,
+    'rc2': 59,
+    'rideCymbal1': 51,
+    'rc1': 51,
 
-    'muteHighConga': 'drum_62',
-    'openHighConga': 'drum_63',
-    'lowConga': 'drum_64',
+    'splashCymbal': 55,
+    'chineseCymbal': 52,
 
-    'highTimbale': 'drum_65',
-    'lowTimbale': 'drum_66',
+    'highBongo': 60,
+    'lowBongo': 61,
 
-    'highAgogo': 'drum_67',
-    'lowAgogo': 'drum_68',
+    'muteHighConga': 62,
+    'openHighConga': 63,
+    'lowConga': 64,
 
-    'cabasa': 'drum_69',
-    'maracas': 'drum_70',
-    'claves': 'drum_75',
+    'highTimbale': 65,
+    'lowTimbale': 66,
 
-    'shortWhistle': 'drum_71',
-    'longWhistle': 'drum_72',
+    'highAgogo': 67,
+    'lowAgogo': 68,
 
-    'shortGuiro': 'drum_73',
-    'longGuiro': 'drum_74',
+    'cabasa': 69,
+    'maracas': 70,
+    'claves': 75,
 
-    'highWoodBlock': 'drum_76',
-    'lowWoodBlock': 'drum_77',
+    'shortWhistle': 71,
+    'longWhistle': 72,
 
-    'muteCuica': 'drum_78',
-    'openCuica': 'drum_79',
+    'shortGuiro': 73,
+    'longGuiro': 74,
 
-    'muteTriangle': 'drum_80',
-    'openTriangle': 'drum_81',
-    'nil': 'drum_80',
+    'highWoodBlock': 76,
+    'lowWoodBlock': 77,
+
+    'muteCuica': 78,
+    'openCuica': 79,
+
+    'muteTriangle': 80,
+    'openTriangle': 81,
+    'nil': 80,
 };
+
+export const drumIdByAlias = Object.keys(drumMidiCodeByAlias).reduce((acc, key) => {
+    acc[key] = `drum_${drumMidiCodeByAlias[key]}`;
+
+    return acc;
+}, {})  as {[key: string]: string};
 
 export const drumInfo: Record<
     DrumType,

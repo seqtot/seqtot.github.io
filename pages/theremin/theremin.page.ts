@@ -4,10 +4,10 @@ import { Dom7, Dom7Array } from 'dom7';
 import 'dom7';
 
 import { getWithDataAttr } from '../../src/utils';
-import { freqList, FreqItem } from './utils';
 import { WaveSource2 } from './wave-source';
 import { Sound } from '../../libs/muse';
 import { getEndPointVolume } from '../../libs/muse/utils';
+import { freqInfoList, FreqInfo } from '../../libs/muse/freq';
 
 const outVol = 80;
 
@@ -23,7 +23,7 @@ function getPosition(element) {
     return { x: xPosition, y: yPosition };
 }
 
-function getFreqList(freqList: FreqItem[], botNote: string, topNote: string): FreqItem[] {
+function getFreqList(freqList: FreqInfo[], botNote: string, topNote: string): FreqInfo[] {
     const botCode = freqList.find(item => item.noteLat === botNote).code;
     const topCode = freqList.find(item => item.noteLat === topNote).code;
 
@@ -103,7 +103,7 @@ class Board {
     isSilent = false;
     lastX = -1;
     lastY = -1;
-    lastFreqObj: FreqItem;
+    lastFreqObj: FreqInfo;
     lastFreqVal = 0;
     lastVolVal = 0;
 
@@ -120,7 +120,7 @@ class Board {
     canvasBot: HTMLCanvasElement;
     canvasCtxBot: CanvasRenderingContext2D;
 
-    freqList: FreqItem[];
+    freqList: FreqInfo[];
 
     wave: WaveSource2;
 
@@ -262,7 +262,7 @@ class Board {
         // });
     } // drawCells
 
-    setFreqList(freqList: FreqItem[], botNote: string, topNote: string) {
+    setFreqList(freqList: FreqInfo[], botNote: string, topNote: string) {
         freqList = [...freqList];
 
         const newFreqList = getFreqList(freqList.reverse(), botNote, topNote);
@@ -611,7 +611,7 @@ export class ThereminPage {
 
         // BASS BOARD
         this.bassBoard = new Board('bass', 'leftToRight');
-        this.bassBoard.setFreqList(freqList, 'do', 'be');
+        this.bassBoard.setFreqList(freqInfoList, 'do', 'be');
         this.bassBoard.createCanvas({
                 ...sizes,
                 width: sizes.boardBassWidth
@@ -626,7 +626,7 @@ export class ThereminPage {
 
         // SOLO BOARD
         this.soloBoard = new Board('solo', 'rightToLeft');
-        this.soloBoard.setFreqList(freqList, 'da', 'bi');
+        this.soloBoard.setFreqList(freqInfoList, 'da', 'bi');
         this.soloBoard.createCanvas({
                 ...sizes,
                 width: sizes.boardSoloWidth

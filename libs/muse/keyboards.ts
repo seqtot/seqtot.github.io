@@ -1,6 +1,4 @@
-'use babel';
-
-import {drumKeysRight, drumInfo, drumCodes} from './drums';
+import {drumKeysRight, drumInfo} from './drums';
 
 export const DEFAULT_TONE_INSTR: number = 162;
 

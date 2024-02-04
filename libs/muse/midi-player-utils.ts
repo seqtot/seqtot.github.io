@@ -1,16 +1,9 @@
-'use babel';
-
 import * as un from './utils';
 import {getInstrumentObj} from './instruments';
 import {WavePreset, WaveZone} from '../waf-player/otypes';
 import {NoteLineInfo, WaveSlide} from './types';
-import {instrName} from '../../pages/keyboard-tone-ctrl-helper';
 import {PAUSE} from './utils';
-
-type MidiCodeAndZone = {
-    code: number,
-    zone?: WaveZone,
-}
+import {getSoundsInfoArr, MidiCodeAndZone} from './get-sound-info-arr';
 
 /**
  * Одиночная нота для воспроизведения
@@ -101,7 +94,6 @@ function getDurationMs(
 function buildSked (ind: number, dx: {
     offsetQ: number,
     noteLineInfo: NoteLineInfo,
-    getSoundsInfoArr: (notes: string)=> MidiCodeAndZone[]
     beatsMs: number[],
     beatsQ: number[],
     instrAny?: string | number | WavePreset,
@@ -126,7 +118,7 @@ function buildSked (ind: number, dx: {
         if (info.note === PAUSE) {
             soundsInfoArr = [];
         } else {
-            soundsInfoArr = dx.getSoundsInfoArr(isDrum ? info.instr : info.note);
+            soundsInfoArr = getSoundsInfoArr(isDrum ? info.instr : info.note);
         }
 
         let beatIndex = getBeatIndex(dx.offsetQ, dx);
@@ -188,8 +180,7 @@ export function getSkedByQuarters(
         restFromPrevRowQ: number; // добавляется только для первого цикла
         restForNextRowQ: number;  // добавляется только для первого цикла
         colLoopDurationQ: number; // длина одного цикла внутри которого надоходится линейка
-    },
-   getSoundsInfoArr: (notes: string, ifDef?: string) => MidiCodeAndZone[]
+    }
 ): LoopAndTicksInfo {
         // все поля обязательно, но проверям их заполненность
         //console.log('getSkedByQuarters.props', props);
@@ -201,7 +192,6 @@ export function getSkedByQuarters(
             beatsMs: props.beatsMs,
             beatsQ: [] as number[],
             repeat: 0,
-            getSoundsInfoArr,
             sked: {} as LoopAndTicksInfo,
             restForNextRowQ: props.restForNextRowQ || 0,
             restFromPrevRowQ: 0,

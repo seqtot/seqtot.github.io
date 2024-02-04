@@ -10,9 +10,9 @@ import {
 } from './freq';
 import * as un from './utils';
 import { DEFAULT_TONE_INSTR } from './keyboards';
-import { drumCodes } from './drums';
+import { drumIdByAlias } from './drums';
 import { hardcodedInstruments, instruments as instruments2 } from './instruments';
-import {WaveZone} from '../waf-player/otypes';
+import { WaveZone } from '../waf-player/otypes';
 
 export const instruments = instruments2;
 const loadingInstruments: { [code: number]: boolean } = {};
@@ -289,14 +289,14 @@ export class Sound {
     }
 
     // тональные или ударные ноты
-    getNoteSame(val: string): string {
+    static GetNoteSame(val: string): string {
         val = (val || '').toLocaleLowerCase().trim();
 
         //if (val === 'DEF' || val === 'ДЭФ') return val;
 
         let result = freqByNoteHash[val] ? val : '';
 
-        result = result || (drumCodes[val] ? val : '');
+        result = result || (drumIdByAlias[val] ? val : '');
 
         return result;
     }
@@ -313,7 +313,7 @@ export class Sound {
         let result = noteLatByNoteHash[val];
 
         result = freqByNoteHash[result] ? result : '';
-        result = result || (drumCodes[val] ? val : '');
+        result = result || (drumIdByAlias[val] ? val : '');
 
         return result;
     }
