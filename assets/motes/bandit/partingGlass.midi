@@ -3,7 +3,7 @@ https://www.youtube.com/watch?v=DLEWBmWTfUI
 
 <settings>
   pitchShift: 0;
-  @drums: v50; $bass: v50; $solo: v50; $back: v30; $guit: v50; $voice: 55;
+  @drums: v50; $bass: v50; $solo: v50; $back: v30; $guit: v50; $voice: 55; $Z: v50;
 
 # соло  : МДСР МДСР МДСР М-СВМ
 # куплет: МДСР МДСР МДСР М-ДР-М
@@ -20,6 +20,10 @@ https://www.youtube.com/watch?v=DLEWBmWTfUI
 > КУПЛЕТ    %G [01*120_08*120_08*120_08*120_08*120] # G - 120 - 960 - 960 - 960 - 960
 > ПРИПЕВ_2  %H [14*120_02*120]                      # H - 1680 - 240
 > СОЛО1_2   %I [08*120_08*120_08*120_08*120]        # I - 960 - 960 - 960 - 960
+> ТИШИНА    %z [02*4*120]
+
+<ТИШИНА b120 $> #960
+$Z: 960 d960 $xylo
 
 <СОЛО1_2 b80 set>
 соло1_1   соло1_бас

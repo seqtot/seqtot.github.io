@@ -3,7 +3,7 @@
 <settings>
   boardShift: -12;
   pitchShift: 0
-  $guit: v40; $voic: v50; $bass: v40; $Z: v50; $H: v20;
+  $guit: v40; $voic: v50; $bass: v40; $H: v20; $Z: v50;
 
 <out b120>
 > СЧЁТ       %_ [1*4*120]

@@ -1,6 +1,6 @@
 <settings>
 # boardShift: -12;
-_ @drums: v50; $bass: v50; $guit: v50;
+_ @drums: v50; $bass: v50; $guit: v50; $Z: v50;
 
 <info>
 https://lyrsense.com/black_sabbath/sweet_leaf
@@ -18,6 +18,10 @@ https://www.songsterr.com/a/wsa/black-sabbath-sweet-leaf-standard-tuning-tab-s47
 > КУПЛЕТ_1 %H [16*4*120] # H - 960 - 960 - 960 - 960 - 960 - 960 - 960 - 960
 > ПРИПЕВ_1 %I [16*4*120] # I - 960 - 960 - 960 - 960 - 960 - 960 - 960 - 960
 > КОДА     %J [02*4*120] # J - 960
+> ТИШИНА   %z [02*4*120]
+
+<ТИШИНА b120 $> #960
+$Z: 960 d960 $xylo
 
 <КОДА b148 set>
 кода
