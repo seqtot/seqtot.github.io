@@ -14,7 +14,7 @@ import {
     SongPartInfo,
     RowInfo,
     LineModel,
-    StoredRow,
+    StoredRow, Line, Cell, LineNote, Sound,
 
 } from '../libs/muse';
 
@@ -27,6 +27,8 @@ import { TrackDetailsDialog } from './dialogs/track-details-dialog';
 import { TracksVolumeDialog } from './dialogs/tracks-volume-dialog';
 import { WavRecorder } from './ide/wav-recorder';
 import { GetTrackDialog } from './dialogs/get-track-dialog';
+import {KeyboardCtrl} from './keyboard-ctrl';
+import {getRandomElement} from '../libs/muse/utils';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 const isDev = /localhost/.test(window.location.href);
@@ -385,7 +387,13 @@ export class MBoxPage {
                 ${svg.minusBtn('data-delete-track-action', '', 24)}
                 ${svg.editBtn('data-edit-track-action', '', 24)}
                 ${svg.soundBtn('data-edit-tracks-volume-action', '', 24)}${blankHalfRem}
-                ${svg.copyPasteBtn('data-clone-track-action', '', 24)}                
+                ${svg.copyPasteBtn('data-clone-track-action', '', 24)}
+                <span 
+                    style="display: inline-block; border: 1px solid lightgray; border-radius: 0.25rem; user-select: none; padding: 0; margin: 0; margin-right: .4rem;"
+                    data-create-bass-track-action
+                >
+                    +bass
+                </span>                
             </div>
         `.trim();
 
@@ -637,7 +645,11 @@ export class MBoxPage {
         });
 
         getWithDataAttr('clone-track-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.cloneTrack());
+            el.addEventListener('pointerup', () => this.cloneTrack());
+        });
+
+        getWithDataAttr('create-bass-track-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerup', () => this.createBassTrack());
         });
     }
 
@@ -993,6 +1005,270 @@ export class MBoxPage {
 
         const newPart = SongStore.ClonePart(song, part.partId);
 
+        this.setPageContent();
+        ideService.songStore.save();
+    }
+
+    getUniqTrackName(song: SongNode, name: string): string {
+        let i = 0;
+
+        while (true) {
+            i++;
+
+            if (song.tracks.find(item => item.name === `${name}${i}`)) {
+                continue;
+            }
+
+            break;
+        }
+
+        return `${name}${i}`;
+    }
+
+
+    getFullLineModel(song: SongNode): {rowInPartId: string, lines: Line[], durQ: number, blockOffsetQ: number}[] {
+        const result: {rowInPartId: string, lines: Line[], durQ: number, blockOffsetQ: number}[] = [];
+
+        song.dynamic.forEach(item => {
+            let curr = result.find(iItem => iItem.rowInPartId === item.rowInPartId)
+
+            if (!curr) {
+                curr = {
+                    rowInPartId: item.rowInPartId,
+                    lines: [],
+                    durQ: 0,
+                    blockOffsetQ: 0,
+                };
+
+                result.push(curr);
+            }
+
+            if (item.lines.length > curr.lines.length) {
+                curr.lines = item.lines.map(line => {
+                    return <Line>{
+                        durQ: line.durQ,
+                        rowInPartId: item.rowInPartId,
+                        startOffsetQ: line.startOffsetQ,
+                        blockOffsetQ: 0,
+                        cells: [],
+                        cellSizeQ: line.cellSizeQ,
+                        endLine: line.endLine,
+                    }
+                });
+            }
+        });
+
+        KeyboardCtrl.Sort_ByPartAndRowNio(result);
+
+        let blockOffsetQ = 0;
+        let blockDurationQ = 0;
+
+        result.forEach(item => {
+            blockDurationQ = 0;
+
+            item.lines.forEach(line => {
+                blockDurationQ += line.durQ;
+                line.blockOffsetQ = blockOffsetQ;
+            });
+
+            item.durQ = blockDurationQ;
+            item.blockOffsetQ = blockOffsetQ;
+
+            blockOffsetQ += blockDurationQ;
+        });
+
+        return result;
+    }
+
+    createBassTrack(){
+        const song = ideService.songStore?.data;
+
+        if (!song) return;
+
+        const allLines = this.getFullLineModel(song);
+
+        let drumsTrackName = '@drums';
+        let bassTrackName = '$bass';
+        let headTrackName = '$H';
+
+        let itemsByBass = song.dynamic.filter(item => item.track === drumsTrackName);
+        let bassTrack = song.tracks.find(item => item.name === drumsTrackName);
+        let itemsByHead = song.dynamic.filter(item => item.track === headTrackName);
+        let headTrack = song.tracks.find(item => item.name === headTrackName);
+
+        if (!bassTrack || !headTrack) return null;
+
+        drumsTrackName = this.getUniqTrackName(song, drumsTrackName);
+        bassTrackName = this.getUniqTrackName(song, bassTrackName);
+
+        itemsByBass = JSON.parse(JSON.stringify(itemsByBass));
+        let allItemsByDrums: ReturnType<this['getFullLineModel']> = JSON.parse(JSON.stringify(allLines));
+        bassTrack = JSON.parse(JSON.stringify(bassTrack));
+        itemsByHead = JSON.parse(JSON.stringify(itemsByHead));
+        let allItemsByHead: ReturnType<this['getFullLineModel']> = JSON.parse(JSON.stringify(allLines));
+
+        bassTrack.name = bassTrackName;
+        bassTrack.isHardTrack = false;
+        bassTrack.board = 'bassGuitar';
+
+        KeyboardCtrl.Sort_ByPartAndRowNio(itemsByHead);
+        KeyboardCtrl.Sort_ByPartAndRowNio(itemsByBass);
+
+        const headCells: (Cell & {blockOffsetQ?: number})[] = [];
+
+        itemsByHead.forEach(item => {
+            const itemInAll = allItemsByHead.find(iItem => iItem.rowInPartId === item.rowInPartId);
+
+            item.lines.forEach((line, i) => {
+                const cells: Cell[] = [];
+
+                line.cells.forEach(cell => {
+                    (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
+
+                    const existedCell = cells.find(iCell => iCell.startOffsetQ === cell.startOffsetQ);
+
+                    if (!existedCell) {
+                        cells.push(cell);
+
+                        return;
+                    }
+
+                    existedCell.notes = [...existedCell.notes, ...cell.notes];
+                });
+
+                LineModel.SortByStartOffsetQ(cells);
+                itemInAll.lines[i].cells = cells;
+
+                headCells.push(...cells);
+            });
+        });
+
+        const bassCells: (Cell & {blockOffsetQ?: number})[] = [];
+
+        itemsByBass.forEach(item => {
+            const itemInAll = allItemsByDrums.find(iItem => iItem.rowInPartId === item.rowInPartId);
+
+            item.lines = item.lines.map(line => {
+                line.blockOffsetQ = itemInAll.blockOffsetQ;
+
+                const cells: Cell[] = [];
+
+                line.cells.forEach(cell => {
+                    (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
+
+                    cell.notes = cell.notes.filter(note => {
+                        return note.instName === '@bd' || note.instName === '@sn';
+                    });
+
+                    if (!cell.notes.length) return;
+
+                    const existedCell = cells.find(iCell => iCell.startOffsetQ === cell.startOffsetQ);
+
+                    if (!existedCell) {
+                        cells.push(cell);
+
+                        return;
+                    }
+
+                    existedCell.notes = [...existedCell.notes, ...cell.notes];
+                })
+
+                LineModel.SortByStartOffsetQ(cells);
+                line.cells = cells;
+
+                bassCells.push(...cells);
+
+                return line;
+            });
+        });
+
+
+        bassCells.forEach((cell, i) => {
+            const nextCell = bassCells[i+1];
+
+            if (nextCell) {
+                cell.notes.forEach(note => {
+                   note.durQ = (nextCell.blockOffsetQ + nextCell.startOffsetQ) - (cell.blockOffsetQ + cell.startOffsetQ);
+                });
+            }  else {
+                cell.notes.forEach(note => {
+                    note.durQ = 30; // jjkl
+                });
+            }
+
+            let headCell: Cell;
+
+            for (let j = 0; j < headCells.length; j++) {
+               if ((headCells[j].startOffsetQ + headCells[j].blockOffsetQ) <= (cell.startOffsetQ + cell.blockOffsetQ)) {
+                   headCell = headCells[j];
+               }
+
+                if ((headCells[j].startOffsetQ + headCells[j].blockOffsetQ) > (cell.startOffsetQ + cell.blockOffsetQ) ) {
+                    break;
+                }
+            }
+
+            if (headCell && headCell.notes.length) {
+                cell.notes = cell.notes.map(note => {
+                    let latNote = '';
+
+                    if (note.instName === '@bd') {
+                        latNote = Sound.GetNoteLat(headCell.notes[0].note);
+                        note.note = latNote[0] + 'u';
+                    } else {
+                        latNote = getRandomElement(headCell.notes).note;
+                        note.note = latNote[0] + 'y';
+                    }
+
+                    if (!latNote) {
+                        note.durQ = 0;
+                    } else {
+                        note.durQ = note.durQ > 10 ? note.durQ - 10 : note.durQ;
+                    }
+
+                    note.instName = '$cBass*f';
+                    note.instCode = '';
+
+                    return note;
+                });
+            } else {
+                cell.notes.forEach(note => {
+                   note.durQ = 0;
+                });
+            }
+        });
+
+        itemsByBass.forEach(item => {
+            item.track = bassTrackName;
+            item.type = 'tone';
+
+            LineModel.ClearBlockOffset(item.lines);
+
+            item.lines.forEach(line => {
+                line.cells.forEach(cell => {
+                    delete (cell as any).blockOffsetQ;
+                    delete (cell as any).durQ;
+
+                    cell.notes = cell.notes.filter(note => {
+                        return !!note.durQ;
+                    });
+                });
+
+                line.cells = line.cells.filter(cell => !!cell.notes.length);
+            });
+        });
+
+        // LineModel.ClearBlockOffset(itemsByDrums);
+        // console.log('createBassTrack.bassCells', bassCells);
+        // console.log('createBassTrack.headCells', headCells);
+        // console.log('createBassTrack.itemsByHead', itemsByHead);
+        console.log('createBassTrack.headTrack', headTrack);
+        console.log('createBassTrack.bassTrack', bassTrack);
+        console.log('createBassTrack.itemsByBass', itemsByBass);
+
+        itemsByBass.forEach(item => song.dynamic.push(item));
+        song.tracks.push(bassTrack);
+        m.sortTracks(ideService.songStore.data.tracks);
         this.setPageContent();
         ideService.songStore.save();
     }

@@ -1027,6 +1027,14 @@ export class KeyboardCtrl {
         rowNio?: number,
         rowInPartId?: string
     }[]) {
+        return KeyboardCtrl.Sort_ByPartAndRowNio(rows);
+    }
+
+    static Sort_ByPartAndRowNio(rows: {
+        partNio?: number,
+        rowNio?: number,
+        rowInPartId?: string
+    }[]) {
         rows.sort((a, b) => {
             const partNioA = a.partNio ? a.partNio : m.getPartNio(a.rowInPartId);
             const partNioB = b.partNio ? b.partNio : m.getPartNio(b.rowInPartId);
