@@ -1,6 +1,6 @@
 <settings>
   pitchShift: 2;
-  @drums: v50; $bass: v50;  $guitL: v50; $guitB: v50; $keys: v50; $Z: v50;
+  $bass: v50;  $guitL: v50; $guitB: v50; $keys: v50; $Z: v50;
 
 # 12   24   36   48   60   72   84   96   108  120  132  144
 # 120  240  360  480  600  720  840  960  1080 1200 1320 1440

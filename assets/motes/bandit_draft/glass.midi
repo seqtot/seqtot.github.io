@@ -1,7 +1,7 @@
 <settings>
 # boardShift: -12;
   pitchShift: 0;
-_ @drums: v50; $bass: v30; $guit: v40; $Z: v50;
+_ $bass: v30; $guit: v40; $Z: v50;
 
 <info>
 

@@ -1,6 +1,6 @@
 <settings>
   pitchShift: -1;
-  @drums: v50; $bass: v50; $bassS: v60; $guit: v50; $back: v50; $solo: v50; $Z: v50;
+  $bass: v50; $bassS: v60; $guit: v50; $back: v50; $solo: v50; $Z: v50;
 
 <out b105>
 > СЧЁТ      %_ [4*120]

@@ -3,7 +3,7 @@
 <settings>
   boardShift: -12;
   pitchShift: 0
-  $guit: v40; $voic: v50; $bass: v40; $H: v20; $Z: v50;
+  $guit: v40; $voic: v50; $H: v20; $Z: v50;
 
 <out b120>
 > СЧЁТ       %_ [1*4*120]
@@ -29,16 +29,12 @@
 $voic: 0   ма=240 ра=240 да=480 $trump
 $H:    0   do+da+ma=240 $organ
 $guit: 0   до+да+ма=60 *drpm  до=60 до=60 до=60           $egit*drp
-$bass: 0   dy=60 mu=60 su=60 dy=60 $cBass*f
 $H:    240 do+fo+ra=240 $organ
 $guit: 240 до+фо+ра=60 *drpm  до=60 до=60 до=60           $egit*drp
-$bass: 240 dy=60 fu=60 su=60 bu=60 $cBass*f
 $H:    480 do+ma+da=240 $organ
 $guit: 480 до+мо+да=60 *drpm до=60 до=60 *drp до+мо+да=60 $egit*drp
-$bass: 480 dy=60 mu=60 su=60 bu=60 $cBass*f
 $H:    720 do+ma+da=240 $organ
 $guit: 720 *drpm до=60 до=60 *drp до+мо+да=60 *drpm до=60 $egit*drp
-$bass: 720 dy=60 bu=60 su=60 mu=60 $cBass*f
 
 
 #          |      щх |         | й--щх |

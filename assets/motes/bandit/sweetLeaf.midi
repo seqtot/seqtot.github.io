@@ -1,6 +1,6 @@
 <settings>
 # boardShift: -12;
-_ @drums: v50; $bass: v50; $guit: v50; $Z: v50;
+_ $bass: v50; $guit: v50; $Z: v50;
 
 <info>
 https://lyrsense.com/black_sabbath/sweet_leaf
