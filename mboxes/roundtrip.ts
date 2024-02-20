@@ -1,4 +1,5 @@
 export default {
+    id: 'roundtrip',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit_draft/roundtrip.midi',

@@ -122,6 +122,7 @@ export type Cell = {
     id: number;
     startOffsetQ: number;
     notes: LineNote[]
+    blockOffsetQ?: number;
 }
 
 export type Line = {

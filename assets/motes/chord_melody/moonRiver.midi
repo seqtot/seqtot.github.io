@@ -1,0 +1,38 @@
+<settings>
+# boardShift: -12;
+
+
+<info>
+Moon River
+https://www.youtube.com/watch?v=BhCiI0Lprcw
+
+<sets b120 set>
+t1
+t2
+t3
+t4
+
+<t0 b120 $>
+$top: 0 $organ*r
+$mid: 0 $organ
+$bot: 0 $cBass*f
+
+<t4 b120 $>
+$top: 0 са+ра=240 да=120 $organ*r
+$mid: 0 бо=240 $organ
+$bot: 0 мо=240 $cBass*f
+
+<t3 b120 $>
+$top: 0 ба+са=180  ла=60 са=60 фа=60 $organ*r
+$mid: 0 ра=180                       $organ
+$bot: 0 фо=180                       $cBass*f
+
+<t2 b120 $>
+$top: 0 ре+са=240 де=120 $organ*r
+$mid: 0 ма=240           $organ
+$bot: 0 лу=240           $cBass*f
+
+<t1 b120 $>
+$top: 0 са=120 бо=120 ма=120 $organ*r
+$mid: 0                      $organ
+$bot: 0 до=120               $cBass*f

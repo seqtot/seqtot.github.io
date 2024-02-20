@@ -1,4 +1,5 @@
 export default {
+    id: 'carcassiOp60n7',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit/carcassiOp60n7.midi',

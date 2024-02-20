@@ -1,4 +1,5 @@
 export default {
+    id: 'sweetLeaf',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit/sweetLeaf.midi',

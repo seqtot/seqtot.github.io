@@ -1,4 +1,5 @@
 export default {
+    id: 'butterflyEffect',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit_draft/butterflyEffect.midi',

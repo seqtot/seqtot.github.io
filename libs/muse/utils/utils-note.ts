@@ -632,8 +632,8 @@ export function getBeatsArrayFromString(val: string): number[] {
     return getBeatsByBpmWithOffset(bpm, count, delayMs);
 }
 
-export function getRandomElement(arr: any[] | string): any {
-    const length = arr ? arr.length : 0;
+export function getRandomElement<T>(arr: T | T[]): T {
+    const length = arr ? (arr as any).length : 0;
 
     const i = Math.floor(Math.random() * length);
 

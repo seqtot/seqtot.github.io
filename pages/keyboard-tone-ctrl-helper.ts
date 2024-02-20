@@ -213,12 +213,16 @@ export function getHarmonicaCellStyles(note: string): {
 export function getKeyFn(x: {
     keyboardId: string | number;
     cellSize?: string;
+    cellHeight?: string,
+    cellWidth?: string,
     fontSize?: string;
     cellStylesFn: (note: string, iRow?: number, iCell?: number) => {bgColor: string, borders: string, text: string}
 }): (note: string, symbol: string, iRow?: number, iCol?: number) => string {
     const keyboardId = x.keyboardId || '';
     const fontSize = x.fontSize || '1.3rem';
-    const cellSize = x.cellSize || '1.5rem';
+    const cellWidth = x.cellWidth || x.cellSize || '1.5rem';
+    const cellHeight = x.cellHeight || x.cellHeight || '1.5rem';
+
     let guid = 1;
 
     return (note: string, symbol: string, iRow?: number, iCol?: number): string => {
@@ -237,8 +241,8 @@ export function getKeyFn(x: {
             margin: 0;
             padding: 0;
             display: inline-block;
-            width: ${cellSize};
-            height: ${cellSize};
+            width: ${cellWidth};
+            height: ${cellHeight};
             user-select: none;
             touch-action: none;
             font-size: ${fontSize};
@@ -345,6 +349,10 @@ export const guitarKeys: string[][] = [
 ];
 
 export const harmonicaKeys: string[][] = [
+    ['zi', 'li', 'ki', 'bi'],
+    ['mi', 'fi', 'vi', 'si'],
+    ['di', 'ti', 'ri', 'ni'],
+
     ['ze', 'le', 'ke', 'be'],
     ['me', 'fe', 've', 'se'],
     ['de', 'te', 're', 'ne'],
@@ -411,16 +419,21 @@ export function getVerticalKeyboard(x: {
     keyboardId: number | string,
     type: ToneKeyboardType,
     keys: string[][],
-    size?: number,
+    cellSize?: number,
+    cellWidth?: number,
+    cellHeight?: number,
 }): string {
     const keyboardId = x.keyboardId || '';
 
     const isT34Type = isT34(x.type);
-    const size = x.size || 1.8;
+
+    const cellWidth = x.cellWidth || x.cellSize || 1.8;
+    const cellHeight = x.cellHeight || x.cellSize || 1.8;
 
     const getKey = getKeyFn({
         keyboardId,
-        cellSize: `${size}rem`,
+        cellWidth: `${cellWidth}rem`,
+        cellHeight: `${cellHeight}rem`,
         fontSize: '1.3rem',
         cellStylesFn: isT34Type ? getHarmonicaCellStyles: getGuitarСellStyles,
     });
@@ -428,7 +441,7 @@ export function getVerticalKeyboard(x: {
     let minWidth = '';
 
     if (x.keys[0] && x.keys[0].length) {
-        minWidth = `min-width: ${size * x.keys[0].length + 0.1}rem;`;
+        minWidth = `min-width: ${cellWidth * x.keys[0].length + 0.1}rem;`;
     }
 
     // padding: 0.5rem 0 0.5rem 0.5rem;"

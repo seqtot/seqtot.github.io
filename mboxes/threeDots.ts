@@ -1,4 +1,5 @@
 export default {
+    id: 'threeDots',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit/threeDots.midi',

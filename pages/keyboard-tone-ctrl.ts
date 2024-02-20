@@ -91,7 +91,7 @@ export class ToneCtrl extends KeyboardCtrl {
             keyboardId: 'base',
             type: boardType,
             keys: boardKeys,
-            size: 1.8,
+            cellSize: 1.8,
         });
     }
 
@@ -195,18 +195,15 @@ export class ToneCtrl extends KeyboardCtrl {
 
     getHarmonicaBoard(boardType: ToneKeyboardType): string {
         let baseKeys = hlp.harmonicaKeys.slice(3);
-        let soloKeys = hlp.harmonicaKeys.slice(0, 12);
+        let soloKeys = hlp.harmonicaKeys.slice(0, 15);
 
         if (boardType === 'solo34' || boardType === 'soloSolo34') {
-            baseKeys = hlp.harmonicaKeys.slice(0, 13);
-            soloKeys = hlp.harmonicaKeys.slice(0, 13);
+            baseKeys = hlp.harmonicaKeys.slice(0, 15);
+            soloKeys = hlp.harmonicaKeys.slice(0, 15);
         } else if (boardType === 'bass34' || boardType === 'bassBass34') {
             baseKeys = hlp.harmonicaKeys.slice(3);
             soloKeys = hlp.harmonicaKeys.slice(3);
         }
-
-        const size = 2.5;
-        const rows = Math.max(soloKeys.length, baseKeys.length);
 
         return `
             <div style="
@@ -218,9 +215,9 @@ export class ToneCtrl extends KeyboardCtrl {
                 justify-content: space-between;
                 position: relative;"
             >
-                ${hlp.getVerticalKeyboard({keyboardId: 'base', type: boardType, keys: baseKeys, size: 2.2})}            
+                ${hlp.getVerticalKeyboard({keyboardId: 'base', type: boardType, keys: baseKeys, cellWidth: 2, cellHeight: 2})}            
                 <div style="width: 1rem; height: {size*rows}rem; user-select: none; touch-action: none;"></div>
-                ${hlp.getVerticalKeyboard({keyboardId: 'solo', type: boardType, keys: soloKeys, size: 2.2})}
+                ${hlp.getVerticalKeyboard({keyboardId: 'solo', type: boardType, keys: soloKeys, cellWidth: 2, cellHeight: 2})}
                 <div
                     style="font-size: 2rem;
                     font-family: monospace;
@@ -1210,7 +1207,7 @@ export class ToneCtrl extends KeyboardCtrl {
         if (el) {
             el.addEventListener('click', () => {
                 const val =
-                    m.getRandomElement('dtrnmfvszlkb') + m.getRandomElement('uoa');
+                    m.getRandomElement('dtrnmfvszlkb') + m.getRandomElement<string>('uoa');
 
                 const key = dyName(
                     `note-key-${val}`,

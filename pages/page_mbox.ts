@@ -6,6 +6,7 @@ import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { standardTicks as ticks } from './ticks';
+import { getBassCells } from './get-bass-cells';
 
 import {
     Muse as m,
@@ -29,9 +30,11 @@ import { WavRecorder } from './ide/wav-recorder';
 import { GetTrackDialog } from './dialogs/get-track-dialog';
 import {KeyboardCtrl} from './keyboard-ctrl';
 import {getRandomElement} from '../libs/muse/utils';
+import {UserSettingsStore} from './user-settings-store';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 const isDev = /localhost/.test(window.location.href);
+const isDevUser = UserSettingsStore.GetUserSettings().userName === 'dev' || isDev;
 
 export class MBoxPage {
     view: 'list' | 'song' = 'list';
@@ -379,6 +382,15 @@ export class MBoxPage {
 
         let content = '';
 
+        const createBass = (n: string = '') => {
+            return `<span
+                style="display: inline-block; border: 1px solid lightgray; border-radius: 0.25rem; user-select: none; padding: 0; margin: 0; margin-right: .4rem;"
+                data-create-bass-track${n}-action
+            >
+                +B${n}
+            </span>`
+        };
+
         let actions = `
             <div style="margin: 1rem 0 0 0;">
                 ${svg.uncheckBtn('data-uncheck-all-tracks-action', 'black', 24)}
@@ -388,12 +400,8 @@ export class MBoxPage {
                 ${svg.editBtn('data-edit-track-action', '', 24)}
                 ${svg.soundBtn('data-edit-tracks-volume-action', '', 24)}${blankHalfRem}
                 ${svg.copyPasteBtn('data-clone-track-action', '', 24)}
-                <span 
-                    style="display: inline-block; border: 1px solid lightgray; border-radius: 0.25rem; user-select: none; padding: 0; margin: 0; margin-right: .4rem;"
-                    data-create-bass-track-action
-                >
-                    +bass
-                </span>                
+                ${createBass()}
+                ${isDevUser ? createBass('2') : ''}
             </div>
         `.trim();
 
@@ -650,6 +658,10 @@ export class MBoxPage {
 
         getWithDataAttr('create-bass-track-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerup', () => this.createBassTrack());
+        });
+
+        getWithDataAttr('create-bass-track2-action', this.pageEl).forEach((el) => {
+            el.addEventListener('pointerup', () => this.createBassTrack2());
         });
     }
 
@@ -1026,7 +1038,7 @@ export class MBoxPage {
     }
 
 
-    getFullLineModel(song: SongNode): {rowInPartId: string, lines: Line[], durQ: number, blockOffsetQ: number}[] {
+    getFullLineModel(song: SongNode): { rowInPartId: string, lines: Line[], durQ: number, blockOffsetQ: number}[] {
         const result: {rowInPartId: string, lines: Line[], durQ: number, blockOffsetQ: number}[] = [];
 
         song.dynamic.forEach(item => {
@@ -1080,7 +1092,187 @@ export class MBoxPage {
         return result;
     }
 
-    createBassTrack(){
+    createBassTrack2() {
+        const song = ideService.songStore?.data;
+
+        if (!song) return;
+
+        const allLines = this.getFullLineModel(song);
+        const totalDurQ = allLines.reduce((acc, item) => (acc + item.durQ), 0)
+
+        let drumsTrackName = '@drums';
+        let bassTrackName = '$bass';
+        let headTrackName = '$H';
+
+        let itemsByBass = song.dynamic.filter(item => item.track === drumsTrackName);
+        let bassTrack = song.tracks.find(item => item.name === drumsTrackName);
+        let itemsByHead = song.dynamic.filter(item => item.track === headTrackName);
+        let headTrack = song.tracks.find(item => item.name === headTrackName);
+
+        if (!bassTrack || !headTrack) return null;
+
+        drumsTrackName = this.getUniqTrackName(song, drumsTrackName);
+        bassTrackName = this.getUniqTrackName(song, bassTrackName);
+
+        itemsByBass = JSON.parse(JSON.stringify(itemsByBass));
+        let allItemsByDrums: ReturnType<this['getFullLineModel']> = JSON.parse(JSON.stringify(allLines));
+        bassTrack = JSON.parse(JSON.stringify(bassTrack));
+        itemsByHead = JSON.parse(JSON.stringify(itemsByHead));
+        let allItemsByHead: ReturnType<this['getFullLineModel']> = JSON.parse(JSON.stringify(allLines));
+
+        bassTrack.name = bassTrackName;
+        bassTrack.isHardTrack = false;
+        bassTrack.board = 'bassGuitar';
+
+        KeyboardCtrl.Sort_ByPartAndRowNio(itemsByHead);
+        KeyboardCtrl.Sort_ByPartAndRowNio(itemsByBass);
+
+        const headCells: (Cell & {blockOffsetQ?: number})[] = [];
+
+        itemsByHead.forEach(item => {
+            const itemInAll = allItemsByHead.find(iItem => iItem.rowInPartId === item.rowInPartId);
+
+            item.lines.forEach((line, i) => {
+                const cells: Cell[] = [];
+
+                line.cells.forEach(cell => {
+                    (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
+
+                    const existedCell = cells.find(iCell => iCell.startOffsetQ === cell.startOffsetQ);
+
+                    if (!existedCell) {
+                        cells.push(cell);
+
+                        return;
+                    }
+
+                    existedCell.notes = [...existedCell.notes, ...cell.notes];
+                });
+
+                LineModel.SortByStartOffsetQ(cells);
+                itemInAll.lines[i].cells = cells;
+
+                headCells.push(...cells);
+            });
+        });
+
+        const bassCells: (Cell & {blockOffsetQ?: number})[] = [];
+
+        itemsByBass.forEach(item => {
+            const itemInAll = allItemsByDrums.find(iItem => iItem.rowInPartId === item.rowInPartId);
+
+            item.lines = item.lines.map(line => {
+                line.blockOffsetQ = itemInAll.blockOffsetQ;
+
+                const cells: Cell[] = [];
+
+                line.cells.forEach(cell => {
+                    (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
+
+                    cell.notes = cell.notes.filter(note => {
+                        return note.instName === '@bd' || note.instName === '@sn';
+                    });
+
+                    if (!cell.notes.length) return;
+
+                    const existedCell = cells.find(iCell => iCell.startOffsetQ === cell.startOffsetQ);
+
+                    if (!existedCell) {
+                        cells.push(cell);
+
+                        return;
+                    }
+
+                    existedCell.notes = [...existedCell.notes, ...cell.notes];
+                })
+
+                LineModel.SortByStartOffsetQ(cells);
+                line.cells = cells;
+
+                bassCells.push(...cells);
+
+                return line;
+            });
+        });
+
+        headCells.forEach((currCell, i) => {
+            let nextCell: typeof currCell = null;
+
+            if (!currCell.notes.length) {
+                return;
+            }
+
+            for (let j = i + 1; j < headCells.length; j++) {
+                if (!headCells[j].notes.length) {
+                    continue;
+                }
+
+                nextCell = headCells[j];
+
+                break;
+            }
+
+            //nextCell = nextCell ?? headCells[headCells.length - 1];
+
+            const startOffsetQ = currCell.blockOffsetQ + currCell.startOffsetQ;
+            const endOffsetQ = nextCell ? nextCell.blockOffsetQ + nextCell.startOffsetQ : totalDurQ;
+
+            nextCell = nextCell ? nextCell : currCell;
+
+            const lBassCells: Cell[] = [];
+
+            for (let drumCell of bassCells) {
+                if (
+                    ((drumCell.startOffsetQ + drumCell.blockOffsetQ) >= startOffsetQ) &&
+                    ((drumCell.startOffsetQ + drumCell.blockOffsetQ) < endOffsetQ)
+                ) {
+                    if (drumCell.notes.length) {
+                        lBassCells.push(drumCell);
+                    }
+                }
+            }
+
+            //console.log(startOffsetQ, endOffsetQ);
+
+            getBassCells({curr: currCell, next: nextCell}, lBassCells, endOffsetQ);
+        });
+
+        itemsByBass.forEach(item => {
+            item.track = bassTrackName;
+            item.type = 'tone';
+
+            LineModel.ClearBlockOffset(item.lines);
+
+            item.lines.forEach(line => {
+                line.cells.forEach(cell => {
+                    ['blockOffsetQ', 'durQ', 'line'].forEach(key => {
+                        delete (cell as any)[key];
+                    });
+
+                    cell.notes = cell.notes.filter(note => {
+                        return !!note.durQ;
+                    });
+                });
+
+                line.cells = line.cells.filter(cell => !!cell.notes.length);
+            });
+        });
+
+        // console.log('createBassTrack2.bassCells', bassCells);
+        // console.log('createBassTrack2.headCells', headCells);
+        // console.log('createBassTrack.headTrack', headTrack);
+        // console.log('createBassTrack.bassTrack', bassTrack);
+        //console.log('createBassTrack.itemsByHead', itemsByHead);
+        //console.log('createBassTrack2.itemsByBass', itemsByBass);
+
+        itemsByBass.forEach(item => song.dynamic.push(item));
+        song.tracks.push(bassTrack);
+        m.sortTracks(ideService.songStore.data.tracks);
+        this.setPageContent();
+        ideService.songStore.save();
+    }
+
+    createBassTrack() {
         const song = ideService.songStore?.data;
 
         if (!song) return;
@@ -1209,32 +1401,48 @@ export class MBoxPage {
             }
 
             if (headCell && headCell.notes.length) {
-                cell.notes = cell.notes.map(note => {
-                    let latNote = '';
+                let note = (cell.notes.find(note => note.instName === '@bd') || cell.notes.find(note => note.instName === '@sn')) as LineNote;
 
-                    if (note.instName === '@bd') {
-                        latNote = Sound.GetNoteLat(headCell.notes[0].note);
-                        note.note = latNote[0] + 'u';
-                    } else {
-                        latNote = getRandomElement(headCell.notes).note;
-                        note.note = latNote[0] + 'y';
-                    }
+                if (!note) {
+                    cell.notes = [];
 
-                    if (!latNote) {
-                        note.durQ = 0;
-                    } else {
-                        note.durQ = note.durQ > 10 ? note.durQ - 10 : note.durQ;
-                    }
+                    return;
+                }
 
-                    note.instName = '$cBass*f';
-                    note.instCode = '';
+                note = {
+                    durQ: note.durQ,
+                    volume: 50,
+                    id: note.id,
+                    lineOffsetQ: note.lineOffsetQ,
+                    instCode: '',
+                    instName: note.instName,
+                } as LineNote;
 
-                    return note;
-                });
+                let latNote = '';
+
+                if (note.instName === '@bd') {
+                    latNote = Sound.GetNoteLat(headCell.notes[0].note);
+                    note.note = latNote[0] + 'u';
+                } else {
+                    latNote = getRandomElement(headCell.notes).note;
+                    note.note = latNote[0] + 'y';
+                }
+
+                if (!latNote) {
+                    //note.durQ = 0;
+                    cell.notes = [];
+
+                    return;
+                } else {
+                    note.durQ = note.durQ > 10 ? note.durQ - 10 : note.durQ;
+                }
+
+                note.instName = '$cBass*f';
+                note.instCode = '';
+
+                cell.notes = [note];
             } else {
-                cell.notes.forEach(note => {
-                   note.durQ = 0;
-                });
+                cell.notes = [];
             }
         });
 

@@ -1,4 +1,5 @@
 export default {
+    id: 'partingGlass',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit/partingGlass.midi',

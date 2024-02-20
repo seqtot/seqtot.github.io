@@ -1,4 +1,5 @@
 export default {
+    id: 'glass',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit_draft/glass.midi',

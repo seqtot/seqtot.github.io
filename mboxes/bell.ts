@@ -1,4 +1,5 @@
 export default {
+    id: 'bell',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit/bell.midi',

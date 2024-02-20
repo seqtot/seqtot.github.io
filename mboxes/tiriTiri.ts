@@ -1,4 +1,5 @@
 export default {
+    id: 'tiriTiri',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit/tiriTiri.midi',

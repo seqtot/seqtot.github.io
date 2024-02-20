@@ -1,4 +1,5 @@
 export default {
+    id: 'billy',
     ns: 'band-song',
     exportToLineModel: true,
     pathNotesText: 'motes/bandit/billy.midi',
