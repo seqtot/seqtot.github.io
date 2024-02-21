@@ -154,7 +154,7 @@ ShiftRight  ~бе~0.5,
 
 Equal        ~ди~0.5,
 BracketRight ~ти~0.5,
-noteMi       ~ри~0.5,
+noteRi       ~ри~0.5,
 noteNi       ~ни~0.5,
 noteMi       ~ми~0.5,
 noteFi       ~фи~0.5,
