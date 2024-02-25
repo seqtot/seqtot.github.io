@@ -68,6 +68,25 @@ export const MY_SONG = 'my-song';
 export const BAND_SONG = 'band-song';
 export const SONG_LIST = 'song-list';
 
+function transformOldDrums(song: SongNode): SongNode {
+    song.dynamic.forEach(item => {
+        if (item.type === 'drums' || item.track.startsWith('@')) {
+            item.lines.forEach(line => {
+                line.cells.forEach(cell => {
+                    cell.notes.forEach(note => {
+                        delete note['headColor'];
+                        delete note['bodyColor'];
+                        delete note['char'];
+                        delete note['vocalism'];
+                    });
+                })
+            });
+        }
+    });
+
+    return song;
+}
+
 // durQ по умолчанию = 1; instName = @note
 function transformV1(song: SongNode): SongNode {
     const version = 1;
@@ -111,7 +130,7 @@ export class SongStore {
 
         if (!data || !this.ns) return;
 
-        SongStore.SetSong(this.songId, this.data, this.ns);
+        SongStore.SetSong(this.songId, data, this.ns);
         this.data = data;
     }
 
@@ -323,7 +342,13 @@ export class SongStore {
         return song;
     }
 
+    static TransformOldDrums(song: SongNode): SongNode {
+        return transformOldDrums(song);
+    }
+
     static TransformVersion(song: SongNode): SongNode {
+        song = transformOldDrums(song);
+
         const version = m.parseInteger(song.version, 0);
 
         if (version === versionTransformers.length) {
@@ -393,8 +418,23 @@ export class SongStore {
         return song;
     }
 
-    static SetSong(id: string, data: SongNode, ns: string) {
+    static SetSong(id: string, data: SongNode, ns: string, saveAll?: boolean) {
         if (!ns || !data || !id) return;
+
+        if (!saveAll) {
+            const hardTracks: {[key: string]: boolean} = {};
+
+            data.tracks.forEach(track => {
+                if (track.isHardTrack) {
+                    hardTracks[track.name] = true;
+                }
+            });
+
+            data = {
+                ...data,
+                dynamic: data.dynamic.filter(item => !hardTracks[item.track])
+            }
+        }
 
         localStorage.setItem(`[${ns}]${id}`, JSON.stringify(data));
     }

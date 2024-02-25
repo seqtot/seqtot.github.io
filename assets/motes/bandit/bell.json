@@ -1,4 +1,5 @@
 {
+    "ns": "band-song",
     "bmpValue": 120,
     "content": "",
     "break": "",
@@ -6,11 +7,11 @@
     "source": "my",
     "isNewCreated": false,
     "pitchShift": 0,
-    "ns": "band-song",
     "pitchShiftSrc": 0,
     "version": 1,
     "volume": 64,
     "score": "",
+    "hideMetronome": false,
     "tracks": [
     {
         "name": "@drums",
@@ -54,7 +55,6 @@
         "isExcluded": false
     }
 ],
-    "hideMetronome": false,
     "parts": [
     {
         "name": "СЧЁТ",

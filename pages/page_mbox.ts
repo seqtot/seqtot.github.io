@@ -156,7 +156,7 @@ export class MBoxPage {
 
                     if (res.ok) {
                         const json = await res.json(); // res.json(); res.blob();
-                        pageData.songNodeHard = json;
+                        pageData.songNodeHard = SongStore.TransformOldDrums(json);
                     } else {
                         throw new Error(`${res.status} ${res.statusText}`);
                     }
@@ -1920,6 +1920,10 @@ export class MBoxPage {
 
         songNode = JSON.parse(val) as SongNode;
         //songNode = SongStore.Transform(val);
+
+        songNode.tracks.forEach(track => {
+           track.isHardTrack = false;
+        });
 
         SongStore.SetSong(this.songId, songNode, this.ns);
 

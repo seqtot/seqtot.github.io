@@ -20,75 +20,6 @@ export const DEFAULT_TONE_INSTR: number = 162;
 // 630 - trombone
 
 
-export const keysLeftToRightBrassSection = `
-# 0-key 1-note 2-volume 3-instrCode
-noteDy      ~ды~0.8~638,
-noteTy      ~ты~0.8~638,
-noteRy      ~ры~0.8~638,
-noteNy      ~ны~0.8~638,
-noteMy      ~мы~0.8~638,
-noteFy      ~фы~0.8~638,
-noteVy      ~вы~0.8~638,
-noteSy      ~сы~0.8~638,
-noteZy      ~зы~0.8~638,
-noteLy      ~лы~0.8~638,
-noteKy      ~кы~0.8~638,
-noteBy      ~бы~0.8~638,
-
-Backquote   ~ду~0.8~638,
-Tab         ~ту~0.8~638,
-CapsLock    ~ру~0.8~638,
-ShiftLeft   ~ну~0.8~638,
-Digit1      ~му~0.8~638,
-KeyQ        ~фу~0.8~638,
-KeyA        ~ву~0.8~638,
-KeyZ        ~су~0.8~638,
-Digit2      ~зу~0.8~638,
-KeyW        ~лу~0.8~638,
-KeyS        ~ку~0.8~638,
-KeyX        ~бу~0.8~638,
-Digit3      ~до~0.8~638,
-KeyE        ~то~0.8~638,
-KeyD        ~ро~0.8~638,
-KeyC        ~но~0.8~638,
-
-Digit4      ~мо~0.3~697,
-KeyR        ~фо~0.3~697,
-KeyF        ~во~0.3~697,
-KeyV        ~со~0.3~697,
-Digit5      ~зо~0.3~697,
-KeyT        ~ло~0.3~697,
-KeyG        ~ко~0.3~697,
-KeyB        ~бо~0.3~697,
-
-Digit6      ~да~0.3~714,
-KeyY        ~та~0.3~714,
-KeyH        ~ра~0.3~714,
-KeyN        ~на~0.3~714,
-Digit7      ~ма~0.3~714,
-KeyU        ~фа~0.3~714,
-KeyJ        ~ва~0.3~714,
-KeyM        ~са~0.3~714,
-Digit8      ~за~0.3~714,
-KeyI        ~ла~0.3~714,
-KeyK        ~ка~0.3~714,
-Comma       ~ба~0.3~714,
-
-Digit9      ~де~0.2~618,
-KeyO        ~те~0.2~618,
-KeyL        ~ре~0.2~618,
-Period      ~не~0.2~618,
-Digit0      ~ме~0.2~618,
-KeyP        ~фе~0.2~618,
-Semicolon   ~ве~0.2~618,
-Slash       ~се~0.2~618,
-Minus       ~зе~0.2~618,
-BracketLeft ~ле~0.2~618,
-Quote       ~ке~0.2~618,
-ShiftRight  ~бе~0.2~618,
-
-`;
-
 export const keysLeftToRight = `
 # 0-key 1-note 2-volume 3-instrCode
 noteDy      ~ды~0.5,
@@ -263,7 +194,3 @@ export const toneAndDrumPlayerSettings = {
     keys: setInstrument(keysLeftToRight, DEFAULT_TONE_INSTR),
     drums: {...drumInfo},
 };
-
-export const leftToRightBrassSection = {
-    keys: keysLeftToRightBrassSection
-}
