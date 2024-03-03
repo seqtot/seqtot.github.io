@@ -9,6 +9,7 @@ import sweetLeaf from './sweetLeaf';
 import engine from './engine';
 import threeDots from './threeDots';
 import noSystems from './noSystems';
+import inSystem from './inSystem';
 
 import glass from './glass';
 import butterflyEffect from './butterflyEffect';
@@ -36,6 +37,7 @@ export default {
   butterflyEffect,
   roundtrip,
   abt1,
+  inSystem,
 
   // LIST
   setBand,

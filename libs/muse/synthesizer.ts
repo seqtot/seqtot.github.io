@@ -114,6 +114,7 @@ export class Synthesizer extends Sound {
         keyOrNote: string,
         id?: string | number,
         instrCode?: string | number,
+        instrObj?: any,
         print?: boolean,
         onlyStop?: boolean,
         volume?: number,
@@ -137,17 +138,15 @@ export class Synthesizer extends Sound {
           soundInfo = this.keysAndNotes[noteLat];
         }
 
-        //console.log('playSound', noteLat, soundInfo, this.instruments);
+        const instrObj = x.instrObj || this.instruments[soundInfo.instrCode];
 
-        if (
-              soundInfo &&
-              isPresent(soundInfo.instrCode) &&
-              this.instruments[soundInfo.instrCode]
-        ) {
+        //console.log('playSound', noteLat, soundInfo, instrObj);
+
+        if (soundInfo && instrObj) {
             instrCode = instrCode || soundInfo.instrCode;
             volume = volume == null ? soundInfo.volume : volume;
 
-            this.playSoundMidi({id, ...soundInfo, instrCode, volume}, print, pitchShift, x.onlyStop);
+            this.playSoundMidi({id, ...soundInfo, instrCode, volume}, print, pitchShift, x.onlyStop, x.instrObj);
         } else if (note) {
           this.playSoundSynth(note, x.onlyStop);
         }
@@ -228,6 +227,7 @@ export class Synthesizer extends Sound {
         print: boolean,
         pitchShift: number,
         onlyStop?: boolean,
+        instrObj?: any,
     ) => {
         this.stopSound(info);
 
@@ -235,9 +235,9 @@ export class Synthesizer extends Sound {
           return this.setPlayingTones();
         }
 
-        const fontInstr = this.instruments[info.instrCode];
+        instrObj = instrObj || this.instruments[info.instrCode];
 
-        if (!fontInstr) {
+        if (!instrObj) {
           return this.setPlayingTones();
         }
 
@@ -258,7 +258,7 @@ export class Synthesizer extends Sound {
         info.midi = this.fontPlayer.queueWaveTableSrc({
             audioContext: ctx,
             targetNode: Sound.masterGain, // ctx.destination,
-            preset: fontInstr,
+            preset: instrObj,
             when: 0,
             pitch: info.code + pitchShift,
             duration: 1234567,

@@ -7,11 +7,12 @@ import { WavePreset } from '../libs/waf-player/otypes';
 import { Anchors } from '../sample-editor/a-wave-form-component';
 
 // SAMPLE EDITOR
-import { SampleEditorWc} from '../sample-editor/a-sample-editor-wc';
+import { SampleEditorWc } from '../sample-editor/a-sample-editor-wc';
 import {EventEmitter} from '../libs/common/event-emitter';
 import {getAudioBufferFromBlobString, getAudioBufferFromString} from '../libs/waf-player/audio-buffer-to-wav';
+import {preparePreset} from '../libs/waf-player/prepare';
 
-import rawVoiceInst from '../waf-fonts/voice_la';
+import rawVoiceInst from '../waf-fonts/voice_han';
 
 if (customElements.get(SampleEditorWc.tag) == null) {
     customElements.define(SampleEditorWc.tag, SampleEditorWc);
@@ -325,6 +326,7 @@ export class SamplePage {
 
     async buildFont(iZone: number, useAnchors = true) {
         let font = cloneWavePreset(this.fontSource);
+
         this.currZone = iZone;
         this.addZoneKeys(font, iZone);
 
@@ -351,10 +353,11 @@ export class SamplePage {
         }
 
         //await this.synthesizer.fontPlayer.adjustPreset(this.synthesizer.ctx, font); // jjkl
-
-        //const audioBuffer = await getAudioBufferFromString(font.zones[iZone].file);
-        const audioBuffer = font.zones[iZone].buffer;
-        this.font = font;
+        const audioBuffer = await getAudioBufferFromString(font.zones[iZone].file);
+        await preparePreset({audioContext: this.synthesizer.ctx, preset: font}); // jjkl
+        //const audioBuffer = font.zones[iZone].buffer;
+        //this.font = font;
+        this.font = await preparePreset({audioContext: this.synthesizer.ctx, preset: font}); // jjkl
         this.byId(ids.info).innerHTML = `duration: ${audioBuffer.duration} length: ${audioBuffer.length} fontSampleRate:  ${font.zones[0].sampleRate} `;
         this.ee.emit(ids.data, { audioBuffer: audioBuffer });
     }
@@ -501,14 +504,14 @@ export class SamplePage {
 
             //const info = {}
 
-            //this.synthesizer.playSound({keyOrNote, instrObj, volume: .5, onlyStop: false}); // jjkl
+            this.synthesizer.playSound({keyOrNote, instrObj, volume: .5, onlyStop: false }); // jjkl
 
             return;
         }
 
         if (soundInfo.noteLat && type === UP) {
             this.downedKeys[keyOrNote] = false;
-            // this.synthesizer.playSound({keyOrNote, instrObj}, true); // jjkl
+            this.synthesizer.playSound({keyOrNote, instrObj, onlyStop: true}); // jjkl
 
             return;
         }

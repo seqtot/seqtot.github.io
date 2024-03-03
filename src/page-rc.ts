@@ -4,7 +4,7 @@ import {RollPage, KeyboardPage, MBoxPage} from '../pages';
 import {MuseEditorPage} from '../pages/page_muse_editor';
 import {UserSettingsPage} from '../pages/page_user_settings';
 import {ThereminPage} from '../pages/theremin/theremin.page';
-//import {SamplePage} from '../pages/page_sample_editor';
+import {SamplePage} from '../pages/page_sample_editor';
 
 const pages = {
     page_roll: RollPage,
@@ -13,7 +13,7 @@ const pages = {
     mbox: MBoxPage,
     userSettings: UserSettingsPage,
     theremin: ThereminPage,
-    //page_sample_editor: SamplePage,
+    page_sample_editor: SamplePage,
 };
 
 let vc: any;

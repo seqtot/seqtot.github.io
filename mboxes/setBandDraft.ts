@@ -2,6 +2,11 @@ function getInnerLink(name: string, href: string): string {
   return `<a class="link" href="${href}">${name}</a>`;
 }
 
+const inSystem = `<div style="margin: .5rem;">
+    ${getInnerLink('В системе (In system)', '/mbox/inSystem/')}
+</div>
+`.trim();
+
 const glass = `<div style="margin: .5rem;">
     ${getInnerLink('Стакан (Glass)', '/mbox/glass/')}
 </div>
@@ -23,6 +28,7 @@ const abt1 = `<div style="margin: .5rem;">
 `.trim();
 
 const content = `
+  ${inSystem}
   ${glass}
   ${butterflyEffect}
   ${roundtrip}
