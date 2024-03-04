@@ -1,3 +1,5 @@
+import {UserSettingsStore} from './user-settings-store';
+
 const attrs = {
     actionDrumKey: 'action-drum-key',
     keyboardId: 'keyboard-id',
@@ -10,6 +12,13 @@ const attrs = {
 
 // black deeppink sienna
 export const drumNotesInfo = {
+    __: {
+        note: '',
+        headColor: '',
+        bodyColor: '',
+        char: '',
+        vocalism: '',
+    },
     bd: {
         note: 'bd',
         headColor: 'sienna',
@@ -80,6 +89,22 @@ export const drumNotesInfo = {
         char: 'а',
         vocalism: 'та',
     },
+}
+
+const userSettings = UserSettingsStore.GetUserSettings();
+
+let drumCodesBoard = [
+    [drumNotesInfo.ho, drumNotesInfo.cc, drumNotesInfo.rc],
+    [drumNotesInfo.th, drumNotesInfo.tm, drumNotesInfo.tl],
+    [drumNotesInfo.hc, drumNotesInfo.sn, drumNotesInfo.bd],
+];
+
+if (userSettings.userName === 'devUser') {
+    drumCodesBoard = [
+        [drumNotesInfo.__, drumNotesInfo.__, drumNotesInfo.sn],
+        [drumNotesInfo.__, drumNotesInfo.hc, drumNotesInfo.__],
+        [drumNotesInfo.bd, drumNotesInfo.__, drumNotesInfo.__],
+    ];
 }
 
 export class DrumBoard {
@@ -237,115 +262,31 @@ export class DrumBoard {
         const info = drumNotesInfo;
         const rowStyle = 'display: flex; width: 100%; user-select: none; touch-action: none; font-size: 1.2rem;';
 
-        const content = `
-            <div style="user-select: none; touch-action: none; position: relative;">
-                <div style="${rowStyle}">
-                    <div 
-                        style="background-color: ${info.ho.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.ho.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.ho.bodyColor}"
-                        data-color2="${info.ho.headColor}"
-                        data-char="${info.ho.char}"
-                    >
-                        <br/>${info.ho.vocalism}
-                    </div>
-                    <div 
-                        style="background-color: ${info.cc.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.cc.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.cc.bodyColor}"
-                        data-color2="${info.cc.headColor}"
-                        data-char="${info.cc.char}"
-                    >
-                        <br/>${info.cc.vocalism}
-                    </div>
-                    <div 
-                        style="background-color: ${info.rc.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.rc.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.rc.bodyColor}"
-                        data-color2="${info.rc.headColor}"
-                        data-char="${info.rc.char}"
-                    >
-                        <br/>${info.rc.vocalism}
-                    </div>                        
-                </div>                        
-                    
-                <div style="${rowStyle}">
-                    <div 
-                        style="background-color: ${info.th.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.th.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.th.bodyColor}"
-                        data-color2="${info.th.headColor}"
-                        data-char="${info.th.char}"                                                                
-                    >         
-                        <br/>${info.th.vocalism}
-                    </div>
-                    <div 
-                        style="background-color: ${info.tm.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.tm.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.tm.bodyColor}"
-                        data-color2="${info.tm.headColor}"
-                        data-char="${info.tm.char}"                                                                
-                    >         
-                        <br/>${info.tm.vocalism}
-                    </div>   
-                    <div 
-                        style="background-color: ${info.tl.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.tl.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.tl.bodyColor}"
-                        data-color2="${info.tl.headColor}"
-                        data-char="${info.tl.char}"                                                                
-                    >         
-                        <br/>${info.tl.vocalism}
-                    </div>                        
-                </div>
+        let wrapper = `<div style="user-select: none; touch-action: none; position: relative;">%content%</div>`
+        let content = '';
 
-                <div style="${rowStyle}">
-                    <div 
-                        style="background-color: ${info.hc.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.hc.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.hc.bodyColor}"
-                        data-color2="${info.hc.headColor}"
-                        data-char="${info.hc.char}"                                                                
-                    >         
-                        <br/>${info.hc.vocalism}
-                    </div>                
-                    <div 
-                        style="background-color: ${info.sn.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.sn.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.sn.bodyColor}"
-                        data-color2="${info.sn.headColor}"
-                        data-char="${info.sn.char}"                                                                
-                    >         
-                        <br/>${info.sn.vocalism}
-                    </div>                
-                    <div 
-                        style="background-color: ${info.bd.bodyColor}; width: 34%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
-                        data-action-drum-key="${info.bd.note}"
-                        data-keyboard-id="${keyboardId}-${ind++}"
-                        data-color="${info.bd.bodyColor}"
-                        data-color2="${info.bd.headColor}"
-                        data-char="${info.bd.char}"                                                                
-                    >         
-                        <br/>${info.bd.vocalism}
-                    </div>                        
-                </div>
-                    
-                <div 
-                    style="font-size: 1.7rem; font-family: monospace; height: 20rem; width: 100%; position: absolute; top: 0; pointer-events: none; user-select: none; touch-action: none; padding-left: .5rem;"
-                    data-name="drum-text-under-board"
-                >
-                </div>
-            </div>
-        `.trim();
+        drumCodesBoard.forEach(row => {
+            let rowHtml = `<div style="${rowStyle}">`;
 
-        return content;
+            row.forEach(cell => {
+                rowHtml += `
+                    <div 
+                        style="background-color: ${cell.bodyColor}; width: 33%; height: ${rowHeight}${rem}; text-align: center; user-select: none; touch-action: none;"
+                        data-action-drum-key="${cell.note}"
+                        data-keyboard-id="${keyboardId}-${ind++}"
+                        data-color="${cell.bodyColor}"
+                        data-color2="${cell.headColor}"
+                        data-char="${cell.char}"
+                    >
+                        <br/>${cell.vocalism}
+                    </div>                
+                `
+            });
+
+            rowHtml += '</div>';
+            content += rowHtml;
+        });
+
+        return wrapper.replace('%content%', content.trim());
     }
 }
