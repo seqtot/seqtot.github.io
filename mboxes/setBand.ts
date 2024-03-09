@@ -10,7 +10,7 @@ function getBpmLink(bpm: number): string {
   return `<a
     class="link external"
     target="_blank"
-    data-set-bmp-action
+    data-set-bpm-action
     data-bpm="${bpm}"
   >${bpm}</a>`;
 }
@@ -140,6 +140,7 @@ const content = `
   ${carcassiOp60n7}
   ${partingGlass}
   ${tiriTiri}
+  <number-stepper-cc data-name="page-bpm-input" value="90" min="1" max="500"></number-stepper-cc>  
   <div style="margin-bottom: 3rem;"></div>
 `.trim();
 

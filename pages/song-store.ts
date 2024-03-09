@@ -24,7 +24,7 @@ export type TrackInfo = {
 }
 
 export type SongNode = {
-    bmpValue: number,
+    bpmValue: number,
     volume?: number,
     version: number,
     content: string,
@@ -305,7 +305,7 @@ export class SongStore {
         song.parts = Array.isArray(song.parts) ? song.parts : [];
         song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
         song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
-        song.bmpValue = song.bmpValue ? song.bmpValue : DEFAULT_BPM_VALUE;
+        song.bpmValue = song.bpmValue ? song.bpmValue : DEFAULT_BPM_VALUE;
 
         // костыль ???
         song.dynamic.forEach(item => {
@@ -444,7 +444,7 @@ export class SongStore {
         // $bass: v30; $organ: v50; $guit: v50;
 
         return {
-            bmpValue: DEFAULT_BPM_VALUE,
+            bpmValue: DEFAULT_BPM_VALUE,
             volume: DEFAULT_OUT_VOLUME,
             content: '',
             break: '',

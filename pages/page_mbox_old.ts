@@ -31,7 +31,7 @@ function getWithDataAttr<T extends HTMLElement = HTMLElement>(
 }
 
 const ns = {
-  setBmpAction: 'set-bmp-action',
+  setBpmAction: 'set-bpm-action',
   setNote: 'set-note',
 };
 
@@ -322,7 +322,7 @@ export class MBoxOldPage {
       });
     });
 
-    getWithDataAttr(ns.setBmpAction, this.pageEl)?.forEach(
+    getWithDataAttr(ns.setBpmAction, this.pageEl)?.forEach(
         (el: HTMLElement) => {
           el.addEventListener('pointerdown', () => {
             this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);

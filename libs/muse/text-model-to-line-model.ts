@@ -64,7 +64,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
 
     // это новая песня
     if (!song.tracks.length) {
-        song.bmpValue = parseInteger(x.settings.bpm[0], 90);
+        song.bpmValue = parseInteger(x.settings.bpm[0], 90);
     }
 
     song.pitchShiftSrc = parseInteger(x.settings.pitchShift[0], 0);

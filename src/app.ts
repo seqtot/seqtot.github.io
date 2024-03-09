@@ -14,6 +14,8 @@ import Framework7 from 'framework7/bundle';
 
 import { pageRc } from './page-rc';
 
+import '../libs/ui/number-stepper-cc';
+
 const appEl = document.getElementById('app');
 
 // const isDev =

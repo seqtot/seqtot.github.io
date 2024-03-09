@@ -384,15 +384,6 @@ export class KeyboardPage implements Page {
         getWithDataAttrValue('action-type', 'test', this.pageEl)?.forEach((el) => {
             el.addEventListener('click', (evt: MouseEvent) => this.playTick3());
         });
-
-        getWithDataAttr('set-bmp-action', this.pageEl)?.forEach(
-            (el: HTMLElement) => {
-                el.addEventListener('pointerdown', () => {
-                    this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);
-                    this.playTick(this.playingTick);
-                });
-            }
-        );
     }
 
     setDrumsContent(boardType: DrumKeyboardType, trackName: string) {

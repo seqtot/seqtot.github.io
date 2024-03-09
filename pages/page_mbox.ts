@@ -216,18 +216,7 @@ export class MBoxPage {
             <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
             <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
             <a data-action-type="stop"><b>stop</b></a>&emsp;
-            <div 
-                class="range-slider"
-                data-name="slider"
-                data-label="true"
-                data-min="0"   
-                data-max="200"
-                data-step="1"
-                data-value="100"
-                data-scale="true"
-                data-scale-steps="10"
-                data-scale-sub-steps="5"
-            ></div>
+            <number-stepper-cc data-name="page-bpm-input" value="90" min="1" max="500"></number-stepper-cc>
         `.trim();
 
         // if (this.pageData.hideMetronome) {
@@ -336,19 +325,6 @@ export class MBoxPage {
             this.updatePartListView();
         }
 
-        this.bpmRange = (this.context.$f7 as any).range.create({
-            el: dyName('slider', this.pageEl),
-            on: {
-                changed: (range: any) => {
-                    this.bpmValue = range.value;
-
-                    if (this.playingTick) {
-                        this.playTick(this.playingTick);
-                    }
-                },
-            },
-        });
-
         // SET BPM
         let bpmValue = this.bpmValue;
 
@@ -356,15 +332,13 @@ export class MBoxPage {
             if (this.songId === ideService.currentEdit.songId) {
                 bpmValue = this.bpmValue;
             } else {
-                //bpmValue = (this.isMy ? this.pageData.bmpValue : this.outBlock?.bpm) || 90;
-                bpmValue = ideService.songStore?.data?.bmpValue || 90;
+                bpmValue = ideService.songStore?.data?.bpmValue || 90;
             }
         }
 
         setTimeout(() => {
-            this.subscribeEvents();
             this.bpmValue = bpmValue;
-            this.bpmRange.setValue(this.bpmValue);
+            this.subscribeEvents();
 
             this.updateView();
         }, 100);
@@ -1620,6 +1594,22 @@ export class MBoxPage {
         getWithDataAttr('edit-selected-parts-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.gotoEditPart());
         });
+
+        getWithDataAttrValue('name', 'page-bpm-input', this.pageEl).forEach((el) => {
+            el.addEventListener('valuechanged', (e: any) => {
+                getWithDataAttrValue('name', 'page-bpm-input', this.pageEl).forEach((el) => {
+                    el.setAttribute('value', e.detail.value);
+                });
+
+                if (this.bpmValue !== e.detail.value) {
+                    this.bpmValue = e.detail.value;
+
+                    if (this.playingTick) {
+                        this.playTick(this.playingTick);
+                    }
+                }
+            });
+        });
     }
 
     subscribeMetronomeEvents() {
@@ -1628,15 +1618,6 @@ export class MBoxPage {
                 this.playTick(el?.dataset?.tickTrigger);
             });
         });
-
-        getWithDataAttr('set-bmp-action', this.pageEl)?.forEach(
-            (el: HTMLElement) => {
-                el.addEventListener('pointerdown', () => {
-                    this.bpmRange.setValue(parseInt(el?.dataset?.bpm, 10) || 100);
-                    this.playTick(this.playingTick);
-                });
-            }
-        );
     }
 
     async tryPlayTextLine({ text, repeat }: { text: string; repeat?: number }) {
@@ -1964,7 +1945,7 @@ export class MBoxPage {
 
         if (!songStore) return;
 
-        songStore.data.bmpValue = this.bpmValue
+        songStore.data.bpmValue = this.bpmValue
 
         songStore.save();
     }

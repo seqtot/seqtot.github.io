@@ -1,5 +1,3 @@
-'use babel';
-
 export type StringHash = {[key: string]: string};
 
 export type StoredRow = {
@@ -51,7 +49,7 @@ export type TrackInfo = {
 }
 
 export type SongNode = {
-    bmpValue: number,
+    bpmValue: number,
     volume?: number,
     version: number,
     content: string,
