@@ -216,7 +216,7 @@ export class MBoxPage {
             <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
             <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
             <a data-action-type="stop"><b>stop</b></a>&emsp;
-            <number-stepper-cc data-name="page-bpm-input" value="90" min="1" max="500"></number-stepper-cc>
+            <number-stepper-cc data-name="page-bpm-input" value="${this.bpmValue}" min="1" max="500"></number-stepper-cc>
         `.trim();
 
         // if (this.pageData.hideMetronome) {
@@ -303,6 +303,22 @@ export class MBoxPage {
     }
 
     setPageContent() {
+        // SET BPM
+        let bpmValue = this.bpmValue;
+
+        if (this.view === 'song') {
+            if (this.songId === ideService.currentEdit.songId) {
+                bpmValue = this.bpmValue;
+            } else {
+                bpmValue = ideService.songStore?.data?.bpmValue || 90;
+            }
+        }
+
+        this.bpmValue = bpmValue;
+
+        console.log('bpmValue', bpmValue);
+
+        // CONTENT
         const wrapper = `
             <div
                 class="page-content"
@@ -325,21 +341,8 @@ export class MBoxPage {
             this.updatePartListView();
         }
 
-        // SET BPM
-        let bpmValue = this.bpmValue;
-
-        if (this.view === 'song') {
-            if (this.songId === ideService.currentEdit.songId) {
-                bpmValue = this.bpmValue;
-            } else {
-                bpmValue = ideService.songStore?.data?.bpmValue || 90;
-            }
-        }
-
         setTimeout(() => {
-            this.bpmValue = bpmValue;
             this.subscribeEvents();
-
             this.updateView();
         }, 100);
     }
@@ -1945,7 +1948,9 @@ export class MBoxPage {
 
         if (!songStore) return;
 
-        songStore.data.bpmValue = this.bpmValue
+        songStore.data.bpmValue = this.bpmValue;
+
+        console.log('saveSong.bpm', this.bpmValue);
 
         songStore.save();
     }
