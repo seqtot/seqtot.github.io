@@ -1,25 +1,20 @@
-import { Range } from 'framework7/components/range/range';
-import { Dialog } from 'framework7/components/dialog/dialog';
+import { getWithDataAttr } from '../../src/utils';
+import { toneBoards, drumBoards } from '../keyboard-ctrl';
+import { SongNode, TrackInfo } from '../song-store';
+import { AppDialog } from './app-dialog';
 
-import {dyName, getWithDataAttr} from '../../src/utils';
-import {toneBoards, drumBoards} from '../keyboard-ctrl';
-import {ComponentContext} from 'framework7/modules/component/component';
-import {SongNode, SongStore, TrackInfo} from '../song-store';
-
-export class TrackDetailsDialog {
-    dialog: Dialog.Dialog;
+export class TrackDetailsDialog extends AppDialog {
     cb: (ok: boolean) => void;
     trackName = '';
     song: SongNode = null;
     track: TrackInfo = null;
     trackSrc: TrackInfo = null;
-    volumeRange: Range.Range;
     ns: string;
 
     get trackNameFromInput(): string {
         let result = '';
 
-        getWithDataAttr('edit-track-dialog-name-input').forEach((el: HTMLInputElement) => {
+        getWithDataAttr('edit-track-dialog-name-input', this.dialogEl).forEach((el: HTMLInputElement) => {
             result = el.value;
             result = result.replace(/ /g, '');
             result = result.replace('$', '');
@@ -30,16 +25,6 @@ export class TrackDetailsDialog {
         if (!result) return '';
 
         return drumBoards[this.track.board] ? '@' + result : '$' + result;
-    }
-
-    get root(): HTMLElement {
-        return getWithDataAttr('edit-track-dialog-content')[0];
-    }
-
-    constructor(
-        public context: ComponentContext,
-    ) {
-
     }
 
     getBoardForChoice(): string {
@@ -72,19 +57,16 @@ export class TrackDetailsDialog {
         `.trim();
     }
 
-    setVolumeRange() {
-        this.volumeRange = (this.context.$f7 as any).range.create({
-            el: getWithDataAttr('edit-track-dialog-volume-range')[0],
-            on: {
-                changed: (range: any) => {
-                    this.track.volume = range.value;
-                },
-            },
+    setVolumeControl() {
+        getWithDataAttr('edit-track-dialog-volume', this.dialogEl).forEach(el => {
+            el.addEventListener('valuechanged', (e: any) => {
+                this.track.volume = e.detail.value;
+            })
         });
 
-        setTimeout(() => {
-            this.volumeRange.setValue(this.track.volume);
-        }, 100);
+        getWithDataAttr('edit-track-dialog-volume', this.dialogEl).forEach(el => {
+           el.setAttribute('value', this.track.volume.toString());
+        });
     }
 
     openTrackDialog(song: SongNode, trackName = '', cb: TrackDetailsDialog['cb']  = null) {
@@ -113,71 +95,54 @@ export class TrackDetailsDialog {
         `.trim();
 
         const wrapper = `
-            <div class="popup">
-                <div class="page">
-                    <div class="page-content">
-                        <div style="padding: 1rem 0 0 1rem;" data-edit-track-dialog-content>
-                            <span data-edit-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
-                            <span data-edit-track-dialog-cancel style="${btnStl}">Cancel</span>
-                        </div>                        
-                        %content%
-                    </div>
+            <div style="background-color: wheat;">
+                <div style="padding: 1rem 0 0 1rem;" data-edit-track-dialog-content>
+                    <span data-edit-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
+                    <span data-edit-track-dialog-cancel style="${btnStl}">Cancel</span>
                 </div>
-            </div>        
+                %content%
+            </div>
         `.trim();
 
         const content = wrapper.replace('%content%', `
-            <div class="list" style="margin: 1rem;">
-                <ul>
-                    <li class="item-content item-input">
-                        <div class="item-inner">
-                            <div class="item-title item-label">Track name</div>
-                            <div class="item-input-wrap">
-                                <input
-                                    data-edit-track-dialog-name-input
-                                    type="text"
-                                    placeholder="Track name"
-                                    value="${this.track.name}"
-                                    ${this.track.isHardTrack ? 'readonly': ''}
-                                >
-                                <span class="input-clear-button"></span>
-                            </div>
-                      </div>
-                    </li>
-                </ul>
+            <div style="margin: 1rem;">
+                <div>Track name</div>
+                <input
+                    data-edit-track-dialog-name-input
+                    type="text"
+                    style="border: 1px solid lightgray; font-size: 1.5rem;"
+                    value="${this.track.name}"
+                    ${this.track.isHardTrack ? 'readonly': ''}
+                >
             </div>
             ${this.getVolumeContent()}
             ${this.getBoardForChoice()}        
         `.trim());
 
-        this.dialog = (this.context.$f7 as any).popup.create({
-            content,
-            on: {
-                opened: () => {
-                    this.subTrackDialogEvents();
-                    this.updateView();
-                    this.setVolumeRange();
-                    // this.subscribePopupBoard();
-                    // this.updatePopupBoard()
-                    // this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
-                }
-            }
-        });
+        this.dialogEl = document.createElement('div');
+        this.dialogEl.style.cssText = `position: fixed; background-color: rgba(255, 255, 255, .6); top: 0; overflow: auto; width: 100%; height: 100%;`;
+        this.dialogEl.innerHTML = content;
+        this.hostEl.appendChild(this.dialogEl);
+        this.hostEl.style.display = 'block';
 
-        this.dialog.open(false);
+        setTimeout(() => {
+            this.subTrackDialogEvents();
+            this.updateView();
+            this.setVolumeControl();
+        });
     }
 
     subTrackDialogEvents() {
-        getWithDataAttr('edit-track-dialog-board-type').forEach((el) => {
-            el.addEventListener('pointerdown', () => this.setBoard(el.dataset.editTrackDialogBoardType));
+        getWithDataAttr('edit-track-dialog-board-type', this.dialogEl).forEach((el) => {
+            el.addEventListener('pointerup', () => this.setBoard(el.dataset.editTrackDialogBoardType));
         });
 
-        getWithDataAttr('edit-track-dialog-ok').forEach((el) => {
-            el.addEventListener('pointerdown', () => this.okClick());
+        getWithDataAttr('edit-track-dialog-ok', this.dialogEl).forEach((el) => {
+            el.addEventListener('pointerup', () => this.okClick());
         });
 
-        getWithDataAttr('edit-track-dialog-cancel').forEach((el) => {
-            el.addEventListener('pointerdown', () => this.cancelClick());
+        getWithDataAttr('edit-track-dialog-cancel', this.dialogEl).forEach((el) => {
+            el.addEventListener('pointerup', () => this.cancelClick());
         });
     }
 
@@ -190,7 +155,7 @@ export class TrackDetailsDialog {
         let newName = this.trackNameFromInput;
 
         const close = () => {
-            this.dialog.close();
+            this.closeDialog();
             this.cb && this.cb(false);
         }
 
@@ -214,7 +179,7 @@ export class TrackDetailsDialog {
 
         this.song.tracks = this.song.tracks.filter(item => item.name && item.board);
 
-        this.dialog.close();
+        this.closeDialog();
         this.cb && this.cb(true);
     }
 
@@ -237,13 +202,21 @@ export class TrackDetailsDialog {
         });
     }
 
+    closeDialog(){
+        this.hostEl.removeChild(this.dialogEl);
+
+        if (!this.hostEl.children.length) {
+            this.hostEl.style.display = 'none';
+        }
+    }
+
     cancelClick() {
-        this.dialog.close();
+        this.closeDialog();
         this.cb && this.cb(false);
     }
 
     updateView() {
-        getWithDataAttr('edit-track-dialog-board-type').forEach((el) => {
+        getWithDataAttr('edit-track-dialog-board-type', this.dialogEl).forEach((el) => {
             el.style.fontWeight = el.dataset.editTrackDialogBoardType === this.track.board ? '700' : '400';
         });
     }
@@ -252,18 +225,12 @@ export class TrackDetailsDialog {
         let result = `
             <div style="margin: 1rem; margin-bottom: 2rem;">
                 Громкость
-                <div
-                    data-edit-track-dialog-volume-range
-                    class="range-slider"
-                    data-label="true"
-                    data-min="0"   
-                    data-max="100"
-                    data-step="1"
-                    data-value="50"
-                    data-scale="true"
-                    data-scale-steps="10"
-                    data-scale-sub-steps="5"
-                ></div>
+                <number-stepper-cc
+                    data-edit-track-dialog-volume                
+                    value="50"
+                    min="0"
+                    max="100"
+                ></number-stepper-cc>
             </div>
         `.trim();
 

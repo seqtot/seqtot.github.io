@@ -11,7 +11,7 @@ export class NumberStepperCc extends CustomElement {
 
     render() {
         const fontSize = 'font-size: 1.2rem;'
-        const btnStl = `display: inline-block; padding: 0; margin: 0; width: min-content; border: 1px solid gray; font-size: 1rem; ${fontSize} user-select: none;`;
+        const btnStl = `display: inline-block; padding: 0; margin: 0; border: 1px solid gray; width: 1.5rem; ${fontSize} user-select: none;`;
 
         this.innerHTML = `
              <div>

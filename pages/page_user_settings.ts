@@ -28,74 +28,44 @@ export class UserSettingsPage {
     }
 
     setContent() {
-        // <note-sequencer time-start="0" duration="4" theme="default"></note-sequencer>
-        // data-decimal-point="2"
-        // block block-strong block-outline-ios text-align-center
-
         const settings = UserSettingsStore.GetUserSettings();
 
         this.el$.html(`
-            <div style="">
-                <div style="padding: .5rem 0 .5rem 1rem;" class="text-align-center">
-                    <div>
-                        <small>громкость клавиатуры</small>                   
-                    </div>   
-                    <div
-                        class="stepper stepper-fill stepper-init"
-                        data-wraps="true"
-                        data-autorepeat="true"
-                        data-autorepeat-dynamic="true"
-                        data-manual-input-mode="true"
-                    >
-                        <div class="stepper-button-minus"></div>
-                        <div class="stepper-input-wrap">
-                            <input
-                                data-board-volume-input
-                                type="text"
-                                value="${settings.boardVolume}" min="0" max="100" step="1" />
-                        </div>
-                        <div class="stepper-button-plus"></div>
-                    </div>
-                    
-                    <div>
-                        <small>имя пользователя</small>                   
-                    </div>                                        
-                    <div class="item-input-wrap">
-                        <input
-                            data-user-name-input
-                            type="text"
-                            placeholder="User name"
-                            value="${settings.userName}"
-                        />
-                    </div>             
-                </div>
+            <div style="padding: .5rem 0 .5rem 1rem;">
+                <div>громкость клавиатуры</div>
+                <number-stepper-cc
+                    data-board-volume-input
+                    value="${settings.boardVolume}"
+                    min="0"
+                    max="100"
+                ></number-stepper-cc>
                 
-                <div class="list list-strong list-outline-ios list-dividers-ios">
-                    <ul>
-                        <li>
-                            <label class="item-content">
-                                <div class="item-inner">
-                                    <div class="item-title">Ноты кириллицей</div>
-                                    <div class="item-after">
-                                        <div class="toggle toggle-init">
-                                            <input
-                                                data-use-сyrillic-note
-                                                type="checkbox"
-                                                ${settings.useCyrillicNote ? 'checked' : ''}
-                                            >
-                                            <span class="toggle-icon"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-                        </li>
-                    </ul>                
-                </div>                
+                <br/>
                 
-                <div data-save-user-settings-action style="padding: .5rem 1rem .5rem 1rem;">
-                    <button class="button button-fill color-green">save</button>
-                </div>
-            </div>    
+                <div>имя пользователя</div>
+                <input
+                    data-user-name-input
+                    type="text"
+                    style="font-size: 1.2rem; border: 1px solid lightgray;"                    
+                    value="${settings.userName}"
+                />
+                
+                <br/>
+
+                <div>ноты кириллицей</div>
+                <input
+                    data-use-сyrillic-note
+                    style="font-size: 1.2rem;"
+                    type="checkbox"
+                    ${settings.useCyrillicNote ? 'checked' : ''}
+                />
+            </div>
+            
+            <br/>
+                            
+            <div data-save-user-settings-action style="padding: .5rem 1rem .5rem 1rem;">
+                <button style="font-size: 1.5rem;">save</button>
+            </div>
         `);
 
         getWithDataAttr('save-user-settings-action', this.pageEl).forEach(el => {

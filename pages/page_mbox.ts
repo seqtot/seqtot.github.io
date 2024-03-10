@@ -543,15 +543,15 @@ export class MBoxPage {
 
     subTracksEvents() {
         getWithDataAttr('add-track-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.addTrack());
+            el.addEventListener('pointerup', () => this.addTrack());
         });
 
         getWithDataAttr('edit-tracks-volume-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.editTracksVolume());
+            el.addEventListener('pointerup', () => this.editTracksVolume());
         });
 
         getWithDataAttr('edit-track-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 const tracks = this.getSelectedTracks();
 
                 if (tracks.length > 1) return;
@@ -561,7 +561,7 @@ export class MBoxPage {
         });
 
         getWithDataAttr('delete-track-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 const tracks = this.getSelectedTracks();
 
                 if (tracks.length > 1) return;
@@ -587,7 +587,7 @@ export class MBoxPage {
         });
 
         getWithDataAttr('uncheck-all-tracks-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
                     ideService.songStore.data.tracks.forEach(track => {
                         track.isExcluded = true;
@@ -601,7 +601,7 @@ export class MBoxPage {
         });
 
         getWithDataAttr('check-all-tracks-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
                     ideService.songStore.data.tracks.forEach(track => {
                         track.isExcluded = false;
@@ -615,7 +615,7 @@ export class MBoxPage {
         });
 
         getWithDataAttr('use-track-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 const trackName = el.dataset.useTrackAction;
                 const track = ideService.songStore.data.tracks.find(track => track.name === trackName);
 
@@ -717,72 +717,72 @@ export class MBoxPage {
     subscribeSongsAndPartsActions() {
         // SONG ACTIONS
         getWithDataAttr('delete-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.deleteSong(this.selectedSong));
+            el.addEventListener('pointerup', () => this.deleteSong(this.selectedSong));
         });
 
         getWithDataAttr('edit-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.gotoEditSong(el.dataset.songId));
+            el.addEventListener('pointerup', () => this.gotoEditSong(el.dataset.songId));
         });
 
         getWithDataAttr('rename-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.renameSong(this.selectedSong));
+            el.addEventListener('pointerup', () => this.renameSong(this.selectedSong));
         });
 
         getWithDataAttr('move-song-up-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.moveSong(this.selectedSong, -1));
+            el.addEventListener('pointerup', () => this.moveSong(this.selectedSong, -1));
         });
 
         getWithDataAttr('move-song-down-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.moveSong(this.selectedSong, 1));
+            el.addEventListener('pointerup', () => this.moveSong(this.selectedSong, 1));
         });
 
         getWithDataAttr('song-item', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.selectSong(el.dataset.songId, el.dataset.songName));
+            el.addEventListener('pointerup', () => this.selectSong(el.dataset.songId, el.dataset.songName));
         });
 
         // PART ACTIONS
         getWithDataAttr('part-item', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.selectPart(el.dataset.partNio));
+            el.addEventListener('pointerup', () => this.selectPart(el.dataset.partNio));
         });
 
         getWithDataAttr('edit-part-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.gotoEditPart(el.dataset.partNio));
+            el.addEventListener('pointerup', () => this.gotoEditPart(el.dataset.partNio));
         });
 
         getWithDataAttr('delete-part-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.deletePart());
+            el.addEventListener('pointerup', () => this.deletePart());
         });
 
         getWithDataAttr('rename-part-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.renamePart());
+            el.addEventListener('pointerup', () => this.renamePart());
         });
 
         getWithDataAttr('clone-part-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.clonePart());
+            el.addEventListener('pointerup', () => this.clonePart());
         });
 
         getWithDataAttr('move-part-up-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.movePart(-1));
+            el.addEventListener('pointerup', () => this.movePart(-1));
         });
 
         getWithDataAttr('move-part-down-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.movePart(1));
+            el.addEventListener('pointerup', () => this.movePart(1));
         });
 
         getWithDataAttr('download-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.downloadFile());
+            el.addEventListener('pointerup', () => this.downloadFile());
         });
 
         getWithDataAttr('play-and-download-ogg-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.playAll(1, true));
+            el.addEventListener('pointerup', () => this.playAll(1, true));
         });
 
         getWithDataAttr('upload-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.uploadFileClick());
+            el.addEventListener('pointerup', () => this.uploadFileClick());
         });
 
         getWithDataAttr('save-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.saveSong());
+            el.addEventListener('pointerup', () => this.saveSong());
         });
 
         getWithDataAttr('upload-song-input', this.pageEl).forEach((el) => {
@@ -927,7 +927,7 @@ export class MBoxPage {
             }
         }
 
-        new TrackDetailsDialog(this.context).openTrackDialog(
+        new TrackDetailsDialog().openTrackDialog(
             ideService.songStore?.data,
             trackName,
             cb
@@ -942,7 +942,7 @@ export class MBoxPage {
             }
         }
 
-        new TrackDetailsDialog(this.context).openTrackDialog(
+        new TrackDetailsDialog().openTrackDialog(
             ideService.songStore.data,
             '',
             cb
@@ -1539,7 +1539,7 @@ export class MBoxPage {
 
     subscribePageEvents() {
         getWithDataAttr('add-part-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 this.prompt = (this.context.$f7 as any).dialog.prompt(
                     'Название только буквами, цифрами, знаками - или _ (без пробелов)',
                     'Наименование',
@@ -1553,7 +1553,7 @@ export class MBoxPage {
         });
 
         getWithDataAttr('add-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 this.prompt = (this.context.$f7 as any).dialog.prompt(
                     'Название только буквами, цифрами, знаками - или _ (без пробелов)',
                     'Наименование',
@@ -1567,7 +1567,7 @@ export class MBoxPage {
         });
 
         getWithDataAttr('note-line', this.pageEl)?.forEach((el) => {
-            el.addEventListener('pointerdown', () => {
+            el.addEventListener('pointerup', () => {
                 this.tryPlayTextLine({
                     text: el?.dataset?.noteLine,
                 });
@@ -1575,27 +1575,27 @@ export class MBoxPage {
         });
 
         getWithDataAttrValue('action-type', 'stop', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.stop());
+            el.addEventListener('pointerup', () => this.stop());
         });
 
         getWithDataAttr('play-all-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.playAll());
+            el.addEventListener('pointerup', () => this.playAll());
         });
 
         getWithDataAttr('loop-all-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.playAll(100));
+            el.addEventListener('pointerup', () => this.playAll(100));
         });
 
         getWithDataAttr('select-all-parts-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.selectAllParts());
+            el.addEventListener('pointerup', () => this.selectAllParts());
         });
 
         getWithDataAttr('unselect-all-parts-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.unselectAllParts());
+            el.addEventListener('pointerup', () => this.unselectAllParts());
         });
 
         getWithDataAttr('edit-selected-parts-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerdown', () => this.gotoEditPart());
+            el.addEventListener('pointerup', () => this.gotoEditPart());
         });
 
         getWithDataAttrValue('name', 'page-bpm-input', this.pageEl).forEach((el) => {
@@ -1617,7 +1617,7 @@ export class MBoxPage {
 
     subscribeMetronomeEvents() {
         getWithDataAttr('tick-trigger', this.pageEl)?.forEach((el) => {
-            el.addEventListener('pointerdown', (evt: MouseEvent) => {
+            el.addEventListener('pointerup', (evt: MouseEvent) => {
                 this.playTick(el?.dataset?.tickTrigger);
             });
         });
@@ -1974,7 +1974,7 @@ export class MBoxPage {
         if (!songStore) return Promise.resolve(null);
 
         return new Promise((resolve, reject) => {
-            const dlg = new GetTrackDialog(this.context);
+            const dlg = new GetTrackDialog();
 
             dlg.openTrackDialog(songStore.data, (tracks) => {
                 resolve(tracks || []);

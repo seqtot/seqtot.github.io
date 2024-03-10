@@ -1,25 +1,11 @@
-import { Range } from 'framework7/components/range/range';
-import { Dialog } from 'framework7/components/dialog/dialog';
+import { getWithDataAttr } from '../../src/utils';
+import { SongNode, SongStore, TrackInfo } from '../song-store';
+import { AppDialog } from './app-dialog';
 
-import {getWithDataAttr} from '../../src/utils';
-import {ComponentContext} from 'framework7/modules/component/component';
-import {SongNode, SongStore, TrackInfo} from '../song-store';
-
-export class GetTrackDialog {
-    dialog: Dialog.Dialog;
+export class GetTrackDialog extends AppDialog {
     cb: (tracks: string[] | null) => void;
     song: SongNode = null;
     tracks: TrackInfo[] = [];
-
-    get root(): HTMLElement {
-        return getWithDataAttr('get-track-dialog-content')[0];
-    }
-
-    constructor(
-        public context: ComponentContext,
-    ) {
-
-    }
 
     getTracksForChoice(): string {
         const btnStl = `
@@ -69,49 +55,41 @@ export class GetTrackDialog {
         `.trim();
 
         const wrapper = `
-            <div class="popup">
-                <div class="page">
-                    <div class="page-content">
-                        <div style="padding: 1rem 0 0 1rem;" data-get-track-dialog-content>
-                            <span data-get-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
-                            <span data-get-track-dialog-cancel style="${btnStl}">Cancel</span>
-                        </div>                        
-                        %content%
-                    </div>
+            <div style="background-color: wheat;">
+                <div style="padding: 1rem 0 0 1rem;" data-get-track-dialog-content>
+                    <span data-get-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
+                    <span data-get-track-dialog-cancel style="${btnStl}">Cancel</span>
                 </div>
-            </div>        
+                %content%
+            </div>
         `.trim();
 
         const content = wrapper.replace('%content%', `
             ${this.getTracksForChoice()}        
         `.trim());
 
-        this.dialog = (this.context.$f7 as any).popup.create({
-            content,
-            on: {
-                opened: () => {
-                    this.subTrackDialogEvents();
-                    this.updateView();
-                    // this.subscribePopupBoard();
-                    // this.updatePopupBoard()
-                    // this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
-                }
-            }
-        });
+        this.dialogEl = document.createElement('div');
+        this.dialogEl.style.cssText = `position: fixed; background-color: rgba(255, 255, 255, .6); top: 0; overflow: auto; width: 100%; height: 100%;`;
+        this.dialogEl.innerHTML = content;
+        this.hostEl.appendChild(this.dialogEl);
+        this.hostEl.style.display = 'block';
 
-        this.dialog.open(false);
+        setTimeout(() => {
+            this.subTrackDialogEvents();
+            this.updateView();
+        });
     }
 
     subTrackDialogEvents() {
-        getWithDataAttr('get-track-dialog-select-track-action').forEach((el) => {
+        getWithDataAttr('get-track-dialog-select-track-action', this.dialogEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.toggleTrack(el.dataset.trackName));
         });
 
-        getWithDataAttr('get-track-dialog-ok').forEach((el) => {
+        getWithDataAttr('get-track-dialog-ok', this.dialogEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.okClick());
         });
 
-        getWithDataAttr('get-track-dialog-cancel').forEach((el) => {
+        getWithDataAttr('get-track-dialog-cancel', this.dialogEl).forEach((el) => {
             el.addEventListener('pointerdown', () => this.cancelClick());
         });
     }
@@ -129,17 +107,17 @@ export class GetTrackDialog {
     okClick() {
         const tracks = this.tracks.filter(track => !track.isExcluded).map(track => track.name);
 
-        this.dialog.close();
+        this.closeDialog();
         this.cb && this.cb(tracks);
     }
 
     cancelClick() {
-        this.dialog.close();
+        this.closeDialog();
         this.cb && this.cb(null);
     }
 
     updateView() {
-        getWithDataAttr('get-track-dialog-select-track-action').forEach((el) => {
+        getWithDataAttr('get-track-dialog-select-track-action', this.dialogEl).forEach((el) => {
             const trackName = el.dataset.trackName;
             const track = this.tracks.find(track => track.name === trackName);
 
@@ -147,5 +125,3 @@ export class GetTrackDialog {
         });
     }
 }
-
-// NS
