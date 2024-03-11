@@ -1,6 +1,5 @@
 import { Props } from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
-import { Range } from 'framework7/components/range/range';
 import { Dom7Array } from 'dom7';
 
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
@@ -11,8 +10,8 @@ import { ToneCtrl } from './keyboard-tone-ctrl';
 import { ToneKeyboardType, DrumKeyboardType, KeyboardType, toneBoards, drumBoards } from './keyboard-ctrl';
 import { ideService, defaultTracks } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
-import {MY_SONG, SongStore, TrackInfo} from './song-store';
-import {UserSettings, UserSettingsStore} from './user-settings-store';
+import { MY_SONG, SongStore, TrackInfo } from './song-store';
+import { UserSettings, UserSettingsStore } from './user-settings-store';
 
 // import { getDevice } from 'framework7';
 //
@@ -26,6 +25,7 @@ interface Page {
     bpmValue: number;
     pageEl: HTMLElement;
     getMetronomeContent(): string;
+    getBpmContent(): string;
     stopTicker();
     stop();
     synthesizer: Synthesizer;
@@ -42,7 +42,6 @@ export class KeyboardPage implements Page {
     toneCtrl: ToneCtrl;
 
     playingTick = '';
-    bpmRange: Range.Range;
     tickInfo = {
         quarterTime: 0,
         quarterNio: 0,
@@ -334,40 +333,29 @@ export class KeyboardPage implements Page {
     }
 
     getMetronomeContent(): string {
-        const style = `border-radius: 0.25rem; border: 1px solid lightgray; font-size: 1rem; user-select: none; touch-action: none;`;
-        // <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
-        // <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
-        // <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
-        // <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
-        // <a data-action-type="stop"><b>stop</b></a>&emsp;
+        return 'jjkl getMetronomeContent';
+    }
 
-        return `
-            <!--div style="margin-bottom: .5rem;">
-                <span
-                    style="${style}"
-                    data-action-type="tick"
-                    data-signature="1:4"
-                >1:4</span>&emsp;
-                <span
-                    style="${style}"
-                    data-action-type="tick"
-                    data-signature="3:8"                    
-                >3:8</span>&emsp;                
-            </div-->
-            <div 
-                class="range-slider"
-                data-name="slider"
-                data-label="true"
-                data-min="30"   
-                data-max="230"
-                data-step="1"
-                data-value="100"
-                data-scale="true"
-                data-scale-steps="10"
-                data-scale-sub-steps="5"
-            >
-            </div>
-        `;
+    getBpmContent(): string {
+        return `<number-stepper-cc data-page-bpm-input value="${this.bpmValue}" min="1" max="500"></number-stepper-cc>`;
+    }
+
+    subscribeBpmEvents() {
+        getWithDataAttr('page-bpm-input', this.pageEl).forEach((el) => {
+            el.addEventListener('valuechanged', (e: any) => {
+                getWithDataAttr('page-bpm-input', this.pageEl).forEach((el) => {
+                    el.setAttribute('value', e.detail.value);
+                });
+
+                if (this.bpmValue !== e.detail.value) {
+                    this.bpmValue = e.detail.value;
+
+                    if (this.playingTick) {
+                        this.playTick(this.playingTick);
+                    }
+                }
+            });
+        });
     }
 
     subscribeMetronomeEvents() {
@@ -395,28 +383,6 @@ export class KeyboardPage implements Page {
 
         dyName('keyboard-page-wrapper').innerHTML = content;
         this.drumCtrl.updateView();
-
-        //console.log(boardType, this.keyboardType)
-        //this.keyboardType = boardType;
-
-        this.bpmRange = (this.context.$f7 as any).range.create({
-            el: dyName('slider', this.pageEl),
-            on: {
-                changed: (range: any) => {
-                    this.bpmValue = range.value;
-
-                    if (this.playingTick) {
-                        this.playTick(this.playingTick);
-                    }
-                },
-            },
-        });
-
-        setTimeout(() => {
-            //  this.subscribeViewInfoEvents();
-            //  this.bpmValue = this.outBlock.bpm;
-            this.bpmRange.setValue(this.bpmValue);
-        }, 100);
     }
 
     setToneContent(boardType: ToneKeyboardType, trackName: string) {
@@ -428,25 +394,6 @@ export class KeyboardPage implements Page {
 
         dyName('keyboard-page-wrapper').innerHTML = content;
         this.toneCtrl.updateView();
-
-        this.bpmRange = (this.context.$f7 as any).range.create({
-            el: dyName('slider', this.pageEl),
-            on: {
-                changed: (range: any) => {
-                    this.bpmValue = range.value;
-
-                    if (this.playingTick) {
-                        this.playTick(this.playingTick);
-                    }
-                },
-            },
-        });
-
-        setTimeout(() => {
-            //  this.subscribeViewInfoEvents();
-            //  this.bpmValue = this.outBlock.bpm;
-            this.bpmRange.setValue(this.bpmValue);
-        }, 100);
     }
 
     subscribeRightPanelEvents() {
@@ -465,11 +412,13 @@ export class KeyboardPage implements Page {
 
     subscribePageEvents() {
         if (toneBoards[this.keyboardType]) {
+            this.subscribeBpmEvents();
             this.subscribeMetronomeEvents();
             this.toneCtrl.subscribeEvents();
             //this.toneCtrl.subscribeRelativeKeyboardEvents();
         }
         else if (this.keyboardType === 'drums') {
+            this.subscribeBpmEvents();
             this.subscribeMetronomeEvents();
             this.drumCtrl.subscribeEvents();
         }

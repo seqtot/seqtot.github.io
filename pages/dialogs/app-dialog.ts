@@ -14,4 +14,15 @@ export class AppDialog {
             this.hostEl.style.display = 'none';
         }
     }
+
+    getDialogStyle (): string {
+        return `
+            position: fixed;
+            background-color: rgba(255, 255, 255, .6);
+            top: 0;
+            overflow: auto;
+            width: 100%;
+            height: 100%;        
+        `.trim();
+    }
 }

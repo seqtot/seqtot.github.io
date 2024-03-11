@@ -1,13 +1,9 @@
 import { Props } from 'framework7/modules/component/snabbdom/modules/props';
 import { ComponentContext } from 'framework7/modules/component/component';
-import { Range } from 'framework7/components/range/range';
-import { Dialog } from 'framework7/components/dialog/dialog';
 import { Dom7Array } from 'dom7';
-
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { standardTicks as ticks } from './ticks';
 import { getBassCells } from './get-bass-cells';
-
 import {
     Muse as m,
     FileSettings,
@@ -16,21 +12,16 @@ import {
     RowInfo,
     LineModel,
     StoredRow, Line, Cell, LineNote, Sound,
-
 } from '../libs/muse';
-
 import mboxes from '../mboxes';
-
 import { ideService } from './ide/ide-service';
 import { SongStore, SongNode, MY_SONG } from './song-store';
 import * as svg from './svg-icons';
-import { TrackDetailsDialog } from './dialogs/track-details-dialog';
-import { TracksVolumeDialog } from './dialogs/tracks-volume-dialog';
+import { ConfirmDialog, TrackDetailsDialog, TracksVolumeDialog, GetTrackDialog, NameDialog } from './dialogs';
 import { WavRecorder } from './ide/wav-recorder';
-import { GetTrackDialog } from './dialogs/get-track-dialog';
-import {KeyboardCtrl} from './keyboard-ctrl';
-import {getRandomElement} from '../libs/muse/utils';
-import {UserSettingsStore} from './user-settings-store';
+import { KeyboardCtrl } from './keyboard-ctrl';
+import { getRandomElement } from '../libs/muse/utils';
+import { UserSettingsStore } from './user-settings-store';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 const isDev = /localhost/.test(window.location.href);
@@ -41,7 +32,6 @@ export class MBoxPage {
 
     recorder: WavRecorder;
     playingTick = '';
-    bpmRange: Range.Range;
     excludePartNio: number [] = [];
     selectedSong = '';
     selectedSongName = '';
@@ -210,13 +200,13 @@ export class MBoxPage {
     }
 
     getMetronomeContent(): string {
-        let metronomeView = `&emsp;
+        let metronomeView = `
             <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
             <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
             <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
             <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
             <a data-action-type="stop"><b>stop</b></a>&emsp;
-            <number-stepper-cc data-name="page-bpm-input" value="${this.bpmValue}" min="1" max="500"></number-stepper-cc>
+            ${this.getBpmContent()}
         `.trim();
 
         // if (this.pageData.hideMetronome) {
@@ -224,6 +214,14 @@ export class MBoxPage {
         // }
 
         return metronomeView;
+    }
+
+    getBpmContent(): string {
+        let bpmView = `
+            <number-stepper-cc data-page-bpm-input value="${this.bpmValue}" min="1" max="500"></number-stepper-cc>
+        `.trim();
+
+        return bpmView;
     }
 
     getSongListContent(): string {
@@ -570,19 +568,14 @@ export class MBoxPage {
 
                 if (!track || track.isHardTrack) return;
 
-                this.confirm = (this.context.$f7 as any).dialog.confirm(
-                   track.name,
-                   'Удалить трэк?',
-                    () => {
-                        if (SongStore.DeleteTrack(ideService.songStore.data, track.name)) {
-                            this.renderTracksView();
-                            ideService.songStore.save();
-                        }
-                    },
-                    () => {}, // cancel
-                );
+                const action = () => {
+                    if (SongStore.DeleteTrack(ideService.songStore.data, track.name)) {
+                        this.renderTracksView();
+                        ideService.songStore.save();
+                    }
+                }
 
-                this.confirm.open();
+                new ConfirmDialog().openConfirmDialog('Удалить трэк?', ok => ok && action());
             });
         });
 
@@ -954,18 +947,14 @@ export class MBoxPage {
 
         if (!songId) return;
 
-        this.prompt = (this.context.$f7 as any).dialog.prompt(
-            'Название',
-            'Наименование',
-            (newName: string) => {
-                SongStore.RenameSong(songId, newName.trim(), this.ns);
-                this.setPageContent();
-            },
-            () => {},
-            this.selectedSongName,
-        );
+        new NameDialog().openNameDialog({name: this.selectedSongName}, ({name}) => {
+            name = name.trim();
 
-        this.prompt.open();
+            if (name !== this.selectedSongName) {
+                SongStore.RenameSong(songId, name.trim(), this.ns);
+                this.setPageContent();
+            }
+        });
     }
 
     deleteSong(songId: string) {
@@ -973,17 +962,12 @@ export class MBoxPage {
 
         if (!songId) return;
 
-        this.confirm = (this.context.$f7 as any).dialog.confirm(
-            '',
-            'Удалить?',
-            () => {
-                SongStore.DeleteSong(songId, this.ns);
-                this.setPageContent();
-            },
-            () => {}, // cancel
-        );
+        const action = () => {
+            SongStore.DeleteSong(songId, this.ns);
+            this.setPageContent();
+        }
 
-        this.confirm.open();
+        new ConfirmDialog().openConfirmDialog('Удалить?', ok => ok && action());
     }
 
     clonePart() {
@@ -1481,19 +1465,13 @@ export class MBoxPage {
 
         if (!songId || !part) return;
 
-        this.prompt = (this.context.$f7 as any).dialog.prompt(
-            'Название только буквами, цифрами, знаками - или _ (без пробелов)',
-            'Наименование',
-            (newName: string) => {
-                SongStore.RenamePart(ideService.songStore.data, part.partId, newName.trim());
+        new NameDialog().openNameDialog({name: part.name}, ({name}) => {
+            if (name !== part.name) {
+                SongStore.RenamePart(ideService.songStore.data, part.partId, name.trim());
                 this.setPageContent();
                 ideService.songStore.save();
-            },
-            () => {},
-            part.name,
-        );
-
-        this.prompt.open();
+            }
+        });
     }
 
     deletePart() {
@@ -1503,27 +1481,15 @@ export class MBoxPage {
 
         const partId = part.partId;
 
-        // https://framework7.io/docs/dialog
-        // app.dialog.confirm(text, title, callbackOk, callbackCancel)- create Confirm Dialog and open it
-        this.confirm = (this.context.$f7 as any).dialog.confirm(
-            '',
-            'Удалить?',
-            () => {
+        const action = () => {
+            if (SongStore.DeletePart(ideService.songStore.data, partId)) {
+                this.setPageContent();
+                ideService.songStore.save();
+            }
+        }
 
-                if (SongStore.DeletePart(ideService.songStore.data, partId)) {
-                    this.setPageContent();
-                    ideService.songStore.save();
-                }
-            },
-            () => {}, // cancel
-        );
-
-        this.confirm.open();
+        new ConfirmDialog().openConfirmDialog('Удалить?', ok => ok && action());
     }
-
-    dialog: Dialog.Dialog;
-    prompt: Dialog.Dialog;
-    confirm: Dialog.Dialog;
 
     addSong(name: string) {
         const song = SongStore.AddSongToList(name, this.ns);
@@ -1540,29 +1506,17 @@ export class MBoxPage {
     subscribePageEvents() {
         getWithDataAttr('add-part-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerup', () => {
-                this.prompt = (this.context.$f7 as any).dialog.prompt(
-                    'Название только буквами, цифрами, знаками - или _ (без пробелов)',
-                    'Наименование',
-                    (name) => this.addPart(name),
-                    () => {}, // cancel
-                    ''
-                );
-
-                this.prompt.open();
+                new NameDialog().openNameDialog({name: ''}, ({name}) => {
+                    if (name) {
+                        this.addPart(name);
+                    }
+                });
             });
         });
 
         getWithDataAttr('add-song-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerup', () => {
-                this.prompt = (this.context.$f7 as any).dialog.prompt(
-                    'Название только буквами, цифрами, знаками - или _ (без пробелов)',
-                    'Наименование',
-                    (name) => this.addSong(name),
-                    () => {}, // cancel
-                    ''
-                );
-
-                this.prompt.open();
+                new NameDialog().openNameDialog({name: ''}, ({name}) => this.addSong(name));
             });
         });
 
@@ -1598,9 +1552,9 @@ export class MBoxPage {
             el.addEventListener('pointerup', () => this.gotoEditPart());
         });
 
-        getWithDataAttrValue('name', 'page-bpm-input', this.pageEl).forEach((el) => {
+        getWithDataAttr('page-bpm-input', this.pageEl).forEach((el) => {
             el.addEventListener('valuechanged', (e: any) => {
-                getWithDataAttrValue('name', 'page-bpm-input', this.pageEl).forEach((el) => {
+                getWithDataAttr('page-bpm-input', this.pageEl).forEach((el) => {
                     el.setAttribute('value', e.detail.value);
                 });
 

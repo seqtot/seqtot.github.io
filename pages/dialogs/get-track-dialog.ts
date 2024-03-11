@@ -55,8 +55,8 @@ export class GetTrackDialog extends AppDialog {
         `.trim();
 
         const wrapper = `
-            <div style="background-color: wheat;">
-                <div style="padding: 1rem 0 0 1rem;" data-get-track-dialog-content>
+            <div style="background-color: wheat; padding-bottom: 1rem;">
+                <div style="padding: 1rem; display: flex; justify-content: space-between;">
                     <span data-get-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
                     <span data-get-track-dialog-cancel style="${btnStl}">Cancel</span>
                 </div>
@@ -69,7 +69,7 @@ export class GetTrackDialog extends AppDialog {
         `.trim());
 
         this.dialogEl = document.createElement('div');
-        this.dialogEl.style.cssText = `position: fixed; background-color: rgba(255, 255, 255, .6); top: 0; overflow: auto; width: 100%; height: 100%;`;
+        this.dialogEl.style.cssText = this.getDialogStyle();
         this.dialogEl.innerHTML = content;
         this.hostEl.appendChild(this.dialogEl);
         this.hostEl.style.display = 'block';

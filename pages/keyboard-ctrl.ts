@@ -1,18 +1,13 @@
-import { Dialog } from 'framework7/components/dialog/dialog';
-import { Sheet } from 'framework7/components/sheet/sheet';
 import { ComponentContext } from 'framework7/modules/component/component';
-
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-
 import { Muse as m, Line, LineModel, LineNote, StoredRow, Synthesizer, MultiPlayer, SongPartInfo, MidiConfig, TextBlock, OutBlockRowInfo } from '../libs/muse';
-
 import { parseInteger } from '../libs/common';
 import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
-import { SongNode, SongStore, StoredSongNodeOld, MY_SONG } from './song-store';
+import { SongNode, SongStore } from './song-store';
 import * as svg from './svg-icons';
-
 import { NoteDetailsDialog } from './dialogs/note-details-dialog';
+import { ConfirmDialog } from './dialogs/confirm-dialog';
 
 export type BpmInfo = {
     bpm: number;
@@ -25,6 +20,7 @@ export interface KeyboardPage {
     bpmValue: number;
     pageEl: HTMLElement;
     getMetronomeContent(): string;
+    getBpmContent(): string;
     stopTicker();
     stop();
     //getOut(bpm: number, seq: DrumCtrl['keySequence'] );
@@ -69,7 +65,6 @@ const iconBtnStl = [
 export class KeyboardCtrl {
     trackName = '';
     liner = new LineModel();
-    confirm: Dialog.Dialog;
     notesForCopy: LineNote[] = [];
     linesForCopy: Line[];
 
@@ -1196,26 +1191,21 @@ export class KeyboardCtrl {
 
         if (!rowNioForDel) return;
 
-        this.confirm = (this.page.context.$f7 as any).dialog.confirm(
-            '',
-            `Удалить строку ${rowNioForDel} во всех трэках?`,
-            () => {
-                SongStore.Delete_RowFromPart(song, partId, <number>partNio, rowNioForDel);
-                ideService.songStore.save();
+        const action = () => {
+            SongStore.Delete_RowFromPart(song, partId, <number>partNio, rowNioForDel);
+            ideService.songStore.save();
 
-                this.remove_EditingItem(`${partNio}-${rowNioForDel}`)
+            this.remove_EditingItem(`${partNio}-${rowNioForDel}`)
 
-                getWithDataAttr('edit-parts-wrapper').forEach(el => {
-                    el.innerHTML = this.getRowsByPartComplexContent();
-                    this.subscribeIdeEvents();
-                });
+            getWithDataAttr('edit-parts-wrapper').forEach(el => {
+                el.innerHTML = this.getRowsByPartComplexContent();
+                this.subscribeIdeEvents();
+            });
 
-                this.updateView();
-            },
-            () => {}, // cancel
-        );
+            this.updateView();
+        }
 
-        this.confirm.open();
+        new ConfirmDialog().openConfirmDialog(`Удалить строку ${rowNioForDel} во всех трэках?`, ok => ok && action());
     }
 
     addRowInPart(partId: string, partNio: number | string) {
@@ -1317,12 +1307,20 @@ export class KeyboardCtrl {
         ideService.songStore.save(song);
     }
 
-    getMetronomeContent() {
+    getMetronomeContent(): string {
         return `
             <div style="margin: 0 0 1.5rem 1rem; width: 15rem;">
                 ${this.page.getMetronomeContent()}
             </div>`.trim();
     }
+
+    getBpmContent(): string {
+        return `
+            <div style="margin: 0 0 1.5rem 1rem; width: 15rem;">
+                ${this.page.getBpmContent()}
+            </div>`.trim();
+    }
+
 
     subscribeEditCommands() {
         getWithDataAttrValue('edit-line-action', 'delete-cell', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -1595,7 +1593,7 @@ export class KeyboardCtrl {
 
         if (!noteForEdit) return;
 
-        new NoteDetailsDialog(this.page.context, this).openDialog(noteForEdit, (note:LineNote) => {
+        new NoteDetailsDialog().openDialog(noteForEdit, (note:LineNote) => {
             noteForEdit.volume = note.volume;
             noteForEdit.slides = note.slides;
 

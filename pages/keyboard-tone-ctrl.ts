@@ -258,7 +258,7 @@ export class ToneCtrl extends KeyboardCtrl {
             
             ${this.getBeatContent()}
             ${this.getRecordCommandPanel()}
-            ${this.getMetronomeContent()}
+            ${this.getBpmContent()}
             ${this.getPlayCommandPanel()}
             ${this.getRowActionsCommands()}            
             ${this.getEditCellCommandPanel()}
@@ -299,7 +299,7 @@ export class ToneCtrl extends KeyboardCtrl {
             
             ${this.getBeatContent()}
             ${this.getRecordCommandPanel()}
-            ${this.getMetronomeContent()}
+            ${this.getBpmContent()}
             
             ${this.getPlayCommandPanel()}
             ${this.getRowActionsCommands()}

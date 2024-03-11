@@ -1,4 +1,3 @@
-import { Range } from 'framework7/components/range/range';
 import { Dialog } from 'framework7/components/dialog/dialog';
 import { ComponentContext } from 'framework7/modules/component/component';
 
@@ -35,26 +34,20 @@ export class TracksVolumeDialog {
         }
 
         this.tracks.forEach(track => {
-            (this.context.$f7 as any).range.create({
-                el: getWithDataAttrValue('tracks-volume-dialog-item', track.name)[0],
-                on: {
-                    changed: (range: {value: number}) => {
-                        track.volume = range.value;
-                        setDataByTracks();
-                    },
-                },
+            getWithDataAttrValue('tracks-volume-dialog-item', track.name).forEach(el => {
+                el.addEventListener('valuechanged', (e: any) => {
+                    track.volume = e.detail.value;
+                    setDataByTracks();
+                })
             });
 
             if (track.items && track.items.length) {
                 track.items.forEach(subtrack => {
-                    (this.context.$f7 as any).range.create({
-                        el: getWithDataAttrValue('tracks-volume-dialog-item', `${track.name}:${subtrack.name}`)[0],
-                        on: {
-                            changed: (range: {value: number}) => {
-                                subtrack.volume = range.value;
-                                setDataByTracks();
-                            },
-                        },
+                    getWithDataAttrValue('tracks-volume-dialog-item', `${track.name}:${subtrack.name}`).forEach(el => {
+                        el.addEventListener('valuechanged', (e: any) => {
+                            subtrack.volume = e.detail.value;
+                            setDataByTracks();
+                        })
                     });
                 });
             }
@@ -160,18 +153,12 @@ export class TracksVolumeDialog {
         result += `
             <div style="margin: 1rem; margin-bottom: 2rem;">
                 ${label}
-                <div
+                <number-stepper-cc
                     data-tracks-volume-dialog-item="${name}"
-                    class="range-slider"
-                    data-label="true"
-                    data-min="0"
-                    data-max="100"
-                    data-step="1"
-                    data-value="${volume || 0}"
-                    data-scale="true"
-                    data-scale-steps="10"
-                    data-scale-sub-steps="5"
-                ></div>
+                    value="${volume || 0}"
+                    min="0"
+                    max="100"
+                ></number-stepper-cc>
             </div>`.trim();
 
         return result;

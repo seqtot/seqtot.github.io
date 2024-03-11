@@ -1,32 +1,16 @@
-import { Range } from 'framework7/components/range/range';
-import { Dialog } from 'framework7/components/dialog/dialog';
-import { ComponentContext } from 'framework7/modules/component/component';
-
 import { getWithDataAttr } from '../../src/utils';
-import { toneBoards, drumBoards, KeyboardCtrl, KeyboardPage } from '../keyboard-ctrl';
-import { SongNode, TrackInfo } from '../song-store';
 import { Muse as m, LineNote } from '../../libs/muse';
+import { AppDialog } from './app-dialog';
 
-export class NoteDetailsDialog {
-    dialog: Dialog.Dialog;
+export class NoteDetailsDialog extends AppDialog {
     cb: (note: LineNote) => void;
-    trackName = '';
-    song: SongNode = null;
-    track: TrackInfo = null;
-    trackSrc: TrackInfo = null;
-    volumeRange: Range.Range;
-
     note: LineNote;
 
     get slidesTextFromInput(): string {
         let result = '';
 
-        getWithDataAttr('note-details-dialog-slides-input').forEach((el: HTMLInputElement) => {
+        getWithDataAttr('slides-input', this.dialogEl).forEach((el: HTMLInputElement) => {
             result = (el.value || '').trim();
-            // result = result.replace(/ /g, '');
-            // result = result.replace('$', '');
-            // result = result.replace('@', '');
-            // result = result.trim();
         });
 
         return result;
@@ -35,87 +19,21 @@ export class NoteDetailsDialog {
     get durQFromInput(): number {
         let result = 0;
 
-        getWithDataAttr('note-details-dialog-duration-input').forEach((el: HTMLInputElement) => {
+        getWithDataAttr('duration-input', this.dialogEl).forEach((el: HTMLInputElement) => {
             result = m.parseInteger(el.value, result);
         });
 
         return result;
     }
 
-    get trackNameFromInput(): string {
-        let result = '';
+    get volumeFromInput(): number {
+        let result = 0;
 
-        getWithDataAttr('edit-track-dialog-name-input').forEach((el: HTMLInputElement) => {
-            result = el.value;
-            result = result.replace(/ /g, '');
-            result = result.replace('$', '');
-            result = result.replace('@', '');
-            result = result.trim();
+        getWithDataAttr('volume-input', this.dialogEl).forEach((el: HTMLInputElement) => {
+            result = m.parseInteger(el.value, result);
         });
 
-        if (!result) return '';
-
-        return drumBoards[this.track.board] ? '@' + result : '$' + result;
-    }
-
-    get root(): HTMLElement {
-        return getWithDataAttr('edit-track-dialog-content')[0];
-    }
-
-    get page(): KeyboardPage {
-        return this.board.page;
-    }
-
-    constructor(
-        public context: ComponentContext,
-        public board: KeyboardCtrl,
-    ) {
-
-    }
-
-    getBoardForChoice(): string {
-        const btnStl = `
-            display: inline-block;
-            margin: 0;            
-            margin-right: .5rem;
-            margin-bottom: 1rem;            
-            border-radius: 0.25rem;
-            border: 1px solid lightgray;
-            font-size: 1.2rem;
-            user-select: none;
-        `.trim();
-
-        return `
-            <div style="margin-left: 1rem;" data-get-board-wrapper>
-                <span style="${btnStl}" data-edit-track-dialog-board-type="${toneBoards.guitar}">
-                    Guitar
-                </span>
-                <span style="${btnStl}" data-edit-track-dialog-board-type="${toneBoards.bassGuitar}">
-                    Bass guitar
-                </span>
-                <span style="${btnStl}" data-edit-track-dialog-board-type="${toneBoards.bassSolo34}">
-                    Harmonica
-                </span>
-                <span style="${btnStl}" data-edit-track-dialog-board-type="${drumBoards.drums}">
-                    Drums
-                </span>                            
-            </div>
-        `.trim();
-    }
-
-    setVolumeRange() {
-        this.volumeRange = (this.context.$f7 as any).range.create({
-            el: getWithDataAttr('note-details-dialog-volume-range')[0],
-            on: {
-                changed: (range: any) => {
-                    this.note.volume = range.value;
-                },
-            },
-        });
-
-        setTimeout(() => {
-            this.volumeRange.setValue(this.note.volume);
-        }, 100);
+        return result;
     }
 
     openDialog(note: LineNote, cb: NoteDetailsDialog['cb']  = null) {
@@ -144,148 +62,100 @@ export class NoteDetailsDialog {
         `.trim();
 
         const wrapper = `
-            <div class="popup">
-                <div class="page">
-                    <div class="navbar">
-                        <div class="navbar-bg"></div>
-                        <div class="navbar-inner" style="justify-content: space-evenly;">
-                            <span data-edit-track-dialog-ok style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
-                            <span data-edit-track-dialog-cancel style="${btnStl}">Cancel</span>
-                            <!--div class="title">Popup Title</div>
-                            <div class="right">
-                                <a class="link popup-close">Close</a>
-                            </div-->
-                        </div>
-                    </div>
-                    <div class="page-content">
-                        %content%
-                    </div>
+            <div style="background-color: wheat; padding-bottom: 1rem;">
+                <div style="padding: 1rem; display: flex; justify-content: space-between;">
+                    <span data-ok-action style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
+                    <span data-cancel-action style="${btnStl}">Cancel</span>
                 </div>
+                %content%
             </div>
         `.trim();
 
         let content = wrapper.replace('%content%', `
-            ${this.getVolumeContent()}
-            <div style="margin-left: 1rem;">
-                <div>
-                    <small>длительность</small>                   
-                </div>   
-                <div
-                    class="stepper stepper-fill stepper-init"
-                    data-wraps="true"
-                    data-autorepeat="true"
-                    data-autorepeat-dynamic="true"
-                    data-manual-input-mode="true"
-                    data-note-details-dialog-duration-stepper
-                >
-                    <div class="stepper-button-minus"></div>
-                    <div class="stepper-input-wrap">
-                        <input
-                            data-note-details-dialog-duration-input
-                            type="text"
-                            value="${note.durQ}" min="1" max="10000" step="10" />
-                    </div>
-                    <div class="stepper-button-plus"></div>
-                </div>
-            </div>      
-            <!--div style="margin-left: 1rem;">
-                durationQ: ${note.durQ}
-            </div-->
-            <div class="list" style="margin: 1rem;">
-                <ul>
-                    <li class="item-content item-input">
-                        <div class="item-inner">
-                            <div class="item-input-wrap">
-                                <textarea
-                                    data-note-details-dialog-slides-input
-                                    placeholder="Slides"
-                                >${this.note.slides || ''}</textarea>
-                            </div>
-                      </div>
-                    </li>
-                </ul>
-            </div>            
+            ${this.getVolumeContent(note)}
+            ${this.getDurationContent(note)}
+            ${this.getSlidesContent(note)}
         `.trim());
 
-        this.dialog = (this.context.$f7 as any).popup.create({
-            content,
-            on: {
-                opened: () => {
-                    this.subEvents();
-                    // this.updateView();
-                    this.setVolumeRange();
-                    // this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
-                }
-            }
-        });
+        this.dialogEl = document.createElement('div');
+        this.dialogEl.style.cssText = this.getDialogStyle();
+        this.dialogEl.innerHTML = content;
+        this.hostEl.appendChild(this.dialogEl);
+        this.hostEl.style.display = 'block';
 
-        this.dialog.open(false);
-
-        //console.log('EL', getWithDataAttr('duration-stepper-input'));
-
-        (this.context.$f7 as any).stepper.create({
-            el: getWithDataAttr('note-details-dialog-duration-stepper')[0],
+        setTimeout(() => {
+            this.subscribeEvents();
         });
     }
 
-    subEvents() {
-        // getWithDataAttr('edit-track-dialog-board-type').forEach((el) => {
-        //     el.addEventListener('pointerdown', () => this.setBoard(el.dataset.editTrackDialogBoardType));
-        // });
-
-        getWithDataAttr('edit-track-dialog-ok').forEach((el) => {
+    subscribeEvents() {
+        getWithDataAttr('ok-action', this.dialogEl).forEach((el) => {
             el.addEventListener('pointerup', () => this.okClick());
         });
 
-        getWithDataAttr('edit-track-dialog-cancel').forEach((el) => {
+        getWithDataAttr('cancel-action', this.dialogEl).forEach((el) => {
             el.addEventListener('pointerup', () => this.cancelClick());
         });
     }
 
-    setBoard(board: string) {
-        this.track.board = board;
-        this.updateView();
-    }
-
     okClick() {
         const close = () => {
-            this.dialog.close();
+            this.closeDialog();
             this.cb && this.cb(this.note);
         }
 
         this.note.slides = this.slidesTextFromInput;
         this.note.durQ = this.durQFromInput;
+        this.note.volume = this.volumeFromInput;
 
         close();
     }
 
     cancelClick() {
-        this.dialog.close();
-        //this.cb && this.cb(false);
+        this.closeDialog();
     }
 
-    updateView() {
-        getWithDataAttr('edit-track-dialog-board-type').forEach((el) => {
-            el.style.fontWeight = el.dataset.editTrackDialogBoardType === this.track.board ? '700' : '400';
-        });
-    }
-
-    getVolumeContent(): string {
+    getSlidesContent(note: LineNote): string {
         let result = `
-            <div style="margin: 1rem; margin-bottom: 2rem;">
-                Громкость
-                <div
-                    data-note-details-dialog-volume-range
-                    class="range-slider"
-                    data-label="true"
-                    data-min="0"   
-                    data-max="100"
-                    data-step="1"
-                    data-value="50"
-                    data-scale="true"
-                    data-scale-steps="10"
-                    data-scale-sub-steps="5"
-                ></div>
+            <div style="margin: 1rem;">
+                <div>слайды</div>            
+                <textarea
+                    style="border: 1px solid lightgray; width: 100%; margin-bottom: 1rem;"                
+                    data-slides-input
+                    rows="5"
+                >${this.note.slides || ''}</textarea>
+            </div>                    
+        `;
+
+        return result;
+    }
+
+    getDurationContent(note: LineNote): string {
+        let result = `
+            <div style="margin: 1rem;">
+                <div>длительность</div>
+                <number-stepper-cc
+                    data-duration-input
+                    value="${note.durQ}"
+                    min="1"
+                    max="10000"
+                ></number-stepper-cc>
+            </div>
+        `.trim();
+
+        return result;
+    }
+
+    getVolumeContent(note: LineNote): string {
+        let result = `
+            <div style="margin: 1rem;">
+                <div>громкость</div>
+                <number-stepper-cc
+                    data-volume-input
+                    value="${note.volume}"
+                    min="0"
+                    max="100"
+                ></number-stepper-cc>
             </div>
         `.trim();
 
@@ -295,7 +165,7 @@ export class NoteDetailsDialog {
 
 // NS
 // note-details-dialog
-// note-details-dialog-slides-input  note-details-dialog-duration-stepper
-// note-details-dialog-duration-input
-// note-details-dialog-volume-range
+// slides-input
+// duration-input
+// volume-input
 //

@@ -1,4 +1,4 @@
-import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
+import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Muse as m, LineModel, Line, KeyData } from '../libs/muse';
 
 import { DrumBoard, drumNotesInfo } from './drum-board';
@@ -401,7 +401,7 @@ export class DrumCtrl extends KeyboardCtrl {
         const content = `
             ${this.getDrumBoard(keyboardId)}
             ${this.getRecordCommandPanel()}
-            ${this.getMetronomeContent()}
+            ${this.getBpmContent()}
             
             ${this.getPlayCommandPanel()}                            
             ${this.getRowActionsCommands()}                
