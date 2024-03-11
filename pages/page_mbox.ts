@@ -909,7 +909,7 @@ export class MBoxPage {
             }
         }
 
-        new TracksVolumeDialog(this.context).openTrackDialog(cb);
+        new TracksVolumeDialog().openTrackDialog(cb);
     }
 
     editTrack(trackName: string) {

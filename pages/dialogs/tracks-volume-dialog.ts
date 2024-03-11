@@ -1,27 +1,14 @@
-import { Dialog } from 'framework7/components/dialog/dialog';
-import { ComponentContext } from 'framework7/modules/component/component';
-
 import { Muse as m } from '../../libs/muse';
 import { getWithDataAttr, getWithDataAttrValue } from '../../src/utils';
 import { DEFAULT_OUT_VOLUME, SongNode, TrackInfo } from '../song-store';
 import { ideService } from '../ide/ide-service';
+import { AppDialog } from './app-dialog';
 
-export class TracksVolumeDialog {
-    dialog: Dialog.Dialog;
+export class TracksVolumeDialog extends AppDialog {
     cb: (ok: boolean) => void;
     song: SongNode = null;
     tracks: TrackInfo[] = null;
     tracksSrc: TrackInfo[] = null;
-
-    get root(): HTMLElement {
-        return getWithDataAttr('edit-track-dialog-content')[0];
-    }
-
-    constructor(
-        public context: ComponentContext,
-    ) {
-
-    }
 
     setVolumeRange() {
         const setDataByTracks = () => {
@@ -34,7 +21,7 @@ export class TracksVolumeDialog {
         }
 
         this.tracks.forEach(track => {
-            getWithDataAttrValue('tracks-volume-dialog-item', track.name).forEach(el => {
+            getWithDataAttrValue('track-volume-item', track.name, this.dialogEl).forEach(el => {
                 el.addEventListener('valuechanged', (e: any) => {
                     track.volume = e.detail.value;
                     setDataByTracks();
@@ -43,7 +30,7 @@ export class TracksVolumeDialog {
 
             if (track.items && track.items.length) {
                 track.items.forEach(subtrack => {
-                    getWithDataAttrValue('tracks-volume-dialog-item', `${track.name}:${subtrack.name}`).forEach(el => {
+                    getWithDataAttrValue('track-volume-item', `${track.name}:${subtrack.name}`, this.dialogEl).forEach(el => {
                         el.addEventListener('valuechanged', (e: any) => {
                             subtrack.volume = e.detail.value;
                             setDataByTracks();
@@ -77,19 +64,12 @@ export class TracksVolumeDialog {
         `.trim();
 
         const wrapper = `
-            <div class="popup">
-                <div class="page">
-                    <div class="navbar">
-                        <div class="navbar-bg"></div>
-                        <div class="navbar-inner" style="justify-content: space-evenly;">
-                            <div data-tracks-volume-dialog-ok style="${btnStl}"><b>OK</b></div>
-                            <div data-tracks-volume-dialog-cancel style="${btnStl}">Cancel</div>                            
-                        </div>
-                    </div>                
-                    <div class="page-content" style="padding-right: 3rem;">
-                        %content%
-                    </div>
+            <div style="background-color: wheat; padding-bottom: 1rem;">
+                <div style="padding: 1rem; display: flex; justify-content: space-between;">
+                    <span data-ok-action style="${btnStl}">&nbsp;ОК&nbsp;</span>&nbsp;
+                    <span data-cancel-action style="${btnStl}">Cancel</span>
                 </div>
+                %content%
             </div>
         `.trim();
 
@@ -97,27 +77,26 @@ export class TracksVolumeDialog {
             ${this.getVolumeContent()}
         `.trim());
 
-        this.dialog = (this.context.$f7 as any).popup.create({
-            content,
-            on: {
-                opened: () => {
-                    this.subTrackDialogEvents();
-                    this.updateView();
-                    this.setVolumeRange();
-                }
-            }
-        });
+        this.dialogEl = document.createElement('div');
+        this.dialogEl.style.cssText = this.getDialogStyle();
+        this.dialogEl.innerHTML = content;
+        this.hostEl.appendChild(this.dialogEl);
+        this.hostEl.style.display = 'block';
 
-        this.dialog.open(false);
+        setTimeout(() => {
+            this.subTrackDialogEvents();
+            this.updateView();
+            this.setVolumeRange();
+        });
     }
 
     subTrackDialogEvents() {
-        getWithDataAttr('tracks-volume-dialog-ok').forEach((el) => {
-            el.addEventListener('pointerdown', () => this.okClick());
+        getWithDataAttr('ok-action', this.dialogEl).forEach((el) => {
+            el.addEventListener('pointerup', () => this.okClick());
         });
 
-        getWithDataAttr('tracks-volume-dialog-cancel').forEach((el) => {
-            el.addEventListener('pointerdown', () => this.cancelClick());
+        getWithDataAttr('cancel-action', this.dialogEl).forEach((el) => {
+            el.addEventListener('pointerup', () => this.cancelClick());
         });
     }
 
@@ -127,7 +106,7 @@ export class TracksVolumeDialog {
         this.song.tracks = tracks;
         ideService.setDataByTracks(this.song);
 
-        this.dialog.close();
+        this.closeDialog();
         this.cb && this.cb(false);
     }
 
@@ -139,7 +118,7 @@ export class TracksVolumeDialog {
         this.song.tracks = tracks;
         ideService.setDataByTracks(this.song);
 
-        this.dialog.close();
+        this.closeDialog();
         this.cb && this.cb(true);
     }
 
@@ -154,7 +133,7 @@ export class TracksVolumeDialog {
             <div style="margin: 1rem; margin-bottom: 2rem;">
                 ${label}
                 <number-stepper-cc
-                    data-tracks-volume-dialog-item="${name}"
+                    data-track-volume-item="${name}"
                     value="${volume || 0}"
                     min="0"
                     max="100"
