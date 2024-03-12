@@ -1,4 +1,5 @@
 export * from './app-dialog';
+export * from './common-dialog';
 export * from './confirm-dialog';
 export * from './get-track-dialog';
 export * from './name-dialog';

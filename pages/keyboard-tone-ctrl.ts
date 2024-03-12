@@ -1,10 +1,10 @@
-import { Dialog } from 'framework7/components/dialog/dialog';
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { ideService } from './ide/ide-service';
 import { Muse as m, KeyData, Line, LineModel } from '../libs/muse';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { isT34 } from './keyboard-tone-ctrl-helper';
+import { CommonDialog } from './dialogs';
 import { KeyboardChessCtrl } from './keyboard-chess-ctrl';
 import { UserSettings, UserSettingsStore } from './user-settings-store';
 
@@ -37,7 +37,7 @@ export class ToneCtrl extends KeyboardCtrl {
         keys: {}
     };
 
-    boardPopup: Dialog.Dialog;
+    boardPopup: CommonDialog;
     chess: KeyboardChessCtrl;
     lastNoteCellGuid = '';
 
@@ -587,33 +587,33 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     updatePopupBoard() {
-        const parent = getWithDataAttr('dynamic-tone-board')[0] as HTMLElement;
+        const dialogEl = this.boardPopup.dialogEl;
 
-        getWithDataAttr('instrument-code', parent).forEach(el => {
+        getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.style.backgroundColor = 'white';
         });
 
-        getWithDataAttrValue('instrument-code', this.instrCode, parent).forEach(el => {
+        getWithDataAttrValue('instrument-code', this.instrCode, dialogEl).forEach(el => {
             el.style.backgroundColor = 'lightgray';
         });
     }
 
     updateInstrumentsPopup() {
-        const parent = getWithDataAttr('instruments-popup')[0] as HTMLElement;
+        const dialogEl = this.boardPopup.dialogEl;
 
-        getWithDataAttr('instrument-code', parent).forEach(el => {
+        getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.style.backgroundColor = 'white';
         });
 
-        getWithDataAttrValue('instrument-code', this.instrCode, parent).forEach(el => {
+        getWithDataAttrValue('instrument-code', this.instrCode, dialogEl).forEach(el => {
             el.style.backgroundColor = 'lightgray';
         });
     }
 
     subscribeInstrumentsPopup() {
-        const parent = getWithDataAttr('instruments-popup')[0] as HTMLElement;
+        const dialogEl = this.boardPopup.dialogEl;
 
-        getWithDataAttr('instrument-code', parent).forEach(el => {
+        getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.addEventListener('pointerdown', () => {
                 this._instrCode = m.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
                 this.updatePopupBoard();
@@ -626,7 +626,7 @@ export class ToneCtrl extends KeyboardCtrl {
             })
         });
 
-        getWithDataAttr('instrument-code', parent).forEach(el => {
+        getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.addEventListener('pointerup', () => {
                 ideService.synthesizer.playSound({
                     keyOrNote: 'do',
@@ -636,16 +636,18 @@ export class ToneCtrl extends KeyboardCtrl {
             })
         });
 
-        getWithDataAttr('close-popup', parent).forEach(el => {
+        getWithDataAttr('close-popup', dialogEl).forEach(el => {
             el.addEventListener('pointerup', () => {
-                this.boardPopup.close(false);
+                this.boardPopup.closeDialog();
+                this.boardPopup = null;
             });
         });
 
-        getWithDataAttr('replace-instrument-action', parent).forEach(el => {
+        getWithDataAttr('replace-instrument-action', dialogEl).forEach(el => {
             el.addEventListener('pointerup', () => {
                 this.replaceInstrument(el);
-                this.boardPopup.close(false);
+                this.boardPopup.closeDialog();
+                this.boardPopup = null;
             })
         });
     }
@@ -654,9 +656,9 @@ export class ToneCtrl extends KeyboardCtrl {
         let lastNoteEl: HTMLElement;
         let lastPlayingNote = '';
         const playingNote: { [key: string]: string } = {};
-        const parent = getWithDataAttr('dynamic-tone-board')[0] as HTMLElement;
+        const dialogEl = this.boardPopup.dialogEl;
 
-        getWithDataAttr('instrument-code', parent).forEach(el => {
+        getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.addEventListener('pointerdown', () => {
                 this._instrCode = m.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
                 this.updatePopupBoard();
@@ -669,7 +671,7 @@ export class ToneCtrl extends KeyboardCtrl {
             })
         });
 
-        getWithDataAttr('instrument-code', parent).forEach(el => {
+        getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.addEventListener('pointerup', () => {
                 ideService.synthesizer.playSound({
                     keyOrNote: 'do',
@@ -679,26 +681,28 @@ export class ToneCtrl extends KeyboardCtrl {
             })
         });
 
-        getWithDataAttr('close-popup', parent).forEach(el => {
+        getWithDataAttr('close-popup', dialogEl).forEach(el => {
             el.addEventListener('pointerup', () => {
                 setTimeout(() => {
-                    this.boardPopup.close(false);
+                    this.boardPopup.closeDialog();
+                    this.boardPopup = null;
                 }, 10);
             });
         });
 
-        getWithDataAttr('select-note-action', parent).forEach(el => {
+        getWithDataAttr('select-note-action', dialogEl).forEach(el => {
             el.addEventListener('pointerup', () => {
                 let note = lastNoteEl ? lastNoteEl.dataset['noteLat'] : '';
 
                 setTimeout(() => {
-                    this.boardPopup.close(false);
+                    this.boardPopup.closeDialog();
+                    this.boardPopup = null;
                     this.addOrDelNoteClick(note);
                 }, 10);
             });
         });
 
-        getWithDataAttr('note-key', parent).forEach((el: HTMLElement) => {
+        getWithDataAttr('note-key', dialogEl).forEach((el: HTMLElement) => {
             const keyboardId = el.dataset.keyboardId;
             const keyOrNote = el.dataset.noteLat || '';
             let keyId = keyboardId;
@@ -822,39 +826,32 @@ export class ToneCtrl extends KeyboardCtrl {
         `.trim();
 
         return `
-            <div class="navbar">
-                <div class="navbar-bg"></div>
-                <div class="navbar-inner" style="justify-content: space-evenly;">
-                    <div data-replace-instrument-action="note"   style="${btnStl}">note</div>
-                    <div data-replace-instrument-action="block"  style="${btnStl}">Block</div>
-                    <div data-replace-instrument-action="blocks" style="${btnStl}">BLOCKS</div>
-                    <div data-close-popup style="${btnStl}">Close</div>
-                </div>
-            </div>`.trim();
+            <div style="
+                display: flex;
+                justify-content: space-evenly;
+                border-bottom: 1px solid gray;
+                padding-bottom: 1rem;
+            ">
+                <div data-replace-instrument-action="note"   style="${btnStl}">note</div>
+                <div data-replace-instrument-action="block"  style="${btnStl}">Block</div>
+                <div data-replace-instrument-action="blocks" style="${btnStl}">BLOCKS</div>
+                <div data-close-popup style="${btnStl}">Close</div>
+            </div>
+        `.trim();
     }
 
     open_InstrumentBoard() {
-        this.boardPopup = (this.page.context.$f7 as any).popup.create({
-            content: `
-                <div class="popup" data-instruments-popup>
-                    <div class="page">
-                        ${this.getInstrumentNavbarContent()}                        
-                        <div class="page-content" >
-                            <div style="margin: 1rem 2rem 0 1rem;">
-                                ${this.getInstrumentsForChoice()}
-                            </div>
-                        </div>
-                    </div>
-                </div>`.trim(),
-            on: {
-                opened: () => {
-                    this.subscribeInstrumentsPopup();
-                    this.updateInstrumentsPopup();
-                }
-            }
-        });
+        this.boardPopup = new CommonDialog().openCommonDialog(`
+            <div data-instruments-popup>
+                ${this.getInstrumentNavbarContent()}                        
+                <div style="margin: 1rem 2rem 0 1rem;">
+                    ${this.getInstrumentsForChoice()}
+                </div>
+            </div>        
+        `.trim());
 
-        this.boardPopup.open(false);
+        this.subscribeInstrumentsPopup();
+        this.updateInstrumentsPopup();
     }
 
     getOKCloseNavbarContent(): string {
@@ -869,73 +866,60 @@ export class ToneCtrl extends KeyboardCtrl {
         `.trim();
 
         return `
-            <div class="navbar">
-                <div class="navbar-bg"></div>
-                <div class="navbar-inner" style="justify-content: space-evenly;">
+            <div style="
+                display: flex;
+                justify-content: space-evenly;
+                border-bottom: 1px solid gray;
+                padding-bottom: 1rem;
+            ">
                 <div data-select-note-action style="${btnStl}"><b>OK</b></div>
                 <div data-close-popup style="${btnStl}">Close</div>                            
             </div>
-        </div>`.trim();
+        `.trim();
     }
 
     open_GuitarBoard() {
-        this.boardPopup = (this.page.context.$f7 as any).popup.create({
-            content: `
-                <div class="popup" data-dynamic-tone-board>
-                    <div class="page">
-                        ${this.getOKCloseNavbarContent()}                    
-                        <div class="page-content">
-                            <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
-                                <div style="margin-top: .5rem; user-select: none; touch-action: none;">
-                                    ${this.getGuitarBoard(<any>this.boardType)}
-                                </div>
-                                <div style="margin-top: .5rem;">
-                                    <!-- content -->
-                                </div>
-                            </div>
-                            <div style="margin: 1rem;">
-                                ${this.getInstrumentsForChoice()} 
-                            </div>                            
-                        </div>                        
+        this.boardPopup = new CommonDialog().openCommonDialog(`
+            <div data-dynamic-tone-board>
+                ${this.getOKCloseNavbarContent()}
+                <div>
+                    <div style="display: flex; margin: .5rem; justify-content: space-between; position: relative;">
+                        <div style="margin-top: .5rem; user-select: none; touch-action: none;">
+                            ${this.getGuitarBoard(<any>this.boardType)}
+                        </div>
+                        <div style="margin-top: .5rem;">
+                            <!-- content -->
+                        </div>
                     </div>
-                </div>`.trim(),
-            on: {
-                opened: () => {
-                    this.subscribePopupBoard();
-                    this.updatePopupBoard()
-                    this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
-                }
-            }
-        });
+                    <div style="margin: 1rem;">
+                        ${this.getInstrumentsForChoice()}
+                    </div>
+                </div>
+            </div>
+        `.trim());
 
-        this.boardPopup.open(false);
+        this.subscribePopupBoard();
+        this.updatePopupBoard()
+        this.updateFixedCellsOnBoard(getWithDataAttr('dynamic-tone-board')[0]);
     }
 
     open_HarmonicaBoard(boardType?: ToneKeyboardType) {
         boardType = (boardType || this.useThisBoard || 'soloSolo34') as ToneKeyboardType;
 
-        this.boardPopup = (this.page.context.$f7 as any).popup.create({
-            content: `
-                <div class="popup" data-dynamic-tone-board>
-                    <div class="page">
-                        ${this.getOKCloseNavbarContent()}
-                        <div class="page-content" >
-                            ${this.getHarmonicaBoard(boardType)}                           
-                            <div style="margin: 0 1rem 0 1rem;">
-                                ${this.getInstrumentsForChoice()}
-                            </div>
-                        </div>
+        this.boardPopup = new CommonDialog().openCommonDialog(`
+            <div data-dynamic-tone-board>
+                ${this.getOKCloseNavbarContent()}
+                <div>
+                    ${this.getHarmonicaBoard(boardType)}                           
+                    <div style="margin: 0 1rem 0 1rem;">
+                        ${this.getInstrumentsForChoice()}
                     </div>
-                </div>`.trim(),
-            on: {
-                opened: () => {
-                    this.subscribePopupBoard();
-                    this.updatePopupBoard();
-                }
-            }
-        });
+                </div>
+            </div>`.trim(),
+        );
 
-        this.boardPopup.open(false);
+        this.subscribePopupBoard();
+        this.updatePopupBoard();
     }
 
     subscribeEditCommands() {

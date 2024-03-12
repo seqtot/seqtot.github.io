@@ -196,16 +196,18 @@ export class MBoxPage {
         //   <p data-name="action-drums">барабан</p>
         // `;
 
-        dyName('panel-right-content').innerHTML = ``.trim();
+        // dyName('panel-right-content').innerHTML = ``.trim();
     }
 
     getMetronomeContent(): string {
         let metronomeView = `
-            <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
-            <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
-            <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
-            <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
-            <a data-action-type="stop"><b>stop</b></a>&emsp;
+            <div style="padding-bottom: .5rem;">
+                <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
+                <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
+                <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
+                <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
+                <a data-action-type="stop"><b>stop</b></a>
+            </div>
             ${this.getBpmContent()}
         `.trim();
 

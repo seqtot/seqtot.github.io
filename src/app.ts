@@ -1,19 +1,5 @@
-// https://framework7.io/docs/init-app.html
-// https://framework7.io/docs/kitchen-sink.html
-
 import Framework7 from 'framework7/bundle';
-
-// import Framework7 from 'framework7';
-// Import additional components
-// import Range from 'framework7/components/range';
-// import Panel from 'framework7/components/panel';
-// Import components styles
-// import 'framework7/components/range/css';
-// import 'framework7/components/panel/css';
-// Framework7.use([Range, Panel]);
-
 import { pageRc } from './page-rc';
-
 import '../libs/ui/number-stepper-cc';
 
 const appEl = document.getElementById('app');
@@ -28,8 +14,8 @@ const isDev = /localhost/.test(window.location.href);
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
 
-//const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
 const defRoute = '/mbox/setBand/';
+//const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
 //const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
 //const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
@@ -82,54 +68,7 @@ const leftPanel = `
 </div>
 `;
 
-const rightPanel = `
-<div
-  class="panel panel-right panel-cover panel-init theme-dark"
->
-  <div class="view view-init" data-view="right">
-    <div class="page">
-      <div class="navbar">
-        <div class="navbar-bg"></div>
-        <div class="navbar-inner sliding">
-          <div data-app-right-panel-title class="title"></div>
-        </div>
-      </div><!-- navbar -->
-
-      <div class="page-content">  
-        <div class="block" data-name="panel-right-content">
-        </div>
-
-      </div><!-- page-content -->
-    </div><!-- page -->
-  </div>
-</div>
-`;
-
-// старая навигационная панель
 let navbar = `
-<div class="navbar">
-<div class="navbar-bg"></div>
-<div class="navbar-inner">
-  <div class="left">
-    <a href="#" class="link icon-only panel-open" data-panel=".panel-left">
-      <i class="icon f7-icons">menu</i>
-    </a>
-    <!--a href="#" class="link back">
-      <i class="icon icon-back"></i>
-      <span class="if-not-md">Back</span>
-    </a-->
-  </div>
-  <div class="title sliding">Band-IT</div>
-  <div class="right">
-    <a href="#" class="link icon-only panel-open" data-panel="right">
-      <i class="icon f7-icons">menu</i>
-    </a>
-  </div>
-</div>
-</div>
-`;
-
-navbar = `
 <div data-app-header-container style="border-bottom: 2px solid gray;">
     <div data-app-header-first-row-area
         style="
@@ -156,7 +95,6 @@ navbar = `
 
 const appTpl = `
   ${leftPanel}
-  ${rightPanel}
   ${navbar}
   <!-- Your main view, should have "view-main" class -->
   <div class="view view-main view-init safe-areas" data-url="${defRoute}" id="app-view-main"></div>
