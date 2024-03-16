@@ -25,7 +25,7 @@ appEl.innerHTML = `
             <div data-app-header-left-area style="padding-left: 1rem;">
                 <span
                     data-app-header-main-button
-                    style="user-select: none; touch-action: none;"
+                    style="user-select: none;"
                 ><b>MAIN</b></span>
             </div>
             <div data-app-header-center-area style=""></div>
