@@ -3,7 +3,6 @@ import { MuseEditorPage } from '../pages/page_muse_editor';
 import { UserSettingsPage } from '../pages/page_user_settings';
 import { ThereminPage } from '../pages/theremin/theremin.page';
 import { SamplePage } from '../pages/page_sample_editor';
-import { Match as RouteInfo } from '../libs/navigo/types';
 import { appRouter } from './router';
 import { getWithDataAttr, getWithDataAttrValue } from './utils';
 import { ConfirmDialog } from '../pages/dialogs';
@@ -61,7 +60,7 @@ class App {
         this.subscribeRouter();
         this.subscribeMainMenu();
 
-        appRouter.resolve();
+        appRouter.navigate(defRoute);
     }
 
     clearCurrentRoute() {
@@ -76,7 +75,7 @@ class App {
     setComponentByRoute(klass: any, routeInfo: any) {
         this.clearCurrentRoute();
 
-        this.lastRouteComponent = new klass(routeInfo);
+        this.lastRouteComponent = new klass({data: routeInfo});
 
         if (this.lastRouteComponent && this.lastRouteComponent['onMounted']) {
             this.lastRouteComponent.onMounted();
@@ -90,7 +89,14 @@ class App {
 
         linksToPage.forEach(item => {
             linksHtml += `
-                    <a style="display: inline-block; padding: .25rem; font-size: 1.2rem;" href="${item.href}" data-navigo>
+                    <a
+                        data-route
+                        style="
+                            display: inline-block;
+                            padding: .4rem; 
+                            font-size: 1.3rem;"
+                            href="${item.href}"
+                    >
                         ${item.name}
                     </a><br/>`.trim();
         });
@@ -114,8 +120,8 @@ class App {
 
             content += `
                 <div
-                    style="font-size: 1.2rem;
-                    padding: .25rem;"
+                    style="font-size: 1.4rem;
+                    padding: .4rem;"
                     data-main-menu-item="${item.href}"
                 >
                     ${item.name}
@@ -140,39 +146,36 @@ class App {
     subscribeRouter() {
         const that = this;
 
-        appRouter.on('/mbox/:song', function (match: RouteInfo) {
-            console.log('/mbox/:song', match);
+        appRouter.on('mbox', this, (song) =>  {
+            console.log('/mbox/:song', song);
 
-            that.setComponentByRoute(MBoxPage, match);
+            that.setComponentByRoute(MBoxPage, {
+                    id: 'mbox',
+                    song: song,
+                });
 
             return true;
         });
 
-        appRouter.on('/page/:id', function (match) {
-            console.log('/page/:id', match);
+        appRouter.on('page', this, (id) => {
+            console.log('/page/:id', id);
 
-            const pageId = ((match.data as any).id || '') as string;
-            const klass = pages[(match.data as any).id];
+            const pageId = (id || '') as string;
+            const klass = pages[pageId];
 
             if (!klass) return;
 
-            that.setComponentByRoute(klass, match);
+            that.setComponentByRoute(klass, {id});
 
             return true;
         });
 
-        appRouter.on('/', function (match) {
-            console.log('/', match);
+        appRouter.on('/', this, (data) => {
+            console.log('/', data);
 
             that.renderDefaultPage();
 
             return true;
-        });
-
-        appRouter.on('', function (match) {
-            console.log('empty', match);
-
-            that.renderDefaultPage();
         });
     }
 

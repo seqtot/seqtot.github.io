@@ -8,8 +8,7 @@ import { ideService, defaultTracks } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
 import { MY_SONG, SongStore, TrackInfo } from './song-store';
 import { UserSettings, UserSettingsStore } from './user-settings-store';
-import { Match as RouteInfo } from '../libs/navigo/types';
-import {appRouter} from '../src/router';
+import { appRouter, RouteInfo } from '../src/router';
 
 // import { getDevice } from 'framework7';
 //
@@ -101,8 +100,7 @@ export class KeyboardPage implements Page {
         getWithDataAttr('app-header-second-row-area')[0].innerHTML = null;
     }
 
-    onClosePage() {
-        //console.log('onClosePage');
+    onUnmounted() {
         this.clearAppHeaderSecondRowArea();
         this.setTrackName();
         this.addTracksLink();
@@ -179,7 +177,7 @@ export class KeyboardPage implements Page {
 
         getWithDataAttr('app-header-center-area').forEach(el => {
             if (name) {
-                el.innerHTML = `<a style="user-select: none; touch-action: none;" ${href} data-navigo>${name}</a>`;
+                el.innerHTML = `<a style="user-select: none; touch-action: none;" ${href} data-route>${name}</a>`;
             } else {
                 el.innerHTML = '';
             }
@@ -189,7 +187,7 @@ export class KeyboardPage implements Page {
 
         // getWithDataAttr('app-header-left-area').forEach(el => {
         //     if (name) {
-        //         el.innerHTML = `${mainLink}${backLink}`;
+        //         //el.innerHTML = `${mainLink}${backLink}`;
         //     } else {
         //         el.innerHTML = mainLink;
         //     }

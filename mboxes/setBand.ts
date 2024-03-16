@@ -3,7 +3,7 @@ function getLink(name: string, href: string): string {
 }
 
 function getInnerLink(name: string, href: string): string {
-  return `<a href="${href}" data-navigo>${name}</a>`;
+  return `<a href="${href}" data-route>${name}</a>`;
 }
 
 function getBpmLink(bpm: number): string {

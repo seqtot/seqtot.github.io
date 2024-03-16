@@ -221,21 +221,25 @@ export default function Navigo(appRoute?: string, options?: RouterOptions) {
   }
 
   function listen() {
-    console.log('isPushStateAvailable', isPushStateAvailable);
+    console.log('Navigo.listen.isPushStateAvailable', isPushStateAvailable);
 
     if (isPushStateAvailable) {
-      this.__popstateListener = () => {
-        console.log('__popstateListener');
+      this.__popstateListener = (e) => {
+        console.log('__popstateListener', e);
 
         if (!self.__freezeListening) {
           resolve();
         }
       };
+
+      console.log('window.addEventListener("popstate", this.__popstateListener);');
       window.addEventListener("popstate", this.__popstateListener);
     }
   }
 
   function destroy() {
+    console.log('Navigo.destroy', isPushStateAvailable);
+
     this.routes = routes = [];
     if (isPushStateAvailable) {
       window.removeEventListener("popstate", this.__popstateListener);

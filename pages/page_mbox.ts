@@ -19,8 +19,7 @@ import { WavRecorder } from './ide/wav-recorder';
 import { KeyboardCtrl } from './keyboard-ctrl';
 import { getRandomElement } from '../libs/muse/utils';
 import { UserSettingsStore } from './user-settings-store';
-import { Match as RouteInfo } from '../libs/navigo/types';
-import { appRouter } from '../src/router';
+import { appRouter, RouteInfo } from '../src/router';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
 
@@ -236,7 +235,7 @@ export class MBoxPage {
             const songs = SongStore.GetSongs(this.ns);
 
             songs.forEach(song => {
-                content += `<div class="row" style="margin: .5rem; align-items: center;">
+                content += `<div style="margin: .5rem; align-items: center; display: flex; justify-content: space-between;">
                     <div style="font-size: 1rem;">
                         <span
                             style="font-weight: 400; user-select: none;"

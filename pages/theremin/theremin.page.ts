@@ -3,7 +3,7 @@ import { WaveSource2 } from './wave-source';
 import { Sound } from '../../libs/muse';
 import { getEndPointVolume } from '../../libs/muse/utils';
 import { freqInfoList, FreqInfo } from '../../libs/muse/freq';
-import { Match as RouteInfo } from '../../libs/navigo/types';
+import { RouteInfo } from '../../src/router';
 
 type WithId = {id: string}
 

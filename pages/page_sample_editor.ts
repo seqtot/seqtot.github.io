@@ -9,7 +9,7 @@ import { EventEmitter } from '../libs/common/event-emitter';
 import { getAudioBufferFromBlobString, getAudioBufferFromString } from '../libs/waf-player/audio-buffer-to-wav';
 import { preparePreset } from '../libs/waf-player/prepare';
 import rawVoiceInst from '../waf-fonts/voice_han';
-import { Match as RouteInfo } from '../libs/navigo/types';
+import { RouteInfo } from '../src/router';
 
 type WithId = {id: string}
 

@@ -1,4 +1,4 @@
-import { Match as RouteInfo } from '../libs/navigo/types';
+import { RouteInfo } from '../src/router';
 
 type WithId = {id: string}
 

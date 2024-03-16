@@ -12,7 +12,7 @@ import { EmptyGlComponent } from './ide/empty-gl.component';
 import { FileTreeGlComponent } from './ide/file-tree-gl.component';
 import { TextEditorGlComponent } from './ide/text-editor-gl.component';
 import { FontViewerGlComponent } from './ide/font-viewer-gl.component';
-import { Match as RouteInfo } from '../libs/navigo/types';
+import { RouteInfo } from '../src/router';
 
 type WithId = {id: string}
 

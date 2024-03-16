@@ -1,7 +1,7 @@
 import { Muse as m } from '../libs/muse';
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { UserSettingsStore } from './user-settings-store';
-import { Match as RouteInfo } from '../libs/navigo/types';
+import { RouteInfo } from '../src/router';
 
 type WithId = {id: string}
 
