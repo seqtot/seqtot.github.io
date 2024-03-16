@@ -1,4 +1,3 @@
-import { ComponentContext } from 'framework7/modules/component/component';
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Muse as m, Line, LineModel, LineNote, StoredRow, Synthesizer, MultiPlayer, SongPartInfo, MidiConfig, TextBlock, OutBlockRowInfo } from '../libs/muse';
 import { parseInteger } from '../libs/common';
@@ -8,6 +7,7 @@ import { SongNode, SongStore } from './song-store';
 import * as svg from './svg-icons';
 import { NoteDetailsDialog } from './dialogs/note-details-dialog';
 import { ConfirmDialog } from './dialogs/confirm-dialog';
+import {appRouter} from '../src/router';
 
 export type BpmInfo = {
     bpm: number;
@@ -26,7 +26,6 @@ export interface KeyboardPage {
     //getOut(bpm: number, seq: DrumCtrl['keySequence'] );
     synthesizer: Synthesizer;
     multiPlayer: MultiPlayer;
-    context: ComponentContext,
     setContent: () => void,
     initData: () => void,
     songId: string,
@@ -1134,6 +1133,7 @@ export class KeyboardCtrl {
             el.addEventListener('pointerdown', () => {
                 getWithDataAttr('app-header-second-row-area').forEach(el => {
                     el.innerHTML = this.getRowsByPartContent();
+
                 });
 
                 // app-header-second-row-area
@@ -1172,7 +1172,7 @@ export class KeyboardCtrl {
     }
 
     gotoSong() {
-        this.page.context.$f7router.navigate(`/mbox/${this.songId}/`);
+        appRouter.navigate(`/mbox/${this.songId}`);
     }
 
     delete_RowFromPart(partId: string, partNio: number | string) {

@@ -53,6 +53,7 @@ export class DrumCtrl extends KeyboardCtrl {
     board: DrumBoard;
     chess: KeyboardChessCtrl;
 
+
     constructor(public page: KeyboardPage, public type: DrumKeyboardType) {
         super(page, type);
         this.chess = new KeyboardChessCtrl(this, this.liner);
@@ -419,12 +420,13 @@ export class DrumCtrl extends KeyboardCtrl {
                 ${drums}
             </div>
             
-            <div
+            <!--div
                 data-name="drum-patterns"                
                 style="width: 90%; padding-left: 2%;"
             >
                 ${this.getPatternsContent()}               
-        </div>`.trim();
+            </div-->
+        `.trim();
 
         return content;
     }

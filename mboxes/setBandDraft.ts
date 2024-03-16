@@ -1,5 +1,5 @@
 function getInnerLink(name: string, href: string): string {
-  return `<a class="link" href="${href}">${name}</a>`;
+  return `<a class="link" href="${href}" data-navigo>${name}</a>`;
 }
 
 const inSystem = `<div style="margin: .5rem;">

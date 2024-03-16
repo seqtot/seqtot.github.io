@@ -1,23 +1,18 @@
-import { Props } from 'framework7/modules/component/snabbdom/modules/props';
-import { ComponentContext } from 'framework7/modules/component/component';
-import { Dom7Array } from 'dom7';
+import { Match as RouteInfo } from '../libs/navigo/types';
+
+type WithId = {id: string}
 
 export class EmptyPage {
     get pageId(): string {
-        return this.props.id;
+        return this.props.data.id;
     }
 
     get pageEl(): HTMLElement {
-        return this.context.$el.value[0] as HTMLElement;
-    }
-
-    get el$(): Dom7Array {
-        return this.context.$el.value;
+        return document.getElementById('app-route');
     }
 
     constructor(
-        public props: Props,
-        public context: ComponentContext,
+        public props: RouteInfo<WithId>,
     ) {}
 
     onMounted() {
@@ -29,8 +24,8 @@ export class EmptyPage {
     }
 
     setContent() {
-        this.el$.html(`
-            <div style="">empty</div>    
-        `);
+        this.pageEl.innerHTML = `
+            <div style="">EmptyPage</div>    
+        `;
     }
 }

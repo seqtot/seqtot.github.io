@@ -3,7 +3,7 @@ function getLink(name: string, href: string): string {
 }
 
 function getInnerLink(name: string, href: string): string {
-  return `<a class="link" href="${href}">${name}</a>`;
+  return `<a href="${href}" data-navigo>${name}</a>`;
 }
 
 const setAll = `<div style="margin: .5rem;">
@@ -49,7 +49,6 @@ const content = `
   ${partingGlass}
   ${tiriTiri}  
   ${setAll}  
-  <div style="margin-bottom: 3rem;"></div>
 `.trim();
 
 export default {

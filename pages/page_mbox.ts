@@ -1,7 +1,4 @@
-import { Props } from 'framework7/modules/component/snabbdom/modules/props';
-import { ComponentContext } from 'framework7/modules/component/component';
-import { Dom7Array } from 'dom7';
-import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
+import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { standardTicks as ticks } from './ticks';
 import { getBassCells } from './get-bass-cells';
 import {
@@ -22,8 +19,11 @@ import { WavRecorder } from './ide/wav-recorder';
 import { KeyboardCtrl } from './keyboard-ctrl';
 import { getRandomElement } from '../libs/muse/utils';
 import { UserSettingsStore } from './user-settings-store';
+import { Match as RouteInfo } from '../libs/navigo/types';
+import { appRouter } from '../src/router';
 
 const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>'
+
 const isDev = /localhost/.test(window.location.href);
 const isDevUser = UserSettingsStore.GetUserSettings().userName === 'dev' || isDev;
 
@@ -48,19 +48,15 @@ export class MBoxPage {
     }
 
     get pageId(): string {
-        return this.props.id;
+        return this.props.data.id;
     }
 
     get songId(): string {
-        return this.props.song;
+        return this.props.data.song;
     }
 
     get pageEl(): HTMLElement {
-        return this.context.$el.value[0] as HTMLElement;
-    }
-
-    get el$(): Dom7Array {
-        return this.context.$el.value;
+        return document.getElementById('app-route');
     }
 
     get outBlock(): TextBlock {
@@ -95,14 +91,13 @@ export class MBoxPage {
         return this.pageId + '-' + id;
     }
 
-    constructor(
-        public props: Props,
-        public context: ComponentContext,
-    ) {}
+    constructor(public props: RouteInfo<{id: string, song?: string}>) {}
 
     pageData: SongNode;
 
     getPageData(): SongNode {
+        console.log('getPageData', this.songId);
+
         if (mboxes[this.songId]) {
             return mboxes[this.songId];
         }
@@ -124,7 +119,10 @@ export class MBoxPage {
         if (this.view === 'song') {
             if (pageData['pathNotesText']) {
                 try {
-                    const url = isDev ? pageData['pathNotesText'] : `assets/${pageData['pathNotesText']}`;
+                    const url = isDev ? '/' + pageData['pathNotesText'] : `/assets/${pageData['pathNotesText']}`;
+
+                    console.log('url', isDev, url);
+
                     const res = await fetch(url); //  // motes/bandit/bell.notes.mid
 
                     if (res.ok) {
@@ -141,7 +139,7 @@ export class MBoxPage {
 
             if (pageData['pathNotesJson']) {
                 try {
-                    const url = isDev ? pageData['pathNotesJson'] : `assets/${pageData['pathNotesJson']}`;
+                    const url = isDev ? '/' + pageData['pathNotesJson'] : `/assets/${pageData['pathNotesJson']}`;
                     const res = await fetch(url); //  // motes/bandit/bell.notes.json
 
                     if (res.ok) {
@@ -184,6 +182,8 @@ export class MBoxPage {
     }
 
     async onMounted() {
+        console.log('onMounted', this.props);
+
         await this.initData(false);
 
         this.setRightPanelContent();
@@ -320,24 +320,23 @@ export class MBoxPage {
 
         // CONTENT
         const wrapper = `
-            <div
-                class="page-content"
-                data="page-content"
-                style="padding-top: 0;
+            <div style="
+                padding-top: 0;
                 padding-bottom: 2rem;"
-            >%content%</div>
-        `.trim();
+            >%content%</div>`.trim();
 
         let content = '';
 
         if (this.view === 'list') {
             content = wrapper.replace('%content%', this.getSongListContent());
-            this.el$.html(content);
+            this.pageEl.innerHTML = content;
             this.updateSongListView();
+
+            appRouter.updatePageLinks();
         }
         else {
             content = wrapper.replace('%content%', this.getSongPageContent());
-            this.el$.html(content);
+            this.pageEl.innerHTML = content;
             this.updatePartListView();
         }
 
@@ -470,12 +469,12 @@ export class MBoxPage {
             const info = m.getPartInfo(item);
 
             acc = acc + `
-                <div class="row" style="margin: .5rem; align-items: center;">
-                    <span
+                <div style="margin: .5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div
                         style="font-weight: 700; font-size: 1rem; user-select: none;"
                         data-part-nio="${i+1}"
                         data-part-item="${info.ref}"                        
-                    >${info.partNio}&nbsp;&nbsp;${info.ref}</span>
+                    >${info.partNio}&nbsp;&nbsp;${info.ref}</div>
                     <div style="margin-right: 1rem;">   
                         ${svg.editBtn(`
                             data-edit-part-action                        
@@ -662,7 +661,7 @@ export class MBoxPage {
 
         if(!songId) return;
 
-        this.context.$f7router.navigate(`/mbox/${songId}/`);
+        appRouter.navigate(`/mbox/${songId}`);
     }
 
     getSelectedParts(): string[] {
@@ -706,7 +705,7 @@ export class MBoxPage {
 
         //console.log('currentEdit', ideService.currentEdit);
 
-        this.context.$f7router.navigate('/page/page_keyboard/');
+        appRouter.navigate('/page/page_keyboard');
     }
 
     subscribeSongsAndPartsActions() {
@@ -1905,24 +1904,8 @@ export class MBoxPage {
         if (!songStore) return;
 
         songStore.data.bpmValue = this.bpmValue;
-
-        console.log('saveSong.bpm', this.bpmValue);
-
         songStore.save();
     }
-
-//     const cb = (ok: boolean) => {
-//         if (ok) {
-//             this.renderTracksView();
-//             ideService.songStore.save();
-//         }
-//     }
-//
-//     new TrackDetailsDialog(this.context).openTrackDialog(
-//         ideService.songStore.data,
-//     '',
-//     cb
-// );
 
     async choiceTracks(): Promise<any> {
         const songStore = ideService.songStore;

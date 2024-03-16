@@ -13,7 +13,7 @@ class FileService {
         const root = 'D:/seqtot.github.io/assets'; // TODO: delete ???
 
         //const reader = new FileReader();
-        fetch(`api/readFile?path=${path}&root=${root}`)
+        fetch(`/api/readFile?path=${path}&root=${root}`)
             .then( res => {
                 return res.text();
                 //return res.json();
@@ -39,7 +39,7 @@ class FileService {
         console.log('Path', path);
 
         //const reader = new FileReader();
-        fetch(`api/readdir?path=${path}&root=${root}`)
+        fetch(`/api/readdir?path=${path}&root=${root}`)
             .then( res => {
                 //return res.text();
                 return res.json();
@@ -82,7 +82,7 @@ class FileService {
         // }
 
         //const reader = new FileReader();
-        fetch(`api/writeFile`, {
+        fetch(`/api/writeFile`, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             headers: {
                 'Content-Type': 'application/json;charset=UTF-8',

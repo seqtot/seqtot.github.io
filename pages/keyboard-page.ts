@@ -1,7 +1,3 @@
-import { Props } from 'framework7/modules/component/snabbdom/modules/props';
-import { ComponentContext } from 'framework7/modules/component/component';
-import { Dom7Array } from 'dom7';
-
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { Synthesizer, MultiPlayer } from '../libs/muse';
 import { standardTicks as ticks } from './ticks';
@@ -12,6 +8,8 @@ import { ideService, defaultTracks } from './ide/ide-service';
 import keyboardSet from './page_keyboard-utils';
 import { MY_SONG, SongStore, TrackInfo } from './song-store';
 import { UserSettings, UserSettingsStore } from './user-settings-store';
+import { Match as RouteInfo } from '../libs/navigo/types';
+import {appRouter} from '../src/router';
 
 // import { getDevice } from 'framework7';
 //
@@ -30,7 +28,6 @@ interface Page {
     stop();
     synthesizer: Synthesizer;
     multiPlayer: MultiPlayer;
-    context: ComponentContext,
 }
 
 export class KeyboardPage implements Page {
@@ -71,15 +68,11 @@ export class KeyboardPage implements Page {
     }
 
     get pageId(): string {
-        return this.props.id;
+        return this.props.data.id;
     }
 
     get pageEl(): HTMLElement {
-        return this.context.$el.value[0] as HTMLElement;
-    }
-
-    get el$(): Dom7Array {
-        return this.context.$el.value;
+        return document.getElementById('app-route');
     }
 
     get setInfo(): {
@@ -101,12 +94,11 @@ export class KeyboardPage implements Page {
     }
 
     constructor(
-        public props: Props,
-        public context: ComponentContext
+        public props: RouteInfo<{id: string, song?: string}>
     ) {}
 
     clearAppHeaderSecondRowArea() {
-        dyName('app-header-second-row-area').innerHTML = null;
+        getWithDataAttr('app-header-second-row-area')[0].innerHTML = null;
     }
 
     onClosePage() {
@@ -124,22 +116,20 @@ export class KeyboardPage implements Page {
     }
 
     onMounted() {
+        console.log('KeyboardPage.onMounted');
+
         this.initData();
 
         window.addEventListener('resize', this.onWindowResize);
 
-        this.el$.html(`
-            <div 
-                class="page-content"
-                style="padding-top: 0; padding-bottom: 10rem;"
-            >
+        this.pageEl.innerHTML = `
+            <div style="padding-top: 0; padding-bottom: 10rem;">
                 <div
                     style="display: flex;"
                     data-name="keyboard-page-wrapper"
                 >
                 </div>
-            </div>`
-        .trim());
+            </div>`.trim();
 
         setTimeout(() => this.setContent(), 50);
     }
@@ -156,7 +146,7 @@ export class KeyboardPage implements Page {
     }
 
     addTracksLink(add = false) {
-        const wrapper = getWithDataAttr('app-right-header-area')[0];
+        const wrapper = getWithDataAttr('app-header-right-area')[0];
 
         if (!wrapper) return;
 
@@ -169,7 +159,7 @@ export class KeyboardPage implements Page {
         getWithDataAttr('track-links', wrapper).forEach(el => {
             el.addEventListener('pointerup', () => {
                 if (getWithDataAttr('track-list-content')[0]) {
-                    const wrapper = dyName('app-header-second-row-area');
+                    const wrapper = getWithDataAttr('app-header-second-row-area')[0];
 
                     if (wrapper) {
                         wrapper.innerHTML = null;
@@ -184,24 +174,26 @@ export class KeyboardPage implements Page {
 
     setTrackName(name?: string) {
         const href = this.songId ? `href="/mbox/${this.songId}/"`: '';
-        const mainLink = '<a class="panel-open" data-panel=".panel-left" style="user-select: none; touch-action: none;"><b>MAIN</b></a>';
+        const mainLink = '<a style="user-select: none; touch-action: none;"><b>MAIN</b></a>';
         const backLink = href ? `&emsp;<a style="user-select: none; touch-action: none;" ${href}><b>BACK</b></a>` : '';
 
-        getWithDataAttr('app-center-header-area').forEach(el => {
+        getWithDataAttr('app-header-center-area').forEach(el => {
             if (name) {
-                el.innerHTML = `<a style="user-select: none; touch-action: none;" ${href}>${name}</a>`;
+                el.innerHTML = `<a style="user-select: none; touch-action: none;" ${href} data-navigo>${name}</a>`;
             } else {
                 el.innerHTML = '';
             }
         });
 
-        getWithDataAttr('app-left-header-area').forEach(el => {
-            if (name) {
-                el.innerHTML = `${mainLink}${backLink}`;
-            } else {
-                el.innerHTML = mainLink;
-            }
-        });
+        appRouter.updatePageLinks();
+
+        // getWithDataAttr('app-header-left-area').forEach(el => {
+        //     if (name) {
+        //         el.innerHTML = `${mainLink}${backLink}`;
+        //     } else {
+        //         el.innerHTML = mainLink;
+        //     }
+        // });
     }
 
     setContent(trackName: string = '') {
@@ -247,7 +239,7 @@ export class KeyboardPage implements Page {
             user-select: none; touch-action: none;
             border: 1px solid gray; border-radius: .3rem;
         `.trim();
-        const wrapper = dyName('app-header-second-row-area');
+        const wrapper = getWithDataAttr('app-header-second-row-area')[0];
 
         if (!wrapper) return;
 
@@ -311,7 +303,7 @@ export class KeyboardPage implements Page {
     }
 
     updateTrackList() {
-        const wrapper = dyName('app-header-second-row-area');
+        const wrapper = getWithDataAttr('app-header-second-row-area')[0];
 
         if (!wrapper) return;
 

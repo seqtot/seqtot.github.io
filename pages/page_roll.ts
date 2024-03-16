@@ -1,6 +1,6 @@
-import {Props} from 'framework7/modules/component/snabbdom/modules/props';
-import {ComponentContext} from 'framework7/modules/component/component';
-import {Dom7Array} from 'dom7';
+import { Match as RouteInfo } from '../libs/navigo/types';
+
+type WithId = {id: string}
 
 // ROLL EDITOR
 import { NoteSequencer } from '../roll/a-sequencer-wc';
@@ -12,20 +12,15 @@ if (customElements.get(NoteSequencer.tag) == null) {
 //
 export class RollPage {
   get pageId(): string {
-    return this.props.id;
+    return this.props.data.id;
   }
 
   get pageEl(): HTMLElement {
-    return this.context.$el.value[0] as HTMLElement;
-  }
-
-  get el$(): Dom7Array {
-    return this.context.$el.value;
+    return document.getElementById('app-route');
   }
 
   constructor(
-      public props: Props,
-      public context: ComponentContext,
+      public props: RouteInfo<WithId>,
   ) {}
 
   onMounted() {
@@ -34,11 +29,11 @@ export class RollPage {
 
   setContent() {
     // <note-sequencer time-start="0" duration="4" theme="default"></note-sequencer>
-    this.el$.html(`
+    this.pageEl.innerHTML = `
       <div style="height: 90%; width: 99%;">
         <note-sequencer theme="default"></note-sequencer>    
       </div>    
-    `);
+    `.trim();
   }
 
   getId(id: string): string {

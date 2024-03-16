@@ -1,26 +1,21 @@
-import { Props } from 'framework7/modules/component/snabbdom/modules/props';
-import { ComponentContext } from 'framework7/modules/component/component';
-import { Dom7Array } from 'dom7';
 import { Muse as m } from '../libs/muse';
-import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
+import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { UserSettingsStore } from './user-settings-store';
+import { Match as RouteInfo } from '../libs/navigo/types';
+
+type WithId = {id: string}
 
 export class UserSettingsPage {
     get pageId(): string {
-        return this.props.id;
+        return this.props.data.id;
     }
 
     get pageEl(): HTMLElement {
-        return this.context.$el.value[0] as HTMLElement;
-    }
-
-    get el$(): Dom7Array {
-        return this.context.$el.value;
+        return document.getElementById('app-route');
     }
 
     constructor(
-        public props: Props,
-        public context: ComponentContext,
+        public props: RouteInfo<WithId>,
     ) {}
 
     onMounted() {
@@ -30,7 +25,7 @@ export class UserSettingsPage {
     setContent() {
         const settings = UserSettingsStore.GetUserSettings();
 
-        this.el$.html(`
+        this.pageEl.innerHTML = `
             <div style="padding: .5rem 0 .5rem 1rem;">
                 <div>громкость клавиатуры</div>
                 <number-stepper-cc
@@ -66,7 +61,7 @@ export class UserSettingsPage {
             <div data-save-user-settings-action style="padding: .5rem 1rem .5rem 1rem;">
                 <button style="font-size: 1.5rem;">save</button>
             </div>
-        `);
+        `.trim();
 
         getWithDataAttr('save-user-settings-action', this.pageEl).forEach(el => {
             el.addEventListener('pointerdown', () => {

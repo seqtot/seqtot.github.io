@@ -1,18 +1,17 @@
-import { Props } from 'framework7/types/modules/component/snabbdom/modules/props';
-import { ComponentContext } from 'framework7/modules/component/component';
-import { Dom7Array } from 'dom7';
-import { byId, dyName } from '../src/utils';
+import { byId } from '../src/utils';
 import { Muse as m, Synthesizer, KeyInfo, Sound } from '../libs/muse';
 import { WavePreset } from '../libs/waf-player/otypes';
 import { Anchors } from '../sample-editor/a-wave-form-component';
 
 // SAMPLE EDITOR
 import { SampleEditorWc } from '../sample-editor/a-sample-editor-wc';
-import {EventEmitter} from '../libs/common/event-emitter';
-import {getAudioBufferFromBlobString, getAudioBufferFromString} from '../libs/waf-player/audio-buffer-to-wav';
-import {preparePreset} from '../libs/waf-player/prepare';
-
+import { EventEmitter } from '../libs/common/event-emitter';
+import { getAudioBufferFromBlobString, getAudioBufferFromString } from '../libs/waf-player/audio-buffer-to-wav';
+import { preparePreset } from '../libs/waf-player/prepare';
 import rawVoiceInst from '../waf-fonts/voice_han';
+import { Match as RouteInfo } from '../libs/navigo/types';
+
+type WithId = {id: string}
 
 if (customElements.get(SampleEditorWc.tag) == null) {
     customElements.define(SampleEditorWc.tag, SampleEditorWc);
@@ -130,15 +129,11 @@ export class SamplePage {
     currZone = 0;
 
     get pageId(): string {
-        return this.props.id;
+        return this.props.data.id;
     }
 
     get pageEl(): HTMLElement {
-        return this.context.$el.value[0] as HTMLElement;
-    }
-
-    get el$(): Dom7Array {
-        return this.context.$el.value;
+        return document.getElementById('app-route');
     }
 
     get ee(): EventEmitter {
@@ -146,8 +141,7 @@ export class SamplePage {
     }
 
     constructor(
-        public props: Props,
-        public context: ComponentContext,
+        public props: RouteInfo<WithId>,
     ) {
         this.mouseDownListener = (event: MouseEvent) => {
             //console.log('MousePressed', this.context);
@@ -187,7 +181,7 @@ export class SamplePage {
     }
 
     setContent() {
-        this.el$.html(`
+        this.pageEl.innerHTML = `
             <div style="margin: 0 .5rem;">
                 <div>
                     <a id="${this.getId(ids.save)}">${ids.save}</a>&emsp;
@@ -226,7 +220,7 @@ export class SamplePage {
             <div style="height: 80%;">
                 <sample-editor id="${this.getId(ids.editor)}"></sample-editor>        
             </div>
-        `);
+        `.trim();
     }
 
     setAnchorGroup(anchorGroup: string) {

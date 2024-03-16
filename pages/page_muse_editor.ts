@@ -1,6 +1,3 @@
-import { Props } from 'framework7/modules/component/snabbdom/modules/props';
-import { ComponentContext } from 'framework7/modules/component/component';
-import { Dom7Array } from 'dom7';
 import { GoldenLayout } from '../libs/gl/ts/golden-layout';
 import { LayoutConfig } from '../libs/gl/ts/config/config';
 import { ComponentContainer } from '../libs/gl/ts/container/component-container';
@@ -15,6 +12,9 @@ import { EmptyGlComponent } from './ide/empty-gl.component';
 import { FileTreeGlComponent } from './ide/file-tree-gl.component';
 import { TextEditorGlComponent } from './ide/text-editor-gl.component';
 import { FontViewerGlComponent } from './ide/font-viewer-gl.component';
+import { Match as RouteInfo } from '../libs/navigo/types';
+
+type WithId = {id: string}
 
 function getViewport(): {width: number; height: number} {
     const win = window;
@@ -136,21 +136,14 @@ export class MuseEditorPage {
     menuContainer: HTMLElement;
 
     get pageId(): string {
-        return this.props.id;
+        return this.props.data.id;
     }
 
     get pageEl(): HTMLElement {
-        return this.context.$el.value[0] as HTMLElement;
+        return document.getElementById('app-route');
     }
 
-    get el$(): Dom7Array {
-        return this.context.$el.value;
-    }
-
-    constructor(
-        public props: Props,
-        public context: ComponentContext,
-    ) {}
+    constructor(public props: RouteInfo<WithId>) {}
 
     onMounted() {
         //console.log('PageMuseEditor.onMounted');
@@ -225,10 +218,10 @@ export class MuseEditorPage {
     }
 
     addTopContainers() {
-        this.el$.html(`
+        this.pageEl.innerHTML = `
             <div style="height: 32px; margin: 2px;" id="${ids.menuContainer}"></div>
             <div id="${ids.glContainer}" style="width: 99%; height: calc(90% - 32px);"></div>
-    `);
+        `.trim();
     }
 
     getId(id: string): string {

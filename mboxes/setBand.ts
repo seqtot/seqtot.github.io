@@ -3,7 +3,7 @@ function getLink(name: string, href: string): string {
 }
 
 function getInnerLink(name: string, href: string): string {
-  return `<a class="link" href="${href}">${name}</a>`;
+  return `<a href="${href}" data-navigo>${name}</a>`;
 }
 
 function getBpmLink(bpm: number): string {
@@ -140,8 +140,6 @@ const content = `
   ${carcassiOp60n7}
   ${partingGlass}
   ${tiriTiri}
-  <number-stepper-cc data-name="page-bpm-input" value="90" min="1" max="500"></number-stepper-cc>  
-  <div style="margin-bottom: 3rem;"></div>
 `.trim();
 
 // ${peterGunn}

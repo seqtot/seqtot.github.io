@@ -1,13 +1,11 @@
-import { Props } from 'framework7/modules/component/snabbdom/modules/props';
-import { ComponentContext } from 'framework7/modules/component/component';
-import { Dom7, Dom7Array } from 'dom7';
-import 'dom7';
-
 import { getWithDataAttr } from '../../src/utils';
 import { WaveSource2 } from './wave-source';
 import { Sound } from '../../libs/muse';
 import { getEndPointVolume } from '../../libs/muse/utils';
 import { freqInfoList, FreqInfo } from '../../libs/muse/freq';
+import { Match as RouteInfo } from '../../libs/navigo/types';
+
+type WithId = {id: string}
 
 const outVol = 80;
 
@@ -519,20 +517,15 @@ export class ThereminPage {
     soloBoard: Board;
 
     get pageId(): string {
-        return this.props.id;
+        return this.props.data.id;
     }
 
     get pageEl(): HTMLElement {
-        return this.context.$el.value[0] as HTMLElement;
-    }
-
-    get el$(): Dom7Array {
-        return this.context.$el.value;
+        return document.getElementById('app-route');
     }
 
     constructor(
-        public props: Props,
-        public context: ComponentContext,
+        public props: RouteInfo<WithId>,
     ) {}
 
     onMounted() {
@@ -547,7 +540,7 @@ export class ThereminPage {
         const stl = 'position: absolute; box-sizing: border-box; user-select: none; touch-action: none;'
         const stl2 = 'style="box-sizing: border-box; user-select: none; touch-action: none;"';
 
-        this.el$.html(`
+        this.pageEl.innerHTML = `
             <div data-boards-container style="${stl2}">
                 <div data-board-bass-container style="${stl}">
                     <div data-board-bass-canvas-container style="${stl}"></div>                
@@ -571,11 +564,12 @@ export class ThereminPage {
                 <span style="${stl2}">к</span>
                 <span style="${stl2}">Б</span>                                
             </div>
-        `);
+        `.trim();
 
+        // jjkl
         const sizes = getSizes({
-            width: Math.floor(this.el$.width()),
-            height: Math.floor(this.el$.height()),
+            width: 200, // Math.floor(this.el$.width()),
+            height: 200, // Math.floor(this.el$.height()),
             cellCount: 36
         });
 
