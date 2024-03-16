@@ -6,6 +6,7 @@ import { SamplePage } from '../pages/page_sample_editor';
 import { appRouter } from './router';
 import { getWithDataAttr, getWithDataAttrValue } from './utils';
 import { ConfirmDialog } from '../pages/dialogs';
+import { GamePage } from '../pages/page_game';
 
 const pages = {
     page_roll: RollPage,
@@ -15,6 +16,7 @@ const pages = {
     userSettings: UserSettingsPage,
     theremin: ThereminPage,
     page_sample_editor: SamplePage,
+    game: GamePage,
 };
 
 const isDev = /localhost/.test(window.location.href);
@@ -22,13 +24,13 @@ const isDev = /localhost/.test(window.location.href);
 //     /devitband/.test(window.location.href) ||
 //     /local/.test(window.location.href);
 
-const defRoute = '/mbox/setBand/';
+const defRoute = isDev ? '/game/test' : '/mbox/setBand';
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
-//const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
-//const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
-//const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
+// const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
+// const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
+// const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
 type Link = {
     href: string,
@@ -41,11 +43,12 @@ const linksToPage: Link[]  = [
     { href: '/mbox/setBandDraft', name: 'Черновики' },
     { href: '/mbox/setMy', name: 'Мои вещи' },
     { href: '/page/page_keyboard', name: 'keyboard', isDev: false },
-    { href: '/page/page_roll', name: 'roll', isDev: true },
-    { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: true },
-    { href: '/page/page_muse_editor', name: 'museEditor', isDev: true },
     { href: '/page/userSettings', name: 'Settings', isDev: false},
     { href: '/page/theremin', name: 'Theremin', isDev: false},
+    { href: '/page/page_muse_editor', name: 'museEditor', isDev: true },
+    { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: true },
+    { href: '/page/page_roll', name: 'roll', isDev: true },
+    { href: '/game/test', name: 'game', isDev: false },
 ];
 
 class App {
@@ -144,15 +147,24 @@ class App {
     }
 
     subscribeRouter() {
-        const that = this;
-
         appRouter.on('mbox', this, (song) =>  {
             console.log('/mbox/:song', song);
 
-            that.setComponentByRoute(MBoxPage, {
+            this.setComponentByRoute(MBoxPage, {
                     id: 'mbox',
                     song: song,
                 });
+
+            return true;
+        });
+
+        appRouter.on('game', this, (game) =>  {
+            console.log('/game/:game', game);
+
+            this.setComponentByRoute(GamePage, {
+                id: 'game',
+                game,
+            });
 
             return true;
         });
@@ -165,7 +177,7 @@ class App {
 
             if (!klass) return;
 
-            that.setComponentByRoute(klass, {id});
+            this.setComponentByRoute(klass, {id});
 
             return true;
         });
@@ -173,7 +185,7 @@ class App {
         appRouter.on('/', this, (data) => {
             console.log('/', data);
 
-            that.renderDefaultPage();
+            this.renderDefaultPage();
 
             return true;
         });

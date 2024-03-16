@@ -96,7 +96,6 @@ function getSizes(x: {
     }
 }
 
-
 class Board {
     isSilent = false;
     lastX = -1;
@@ -566,10 +565,9 @@ export class ThereminPage {
             </div>
         `.trim();
 
-        // jjkl
         const sizes = getSizes({
-            width: 200, // Math.floor(this.el$.width()),
-            height: 200, // Math.floor(this.el$.height()),
+            width: this.pageEl.clientWidth, // this.pageEl.getBoundingClientRect().width,
+            height: this.pageEl.clientHeight, // this.pageEl.getBoundingClientRect().height,
             cellCount: 36
         });
 

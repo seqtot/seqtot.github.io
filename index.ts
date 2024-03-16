@@ -38,6 +38,7 @@ appEl.innerHTML = `
     <div id="app-route"
         style="
             height: calc(100dvh - 2rem);
+            position: relative;
             overflow: auto;"
     >
     </div>
