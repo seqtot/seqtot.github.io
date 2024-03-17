@@ -18,6 +18,7 @@ import butterflyEffect from './setBandDraft/butterflyEffect';
 import roundtrip from './setBandDraft/roundtrip';
 import abt1 from './setBandDraft/abt1';
 import mosquito from './setBandDraft/mosquito';
+import cage from './setBandDraft/cage';
 import peterGunn from './setBandDraft/peterGunn';
 
 export default {
@@ -40,6 +41,7 @@ export default {
   abt1,
   inSystem,
   mosquito,
+  cage,
 
   // LIST
   setBand,
