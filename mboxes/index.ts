@@ -1,23 +1,24 @@
-import setMy from './setMy';
-import tiriTiri from './tiriTiri';
-import bell from './bell';
-import carcassiOp60n7 from './carcassiOp60n7';
-import partingGlass from './partingGlass';
-import billy from './billy';
-import peterGunn from './peterGunn';
-import sweetLeaf from './sweetLeaf';
-import engine from './engine';
-import threeDots from './threeDots';
-import noSystems from './noSystems';
-import inSystem from './inSystem';
+import setMy from './setMy/a';
 
-import glass from './glass';
-import butterflyEffect from './butterflyEffect';
-import roundtrip from './roundtrip';
-import abt1 from './abt1';
+import setBand from './setBand/a';
+import tiriTiri from './setBand/tiriTiri';
+import bell from './setBand/bell';
+import carcassiOp60n7 from './setBand/carcassiOp60n7';
+import partingGlass from './setBand/partingGlass';
+import billy from './setBand/billy';
+import sweetLeaf from './setBand/sweetLeaf';
+import engine from './setBand/engine';
+import threeDots from './setBand/threeDots';
+import noSystems from './setBand/noSystems';
+import inSystem from './setBandDraft/inSystem';
 
-import setBand from './setBand';
-import setBandDraft from './setBandDraft';
+import setBandDraft from './setBandDraft/a';
+import glass from './setBandDraft/glass';
+import butterflyEffect from './setBandDraft/butterflyEffect';
+import roundtrip from './setBandDraft/roundtrip';
+import abt1 from './setBandDraft/abt1';
+import mosquito from './setBandDraft/mosquito';
+import peterGunn from './setBandDraft/peterGunn';
 
 export default {
   // SONG
@@ -38,6 +39,7 @@ export default {
   roundtrip,
   abt1,
   inSystem,
+  mosquito,
 
   // LIST
   setBand,

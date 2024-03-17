@@ -72,7 +72,7 @@ export class KeyboardChessCtrl {
         });
 
         getWithDataAttr('chess-pony-col-line-ind', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.board.ponyCellClicked());
+            el.addEventListener('pointerup', () => this.board.ponyCellClicked());
         });
     }
 
