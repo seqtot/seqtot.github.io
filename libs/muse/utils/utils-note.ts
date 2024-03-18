@@ -1,4 +1,3 @@
-'use babel';
 import {TextBlock, BlockType, SongPartInfo} from '../types'
 import { parseInteger } from './parse-integer';
 
@@ -635,7 +634,7 @@ export function getBeatsArrayFromString(val: string): number[] {
 export function getRandomElement<T>(arr: T | T[]): T {
     const length = arr ? (arr as any).length : 0;
 
-    const i = Math.floor(Math.random() * length);
+    let i = Math.round(Math.random() * (length - 1));
 
     return arr[i];
 }

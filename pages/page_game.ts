@@ -34,7 +34,6 @@ const colors2 = {
     white: '255,255,255',
 }
 
-
 function getSizes(x: {
     width: number,
     height: number,
@@ -67,15 +66,12 @@ function getSizes(x: {
         cellWidth,
     };
 
-    console.log('getSizes', result);
-
     return result;
 }
 
-
 type ModelType = {
     lines: {
-        restQ: number,
+        restQ?: number,
         cells: {
             offsetQ: number,
             durQ: number,
@@ -83,28 +79,56 @@ type ModelType = {
     }[]
 }
 
+const topTestBlock: ModelType = {
+    lines: [
+        {
+            cells: [{
+                offsetQ: 0,
+                durQ: 30,
+            }]
+        },
+        {
+            cells: [{
+                offsetQ: 0,
+                durQ: 30,
+            }]
+        },
+        {
+            cells: [{
+                offsetQ: 0,
+                durQ: 30,
+            }]
+        },
+        {
+            cells: [{
+                offsetQ: 0,
+                durQ: 30,
+            }]
+        }
+    ]
+};
 
-const testBlock: ModelType = {
+const midTestBlock: ModelType = {
     lines: [
         {
             restQ: 0,
             cells: [{
                 offsetQ: 0,
-                durQ: 120,
+                durQ: 30,
             }]
         },
         {
             restQ: 0,
             cells: [{
                 offsetQ: 30,
-                durQ: 90,
+                durQ: 30,
             }]
         },
         {
             restQ: 0,
             cells: [{
                 offsetQ: 60,
-                durQ: 60,
+                durQ: 30,
             }]
         },
         {
@@ -117,10 +141,47 @@ const testBlock: ModelType = {
     ]
 };
 
+function getRandomBlock(rowCount: number): ModelType {
+    let lines = new Array(rowCount).fill(null) as ModelType['lines'];
+    lines = lines.map(() => ({cells: []}));
+
+    lines.forEach(line => {
+        const count = Math.round(Math.random() * 4);
+        let indexes: number[] = [];
+
+        if (count === 4) {
+            indexes = [0, 1, 2, 3];
+        }
+
+        while (count < 4) {
+            if (indexes.length === count) break;
+
+            const index = Math.round(Math.random() * 3);
+
+            if (!indexes.includes(index)) {
+                indexes.push(index);
+            }
+        }
+
+        indexes.sort();
+
+        indexes.forEach(ind => {
+            line.cells[ind] = {
+                durQ: 30,
+                offsetQ: ind * 30
+            };
+        });
+    });
+
+    return {
+        lines
+    }
+}
+
 const model: {top: ModelType, mid: ModelType, bot: ModelType} = {
-    top: testBlock,
-    mid: testBlock,
-    bot: testBlock,
+    top: topTestBlock,
+    mid: getRandomBlock(4),
+    bot: getRandomBlock(4),
 }
 
 class Board {
@@ -207,8 +268,8 @@ class Board {
 
                     ctx.fillStyle = `rgba(${colors.blue}, 1)`;
                     ctx.fillRect(startX, lastY, endX - startX, rowHeight);
-                    ctx.fillStyle = `rgba(${colors2.black}, .7)`;
-                    ctx.fillRect(startX + 1, lastY + 1, 4 , rowHeight - 2);
+                    ctx.fillStyle = `rgba(${colors2.black}, 1)`;
+                    ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
                 });
 
                 lastY += rowHeight;
@@ -255,7 +316,7 @@ class Board {
         height = sizes.rowInBlockCount * sizes.halfRowHeight;
         ctx.fillRect(0, lastY, sizes.boardWidth , height);
 
-        lastY = sizes.boardHeight - (sizes.rowInBlockCount * sizes.halfRowHeight);
+        lastY = (sizes.rowInBlockCount * sizes.rowHeight) +  (sizes.rowInBlockCount * sizes.halfRowHeight);
         ctx.fillRect(0, lastY, sizes.boardWidth , height);
     }
 
@@ -347,6 +408,7 @@ export class GamePage {
                 <div style="padding: 8px 8px 0 8px;">
                     <button data-start-game-action>start</button>
                     <button data-stop-game-action>stop</button>                    
+                    <button data-next-game-action>next</button>
                 </div>
                 <div
                     style="
@@ -387,5 +449,14 @@ export class GamePage {
         this.board = new Board();
         this.board.createCanvas(this.sizes, gameBoardEl);
         this.board.paint();
+
+        getWithDataAttr('next-game-action', this.pageEl).forEach(el => {
+           el.addEventListener('pointerup', (e: MouseEvent) => {
+               model.top = model.mid;
+               model.mid = model.bot;
+               model.bot = getRandomBlock(this.board.sizes.rowInBlockCount);
+               this.board.paint();
+           });
+        });
     }
 }
