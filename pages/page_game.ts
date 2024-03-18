@@ -3,64 +3,54 @@ import {getWithDataAttr} from '../src/utils';
 
 type RouteType = {id: string, game: string}
 
-
 type Sizes = {
-    width: number,
-    height: number,
+    pageWidth: number,
+    pageHeight: number,
+
     boardHeight: number,
+    boardWidth: number,
 
-    cellSize: number,
-    halfSize: number,
+    rowWidth: number,
+    rowHeight: number,
+    halfRowHeight: number;
 
-    boardSoloWidth: number,
-    boardSoloLeft: number,
-    boardBassLeft: number,
-    boardBassWidth: number,
-    boardLeftOffset: number,
-    boardTopOffset: number,
+    topPadding: number,
+
+    blockCount: number,
+    rowInBlockCount: number;
 };
 
 function getSizes(x: {
     width: number,
     height: number,
-    cellCount: number,
+    blockCount: number,
+    rowInBlockCount: number;
+    paddingTop: number,
+    paddingSide: number,
 }): Sizes {
+    let pageWidth = Math.floor(x.width);
+    let pageHeight = Math.floor(x.height);
+    let rowWidth = (Math.floor((pageWidth - (x.paddingSide * 2)) / 2) * 2);
+    let boardHeight = pageHeight - x.paddingTop;
+    let rowHeight = Math.floor((boardHeight / (x.rowInBlockCount * 2)) / 2) * 2;
+    let halfRowHeight = rowHeight / 2;
 
-    //console.log(getPosition(this.bassBoard.canvasEl));
-
-    let headerHeight = getWithDataAttr('app-header-first-row-area')[0].clientHeight;
-
-    let width = x.width ; // window.innerWidth;
-    let height = x.height - (headerHeight * 2); //window.innerHeight;
-    // let boardWidth = pageWidth - 64;
-    // let boardHeight = 0;
-    let halfSize = Math.floor((((height - (x.cellCount + 2)) / (x.cellCount + 2))) / 2);
-    let cellSize = (halfSize * 2) + 1;
-
-    const halfWidth = Math.floor(width / cellSize / 2) * cellSize;
-
-    let boardSoloWidth = halfWidth; //Math.floor(width / cellSize);
-    //boardSoloWidth = boardSoloWidth - 3;
-    //boardSoloWidth = boardSoloWidth * cellSize;
-    let boardBassLeft = 0;
-    let boardBassWidth = halfWidth; // cellSize * 3;
-    let boardSoloLeft = width - 1 - halfWidth; // cellSize * 3;
-
-    let boardHeight = (x.cellCount * cellSize) + (cellSize * 2);
-
-    return {
-        width,
-        height,
+    const result =  {
+        pageWidth,
+        pageHeight,
         boardHeight,
-        cellSize,
-        halfSize,
-        boardSoloWidth,
-        boardSoloLeft,
-        boardBassLeft,
-        boardBassWidth,
-        boardLeftOffset: 0,
-        boardTopOffset: 0,
-    }
+        boardWidth: rowWidth,
+        rowWidth,
+        rowHeight,
+        halfRowHeight,
+        topPadding: 32,
+        blockCount: x.blockCount,
+        rowInBlockCount: x.rowInBlockCount,
+    };
+
+    console.log('getSizes', result);
+
+    return result;
 }
 
 class Board {
@@ -73,21 +63,57 @@ class Board {
     canvasBot: HTMLCanvasElement;
     canvasCtxBot: CanvasRenderingContext2D;
 
-    gutter: number;
     canvasEl: HTMLElement;
 
     sizes: Sizes;
+    blocks: {
+        blockCount: number,
+        rowInBlockCount: number;
+    }
+
+    clearCanvasTop() {
+        this.canvasCtxTop.clearRect(0, 0, this.canvasTop.width, this.canvasTop.height);
+    }
+
+    clearCanvasBot() {
+        this.canvasCtxBot.clearRect(0, 0, this.canvasBot.width, this.canvasBot.height);
+    }
+
+    clearCanvasMid() {
+        this.canvasCtxMid.clearRect(0, 0, this.canvasMid.width, this.canvasMid.height);
+    }
+
+    paint() {
+        this.clearCanvasMid();
+        const sizes = this.sizes;
+
+        const ctx = this.canvasCtxMid;
+        const defStroke = 'rgb(200, 200, 200)';
+        ctx.strokeStyle = defStroke;
+        ctx.lineWidth = 1;
+
+        let lastY = 0;
+        let height = sizes.rowInBlockCount * sizes.halfRowHeight;
+        ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
+
+        lastY = lastY + height;
+        height = sizes.rowInBlockCount * sizes.rowHeight;
+        ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
+
+        lastY = lastY + height;
+        height = sizes.rowInBlockCount * sizes.halfRowHeight;
+        ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
+    }
 
     createCanvas(sizes: Sizes, canvasEl: HTMLElement) {
         this.sizes = sizes;
-        this.gutter = sizes.cellSize;
         this.canvasEl = canvasEl;
 
         // BOT TOM
         this.canvasBot = document.createElement('canvas');
         this.canvasBot.style.position = "absolute";
-        this.canvasBot.width  = sizes.width;
-        this.canvasBot.height = sizes.height;
+        this.canvasBot.width  = sizes.boardWidth;
+        this.canvasBot.height = sizes.boardHeight;
         // this.canvasEl.style.border   = "1px solid gray";
         this.canvasEl.appendChild(this.canvasBot);
         this.canvasCtxBot = this.canvasBot.getContext("2d");
@@ -95,16 +121,16 @@ class Board {
         // MID CANVAS
         this.canvasMid = document.createElement('canvas');
         this.canvasMid.style.position = "absolute";
-        this.canvasMid.width  = sizes.width;
-        this.canvasMid.height = sizes.height;
+        this.canvasMid.width  = sizes.boardWidth;
+        this.canvasMid.height = sizes.boardHeight;
         this.canvasEl.appendChild(this.canvasMid);
         this.canvasCtxMid = this.canvasMid.getContext("2d");
 
         // TOP CANVAS
         this.canvasTop = document.createElement('canvas');
         this.canvasTop.style.position = "absolute";
-        this.canvasTop.width  = sizes.width;
-        this.canvasTop.height = sizes.height;
+        this.canvasTop.width  = sizes.boardWidth;
+        this.canvasTop.height = sizes.boardHeight;
         this.canvasEl.appendChild(this.canvasTop);
         this.canvasCtxTop = this.canvasTop.getContext("2d");
     }
@@ -114,6 +140,9 @@ class Board {
 export class GamePage {
     width = 0;
     height = 0;
+    sizes: Sizes;
+    board: Board;
+
     get pageId(): string {
         return this.props.data.id;
     }
@@ -146,17 +175,55 @@ export class GamePage {
 
     setContent() {
         //this.pageEl.style.border = `1px solid gray`;
+        const sizes = this.sizes = getSizes({
+            width: this.width,
+            height: this.height,
+            blockCount: 3,
+            rowInBlockCount: 4,
+            paddingTop: 48,
+            paddingSide: 8,
+        })
+
+        console.log('sizes', this.sizes);
 
         this.pageEl.innerHTML = `
-            <div style="display: flex; justify-content: center;">
-                <div style="
-                    border: 1px solid gray;
-                    width: ${this.width * 0.7}px;"
+            <div>
+                <div style="padding: 8px;">
+                    <button data-start-game-action>start</button>
+                    <button data-stop-game-action>stop</button>                    
+                </div>
+                <div
+                    style="width: ${sizes.boardWidth}px; height: ${sizes.boardHeight}px; padding-left: 8px;" 
+                    data-game-board
                 >
-                    GamePage
-                </div>            
+                </div>
+                <div></div>            
             </div>
-    
+            <!--div style="border: 1px solid gray;">
+                <span style="background-color: lightgray;">lightgray</span>
+                <span style="background-color: gray;">gray</span><br/>
+                <span style="background-color: deepskyblue;">deepskyblue</span>
+                <span style="background-color: blue;">blue</span><br/>
+                <span style="background-color: aquamarine;">aquamarine</span>
+                <span style="background-color: darkcyan;">darkcyan</span><br/>                    
+                <span style="background-color: lime;">lime</span>                    
+                <span style="background-color: green;">green</span><br/>
+                <span style="background-color: orange;">orange</span>
+                <span style="background-color: saddlebrown;">saddlebrown</span><br/>                    
+                <span style="background-color: lightcoral;">lightcoral</span>
+                <span style="background-color: red;">red</span><br/>
+                <span style="background-color: cyan;">cyan</span>
+                <span style="background-color: violet;">violet</span><br/>                    
+                <span style="background-color: yellow;">yellow</span>
+                <span style="background-color: bisque;">bisque</span><br/>
+                <span style="background-color: darkkhaki;">darkkhaki</span>
+                <span style="background-color: white;">unkonow</span>                                        
+            </div-->
         `;
+
+        const gameBoardEl = getWithDataAttr('game-board', this.pageEl)[0];
+        this.board = new Board();
+        this.board.createCanvas(this.sizes, gameBoardEl);
+        this.board.paint();
     }
 }
