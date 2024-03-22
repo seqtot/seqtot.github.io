@@ -9,6 +9,7 @@ import keyboardSet from './page_keyboard-utils';
 import { MY_SONG, SongStore, TrackInfo } from './song-store';
 import { UserSettings, UserSettingsStore } from './user-settings-store';
 import { appRouter, RouteInfo } from '../src/router';
+import {SignatureType} from '../libs/muse/ticker';
 
 // import { getDevice } from 'framework7';
 //
@@ -350,16 +351,16 @@ export class KeyboardPage implements Page {
 
     subscribeMetronomeEvents() {
         getWithDataAttr('tick-trigger', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => {
+            el.addEventListener('pointerup', (evt: MouseEvent) => {
                 this.playTick(el?.dataset?.tickTrigger);
             });
         });
 
-        getWithDataAttrValue('action-type', 'tick', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', () => this.playTick3(el.dataset['signature']));
+        getWithDataAttr('start-tick-action', this.pageEl)?.forEach((el) => {
+            el.addEventListener('pointerup', () => this.playTick3(el.dataset['signature'] as SignatureType));
         });
 
-        getWithDataAttrValue('action-type', 'test', this.pageEl)?.forEach((el) => {
+        getWithDataAttrValue('pointerup', 'test', this.pageEl)?.forEach((el) => {
             el.addEventListener('click', (evt: MouseEvent) => this.playTick3());
         });
     }
@@ -514,7 +515,7 @@ export class KeyboardPage implements Page {
         }
     }
 
-    playTick3(signature?: string) {
+    playTick3(signature?: SignatureType) {
         this.stopTicker();
 
         const cb = (x: {ab: AudioBufferSourceNode, startTimeMs: number}) => {
@@ -536,7 +537,7 @@ export class KeyboardPage implements Page {
         }
 
         ideService.ticker.createTickSource({
-            qms: Math.round(60000/ this.bpmValue),
+            qMs: Math.round(60000/ this.bpmValue),
             preset1: ideService.synthesizer.instruments['drum_56'],
             preset2: ideService.synthesizer.instruments['drum_80'],
             repeat: 100,

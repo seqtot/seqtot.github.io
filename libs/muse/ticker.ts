@@ -19,6 +19,8 @@ export function tickOnTime(endTime: number, ctx: AudioContext, cb: () => void): 
     return oscil;
 }
 
+export type SignatureType = '1:4' | '3:8' | '2:8';
+
 export class Ticker {
     private interval: any = null;
 
@@ -171,52 +173,71 @@ export class Ticker {
     }
 
     createTickSource(x: {
-        qms: number,
-        signature?: string,
+        qMs: number,
+        signature?: SignatureType,
         preset1: WavePreset,
         preset2?: WavePreset,
+        startOffsetMs?: number,
         cb: (x: {
             ab: AudioBufferSourceNode,
-            startTimeMs: number
+            startTimeMs: number,
+            qMs: number,
          })=> void,
         repeat: number,
     }) {
         let repeat = x.repeat || 100;
-        let qms = x.qms || 400;
-        let qmsSec = qms / 1000;
-        let totalDurationSec = qmsSec * repeat;
+        let qMs = x.qMs || 400;
+        let qSec = qMs / 1000;
+        let totalDurationSec = qSec * repeat;
         let offlineCtx = new OfflineAudioContext(1, 44100 * totalDurationSec, 44100);
         let currentTime = offlineCtx.currentTime;
-        let offset = 0;
+        let startOffsetSec = x.startOffsetMs ? x.startOffsetMs / 1000 : 0;
+        let currentOffsetSec = 0;
+        let signature = x.signature || '2:8';
 
         for (let i=0; i<repeat; i++) {
-            if (x.signature === '3:8') {
-                const qmsHalfSec = qmsSec / 2;
+            if (signature === '2:8') {
+                const qHalfSec = qSec / 2;
 
                 let soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
                 soundSource.buffer = x.preset1.zones[0].buffer;
                 soundSource.connect(offlineCtx.destination);
-                soundSource.start(currentTime + offset);
-                offset = offset + qmsHalfSec;
+                soundSource.start(currentTime + currentOffsetSec);
+                currentOffsetSec += qHalfSec;
 
                 soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
                 soundSource.buffer = x.preset2.zones[0].buffer;
                 soundSource.connect(offlineCtx.destination);
-                soundSource.start(currentTime + offset);
-                offset = offset + qmsHalfSec;
+                soundSource.start(currentTime + currentOffsetSec);
+                currentOffsetSec += qHalfSec;
+            }
+            else if (signature === '3:8') {
+                const qHalfSec = qSec / 2;
+
+                let soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+                soundSource.buffer = x.preset1.zones[0].buffer;
+                soundSource.connect(offlineCtx.destination);
+                soundSource.start(currentTime + currentOffsetSec);
+                currentOffsetSec += qHalfSec;
 
                 soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
                 soundSource.buffer = x.preset2.zones[0].buffer;
                 soundSource.connect(offlineCtx.destination);
-                soundSource.start(currentTime + offset);
-                offset = offset + qmsHalfSec;
+                soundSource.start(currentTime + currentOffsetSec);
+                currentOffsetSec += qHalfSec;
+
+                soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
+                soundSource.buffer = x.preset2.zones[0].buffer;
+                soundSource.connect(offlineCtx.destination);
+                soundSource.start(currentTime + currentOffsetSec);
+                currentOffsetSec += qHalfSec;
             }
             else { // 1:4
                 const soundSource = offlineCtx.createBufferSource(); // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createBufferSource
                 soundSource.buffer = x.preset1.zones[0].buffer;
                 soundSource.connect(offlineCtx.destination);
-                soundSource.start(currentTime + offset);
-                offset = offset + qmsSec;
+                soundSource.start(currentTime + currentOffsetSec);
+                currentOffsetSec += qSec;
             }
 
         }
@@ -228,18 +249,25 @@ export class Ticker {
 
                 audioBufferSourceNode.buffer = audioBuffer;
                 audioBufferSourceNode.connect(Sound.ctx.destination);
-                audioBufferSourceNode.start();
-                audioBufferSourceNode.stop(Sound.ctx.currentTime + totalDurationSec);
-                audioBufferSourceNode.onended = () => {
-                    //console.log('onended');
-                    audioBufferSourceNode.disconnect(Sound.ctx.destination);
-                }
 
+                const startTimeMs = Date.now() + (x.startOffsetMs || 0);
+
+                audioBufferSourceNode.start(Sound.ctx.currentTime + startOffsetSec);
                 x.cb({
                     ab: audioBufferSourceNode,
-                    startTimeMs: Date.now()
+                    startTimeMs,
+                    qMs,
                 });
 
+                audioBufferSourceNode.stop(Sound.ctx.currentTime + totalDurationSec + startOffsetSec);
+                audioBufferSourceNode.onended = () => {
+                    //console.log('onended');
+                    try {
+                        audioBufferSourceNode.disconnect(Sound.ctx.destination);
+                    } catch (e) {
+                        console.log('catch on disconnect', e);
+                    }
+                }
             })
             .catch(function(err) {
                 console.log('Rendering failed: ' + err);

@@ -12,7 +12,7 @@ const appEl = document.getElementById('app');
 
 appEl.innerHTML = `
     <!-- HEADER -->
-    <div data-app-header-container style="border-bottom: 2px solid gray;">
+    <div data-app-header-container style="border-bottom: 2px solid gray; box-sizing: border-box;">
         <div data-app-header-first-row-area
             style="
                 display: flex;

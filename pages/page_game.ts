@@ -1,5 +1,7 @@
 import { RouteInfo } from '../src/router';
 import { getWithDataAttr } from '../src/utils';
+import { ideService } from './ide/ide-service';
+import {SignatureType} from '../libs/muse/ticker';
 
 type RouteType = {id: string, game: string}
 
@@ -82,28 +84,28 @@ type ModelType = {
 const topTestBlock: ModelType = {
     lines: [
         {
-            cells: [{
-                offsetQ: 0,
-                durQ: 30,
-            }]
+            cells: [
+                { offsetQ: 0, durQ: 30 },
+                { offsetQ: 60, durQ: 30 },
+            ]
         },
         {
-            cells: [{
-                offsetQ: 0,
-                durQ: 30,
-            }]
+            cells: [
+                { offsetQ: 0, durQ: 30 },
+                { offsetQ: 60, durQ: 30 },
+            ]
         },
         {
-            cells: [{
-                offsetQ: 0,
-                durQ: 30,
-            }]
+            cells: [
+                { offsetQ: 0, durQ: 30 },
+                { offsetQ: 60, durQ: 30 },
+            ]
         },
         {
-            cells: [{
-                offsetQ: 0,
-                durQ: 30,
-            }]
+            cells: [
+                { offsetQ: 0, durQ: 30 },
+                { offsetQ: 60, durQ: 30 },
+            ]
         }
     ]
 };
@@ -212,6 +214,35 @@ class Board {
 
     clearCanvasMid() {
         this.canvasCtxMid.clearRect(0, 0, this.canvasMid.width, this.canvasMid.height);
+    }
+
+    paintTick(tickNio: number) {
+        //console.log('paintTick', tickNio);
+
+        this.clearCanvasTop();
+
+        if (tickNio === Infinity) return;
+
+        const ctx = this.canvasCtxTop;
+        const tickInd = tickNio - 1;
+        const tickInRow = 2;
+
+        const blockInd = Math.floor(tickInd / (this.sizes.rowInBlockCount * tickInRow));
+        const cellNio = tickNio - (blockInd * 8);
+        const cellInd = cellNio - 1;
+        const rowInd = Math.floor(cellInd / tickInRow);
+        const cellInRowInd = cellInd - (rowInd * tickInRow);
+
+        //console.log(blockInd, rowInd, cellNio);
+
+        ctx.fillStyle = `rgba(${colors.red}, 1)`;
+
+        let yOffset = this.sizes.halfRowHeight * this.sizes.rowInBlockCount;
+        yOffset += ((this.sizes.rowHeight * rowInd) + (this.sizes.halfRowHeight / 2));
+
+        const x = cellInRowInd * (this.sizes.cellWidth * tickInRow) + ((this.sizes.cellWidth - this.sizes.halfRowHeight) / 2);
+
+        ctx.fillRect(x, yOffset , this.sizes.halfRowHeight , this.sizes.halfRowHeight);
     }
 
     paintCellGrid() {
@@ -353,11 +384,37 @@ class Board {
 }
 
 
+type TickInfo = {
+    tickNode: AudioBufferSourceNode | null,
+    tickStartTimeMs: number,
+    tickEndTimeMs: number,
+    tickQms: number,
+    prevFrameMs: number,
+    requestAnimationFrameId: number,
+    repeat: number,
+    lastTickNio: number,
+}
+
+function getTickInfo(): TickInfo {
+    return {
+        tickNode: null,
+        tickStartTimeMs: 0,
+        tickEndTimeMs: 0,
+        tickQms: 0,
+        prevFrameMs: 0,
+        requestAnimationFrameId: 0,
+        repeat: 0,
+        lastTickNio: 0,
+    }
+}
+
 export class GamePage {
     width = 0;
     height = 0;
     sizes: Sizes;
     board: Board;
+    bpmValue: number = 90;
+    tickInfo = getTickInfo();
 
     get pageId(): string {
         return this.props.data.id;
@@ -380,9 +437,10 @@ export class GamePage {
         this.height = this.pageEl.getBoundingClientRect().height;
 
         this.setContent();
+        this.subscribeEvents();
 
-        console.log(this.width);
-        console.log(this.height);
+        //console.log(this.width);
+        //console.log(this.height);
     }
 
     onUnmounted() {
@@ -396,20 +454,25 @@ export class GamePage {
             height: this.height,
             blockCount: 3,
             rowInBlockCount: 4,
-            paddingTop: 48,
+            paddingTop: 8 + 32 + 32 + 8, // 80
             paddingSide: 8,
             cellCount: 4,
         })
 
-        console.log('sizes', this.sizes);
+        //console.log('sizes', this.sizes);
 
         this.pageEl.innerHTML = `
             <div>
-                <div style="padding: 8px 8px 0 8px;">
+                <div style="padding: 8px 8px 0 8px; height: 32px; box-sizing: border-box;">
                     <button data-start-game-action>start</button>
                     <button data-stop-game-action>stop</button>                    
                     <button data-next-game-action>next</button>
                 </div>
+                
+                <div style="padding: 8px 8px 0 8px; height: 32px; box-sizing: border-box;">
+                    <number-stepper-cc data-game-bpm-input value="90" min="1" max="500"></number-stepper-cc>
+                </div>
+                                
                 <div
                     style="
                         width: ${sizes.boardWidth}px;
@@ -421,6 +484,7 @@ export class GamePage {
                     data-game-board
                 >
                 </div>
+                
                 <div></div>            
             </div>
             <!--div style="border: 1px solid gray;">
@@ -449,14 +513,132 @@ export class GamePage {
         this.board = new Board();
         this.board.createCanvas(this.sizes, gameBoardEl);
         this.board.paint();
+    }
 
+    subscribeEvents() {
         getWithDataAttr('next-game-action', this.pageEl).forEach(el => {
-           el.addEventListener('pointerup', (e: MouseEvent) => {
-               model.top = model.mid;
-               model.mid = model.bot;
-               model.bot = getRandomBlock(this.board.sizes.rowInBlockCount);
-               this.board.paint();
-           });
+            el.addEventListener('pointerup', (e: MouseEvent) => {
+                model.top = model.mid;
+                model.mid = model.bot;
+                model.bot = getRandomBlock(this.board.sizes.rowInBlockCount);
+                this.board.paint();
+            });
         });
+
+        getWithDataAttr('start-game-action', this.pageEl).forEach(el => {
+            el.addEventListener('pointerup', (e: MouseEvent) => {
+                this.playTick3();
+            });
+        });
+
+        getWithDataAttr('stop-game-action', this.pageEl).forEach(el => {
+            el.addEventListener('pointerup', (e: MouseEvent) => {
+                this.stopTicker();
+            });
+        });
+
+        getWithDataAttr('game-bpm-input', this.pageEl).forEach((el) => {
+            el.addEventListener('valuechanged', (e: any) => {
+                getWithDataAttr('game-bpm-input', this.pageEl).forEach((el) => {
+                    el.setAttribute('value', e.detail.value);
+                });
+
+                if (this.bpmValue !== e.detail.value) {
+                    this.bpmValue = e.detail.value;
+
+                    // if (this.playingTick) {
+                    //     this.playTick(this.playingTick);
+                    // }
+                }
+            });
+        });
+    }
+
+    animationFrame = () => {
+        const time = Date.now();
+
+        const tickInfo = this.tickInfo;
+        const diffMs = time - tickInfo.tickStartTimeMs;
+        const tickNio = Math.floor(diffMs / tickInfo.tickQms) + 1;
+        const tickInd = tickNio - 1;
+        const prevFrameMs = tickInfo.prevFrameMs;
+
+        tickInfo.prevFrameMs = time;
+
+        if (diffMs > -1 && tickInfo.lastTickNio !== tickNio) {
+            //console.log(
+            //     tickNio,
+            //     tickInfo.tickStartTimeMs + (tickInd * tickInfo.tickQms),
+            //     time - (tickInfo.tickStartTimeMs + (tickInd * tickInfo.tickQms)),
+            //     time
+            // );
+            tickInfo.lastTickNio = tickNio;
+            this.board.paintTick(tickNio);
+        }
+
+        if (time < tickInfo.tickEndTimeMs) {
+            this.tickInfo.requestAnimationFrameId = requestAnimationFrame(this.animationFrame);
+        } else {
+            this.board.paintTick(Infinity);
+        }
+    }
+
+    playTick3(signature?: SignatureType) {
+        this.stopTicker();
+        signature =  signature || '2:8';
+
+        const tickInfo = this.tickInfo;
+        const repeat = 100; // 8
+
+        const cb = (x: {
+            ab: AudioBufferSourceNode,
+            startTimeMs: number,
+            qMs: number,
+        }) => {
+            //console.log(x);
+
+            tickInfo.tickNode = x.ab;
+            tickInfo.repeat = repeat * 2;
+            tickInfo.tickQms = x.qMs / 2;
+            tickInfo.tickStartTimeMs = x.startTimeMs;
+            tickInfo.tickEndTimeMs = x.startTimeMs + (tickInfo.repeat * tickInfo.tickQms);
+            tickInfo.requestAnimationFrameId = requestAnimationFrame(this.animationFrame);
+        }
+
+        const qMs = Math.round(60000/ this.bpmValue); // quoter in ms
+
+        ideService.ticker.createTickSource({
+            qMs, // quoter in ms
+            //preset1: ideService.synthesizer.instruments['drum_56'],
+            preset1: ideService.synthesizer.instruments['drum_80'],
+            preset2: ideService.synthesizer.instruments['drum_80'],
+            repeat,
+            signature,
+            cb,
+            startOffsetMs: qMs,
+        });
+    }
+
+    stopTicker() {
+        //console.log('stopTicker');
+        // ideService.ticker.stop();
+        // ideService.synthesizer.playSound({
+        //     keyOrNote: 'cowbell',
+        //     id: 'ticker',
+        //     onlyStop: true,
+        // });
+
+        const tickInfo = this.tickInfo;
+
+        if (tickInfo.requestAnimationFrameId) {
+            window.cancelAnimationFrame(this.tickInfo.requestAnimationFrameId)
+        }
+
+        if (tickInfo.tickNode) {
+            tickInfo.tickNode.stop();
+            tickInfo.tickNode = null;
+        }
+
+        this.tickInfo = getTickInfo();
     }
 }

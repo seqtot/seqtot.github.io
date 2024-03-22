@@ -436,12 +436,12 @@ export class KeyboardCtrl {
                 >rec</span>&nbsp;
                 <span
                     style="${style}"
-                    data-action-type="tick"
+                    data-start-tick-action
                     data-signature="1:4"
                 >1:4</span>
                 <span
                     style="${style}"
-                    data-action-type="tick"
+                    data-start-tick-action
                     data-signature="3:8"                    
                 >3:8</span>&nbsp;
             </div>
