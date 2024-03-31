@@ -19,6 +19,7 @@ import roundtrip from './setBandDraft/roundtrip';
 import abt1 from './setBandDraft/abt1';
 import mosquito from './setBandDraft/mosquito';
 import cage from './setBandDraft/cage';
+import brotherBilly from './setBandDraft/brotherBilly';
 import peterGunn from './setBandDraft/peterGunn';
 
 export default {
@@ -35,6 +36,7 @@ export default {
   //peterGunn,
 
   // DRAFT
+  brotherBilly,
   glass,
   butterflyEffect,
   roundtrip,

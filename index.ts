@@ -2,7 +2,7 @@ import './libs/cm/codemirror.css';
 import './libs/cm-addons/cm_musa.less';
 import './libs/gl/less/goldenlayout-base.less';
 import './libs/gl/less/themes/goldenlayout-borderless-dark-theme.less';
-import './src/style.css';
+import './src/style.less';
 
 import './libs/ui/number-stepper-cc';
 

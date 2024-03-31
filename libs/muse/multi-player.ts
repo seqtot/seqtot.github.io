@@ -1,13 +1,11 @@
-'use babel';
-
 import { Sound } from './sound';
 import { MidiPlayer } from './midi-player';
 import { toneAndDrumPlayerSettings, DEFAULT_TONE_INSTR } from './keyboards';
 import { Ticker } from './ticker';
 import { DEFAULT_OUT_VOLUME } from '../../pages/song-store';
-import {TextBlock, DataByTracks} from './types';
+import { TextBlock, DataByTracks } from './types';
 import * as u from './utils';
-import {Deferred} from './utils';
+import { Deferred } from './utils';
 //import * as Fs from 'fs';
 
 const Fs: any = null;
@@ -41,6 +39,7 @@ type OutLoopsInfo = {
     rowLoops: {
         ids: (string | number)[],
         beatsMs: number[],
+        partId: string,
     }[],
     durationInFullQ?: number;
     durationInFullQMs?: number;
@@ -172,8 +171,7 @@ export class MultiPlayer {
         this.midiPlayer.stopAndClear();
         if (midiOut) {
             outLoops = this.getLoopsInfo({
-                repeat: 1, // jjkl
-                beatOffsetMs: params.beatOffsetMs || beatsWithOffsetMs[0],
+                repeat: 1, // ???
                 beatsMs: beatsWithOffsetMs.slice(1),
                 blocks: params.midiTextBlocks,
                 playBlock: midiOut,
@@ -362,19 +360,16 @@ export class MultiPlayer {
     getLoopsInfo(x: {
         blocks?: TextBlock[] | string,
         playBlock?: TextBlock | string,
-        repeat?: number, // jjkl delete ?
-        repeatCount?: number, // jjkl delete ?
-        beatOffsetMs?: number, // jjkl delete ?
+        repeat?: number, // delete ???
+        repeatCount?: number, // delete ???
         beatsMs?: number[],
         bpm?: number,
-        excludeLines?: string[],
         dataByTracks?: DataByTracks,
         pitchShift?: number
     }): OutLoopsInfo {
         //console.log('getLoopsInfo.params', {...params});
 
         const pitchShift = x.pitchShift || 0;
-        const excludeLines = x.excludeLines || [];
         let beatsMs: number[] = Array.isArray(x.beatsMs) ? [...x.beatsMs]: [];
         let playBlock = x.playBlock || 'out';
         const allBlocks = Array.isArray(x.blocks) ? x.blocks : u.getTextBlocks(x.blocks);
@@ -399,42 +394,24 @@ export class MultiPlayer {
         let durationInFullQMs = 0;
         let addPauseToNextRowQ = 0;
 
+        // ADD PITCH SHIFT
         outBlocks.rows.forEach(row => {
             row.trackLns.forEach(noteLn => {
                 noteLn.noteLineInfo.notes.forEach(noteInfo => {
                     noteInfo.pitchShift = noteInfo.pitchShift + pitchShift;
-
-                    // SET VOLUME
-                    // let trackName = noteLn.trackName;
-                    // let rootVolume = u.getSafeVolume(dataByTracks.total.volume, DEFAULT_OUT_VOLUME);
-                    // let trackVolume = u.getSafeVolume(dataByTracks[trackName]?.volume);
-                    // let instData = (dataByTracks[trackName]?.items && dataByTracks[trackName].items[noteInfo.instr]);
-                    //
-                    // trackVolume = u.mergeVolume(rootVolume, trackVolume);
-                    //
-                    // if (instData) {
-                    //     trackVolume = u.mergeVolume(
-                    //       trackVolume,
-                    //       instData.volume);
-                    // }
-                    //
-                    // noteInfo.volume = u.mergeVolume(
-                    //     noteInfo.volume,
-                    //     u.getSafeVolume(trackVolume)
-                    // );
                 });
             });
         });
-
-        //console.log('outBlocks', outBlocks);
 
         const rowLoops = outBlocks.rows.map((rowLoop) => {
             const result: {
                 ids: (number | string)[],
                 beatsMs: number[],
+                partId: string,
             } = {
                 ids: [],
                 beatsMs: [],
+                partId: rowLoop.partId
             }
 
             const addPauseQ = addPauseToNextRowQ;
@@ -527,7 +504,6 @@ export class MultiPlayer {
         dontClear?: boolean;
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
-        excludeLines?: string[]
         dataByTracks?: DataByTracks,
     }) {
         //console.log('tryPlayMidiBlock', x.dataByTracks);
@@ -536,16 +512,16 @@ export class MultiPlayer {
         }
 
         const outLoops = x.outLoops || this.getLoopsInfo(x);
-        const beatOffsetMs = x.beatOffsetMs || 0;
+        const beatOffsetMs = x.beatOffsetMs || 20;
         const cb = x.cb || (() => {}) as any;
 
-        //console.log('tryPlayMidiBlock.outLoops', outLoops);
-
-        let breakLoop: boolean = false;
+        console.log('tryPlayMidiBlock.outLoops', outLoops);
 
         await this.midiPlayer.waitLoadingAllInstruments();
 
-        let startTimeSec = x.startTimeSec || this.ctx.currentTime;
+        const currentCtxTime = this.ctx.currentTime;
+        let diffDateNowAndCtxTime = Date.now() - Math.floor(currentCtxTime * 1000);
+        let startTimeSec = x.startTimeSec || currentCtxTime;
         let beatOffsetMsInRowLoop = beatOffsetMs;
 
         // длительность одного цикла
@@ -555,15 +531,18 @@ export class MultiPlayer {
             oneLoopDurationMs += (rowLoops.beatsMs.reduce((acc, item) => acc + item, 0));
         }
 
-        const startTimeInMs = new Date().getTime() + beatOffsetMsInRowLoop;
-        const endTimeInMs = startTimeInMs + (oneLoopDurationMs * outLoops.repeat);
+        const startTimeMs = Math.floor(startTimeSec*1000) + diffDateNowAndCtxTime + beatOffsetMsInRowLoop;
+        const endTimeMs = startTimeMs + (oneLoopDurationMs * outLoops.repeat);
+        let breakLoop = false;
+
+        // start, break, finish
+        cb({type: 'start', startTimeMs});
 
         for (let i = 0; i < outLoops.repeat; i++) {
             if (breakLoop) break;
 
             for (let rowLoops of outLoops.rowLoops) {
                 const loopResult = await this.midiPlayer.playByQuarters({
-                    beatOffsetMs: beatOffsetMsInRowLoop,
                     beatsWithOffsetMs: [beatOffsetMsInRowLoop, ...rowLoops.beatsMs],
                     loopIdsArr: rowLoops.ids,
                     startTimeSec,
@@ -578,7 +557,7 @@ export class MultiPlayer {
             }
         }
 
-        let msToEnd = endTimeInMs - new Date().getTime();
+        let msToEnd = endTimeMs - Date.now();
         msToEnd = msToEnd > 0 ? msToEnd: 0;
 
         const dfr = new Deferred();
@@ -597,6 +576,102 @@ export class MultiPlayer {
         }
 
         return dfr.promise;
+    }
+
+    async getLoopsPlayer(x: {
+        blocks?: TextBlock[] | string,
+        playBlock?: string | TextBlock,
+        repeatCount?: number
+        beatsWithOffsetMs?: number[],
+        bpm?: number,
+        outLoops?: OutLoopsInfo,
+        dontClear?: boolean;
+        pitchShift?: number;
+        cb?: (type: string, data: any) => void,
+        dataByTracks?: DataByTracks,
+    }) {
+        const outLoops = x.outLoops || this.getLoopsInfo(x);
+        const cb = x.cb || (() => {}) as any;
+
+        console.log('getLoopsPlayer', outLoops);
+
+        await this.midiPlayer.waitLoadingAllInstruments();
+
+        const loops = [...outLoops.rowLoops];
+
+        // start, break, finish
+        // beforePlayPart, afterPlayPart
+        const play = async (firstBeatOffsetMsInput = 0, startTimeSecInput = 0) => {
+            const currentCtxTime = this.ctx.currentTime;
+            let diffDateNowAndCtxTime = Date.now() - Math.floor(currentCtxTime * 1000);
+            let startTimeSec = startTimeSecInput || currentCtxTime;
+            let firstBeatOffsetMs = firstBeatOffsetMsInput || 0;
+            let firstBeatOffsetSec = firstBeatOffsetMs / 1000;
+            let startTimeMs = Math.floor(startTimeSec * 1000) + diffDateNowAndCtxTime;
+            let breakLoop = false;
+            let nextTimeMs = 0;
+            let nextTimeSec = 0;
+            let rowLoopsDurMs = 0;
+            let rowLoopsDurSec = 0;
+            let beatOffsetMs = firstBeatOffsetMs;
+            let partId: string = '';
+
+            startTimeMs = startTimeMs + firstBeatOffsetMs;
+            startTimeSec = startTimeSec + firstBeatOffsetSec;
+
+            cb({type: 'start', startTimeMs, startTimeSec});
+
+            while (loops.length) {
+                const rowLoops = loops.shift();
+                partId = rowLoops.partId;
+
+                if (breakLoop) {
+                    cb({type: 'break', partId});
+                    break;
+                }
+
+                rowLoopsDurMs = rowLoops.beatsMs.reduce((acc, item) => acc + item, 0);
+                rowLoopsDurSec = (rowLoopsDurMs / 1000);
+                nextTimeMs = startTimeMs + rowLoopsDurMs;
+                nextTimeSec = startTimeSec + rowLoopsDurSec;
+
+                cb({type: 'beforePlayPart', partId, startTimeSec, nextTimeMs});
+
+                const loopResult = await this.midiPlayer.playByQuarters({
+                    beatsWithOffsetMs: [beatOffsetMs, ...rowLoops.beatsMs],
+                    loopIdsArr: rowLoops.ids,
+                    startTimeSec: startTimeSec - (beatOffsetMs / 1000),
+                    cb,
+                });
+
+                beatOffsetMs = 0; // значим только для первой rowLoop
+
+                if (!!loopResult.break) {
+                    cb({type: 'break', partId, nextTimeMs, nextTimeSec});
+                    break;
+                }
+
+                cb({ type: 'afterPlayPart', partId, startTimeMs, nextTimeMs });
+
+                startTimeSec = nextTimeSec;
+                startTimeMs = nextTimeMs;
+            }
+
+            if (!loops.length && !breakLoop) {
+                cb({ type: 'finish', partId, nextTimeMs, nextTimeSec });
+            }
+        }
+
+        return Promise.resolve({
+            outLoops,
+            loops,
+            play: (firstBeatOffsetMs = 0, startTimeSec = 0) => {
+                play(firstBeatOffsetMs, startTimeSec);
+            },
+            stop: () => {
+                this.midiPlayer.stopAndClear();
+            }
+        });
     }
 }
 

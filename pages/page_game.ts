@@ -1,7 +1,8 @@
 import { RouteInfo } from '../src/router';
 import { getWithDataAttr } from '../src/utils';
 import { ideService } from './ide/ide-service';
-import {SignatureType} from '../libs/muse/ticker';
+import { SignatureType } from '../libs/muse/ticker';
+import { standardTicks as ticks } from './ticks';
 
 type RouteType = {id: string, game: string}
 
@@ -583,7 +584,47 @@ export class GamePage {
         }
     }
 
+    async playTick1(name?: string) {
+        this.stopMetronome();
+
+        name = name || '';
+        //this.playingTick = name;
+
+        const tick = ticks[name];
+        const body = ticks['_x___XX_xx___x__'];
+
+        console.log(body);
+
+        if (!tick) {
+            //this.playingTick = '';
+
+            return;
+        }
+
+        const blocks = `
+        <out r1>
+        tick %tick
+        body %body
+
+        ${tick}
+        ${body}
+        
+        `;
+
+        const loopsPlayer = await ideService.metronome.getLoopsPlayer({
+            blocks,
+            bpm: this.bpmValue,
+            cb: (type, data) => {
+                console.log(type, data);
+            }
+        });
+
+        loopsPlayer.play(1000);
+    }
+
     playTick3(signature?: SignatureType) {
+        //return this.playTick1('8:8');
+
         this.stopTicker();
         signature =  signature || '2:8';
 
@@ -640,5 +681,15 @@ export class GamePage {
         }
 
         this.tickInfo = getTickInfo();
+
+        this.stopMetronome();
+    }
+
+    stopMetronome() {
+        ideService.metronome.stopAndClearMidiPlayer();
+    }
+
+    stopMultiplayer() {
+        ideService.multiPlayer.stopAndClearMidiPlayer();
     }
 }

@@ -1088,9 +1088,7 @@ span.CodeMirror-selectedtext { background: none; }
   opacity: 1;
 }
 
-h1, h2 {
-  font-family: Lato;
-}
+
 .CodeMirror-dialog {
   position: absolute;
   left: 0; right: 0;

@@ -42,6 +42,7 @@ export type OutBlockRowInfo = {
     //mask?: string | number,
     text?: string,
     startOffsetQ?: number,
+    partId: string,
 };
 
 type OutBlocksInfo = {
@@ -268,13 +269,14 @@ export function getOutBlocksInfo(
             rowDurationByHeadQ,
             rowRepeat,
             //mask: mask || rowDurationByHeadQ,
-            text: row
+            text: row,
+            partId
         });
     });
 
     result.durationQ = totalDurationQ;
 
-    console.log('getOutBlocksInfo.result', JSON.parse(JSON.stringify(result)));
+    //console.log('getOutBlocksInfo.result', JSON.parse(JSON.stringify(result)));
 
     return result;
 }

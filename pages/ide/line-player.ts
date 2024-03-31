@@ -526,7 +526,6 @@ export class LinePlayer {
                     }
                     //console.log(type, data);
                 },
-                excludeLines: this.settings.exclude,
                 dataByTracks: getDataByTracksFromSettings(this.settings),
                 pitchShift: m.parseInteger(this.settings.pitchShift[0]),
                 //beatsWithOffsetMs: un.getBeatsByBpmWithOffset(90, 8),

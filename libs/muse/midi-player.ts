@@ -48,7 +48,6 @@ export class MidiPlayer extends Sound {
     }
 
     playByQuarters(params: {
-        beatOffsetMs?: number, // ??? unused but
         beatsWithOffsetMs: number[],
         startTimeSec?: number,
         loopIdsArr?: (string | number)[],
@@ -59,7 +58,6 @@ export class MidiPlayer extends Sound {
         //console.log('midiPlayer.playByQuarters.loops', this.loops);
         this.pitchShift = params.pitchShift || 0;
 
-        let beatOffsetMs = params.beatOffsetMs || 0; // ??? unused but
         let cb = params.cb || ((type: string, data: unknown) => {});
         let beatsWithOffsetMs = Array.isArray(params.beatsWithOffsetMs) ? params.beatsWithOffsetMs : [];
         let loopIdsArr = params.loopIdsArr;

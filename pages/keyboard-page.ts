@@ -9,14 +9,9 @@ import keyboardSet from './page_keyboard-utils';
 import { MY_SONG, SongStore, TrackInfo } from './song-store';
 import { UserSettings, UserSettingsStore } from './user-settings-store';
 import { appRouter, RouteInfo } from '../src/router';
-import {SignatureType} from '../libs/muse/ticker';
-
-// import { getDevice } from 'framework7';
-//
-// console.log('getDevice', getDevice().desktop);
+import { SignatureType } from '../libs/muse/ticker';
 
 const MAX_BOARD_WIDTH = 400;
-
 const DEF_SONG = '_empty_'
 
 interface Page {
@@ -396,8 +391,8 @@ export class KeyboardPage implements Page {
     }
 
     subscribeCommonPageEvents() {
-        getWithDataAttrValue('action-type', 'stop', this.pageEl)?.forEach((el) => {
-            el.addEventListener('click', (evt: MouseEvent) => this.stop());
+        getWithDataAttr('stop-action', this.pageEl)?.forEach((el) => {
+            el.addEventListener('pointerup', () => this.stop());
         });
     }
 

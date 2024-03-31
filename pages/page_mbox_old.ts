@@ -65,7 +65,7 @@
 // const ticks = {
 //   '1:4': tick14,
 //   '2:4': tick24,
-//   '3:4': tick34,
+//   '3:8': tick34,
 //   '4:4': tick44,
 // };
 //
@@ -124,7 +124,7 @@
 //           &emsp;
 //           <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
 //           <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
-//           <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
+//           <a data-tick-trigger="3:8"><b>3:8</b></a>&emsp;
 //           <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
 //           <a data-tick-trigger="stop"><b>stop</b></a>&emsp;
 //           <div

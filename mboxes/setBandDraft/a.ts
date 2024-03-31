@@ -2,6 +2,11 @@ function getInnerLink(name: string, href: string): string {
   return `<a class="link" href="${href}" data-route>${name}</a>`;
 }
 
+const brotherBilly = `<div style="margin: .5rem;">
+    ${getInnerLink('Брат Билли (Brother Billy)', '/mbox/brotherBilly')}
+</div>
+`.trim();
+
 const cage = `<div style="margin: .5rem;">
     ${getInnerLink('Клетка (Cage)', '/mbox/cage')}
 </div>
@@ -38,6 +43,7 @@ const abt1 = `<div style="margin: .5rem;">
 `.trim();
 
 const content = `
+  ${brotherBilly}
   ${cage}
   ${mosquito}
   ${inSystem}

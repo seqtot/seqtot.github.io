@@ -1,4 +1,4 @@
-import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
+import { getWithDataAttr } from '../src/utils';
 import { standardTicks as ticks } from './ticks';
 import { getBassCells } from './get-bass-cells';
 import {
@@ -203,9 +203,9 @@ export class MBoxPage {
             <div style="padding-bottom: .5rem;">
                 <a data-tick-trigger="1:4"><b>1:4</b></a>&emsp;
                 <a data-tick-trigger="2:4"><b>2:4</b></a>&emsp;
-                <a data-tick-trigger="3:4"><b>3:4</b></a>&emsp;
+                <a data-tick-trigger="3:8"><b>3:8</b></a>&emsp;
                 <a data-tick-trigger="4:4"><b>4:4</b></a>&emsp;
-                <a data-action-type="stop"><b>stop</b></a>
+                <a data-stop-action><b>stop</b></a>
             </div>
             ${this.getBpmContent()}
         `.trim();
@@ -455,7 +455,7 @@ export class MBoxPage {
             <div>
                 ${svg.uncheckBtn('data-unselect-all-parts-action', '', 24)}
                 ${svg.checkBtn('data-select-all-parts-action', '', 24)}
-                ${svg.stopBtn('data-action-type="stop"', '', 24)}
+                ${svg.stopBtn('data-stop-action', '', 24)}
                 ${svg.playBtn('data-play-all-action', '', 24)}
                 ${svg.playLoopBtn('data-loop-all-action', '', 24)}
             </div>
@@ -490,11 +490,19 @@ export class MBoxPage {
         return allCommands + tracks  + (allSongParts.length > 5 ? allCommands : '') + fileCommands;
     }
 
+    stopMetronome() {
+        ideService.metronome.stopAndClearMidiPlayer();
+    }
+
+    stopMultiplayer() {
+        ideService.multiPlayer.stopAndClearMidiPlayer();
+    }
+
     playTick(name?: string) {
+        this.stopMetronome();
+
         name = name || '';
         this.playingTick = name;
-
-        ideService.metronome.stopAndClearMidiPlayer();
 
         const tick = ticks[this.playingTick];
 
@@ -514,6 +522,9 @@ export class MBoxPage {
         ideService.metronome.tryPlayMidiBlock({
             blocks,
             bpm: this.bpmValue,
+            cb: (type, data) => {
+                console.log(type, data);
+            }
         });
     }
 
@@ -1528,7 +1539,7 @@ export class MBoxPage {
             });
         });
 
-        getWithDataAttrValue('action-type', 'stop', this.pageEl).forEach((el) => {
+        getWithDataAttr('stop-action', this.pageEl).forEach((el) => {
             el.addEventListener('pointerup', () => this.stop());
         });
 
@@ -1809,7 +1820,6 @@ export class MBoxPage {
                     }
                     //console.log(type, data);
                 },
-                excludeLines: this.settings.exclude,
                 dataByTracks: ideService.dataByTracks,
                 //pitchShift: getPitchShiftSetting(this.settings),
                 bpm: this.bpmValue,
@@ -1830,11 +1840,13 @@ export class MBoxPage {
             return;
         }
 
-        ideService.multiPlayer.stopAndClearMidiPlayer();
+        this.stopMultiplayer();
     }
 
     stop() {
-        ideService.multiPlayer.stopAndClearMidiPlayer();
+        this.stopMultiplayer();
+        this.stopMetronome();
+
         if (this.recorder) {
             this.recorder.break();
             this.recorder = null;
