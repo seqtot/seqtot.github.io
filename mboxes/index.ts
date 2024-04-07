@@ -20,6 +20,7 @@ import abt1 from './setBandDraft/abt1';
 import mosquito from './setBandDraft/mosquito';
 import cage from './setBandDraft/cage';
 import brotherBilly from './setBandDraft/brotherBilly';
+import shipsAreSailing from './setBandDraft/shipsAreSailing';
 import peterGunn from './setBandDraft/peterGunn';
 
 export default {
@@ -36,6 +37,7 @@ export default {
   //peterGunn,
 
   // DRAFT
+  shipsAreSailing,
   brotherBilly,
   glass,
   butterflyEffect,
