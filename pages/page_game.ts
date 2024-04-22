@@ -26,7 +26,7 @@ type Sizes = {
 };
 
 
-const colors = {
+const colors1 = {
     red: '255,0,0',
     green: '0,255,0',
     blue: '0,0,255',
@@ -36,6 +36,48 @@ const colors2 = {
     black: '0,0,0',
     white: '255,255,255',
 }
+
+const colorHash = {
+    '12':   { val: 7,   name: 'Salmon',          rgb: '250,128,114' },
+    '-12':  { val: -7,  name: 'Red',             rgb: '255,0,0'     },
+
+    '-11':  { val: -1,  name: 'SlateGray',       rgb: '112,128,144' },
+    '11':   { val: 1,   name: 'LightSteelBlue',  rgb: '176,196,222' },
+
+    '10':  { val: 11,  name: 'Plum',            rgb: '221,160,221' },
+    '-10': { val: -11, name: 'Purple',          rgb: '128,0,128'   },
+
+    '9':   { val: 9,   name: 'Cyan',            rgb: '0,255,255'   },
+    '-9':  { val: -9,  name: 'DarkCyan',        rgb: '0,139,139'   },
+
+    '8':  { val: 10,  name: 'Thistle',         rgb: '216,191,216' },
+    '-8': { val: -10, name: 'MediumPurple',    rgb: '147,112,219' },
+
+    '7':   { val: 6,   name: 'Pink',            rgb: '255,192,203' },
+    '-7':  { val: -6,  name: 'MediumVioletRed', rgb: '199,21,133'  },
+
+    '6':   { val: 8,   name: 'Peru',            rgb: '205,133,63'  },
+    '-6':  { val: -8,  name: 'SaddleBrown',     rgb: '139,69,19'   },
+
+    '-5':  { val: -5,  name: 'Chocolate',       rgb:	'210,105,30' },
+    '5':   { val: 5,   name: 'Orange',          rgb: '255,165,0'   },
+
+    '-4':  { val: -4,  name: 'Green',           rgb: '0,128,0'     },
+    '4':   { val: 4,   name: 'Lime',            rgb:	'0,255,0'    },
+
+    '-3':  { val: -3,  name: 'RoyalBlue',       rgb: '65,105,225'  },
+    '3':   { val: 3,   name: 'LightSkyBlue',    rgb: '135,206,250' },
+
+    '-2':  { val: -2,  name: 'Gold',            rgb: '255,215,0'   },
+    '2':   { val: 2,   name: 'Yellow',          rgb: '255,255,0'   },
+
+    '1':  { val: 12,  name: 'LightGray',       rgb: '211,211,211' },
+    '-1': { val: -12, name: 'DimGray',         rgb: '105,105,105' },
+
+    '0':   { val: 0,   name: 'DarkGray',        rgb: '169,169,169' },
+};
+
+const colorArr = Object.values(colorHash);
 
 function getSizes(x: {
     width: number,
@@ -236,7 +278,7 @@ class Board {
 
         //console.log(blockInd, rowInd, cellNio);
 
-        ctx.fillStyle = `rgba(${colors.red}, 1)`;
+        ctx.fillStyle = `rgba(${colors1.red}, 1)`;
 
         let yOffset = this.sizes.halfRowHeight * this.sizes.rowInBlockCount;
         yOffset += ((this.sizes.rowHeight * rowInd) + (this.sizes.halfRowHeight / 2));
@@ -297,9 +339,11 @@ class Board {
                 line.cells.forEach((cell, iCell) => {
                     const startX = cell.offsetQ * w;
                     const endX = (cell.offsetQ + cell.durQ) * w;
+                    const clr = colorArr[Math.round(Math.random() * (colorArr.length - 1))].rgb;
 
-                    ctx.fillStyle = `rgba(${colors.blue}, 1)`;
+                    ctx.fillStyle = `rgba(${clr}, 1)`;
                     ctx.fillRect(startX, lastY, endX - startX, rowHeight);
+
                     ctx.fillStyle = `rgba(${colors2.black}, 1)`;
                     ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
                 });
@@ -460,8 +504,6 @@ export class GamePage {
             cellCount: 4,
         })
 
-        //console.log('sizes', this.sizes);
-
         this.pageEl.innerHTML = `
             <div>
                 <div style="padding: 8px 8px 0 8px; height: 32px; box-sizing: border-box;">
@@ -488,8 +530,10 @@ export class GamePage {
                 
                 <div></div>            
             </div>
-            <!--div style="border: 1px solid gray;">
-                <span style="background-color: lightgray;">lightgray</span>
+            
+            <div style="border: 1px solid gray;">
+                <!--
+                span style="background-color: lightgray;">lightgray</span>
                 <span style="background-color: gray;">gray</span><br/>
                 <span style="background-color: deepskyblue;">deepskyblue</span>
                 <span style="background-color: blue;">blue</span><br/>
@@ -506,8 +550,9 @@ export class GamePage {
                 <span style="background-color: yellow;">yellow</span>
                 <span style="background-color: bisque;">bisque</span><br/>
                 <span style="background-color: darkkhaki;">darkkhaki</span>
-                <span style="background-color: white;">unkonow</span>                                        
-            </div-->
+                <span style="background-color: white;">unkonow</span
+                -->                                        
+            </div>
         `;
 
         const gameBoardEl = getWithDataAttr('game-board', this.pageEl)[0];
@@ -693,3 +738,49 @@ export class GamePage {
         ideService.multiPlayer.stopAndClearMidiPlayer();
     }
 }
+
+/*
+00:Gray:   |                 | DarkGray  |                |
+01:ColorG  | SlateGray       |           | LightSteelBlue |
+02:Yellow: | Gold            |           | Yellow         |
+03:Blue:   | RoyalBlue       |           | LightSkyBlue   |
+04:Green:  | Green           |           | Lime           |
+05:Orange: | Chocolate       |           | Orange         |
+06:Pink:   | MediumVioletRed |           | Pink           |
+07:Red:    | Red             |           | Salmon         |
+08:Brown:  | SaddleBrown     |           | Peru           |
+09:Cyan:   | DarkCyan        |           | Cyan           |
+10:Purple  | MediumPurple    |           | Thistle        |
+11:Purple: | Purple          |           | Plum           |
+12:        | DimGray         |           | LightGray      |
+
+'12':  {name: 'LightGray',       rgb: '211,211,211' },
+'-12': {name: 'DimGray',         rgb: '105,105,105' },
+'11':  {name: 'Plum',            rgb: '221,160,221' },
+'-11': {name: 'Purple,           rgb: '128,0,128'   },
+'10':  {name: 'Thistle',         rgb: '216,191,216' },
+'-10': {name: 'MediumPurple',    rgb: '147,112,219' },
+'9':   {name: 'Cyan',            rgb: '0,255,255'   },
+'-9':  {name: 'DarkCyan',        rgb: '0,139,139'   },
+'8':   {name: 'Peru',            rgb: '205,133,63'  },
+'-8':  {name: 'SaddleBrown',     rgb: '139,69,19'   },
+'7':   {name: 'Salmon',          rgb: '250,128,114' },
+'-7':  {name: 'Red',             rgb: '255,0,0'     },
+'6':   {name: 'Pink',            rgb: '255,192,203' },
+'-6':  {name: 'MediumVioletRed', rgb: '199,21,133'  },
+'-5':  {name: 'Chocolate',       rgb:	'210,105,30'  },
+'5':   {name: 'Orange',          rgb: '255,165,0'   },
+'-4':  {name: 'Green',           rgb: '0,128,0'     },
+'4':   {name: 'Lime',            rgb:	'0,255,0'     },
+'-3':  {name: 'RoyalBlue',       rgb: '65,105,225'  },
+'3':   {name: 'LightSkyBlue',    rgb: '135,206,250' },
+'-2':  {name: 'Gold',            rgb: '255,215,0'   },
+'2':   {name: 'Yellow',          rgb: '255,255,0'   },
+'-1':  {name: 'SlateGray',       rgb: '112,128,144' },
+'1':   {name: 'LightSteelBlue',  rgb: '176,196,222' },
+'0':   {name: 'DarkGray',        rgb: '169,169,169' },
+
+
+https://en.wikipedia.org/wiki/Web_colors#Color_selection
+
+*/
