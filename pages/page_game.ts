@@ -38,28 +38,28 @@ const colors2 = {
 }
 
 const colorHash = {
-    '12':   { val: 7,   name: 'Salmon',          rgb: '250,128,114' },
-    '-12':  { val: -7,  name: 'Red',             rgb: '255,0,0'     },
+    '12':   { val: 12,   name: 'Salmon',          rgb: '250,128,114' },
+    '-12':  { val: -12,  name: 'Firebrick',       rgb: '255,0,0'     }, // Red
 
-    '-11':  { val: -1,  name: 'SlateGray',       rgb: '112,128,144' },
-    '11':   { val: 1,   name: 'LightSteelBlue',  rgb: '176,196,222' },
+    '-11':  { val: -11,  name: 'DarkSlateGray',   rgb: '112,128,144' }, // SlateGray
+    '11':   { val: 11,   name: 'LightSteelBlue',  rgb: '176,196,222' },
 
-    '10':  { val: 11,  name: 'Plum',            rgb: '221,160,221' },
-    '-10': { val: -11, name: 'Purple',          rgb: '128,0,128'   },
+    '10':  { val: 10,  name: 'Plum',            rgb: '221,160,221' },
+    '-10': { val: -10, name: 'Purple',          rgb: '128,0,128'   },
 
     '9':   { val: 9,   name: 'Cyan',            rgb: '0,255,255'   },
     '-9':  { val: -9,  name: 'DarkCyan',        rgb: '0,139,139'   },
 
-    '8':  { val: 10,  name: 'Thistle',         rgb: '216,191,216' },
-    '-8': { val: -10, name: 'MediumPurple',    rgb: '147,112,219' },
+    '8':  { val: 8,  name: 'Thistle',         rgb: '216,191,216' },
+    '-8': { val: -8, name: 'MediumPurple',    rgb: '147,112,219' },
 
-    '7':   { val: 6,   name: 'Pink',            rgb: '255,192,203' },
-    '-7':  { val: -6,  name: 'MediumVioletRed', rgb: '199,21,133'  },
+    '7':   { val: 7,   name: 'HotPink',            rgb: '255,192,203' }, // Pink
+    '-7':  { val: -7,  name: 'MediumVioletRed', rgb: '199,21,133'  },
 
-    '6':   { val: 8,   name: 'Peru',            rgb: '205,133,63'  },
-    '-6':  { val: -8,  name: 'SaddleBrown',     rgb: '139,69,19'   },
+    '6':   { val: 6,   name: 'YellowGreen',      rgb: '205,133,63'  },
+    '-6':  { val: -6,  name: 'Olive',            rgb: '139,69,19'   },
 
-    '-5':  { val: -5,  name: 'Chocolate',       rgb:	'210,105,30' },
+    '-5':  { val: -5,  name: 'SaddleBrown',     rgb:	'210,105,30' }, //
     '5':   { val: 5,   name: 'Orange',          rgb: '255,165,0'   },
 
     '-4':  { val: -4,  name: 'Green',           rgb: '0,128,0'     },
@@ -68,11 +68,11 @@ const colorHash = {
     '-3':  { val: -3,  name: 'RoyalBlue',       rgb: '65,105,225'  },
     '3':   { val: 3,   name: 'LightSkyBlue',    rgb: '135,206,250' },
 
-    '-2':  { val: -2,  name: 'Gold',            rgb: '255,215,0'   },
+    '-2':  { val: -2,  name: 'RosyBrown',       rgb: '255,215,0'   }, // RosyBrown Gold DarkKhaki
     '2':   { val: 2,   name: 'Yellow',          rgb: '255,255,0'   },
 
-    '1':  { val: 12,  name: 'LightGray',       rgb: '211,211,211' },
-    '-1': { val: -12, name: 'DimGray',         rgb: '105,105,105' },
+    '1':  { val: 1,  name: 'LightGray',       rgb: '211,211,211' },
+    '-1': { val: -1, name: 'DimGray',         rgb: '105,105,105' },
 
     '0':   { val: 0,   name: 'DarkGray',        rgb: '169,169,169' },
 };
@@ -502,7 +502,8 @@ export class GamePage {
             paddingTop: 8 + 32 + 32 + 8, // 80
             paddingSide: 8,
             cellCount: 4,
-        })
+        });
+
 
         this.pageEl.innerHTML = `
             <div>
@@ -531,7 +532,33 @@ export class GamePage {
                 <div></div>            
             </div>
             
-            <div style="border: 1px solid gray;">
+            <div style="padding: 1rem;">
+                <span style="background-color: ${colorHash['0'].name};">+0</span>
+                <span style="background-color: ${colorHash['0'].name};">-0</span><br/>
+                <span style="background-color: ${colorHash['-1'].name};">-1</span>
+                <span style="background-color: ${colorHash['1'].name};">+1</span><br/>
+                <span style="background-color: ${colorHash['-2'].name};">-2</span>
+                <span style="background-color: ${colorHash['2'].name};">+2</span><br/>
+                <span style="background-color: ${colorHash['-3'].name};">-3</span>
+                <span style="background-color: ${colorHash['3'].name};">+3</span><br/>
+                <span style="background-color: ${colorHash['-4'].name};">-4</span>
+                <span style="background-color: ${colorHash['4'].name};">+4</span><br/>
+                <span style="background-color: ${colorHash['-5'].name};">-5</span>
+                <span style="background-color: ${colorHash['5'].name};">+5</span><br/>
+                <span style="background-color: ${colorHash['-6'].name};">-6</span>
+                <span style="background-color: ${colorHash['6'].name};">+6</span><br/>
+                <span style="background-color: ${colorHash['-7'].name};">-7</span>
+                <span style="background-color: ${colorHash['7'].name};">+7</span><br/>
+                <span style="background-color: ${colorHash['-8'].name};">-8</span>
+                <span style="background-color: ${colorHash['8'].name};">+8</span><br/>
+                <span style="background-color: ${colorHash['-9'].name};">-9</span>
+                <span style="background-color: ${colorHash['9'].name};">+9</span><br/>
+                <span style="background-color: ${colorHash['-10'].name};">-10</span>
+                <span style="background-color: ${colorHash['10'].name};">+10</span><br/>
+                <span style="background-color: ${colorHash['-11'].name};">-11</span>
+                <span style="background-color: ${colorHash['11'].name};">+11</span><br/>
+                <span style="background-color: ${colorHash['-12'].name};">-12</span>
+                <span style="background-color: ${colorHash['12'].name};">+12</span>                                
                 <!--
                 span style="background-color: lightgray;">lightgray</span>
                 <span style="background-color: gray;">gray</span><br/>
@@ -753,33 +780,6 @@ export class GamePage {
 10:Purple  | MediumPurple    |           | Thistle        |
 11:Purple: | Purple          |           | Plum           |
 12:        | DimGray         |           | LightGray      |
-
-'12':  {name: 'LightGray',       rgb: '211,211,211' },
-'-12': {name: 'DimGray',         rgb: '105,105,105' },
-'11':  {name: 'Plum',            rgb: '221,160,221' },
-'-11': {name: 'Purple,           rgb: '128,0,128'   },
-'10':  {name: 'Thistle',         rgb: '216,191,216' },
-'-10': {name: 'MediumPurple',    rgb: '147,112,219' },
-'9':   {name: 'Cyan',            rgb: '0,255,255'   },
-'-9':  {name: 'DarkCyan',        rgb: '0,139,139'   },
-'8':   {name: 'Peru',            rgb: '205,133,63'  },
-'-8':  {name: 'SaddleBrown',     rgb: '139,69,19'   },
-'7':   {name: 'Salmon',          rgb: '250,128,114' },
-'-7':  {name: 'Red',             rgb: '255,0,0'     },
-'6':   {name: 'Pink',            rgb: '255,192,203' },
-'-6':  {name: 'MediumVioletRed', rgb: '199,21,133'  },
-'-5':  {name: 'Chocolate',       rgb:	'210,105,30'  },
-'5':   {name: 'Orange',          rgb: '255,165,0'   },
-'-4':  {name: 'Green',           rgb: '0,128,0'     },
-'4':   {name: 'Lime',            rgb:	'0,255,0'     },
-'-3':  {name: 'RoyalBlue',       rgb: '65,105,225'  },
-'3':   {name: 'LightSkyBlue',    rgb: '135,206,250' },
-'-2':  {name: 'Gold',            rgb: '255,215,0'   },
-'2':   {name: 'Yellow',          rgb: '255,255,0'   },
-'-1':  {name: 'SlateGray',       rgb: '112,128,144' },
-'1':   {name: 'LightSteelBlue',  rgb: '176,196,222' },
-'0':   {name: 'DarkGray',        rgb: '169,169,169' },
-
 
 https://en.wikipedia.org/wiki/Web_colors#Color_selection
 
