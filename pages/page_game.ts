@@ -37,44 +37,50 @@ const colors2 = {
     white: '255,255,255',
 }
 
+// R       G       B       Y      M      C     |
+// 12!__   04_!_   03__!   02!!_  07!_!  09_!! |
+// 05!:_   01:!.   08:.!                       |
+// 11!.:   10.!:   06.:!                       |
+//
+
 const colorHash = {
-    '12':   { val: 12,   name: 'Salmon',          rgb: '250,128,114' },
-    '-12':  { val: -12,  name: 'Firebrick',       rgb: '255,0,0'     }, // Red
+/* !__ */'12':   { val: 12,   name: 'йа',  rgb: '250,0,0'   },
+         '-12':  { val: -12,   name: 'йу',  rgb: '125,0,0'   },
 
-    '-11':  { val: -11,  name: 'DarkSlateGray',   rgb: '112,128,144' }, // SlateGray
-    '11':   { val: 11,   name: 'LightSteelBlue',  rgb: '176,196,222' },
+/* !.: */'11':   { val: 11,   name: 'га', rgb: '250,150,200' },
+         '-11':  { val: -11,  name:  'гу', rgb: '125,75,100'  },
 
-    '10':  { val: 10,  name: 'Plum',            rgb: '221,160,221' },
-    '-10': { val: -10, name: 'Purple',          rgb: '128,0,128'   },
+/* .!: */'10':  { val: 10,  name: 'ра', rgb: '150,250,200'  },
+         '-10': { val: -10,  name: 'ру', rgb: '50,150,100'   },
 
-    '9':   { val: 9,   name: 'Cyan',            rgb: '0,255,255'   },
-    '-9':  { val: -9,  name: 'DarkCyan',        rgb: '0,139,139'   },
+/* _!! */'9':   { val: 9,  name: 'фа', rgb: '0,250,250'   },
+         '-9':  { val: -9,  name: 'фу', rgb: '0,125,125'   },
 
-    '8':  { val: 8,  name: 'Thistle',         rgb: '216,191,216' },
-    '-8': { val: -8, name: 'MediumPurple',    rgb: '147,112,219' },
+/* :.! */'8':  { val: 8, name: 'ва',  rgb: '200,150,250' },
+         '-8': { val: -8, name:  'ву', rgb: '100,75,125'  },
 
-    '7':   { val: 7,   name: 'HotPink',            rgb: '255,192,203' }, // Pink
-    '-7':  { val: -7,  name: 'MediumVioletRed', rgb: '199,21,133'  },
+/* !_! */'7':   { val: 7,   name: 'са', rgb: '250,0,250'  },
+         '-7':  { val: -7,   name: 'су', rgb: '120,0,125'  },
 
-    '6':   { val: 6,   name: 'YellowGreen',      rgb: '205,133,63'  },
-    '-6':  { val: -6,  name: 'Olive',            rgb: '139,69,19'   },
+/* .:!  */'6':   { val: 6,  name: 'ша', rgb: '150,200,250'  },
+         '-6':  { val: -6,   name: 'шу', rgb: '50,100,150'   },
 
-    '-5':  { val: -5,  name: 'SaddleBrown',     rgb:	'210,105,30' }, //
-    '5':   { val: 5,   name: 'Orange',          rgb: '255,165,0'   },
+/* !:_ */'5':   { val: 5,  name: 'ла',  rgb: '250,150,0'   },
+         '-5':  { val: -5,  name: 'лу',  rgb: '125,50,0'    },
 
-    '-4':  { val: -4,  name: 'Green',           rgb: '0,128,0'     },
-    '4':   { val: 4,   name: 'Lime',            rgb:	'0,255,0'    },
+/* _!_ */'4':   { val: 4,   name: 'жа', rgb: '0,250,0'   },
+/*     */'-4':  { val: -4,  name: 'жу', rgb: '0,100,0'   },
 
-    '-3':  { val: -3,  name: 'RoyalBlue',       rgb: '65,105,225'  },
-    '3':   { val: 3,   name: 'LightSkyBlue',    rgb: '135,206,250' },
+/* __! */'3':   { val: 3,  name: 'ща',      rgb: '0,0,250'    },
+/*     */'-3':  { val: -3,  name: 'щу',      rgb: '0,0,125'   },
 
-    '-2':  { val: -2,  name: 'RosyBrown',       rgb: '255,215,0'   }, // RosyBrown Gold DarkKhaki
-    '2':   { val: 2,   name: 'Yellow',          rgb: '255,255,0'   },
+/* !!_ */'2':   { val: 2,   name: 'са', rgb: '250,250,0'   },
+/*     */'-2':  { val: -2,  name: 'су', rgb: '125,125,0'   },
 
-    '1':  { val: 1,  name: 'LightGray',       rgb: '211,211,211' },
-    '-1': { val: -1, name: 'DimGray',         rgb: '105,105,105' },
+/* !:: */'1':  { val: 1,  name:  'ха',  rgb: '200,190,190'  },
+/* ::! */'-1': { val: -1, name:  'ху',  rgb: '100,100,110'  },
 
-    '0':   { val: 0,   name: 'DarkGray',        rgb: '169,169,169' },
+/* ::: */'0':   { val: 0,   name: 'мо', rgb: '150,150,150' },
 };
 
 const colorArr = Object.values(colorHash);
@@ -335,17 +341,30 @@ class Board {
         let lastY = 0;
 
         const paintSection = (block: ModelType, lastY: number, rowHeight): number => {
+            let firstCell = true;
             block.lines.forEach((line, iLine) => {
                 line.cells.forEach((cell, iCell) => {
                     const startX = cell.offsetQ * w;
                     const endX = (cell.offsetQ + cell.durQ) * w;
-                    const clr = colorArr[Math.round(Math.random() * (colorArr.length - 1))].rgb;
+                    const realClr = colorArr.filter(item => item.val !== null);
+                    let clrItem = realClr[Math.round(Math.random() * (realClr.length - 1))];
 
-                    ctx.fillStyle = `rgba(${clr}, 1)`;
+                    if (firstCell) {
+                        clrItem = colorHash['0'];
+                        firstCell = false;
+                    }
+
+                    ctx.fillStyle = `rgba(${clrItem.rgb}, 1)`;
                     ctx.fillRect(startX, lastY, endX - startX, rowHeight);
 
                     ctx.fillStyle = `rgba(${colors2.black}, 1)`;
                     ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
+
+                    const fontSize = Math.floor(rowHeight/2);
+                    ctx.fillStyle = `rgba(${colorHash[-clrItem.val].rgb}, 1)`;
+                    ctx.textBaseline = 'middle'; // 'top';
+                    ctx.font = `${Math.floor(rowHeight/2)}px serif`;
+                    ctx.fillText(clrItem.name, startX + fontSize, lastY + (rowHeight /2));
                 });
 
                 lastY += rowHeight;
@@ -533,32 +552,32 @@ export class GamePage {
             </div>
             
             <div style="padding: 1rem;">
-                <span style="background-color: ${colorHash['0'].name};">+0</span>
-                <span style="background-color: ${colorHash['0'].name};">-0</span><br/>
-                <span style="background-color: ${colorHash['-1'].name};">-1</span>
-                <span style="background-color: ${colorHash['1'].name};">+1</span><br/>
-                <span style="background-color: ${colorHash['-2'].name};">-2</span>
-                <span style="background-color: ${colorHash['2'].name};">+2</span><br/>
-                <span style="background-color: ${colorHash['-3'].name};">-3</span>
-                <span style="background-color: ${colorHash['3'].name};">+3</span><br/>
-                <span style="background-color: ${colorHash['-4'].name};">-4</span>
-                <span style="background-color: ${colorHash['4'].name};">+4</span><br/>
-                <span style="background-color: ${colorHash['-5'].name};">-5</span>
-                <span style="background-color: ${colorHash['5'].name};">+5</span><br/>
-                <span style="background-color: ${colorHash['-6'].name};">-6</span>
-                <span style="background-color: ${colorHash['6'].name};">+6</span><br/>
-                <span style="background-color: ${colorHash['-7'].name};">-7</span>
-                <span style="background-color: ${colorHash['7'].name};">+7</span><br/>
-                <span style="background-color: ${colorHash['-8'].name};">-8</span>
-                <span style="background-color: ${colorHash['8'].name};">+8</span><br/>
-                <span style="background-color: ${colorHash['-9'].name};">-9</span>
-                <span style="background-color: ${colorHash['9'].name};">+9</span><br/>
-                <span style="background-color: ${colorHash['-10'].name};">-10</span>
-                <span style="background-color: ${colorHash['10'].name};">+10</span><br/>
-                <span style="background-color: ${colorHash['-11'].name};">-11</span>
-                <span style="background-color: ${colorHash['11'].name};">+11</span><br/>
-                <span style="background-color: ${colorHash['-12'].name};">-12</span>
-                <span style="background-color: ${colorHash['12'].name};">+12</span>                                
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['0'].rgb});">+0</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['0'].rgb});">-0</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-1'].rgb});">-1</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['1'].rgb});">+1</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-2'].rgb});">-2</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['2'].rgb});">+2</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-3'].rgb});">-3</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['3'].rgb});">+3</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-4'].rgb});">-4</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['4'].rgb});">+4</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-5'].rgb});">-5</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['5'].rgb});">+5</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-6'].rgb});">-6</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['6'].rgb});">+6</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-7'].rgb});">-7</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['7'].rgb});">+7</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-8'].rgb});">-8</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['8'].rgb});">+8</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-9'].rgb});">-9</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['9'].rgb});">+9</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-10'].rgb});">-10</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['10'].rgb});">+10</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-11'].rgb});">-11</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['11'].rgb});">+11</span><br/>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-12'].rgb});">-12</span>
+                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['12'].rgb});">+12</span>                                
                 <!--
                 span style="background-color: lightgray;">lightgray</span>
                 <span style="background-color: gray;">gray</span><br/>
