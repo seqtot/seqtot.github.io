@@ -44,43 +44,43 @@ const colors2 = {
 //
 
 const colorHash = {
-/* !__ */'12':   { val: 12,   name: 'йа',  rgb: '250,0,0'   },
-         '-12':  { val: -12,   name: 'йу',  rgb: '125,0,0'   },
+'12':   { mask: '!__', val: 12,   name: 'йа',  rgb: '250,0,0'   },
+'-12':  { mask: '!__', val: -12,   name: 'йу',  rgb: '125,0,0'   },
 
-/* !.: */'11':   { val: 11,   name: 'га', rgb: '250,150,200' },
-         '-11':  { val: -11,  name:  'гу', rgb: '125,75,100'  },
+'11':   { mask: '!.:', val: 11,   name: 'га',  rgb: '250,150,200' },
+'-11':  { mask: '!.:', val: -11,  name:  'гу', rgb: '125,75,100'  },
 
-/* .!: */'10':  { val: 10,  name: 'ра', rgb: '150,250,200'  },
-         '-10': { val: -10,  name: 'ру', rgb: '50,150,100'   },
+'10':  { mask: '.!:', val: 10,  name: 'ра', rgb: '150,250,200'  },
+'-10': { mask: '.!:', val: -10,  name: 'ру', rgb: '50,150,100'   },
 
-/* _!! */'9':   { val: 9,  name: 'фа', rgb: '0,250,250'   },
-         '-9':  { val: -9,  name: 'фу', rgb: '0,125,125'   },
+'9':   { mask: '_!!', val: 9,  name: 'фа', rgb: '0,250,250'   },
+'-9':  { mask: '_!!', val: -9,  name: 'фу', rgb: '0,125,125'   },
 
-/* :.! */'8':  { val: 8, name: 'ва',  rgb: '200,150,250' },
-         '-8': { val: -8, name:  'ву', rgb: '100,75,125'  },
+'8':  { mask: ':.!', val: 8, name: 'ва',  rgb: '200,150,250' },
+'-8': { mask: ':.!', val: -8, name:  'ву', rgb: '100,75,125'  },
 
-/* !_! */'7':   { val: 7,   name: 'за', rgb: '250,0,250'  },
-         '-7':  { val: -7,   name: 'зу', rgb: '120,0,125'  },
+'7':   { mask: '!_!', val: 7,   name: 'за', rgb: '250,0,250'  },
+'-7':  { mask: '!_!', val: -7,   name: 'зу', rgb: '120,0,125'  },
 
-/* .:!  */'6':   { val: 6,  name: 'ша', rgb: '150,200,250'  },
-         '-6':  { val: -6,   name: 'шу', rgb: '50,100,150'   },
+'6':   { mask: '.:!', val: 6,  name: 'ша', rgb: '150,200,250'  },
+'-6':  { mask: '.:!', val: -6,   name: 'шу', rgb: '50,100,150'   },
 
-/* !:_ */'5':   { val: 5,  name: 'ла',  rgb: '250,150,0'   },
-         '-5':  { val: -5,  name: 'лу',  rgb: '125,50,0'    },
+'5':   { mask: '!:_', val: 5,  name: 'ла',  rgb: '250,175,0'   },
+'-5':  { mask: '!:_', val: -5,  name: 'лу',  rgb: '125,50,0'    },
 
-/* _!_ */'4':   { val: 4,   name: 'жа', rgb: '0,250,0'   },
-/*     */'-4':  { val: -4,  name: 'жу', rgb: '0,100,0'   },
+'4':   { mask: '_!_', val: 4,   name: 'жа', rgb: '0,250,0'   },
+'-4':  { mask: '_!_', val: -4,  name: 'жу', rgb: '0,100,0'   },
 
-/* __! */'3':   { val: 3,  name: 'ща',      rgb: '0,0,250'    },
-/*     */'-3':  { val: -3,  name: 'щу',      rgb: '0,0,125'   },
+'3':   { mask: '__!', val: 3,  name: 'ща',      rgb: '0,0,250'    },
+'-3':  { mask: '__!', val: -3,  name: 'щу',      rgb: '0,0,125'   },
 
-/* !!_ */'2':   { val: 2,   name: 'са', rgb: '250,250,0'   },
-/*     */'-2':  { val: -2,  name: 'су', rgb: '125,125,0'   },
+'2':   { mask: '!!_', val: 2,   name: 'са', rgb: '250,250,0'   },
+'-2':  { mask: '!!_', val: -2,  name: 'су', rgb: '125,125,0'   },
 
-/* !:: */'1':  { val: 1,  name:  'ха',  rgb: '200,190,190'  },
-/* ::! */'-1': { val: -1, name:  'ху',  rgb: '100,100,110'  },
+'1':  { mask: '!::', val: 1,  name:  'ха',  rgb: '200,190,190'  },
+'-1': { mask: '!::', val: -1, name:  'ху',  rgb: '100,100,110'  },
 
-/* ::: */'0':   { val: 0,   name: 'мо', rgb: '150,150,150' },
+'0':   { mask: '!!!', val: 0,   name: 'мо', rgb: '150,150,150' },
 };
 
 const colorArr = Object.values(colorHash);
@@ -360,11 +360,11 @@ class Board {
                     ctx.fillStyle = `rgba(${colors2.black}, 1)`;
                     ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
 
-                    const fontSize = Math.floor(rowHeight/2);
+                    const fontSize = Math.floor(rowHeight/3);
                     ctx.fillStyle = `rgba(${colorHash[-clrItem.val].rgb}, 1)`;
                     ctx.textBaseline = 'middle'; // 'top';
                     ctx.font = `${Math.floor(rowHeight/2)}px serif`;
-                    ctx.fillText(clrItem.name, startX + fontSize, lastY + (rowHeight /2));
+                    ctx.fillText(clrItem.mask, startX + fontSize, lastY + (rowHeight /2));
                 });
 
                 lastY += rowHeight;
