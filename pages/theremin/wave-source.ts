@@ -1,6 +1,6 @@
 //appContents.style.display = "none";
-import {Sound} from '../../libs/muse';
-import {isPresent} from '../../libs/muse/utils';
+import { Sound } from '../../libs/muse';
+import { isPresent } from '../../libs/common';
 
 export class WaveSource {
   vol: GainNode;

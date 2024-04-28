@@ -1,6 +1,3 @@
-'use babel';
-//'use strict';
-
 export class WebAudioFontChannel {
 	audioContext: AudioContext;
 	input: GainNode;

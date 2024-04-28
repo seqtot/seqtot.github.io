@@ -1,13 +1,13 @@
+import { Muse as m, Sound, TFreqInfo } from '../../libs/muse';
+
 import { getWithDataAttr } from '../../src/utils';
 import { WaveSource2 } from './wave-source';
-import { Sound } from '../../libs/muse';
-import { getEndPointVolume } from '../../libs/muse/utils';
-import { freqInfoList, FreqInfo } from '../../libs/muse/freq';
 import { RouteInfo } from '../../src/router';
 
 type WithId = {id: string}
 
 const outVol = 80;
+const freqInfoList = m.const.freqInfoList;
 
 function getPosition(element) {
     let xPosition = 0;
@@ -21,7 +21,7 @@ function getPosition(element) {
     return { x: xPosition, y: yPosition };
 }
 
-function getFreqList(freqList: FreqInfo[], botNote: string, topNote: string): FreqInfo[] {
+function getFreqList(freqList: TFreqInfo[], botNote: string, topNote: string): TFreqInfo[] {
     const botCode = freqList.find(item => item.noteLat === botNote).code;
     const topCode = freqList.find(item => item.noteLat === topNote).code;
 
@@ -100,7 +100,7 @@ class Board {
     isSilent = false;
     lastX = -1;
     lastY = -1;
-    lastFreqObj: FreqInfo;
+    lastFreqObj: TFreqInfo;
     lastFreqVal = 0;
     lastVolVal = 0;
 
@@ -117,7 +117,7 @@ class Board {
     canvasBot: HTMLCanvasElement;
     canvasCtxBot: CanvasRenderingContext2D;
 
-    freqList: FreqInfo[];
+    freqList: TFreqInfo[];
 
     wave: WaveSource2;
 
@@ -259,7 +259,7 @@ class Board {
         // });
     } // drawCells
 
-    setFreqList(freqList: FreqInfo[], botNote: string, topNote: string) {
+    setFreqList(freqList: TFreqInfo[], botNote: string, topNote: string) {
         freqList = [...freqList];
 
         const newFreqList = getFreqList(freqList.reverse(), botNote, topNote);
@@ -423,7 +423,7 @@ class Board {
             this.lastVolVal = lastVolVal;
 
             this.wave.setVol(
-                getEndPointVolume(lastVolVal * outVol / 100) / 100
+                m.utils.getEndPointVolume(lastVolVal * outVol / 100) / 100
             );
         }
 

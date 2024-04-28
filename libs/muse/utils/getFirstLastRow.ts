@@ -1,9 +1,7 @@
-'use babel';
-
-import {TextBlock} from '../types';
+import {TTextBlock} from '../types';
 
 export function getFirstLastRow(dx: {
-    block: TextBlock,
+    block: TTextBlock,
     startIndex: number,
     direction: 'up' | 'down',
     skip?: '$R' | '$L' | null | undefined

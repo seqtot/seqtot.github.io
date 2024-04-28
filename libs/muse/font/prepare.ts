@@ -1,6 +1,4 @@
-'use babel';
-
-import {WavePreset, WaveZone} from './otypes'
+import {TWavePreset, TWaveZone} from './otypes'
 import {Deferred} from './utils';
 
 function isNeg (number): boolean {
@@ -175,7 +173,7 @@ async function getBufferFromFile(ctx: AudioContext, file: string): Promise<Audio
 	return dfr.promise;
 }
 
-function getBufferFromSample(ctx: AudioContext, zone: WaveZone): AudioBuffer {
+function getBufferFromSample(ctx: AudioContext, zone: TWaveZone): AudioBuffer {
 	const decoded = atob(zone.sample);
 	const buffer = ctx.createBuffer(1, decoded.length / 2, zone.sampleRate);
 	const float32Array = buffer.getChannelData(0);
@@ -201,8 +199,8 @@ function getBufferFromSample(ctx: AudioContext, zone: WaveZone): AudioBuffer {
 	return buffer;
 }
 
-export function findZone(audioContext: AudioContext, preset: WavePreset, pitch: number): WaveZone | null {
-	var zone: WaveZone | null = null;
+export function findZone(audioContext: AudioContext, preset: TWavePreset, pitch: number): TWaveZone | null {
+	var zone: TWaveZone | null = null;
 	for (let i = preset.zones.length - 1; i >= 0; i--) {
 		zone = preset.zones[i];
 		//if (zone.keyRangeLow <= pitch && zone.keyRangeHigh + 1 >= pitch) { // original
@@ -218,7 +216,7 @@ export function findZone(audioContext: AudioContext, preset: WavePreset, pitch: 
 	return zone;
 }
 
-export async function prepareZone (ctx: AudioContext, zone: WaveZone): Promise<WaveZone> {
+export async function prepareZone (ctx: AudioContext, zone: TWaveZone): Promise<TWaveZone> {
 	if (zone.buffer) return Promise.resolve(zone);
 
 	const dfr = new Deferred();
@@ -266,11 +264,11 @@ export async function prepareZone (ctx: AudioContext, zone: WaveZone): Promise<W
 export async function preparePreset(
 	x: {
 		audioContext: AudioContext,
-		preset: WavePreset,
+		preset: TWavePreset,
 		var?: string,
 		id?: number | string
 	} & {[key: string]: any}
-): Promise<WavePreset | null> {
+): Promise<TWavePreset | null> {
 	if (!x.preset) {
 		console.log('preparePreset: preset is null', x);
 

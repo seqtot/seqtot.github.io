@@ -1,15 +1,20 @@
+import {
+    Muse as m,
+    TFileSettings,
+    TTextBlock,
+    TSongPartInfo,
+    TRowInfo,
+    LineModel,
+    TStoredRow,
+    TLine,
+    TCell,
+    TLineNote,
+    Sound,
+} from '../libs/muse';
+
 import { getWithDataAttr } from '../src/utils';
 import { standardTicks as ticks } from './ticks';
 import { getBassCells } from './get-bass-cells';
-import {
-    Muse as m,
-    FileSettings,
-    TextBlock,
-    SongPartInfo,
-    RowInfo,
-    LineModel,
-    StoredRow, Line, Cell, LineNote, Sound,
-} from '../libs/muse';
 import mboxes from '../mboxes';
 import { ideService } from './ide/ide-service';
 import { SongStore, SongNode, MY_SONG } from './song-store';
@@ -17,7 +22,6 @@ import * as svg from './svg-icons';
 import { ConfirmDialog, TrackDetailsDialog, TracksVolumeDialog, GetTrackDialog, NameDialog } from './dialogs';
 import { WavRecorder } from './ide/wav-recorder';
 import { KeyboardCtrl } from './keyboard-ctrl';
-import { getRandomElement } from '../libs/muse/utils';
 import { UserSettingsStore } from './user-settings-store';
 import { appRouter, RouteInfo } from '../src/router';
 
@@ -58,7 +62,7 @@ export class MBoxPage {
         return document.getElementById('app-route');
     }
 
-    get outBlock(): TextBlock {
+    get outBlock(): TTextBlock {
         return  this.blocks.find((item) => item.id === 'out');
     }
 
@@ -66,11 +70,11 @@ export class MBoxPage {
         return !!(this.isMy || this.pageData.exportToLineModel || false);
     }
 
-    get blocks (): TextBlock[] {
+    get blocks (): TTextBlock[] {
         return ideService.blocks;
     }
 
-    get settings (): FileSettings  {
+    get settings (): TFileSettings  {
         return ideService.settings;
     }
 
@@ -688,7 +692,7 @@ export class MBoxPage {
     }
 
     gotoEditPart(pPartNio?: number | string) {
-        let partNio = m.parseInteger(pPartNio, null);
+        let partNio = m.utils.parseInteger(pPartNio, null);
         let editPartsNio: number[] = [];
         const isMy = this.isMy;
 
@@ -810,7 +814,7 @@ export class MBoxPage {
         return 0;
     }
 
-    getOneSelectedPartInfo(parts?: string[]): SongPartInfo {
+    getOneSelectedPartInfo(parts?: string[]): TSongPartInfo {
         parts = Array.isArray(parts) ? parts: this.allSongParts;
         const partNio = this.getOneSelectedPartNio(parts);
 
@@ -832,7 +836,7 @@ export class MBoxPage {
     }
 
     selectPart(partNio: number | string) {
-        partNio = m.parseInteger(partNio, null);
+        partNio = m.utils.parseInteger(partNio, null);
 
         if (!partNio) return;
 
@@ -880,7 +884,7 @@ export class MBoxPage {
 
     updatePartListView() {
         getWithDataAttr('part-item', this.pageEl).forEach(el => {
-            const partNio = m.parseInteger(el.dataset.partNio, 0);
+            const partNio = m.utils.parseInteger(el.dataset.partNio, 0);
 
             if (this.excludePartNio.includes(partNio)) {
                 el.style.fontWeight = '400';
@@ -1010,8 +1014,8 @@ export class MBoxPage {
     }
 
 
-    getFullLineModel(song: SongNode): { rowInPartId: string, lines: Line[], durQ: number, blockOffsetQ: number}[] {
-        const result: {rowInPartId: string, lines: Line[], durQ: number, blockOffsetQ: number}[] = [];
+    getFullLineModel(song: SongNode): { rowInPartId: string, lines: TLine[], durQ: number, blockOffsetQ: number}[] {
+        const result: {rowInPartId: string, lines: TLine[], durQ: number, blockOffsetQ: number}[] = [];
 
         song.dynamic.forEach(item => {
             let curr = result.find(iItem => iItem.rowInPartId === item.rowInPartId)
@@ -1029,7 +1033,7 @@ export class MBoxPage {
 
             if (item.lines.length > curr.lines.length) {
                 curr.lines = item.lines.map(line => {
-                    return <Line>{
+                    return <TLine>{
                         durQ: line.durQ,
                         rowInPartId: item.rowInPartId,
                         startOffsetQ: line.startOffsetQ,
@@ -1099,13 +1103,13 @@ export class MBoxPage {
         KeyboardCtrl.Sort_ByPartAndRowNio(itemsByHead);
         KeyboardCtrl.Sort_ByPartAndRowNio(itemsByBass);
 
-        const headCells: (Cell & {blockOffsetQ?: number})[] = [];
+        const headCells: (TCell & {blockOffsetQ?: number})[] = [];
 
         itemsByHead.forEach(item => {
             const itemInAll = allItemsByHead.find(iItem => iItem.rowInPartId === item.rowInPartId);
 
             item.lines.forEach((line, i) => {
-                const cells: Cell[] = [];
+                const cells: TCell[] = [];
 
                 line.cells.forEach(cell => {
                     (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
@@ -1128,7 +1132,7 @@ export class MBoxPage {
             });
         });
 
-        const bassCells: (Cell & {blockOffsetQ?: number})[] = [];
+        const bassCells: (TCell & {blockOffsetQ?: number})[] = [];
 
         itemsByBass.forEach(item => {
             const itemInAll = allItemsByDrums.find(iItem => iItem.rowInPartId === item.rowInPartId);
@@ -1136,7 +1140,7 @@ export class MBoxPage {
             item.lines = item.lines.map(line => {
                 line.blockOffsetQ = itemInAll.blockOffsetQ;
 
-                const cells: Cell[] = [];
+                const cells: TCell[] = [];
 
                 line.cells.forEach(cell => {
                     (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
@@ -1191,7 +1195,7 @@ export class MBoxPage {
 
             nextCell = nextCell ? nextCell : currCell;
 
-            const lBassCells: Cell[] = [];
+            const lBassCells: TCell[] = [];
 
             for (let drumCell of bassCells) {
                 if (
@@ -1278,13 +1282,13 @@ export class MBoxPage {
         KeyboardCtrl.Sort_ByPartAndRowNio(itemsByHead);
         KeyboardCtrl.Sort_ByPartAndRowNio(itemsByBass);
 
-        const headCells: (Cell & {blockOffsetQ?: number})[] = [];
+        const headCells: (TCell & {blockOffsetQ?: number})[] = [];
 
         itemsByHead.forEach(item => {
             const itemInAll = allItemsByHead.find(iItem => iItem.rowInPartId === item.rowInPartId);
 
             item.lines.forEach((line, i) => {
-                const cells: Cell[] = [];
+                const cells: TCell[] = [];
 
                 line.cells.forEach(cell => {
                     (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
@@ -1307,7 +1311,7 @@ export class MBoxPage {
             });
         });
 
-        const bassCells: (Cell & {blockOffsetQ?: number})[] = [];
+        const bassCells: (TCell & {blockOffsetQ?: number})[] = [];
 
         itemsByBass.forEach(item => {
             const itemInAll = allItemsByDrums.find(iItem => iItem.rowInPartId === item.rowInPartId);
@@ -1315,7 +1319,7 @@ export class MBoxPage {
             item.lines = item.lines.map(line => {
                 line.blockOffsetQ = itemInAll.blockOffsetQ;
 
-                const cells: Cell[] = [];
+                const cells: TCell[] = [];
 
                 line.cells.forEach(cell => {
                     (cell as any).blockOffsetQ = itemInAll.blockOffsetQ;
@@ -1360,7 +1364,7 @@ export class MBoxPage {
                 });
             }
 
-            let headCell: Cell;
+            let headCell: TCell;
 
             for (let j = 0; j < headCells.length; j++) {
                if ((headCells[j].startOffsetQ + headCells[j].blockOffsetQ) <= (cell.startOffsetQ + cell.blockOffsetQ)) {
@@ -1373,7 +1377,7 @@ export class MBoxPage {
             }
 
             if (headCell && headCell.notes.length) {
-                let note = (cell.notes.find(note => note.instName === '@bd') || cell.notes.find(note => note.instName === '@sn')) as LineNote;
+                let note = (cell.notes.find(note => note.instName === '@bd') || cell.notes.find(note => note.instName === '@sn')) as TLineNote;
 
                 if (!note) {
                     cell.notes = [];
@@ -1388,7 +1392,7 @@ export class MBoxPage {
                     lineOffsetQ: note.lineOffsetQ,
                     instCode: '',
                     instName: note.instName,
-                } as LineNote;
+                } as TLineNote;
 
                 let latNote = '';
 
@@ -1396,7 +1400,7 @@ export class MBoxPage {
                     latNote = Sound.GetNoteLat(headCell.notes[0].note);
                     note.note = latNote[0] + 'u';
                 } else {
-                    latNote = getRandomElement(headCell.notes).note;
+                    latNote = m.utils.getRandomElement(headCell.notes).note;
                     note.note = latNote[0] + 'y';
                 }
 
@@ -1592,21 +1596,21 @@ export class MBoxPage {
         return ideService.multiPlayer.tryPlayTextLine({ text, repeat });
     }
 
-    buildBlocksForMySong(blocks: TextBlock[]): TextBlock[] {
+    buildBlocksForMySong(blocks: TTextBlock[]): TTextBlock[] {
         //console.log('buildBlocksForMySong.blocks', blocks);
 
         blocks = []; // jjkl
 
         const song = ideService.songStore.clone();
         const hash = {};
-        const list: {id: string, rows: StoredRow[][]}[] = [];
+        const list: {id: string, rows: TStoredRow[][]}[] = [];
         const selectedParts = this.getSelectedParts();
 
         selectedParts.forEach(partStr => {
             const part = m.getPartInfo(partStr);
             const partRows = song.dynamic.filter(row => {
                 const iPartId = (row.partId || '').trim();
-                const iPartNio = m.parseInteger(row.rowInPartId.split('-')[0], 0);
+                const iPartNio = m.utils.parseInteger(row.rowInPartId.split('-')[0], 0);
 
                 if (part.partId && iPartId) {
                     return part.partId === iPartId;
@@ -1616,8 +1620,8 @@ export class MBoxPage {
             });
 
             partRows.sort((a, b) => {
-                const iRowNioA = m.parseInteger(a.rowInPartId.split('-')[1], 0);
-                const iRowNioB = m.parseInteger(b.rowInPartId.split('-')[1], 0);
+                const iRowNioA = m.utils.parseInteger(a.rowInPartId.split('-')[1], 0);
+                const iRowNioB = m.utils.parseInteger(b.rowInPartId.split('-')[1], 0);
 
                 if (iRowNioA < iRowNioB) return -1;
                 if (iRowNioA > iRowNioB) return 1;
@@ -1626,8 +1630,8 @@ export class MBoxPage {
             });
 
             partRows.forEach(row => {
-                const iPartNio = m.parseInteger(row.rowInPartId.split('-')[0], 0);
-                const iRowNio = m.parseInteger(row.rowInPartId.split('-')[1], 0);
+                const iPartNio = m.utils.parseInteger(row.rowInPartId.split('-')[0], 0);
+                const iRowNio = m.utils.parseInteger(row.rowInPartId.split('-')[1], 0);
 
                 if (!hash[iPartNio]) {
                     hash[iPartNio] = {
@@ -1695,7 +1699,7 @@ export class MBoxPage {
         return blocks;
     }
 
-    getNotes(id: string, item: StoredRow): string {
+    getNotes(id: string, item: TStoredRow): string {
         item.lines.forEach(line => {
             line.blockOffsetQ = 0;
         });
@@ -1734,16 +1738,16 @@ export class MBoxPage {
     playAll(repeatCount = 1, saveWav = false) {
         this.stop();
 
-        let currRowInfo: RowInfo = { first: 0, last: 0}; // индекс в текущем блоке
+        let currRowInfo: TRowInfo = { first: 0, last: 0}; // индекс в текущем блоке
         let blocks = this.useLineModel ? this.buildBlocksForMySong(this.blocks) : [...this.blocks];
 
         const x = {
             blocks,
-            currBlock: null as TextBlock,
+            currBlock: null as TTextBlock,
             currRowInfo: currRowInfo,
             excludeIndex: this.excludePartNio,
-            midiBlockOut: null as TextBlock,
-            playBlockOut: '' as string | TextBlock,
+            midiBlockOut: null as TTextBlock,
+            playBlockOut: '' as string | TTextBlock,
             topBlocksOut: [],
         };
 
@@ -1766,7 +1770,7 @@ export class MBoxPage {
 
         m.getMidiConfig(x);
 
-        const playBlock = x.playBlockOut as TextBlock;
+        const playBlock = x.playBlockOut as TTextBlock;
 
         //console.log('getMidiConfig', x);
 

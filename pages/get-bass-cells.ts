@@ -1,7 +1,6 @@
-import {Cell, LineNote} from '../libs/muse';
-import { Sound } from '../libs/muse';
-import {FreqInfo, freqInfoHash} from '../libs/muse/freq';
-import {getRandomElement, isPresent} from '../libs/muse/utils';
+import { Muse as m, TCell, TLineNote, Sound, TFreqInfo } from '../libs/muse';
+
+const freqInfoHash = m.const.freqInfoHash;
 
 function firstToLower(val: string): string {
     return val[0].toLowerCase() + val.slice(1);
@@ -75,7 +74,7 @@ const bassLines: {[key: string]: BassPattern[]} = bassLinesSrc.reduce((acc, item
 
     if (!acc[key].find((val) => val.key === items[2])) {
         const notes = camelToKebab(items[2]); //.split('-').map(note => char2ToDigit[note]).filter(isPresent);
-        const arr = notes.split('-').map(note => char2ToDigit[note]).filter(isPresent);
+        const arr = notes.split('-').map(note => char2ToDigit[note]).filter(m.utils.isPresent);
 
         if (notes) {
             acc[key].push({
@@ -90,7 +89,7 @@ const bassLines: {[key: string]: BassPattern[]} = bassLinesSrc.reduce((acc, item
 
 console.log('bassLines', bassLines);
 
-function getChordStructure(cell: Cell): {notes: string[], codes: number[], formula: string} {
+function getChordStructure(cell: TCell): {notes: string[], codes: number[], formula: string} {
     const result = {
         notes: [],
         codes: [],
@@ -129,7 +128,7 @@ function getChordStructure(cell: Cell): {notes: string[], codes: number[], formu
     return result;
 }
 
-function getBeatStructure(bassCells: Cell[], startOffsetQ: number, nextOffsetQ: number): number[] {
+function getBeatStructure(bassCells: TCell[], startOffsetQ: number, nextOffsetQ: number): number[] {
     let pause = 0;
     let arr = [];
 
@@ -156,7 +155,7 @@ function getBeatStructure(bassCells: Cell[], startOffsetQ: number, nextOffsetQ: 
 }
 
 
-function cutNotes(notes: LineNote[]): LineNote[] {
+function cutNotes(notes: TLineNote[]): TLineNote[] {
     notes.forEach(note => {
         if (note.durQ) {
             note.durQ = note.durQ > 10 ? note.durQ - 10 : note.durQ;
@@ -166,7 +165,7 @@ function cutNotes(notes: LineNote[]): LineNote[] {
     return notes;
 }
 
-function createSimpleBass(bassCells: Cell[], headCells: Cell[], endOffsetQ: number) {
+function createSimpleBass(bassCells: TCell[], headCells: TCell[], endOffsetQ: number) {
     console.log('bassCells', bassCells);
 
     bassCells.forEach((cell, i) => {
@@ -182,7 +181,7 @@ function createSimpleBass(bassCells: Cell[], headCells: Cell[], endOffsetQ: numb
             });
         }
 
-        let headCell: Cell;
+        let headCell: TCell;
 
         for (let j = 0; j < headCells.length; j++) {
             if ((headCells[j].startOffsetQ + headCells[j].blockOffsetQ) <= (cell.startOffsetQ + cell.blockOffsetQ)) {
@@ -195,7 +194,7 @@ function createSimpleBass(bassCells: Cell[], headCells: Cell[], endOffsetQ: numb
         }
 
         if (headCell && headCell.notes.length) {
-            let note = (cell.notes.find(note => note.instName === '@bd') || cell.notes.find(note => note.instName === '@sn')) as LineNote;
+            let note = (cell.notes.find(note => note.instName === '@bd') || cell.notes.find(note => note.instName === '@sn')) as TLineNote;
 
             if (!note) {
                 cell.notes = [];
@@ -210,7 +209,7 @@ function createSimpleBass(bassCells: Cell[], headCells: Cell[], endOffsetQ: numb
                 lineOffsetQ: note.lineOffsetQ,
                 instCode: '',
                 instName: note.instName,
-            } as LineNote;
+            } as TLineNote;
 
             let latNote = '';
 
@@ -218,7 +217,7 @@ function createSimpleBass(bassCells: Cell[], headCells: Cell[], endOffsetQ: numb
                 latNote = Sound.GetNoteLat(headCell.notes[0].note);
                 note.note = latNote[0] + 'u';
             } else {
-                latNote = getRandomElement(headCell.notes).note;
+                latNote = m.utils.getRandomElement(headCell.notes).note;
                 note.note = latNote[0] + 'y';
             }
 
@@ -238,7 +237,7 @@ function createSimpleBass(bassCells: Cell[], headCells: Cell[], endOffsetQ: numb
     });
 }
 
-export function getBassCells(harmCells: {curr: Cell, next: Cell}, bassCells: Cell[], endOffsetQ: number) { // Cell[]
+export function getBassCells(harmCells: {curr: TCell, next: TCell}, bassCells: TCell[], endOffsetQ: number) { // Cell[]
     const curr = getChordStructure(harmCells.curr);
     const next = getChordStructure(harmCells.next);
     const bassDiff = next.codes[0] - curr.codes[0];
@@ -250,7 +249,7 @@ export function getBassCells(harmCells: {curr: Cell, next: Cell}, bassCells: Cel
     );
 
     const patternId = `${curr.formula} ${digitTo2Char[bassDiff]} ${next.formula}:${beatStructure.join(' ')}`;
-    const pattern = getRandomElement(bassLines[patternId] || []) || {key: '', arr: []};
+    const pattern = m.utils.getRandomElement(bassLines[patternId] || []) || {key: '', arr: []};
     const pitchArr = pattern.arr;
 
     beatStructure = beatStructure.filter(item => item > -1)
@@ -262,7 +261,7 @@ export function getBassCells(harmCells: {curr: Cell, next: Cell}, bassCells: Cel
     }
 
     let currCode = curr.codes[0];
-    let freqInfo: FreqInfo[] = [];
+    let freqInfo: TFreqInfo[] = [];
 
     pitchArr.forEach(item => {
         currCode = currCode + item;

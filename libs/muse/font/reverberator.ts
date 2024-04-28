@@ -1,6 +1,3 @@
-'use babel';
-//'use strict'
-
 export  class WebAudioFontReverberator {
 	audioContext: AudioContext;
 	output: GainNode;

@@ -155,7 +155,7 @@ export class TracksVolumeDialog extends AppDialog {
 
         this.tracks.unshift({
             name: 'total',
-            volume: m.parseInteger(this.song.volume, DEFAULT_OUT_VOLUME),
+            volume: m.utils.parseInteger(this.song.volume, DEFAULT_OUT_VOLUME),
             board: ''
         });
 
@@ -184,7 +184,7 @@ export class TracksVolumeDialog extends AppDialog {
             if (oldSubitems.length) {
                 track.items.forEach(newSubitem => {
                     const oldSubitem = oldSubitems.find(oldSubitem => oldSubitem.name === newSubitem.name);
-                    newSubitem.volume = m.isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
+                    newSubitem.volume = m.utils.isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
                 });
             }
 

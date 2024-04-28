@@ -1,8 +1,8 @@
 import {DEFAULT_VOLUME, NUM_120, drumsTrack} from './utils/utils-note';
-import { StoredRow, Line, LineNote, Cell, KeyData, SongPartInfo } from './types';
+import { TStoredRow, TLine, TLineNote, TCell, TKeyData, TSongPartInfo } from './types';
 import { parseInteger } from './utils';
 
-type CellCoord = {
+type TCellCoord = {
     row: number,
     ind: number,
     col: number,
@@ -23,7 +23,7 @@ function getSlides(val: string): string {
 const DEF_DRUM_DUR = 1;
 
 export class LineModel {
-    lines: Line[] = [];
+    lines: TLine[] = [];
 
     findRowIndByOffset(offsetQ: number): number {
         return this.lines.findIndex(row => {
@@ -32,11 +32,11 @@ export class LineModel {
         });
     }
 
-    getRowByOffset(offsetQ: number): Line {
+    getRowByOffset(offsetQ: number): TLine {
         return this.lines[this.findRowIndByOffset(offsetQ)];
     }
 
-    getCellByNoteId(id: number): Cell {
+    getCellByNoteId(id: number): TCell {
         for (let row of this.lines) {
             for (let cell of row.cells) {
                 for (let note of cell.notes) {
@@ -50,7 +50,7 @@ export class LineModel {
         return null as any;
     }
 
-    addCellDuration(id: number, value: number): CellCoord | null {
+    addCellDuration(id: number, value: number): TCellCoord | null {
         const info = this.getRowAndCellIndexes(id);
 
 
@@ -70,7 +70,7 @@ export class LineModel {
         return info;
     }
 
-    moveCell(id: number, value: number): CellCoord | null {
+    moveCell(id: number, value: number): TCellCoord | null {
         const info = this.getRowAndCellIndexes(id);
 
         if (!info) {
@@ -104,7 +104,7 @@ export class LineModel {
         return null;
     }
 
-    setData(rows: Line[]) {
+    setData(rows: TLine[]) {
         let noteId = 1;
         let cellId = 1;
 
@@ -144,8 +144,8 @@ export class LineModel {
         });
     }
 
-    getAllCells(): Cell[] {
-        const result: Cell[] = [];
+    getAllCells(): TCell[] {
+        const result: TCell[] = [];
 
         this.lines.forEach(row => {
             row.cells.forEach(cell => {
@@ -170,7 +170,7 @@ export class LineModel {
         return Math.max(...notes.map(item => item.id));
     }
 
-    getAllNotes(): LineNote[] {
+    getAllNotes(): TLineNote[] {
         const cells = this.getAllCells();
 
         if (!cells.length) return [];
@@ -180,9 +180,9 @@ export class LineModel {
         }, []);
     }
 
-    addNoteByOffset(offsetQ: number, note: LineNote): {
-        note: LineNote,
-        coord: CellCoord,
+    addNoteByOffset(offsetQ: number, note: TLineNote): {
+        note: TLineNote,
+        coord: TCellCoord,
     } {
         const row = this.getRowByOffset(offsetQ);
 
@@ -220,7 +220,7 @@ export class LineModel {
         this.lines = [...topArr, ...botArr];
     }
 
-    static GetEmptyLine(rowInPartId: string = ''): Line {
+    static GetEmptyLine(rowInPartId: string = ''): TLine {
         return  {
             durQ: 120,
             startOffsetQ: 0,
@@ -232,7 +232,7 @@ export class LineModel {
 
     }
 
-    getEmptyLine(rowInPartId: string = ''): Line {
+    getEmptyLine(rowInPartId: string = ''): TLine {
         return LineModel.GetEmptyLine(rowInPartId);
     }
 
@@ -258,7 +258,7 @@ export class LineModel {
         this.lines = [...topArr, ...botArr];
     }
 
-    addOffset(arr: Line[], offsetQ: number, rowInPartId= '') {
+    addOffset(arr: TLine[], offsetQ: number, rowInPartId= '') {
         for (let i = 0; i < arr.length; i++) {
             const row = arr[i];
 
@@ -277,7 +277,7 @@ export class LineModel {
         }
     }
 
-    getRowAndCellIndexes(id: number): CellCoord | null {
+    getRowAndCellIndexes(id: number): TCellCoord | null {
         if (!id || !this.lines) {
             return null;
         }
@@ -301,7 +301,7 @@ export class LineModel {
         return null;
     }
 
-    getItemById(id: number): Cell | null {
+    getItemById(id: number): TCell | null {
         if (!id) {
             return null;
         }
@@ -317,13 +317,13 @@ export class LineModel {
         return null;
     }
 
-    getLineModelFromRecord(bpm: number, startTimeMs, seq: KeyData[] ): Line[] {
+    getLineModelFromRecord(bpm: number, startTimeMs, seq: TKeyData[] ): TLine[] {
         return LineModel.GetToneLineModelFromRecord(bpm, startTimeMs, seq);
     }
 
-    static GetToneLineModelFromRecord(bpm: number, startTimeMs, seq: KeyData[] ): Line[] {
+    static GetToneLineModelFromRecord(bpm: number, startTimeMs, seq: TKeyData[] ): TLine[] {
         let qms = Math.round(60000/ bpm); // ms в четверти
-        let rows: Line[] = [];
+        let rows: TLine[] = [];
 
         // начало и номер четверти
         for (let i = 0; i<seq.length; i++) {
@@ -357,20 +357,20 @@ export class LineModel {
             })
         }
 
-        const getLineByStartOffsetQ = (startOffsetQ: number): Line => {
+        const getLineByStartOffsetQ = (startOffsetQ: number): TLine => {
             return rows.find(item => {
                 return startOffsetQ >= item.startOffsetQ && startOffsetQ < (item.startOffsetQ + item.durQ);
             });
         }
 
-        const getCellByStartOffsetQ = (startOffsetQ: number, row: Line): Cell => {
+        const getCellByStartOffsetQ = (startOffsetQ: number, row: TLine): TCell => {
             return row.cells.find(item => startOffsetQ === item.startOffsetQ);
         }
 
         let cellId = 1;
 
         seq.forEach((item, i) => {
-            let itemNew: LineNote = {
+            let itemNew: TLineNote = {
                 id: i + 1,
                 bodyColor: '',
                 headColor: '',
@@ -393,7 +393,7 @@ export class LineModel {
 
             if (row) {
                 //let cell = getCellByStartOffsetQ(startOffsetQ, row) as Cell;
-                let cell: Cell;
+                let cell: TCell;
 
                 if (!cell) {
                     cell = {
@@ -412,9 +412,9 @@ export class LineModel {
         return rows;
     }
 
-    static GetLineModelFromRecord(bpm: number, startTimeMs, seq: KeyData[] ): Line[] {
+    static GetLineModelFromRecord(bpm: number, startTimeMs, seq: TKeyData[] ): TLine[] {
         let qms = Math.round(60000/ bpm); // ms в четверти
-        let rows: Line[] = [];
+        let rows: TLine[] = [];
 
         // начало и номер четверти
         for (let i = 0; i<seq.length; i++) {
@@ -448,20 +448,20 @@ export class LineModel {
             })
         }
 
-        const getLineByStartOffsetQ = (startOffsetQ: number): Line => {
+        const getLineByStartOffsetQ = (startOffsetQ: number): TLine => {
             return rows.find(item => {
                 return startOffsetQ >= item.startOffsetQ && startOffsetQ < (item.startOffsetQ + item.durQ);
             });
         }
 
-        const getCellByStartOffsetQ = (startOffsetQ: number, row: Line): Cell => {
+        const getCellByStartOffsetQ = (startOffsetQ: number, row: TLine): TCell => {
             return row.cells.find(item => startOffsetQ === item.startOffsetQ);
         }
 
         let cellId = 1;
 
         seq.forEach((item, i) => {
-            let itemNew: LineNote = {
+            let itemNew: TLineNote = {
                 id: i + 1,
                 bodyColor: '',
                 headColor: '',
@@ -484,7 +484,7 @@ export class LineModel {
 
             if (row) {
                 //let cell = getCellByStartOffsetQ(startOffsetQ, row) as Cell;
-                let cell: Cell;
+                let cell: TCell;
 
                 if (!cell) {
                     cell = {
@@ -503,9 +503,9 @@ export class LineModel {
         return rows;
     }
 
-    static GetSortedNotes(rows: Line[]): LineNote[] {
+    static GetSortedNotes(rows: TLine[]): TLineNote[] {
         rows = Array.isArray(rows) ? rows : [];
-        const notes: LineNote[] = [];
+        const notes: TLineNote[] = [];
 
         rows.forEach(row => {
             row.cells.forEach(cell => {
@@ -521,7 +521,7 @@ export class LineModel {
         return notes;
     }
 
-    getSortedNotes(rows: Line[]): LineNote[] {
+    getSortedNotes(rows: TLine[]): TLineNote[] {
         return LineModel.GetSortedNotes(Array.isArray(rows) ? rows : this.lines);
     }
 
@@ -539,7 +539,7 @@ export class LineModel {
         });
     }
 
-    static SortByStartOffsetQ(arr: (Cell | LineNote) []) {
+    static SortByStartOffsetQ(arr: (TCell | TLineNote) []) {
         arr.sort((first, second) => {
             if (first.startOffsetQ < second.startOffsetQ) {
                 return -1;
@@ -553,11 +553,11 @@ export class LineModel {
         });
     }
 
-    sortByStartOffsetQ(arr: (Cell | LineNote) []) {
+    sortByStartOffsetQ(arr: (TCell | TLineNote) []) {
         LineModel.SortByStartOffsetQ(arr);
     }
 
-    static GetNoteNames(arr: LineNote[]): string[] {
+    static GetNoteNames(arr: TLineNote[]): string[] {
         const result: {[key: string]: string} = {};
 
         arr.forEach(item => {
@@ -567,7 +567,7 @@ export class LineModel {
         return Object.values(result);
     }
 
-    static GetInstrNames(arr: LineNote[]): string[] {
+    static GetInstrNames(arr: TLineNote[]): string[] {
         const result: {[key: string]: string} = {};
 
         arr.forEach(item => {
@@ -577,11 +577,11 @@ export class LineModel {
         return Object.values(result);
     }
 
-    getNoteNames(arr: LineNote[]): string[] {
+    getNoteNames(arr: TLineNote[]): string[] {
         return LineModel.GetNoteNames(arr);
     }
 
-    static GetDurationQByLines(lines: Line[]) {
+    static GetDurationQByLines(lines: TLine[]) {
         lines = Array.isArray(lines) ? lines : [];
 
         if (lines.length) {
@@ -591,11 +591,11 @@ export class LineModel {
         return 0;
     }
 
-    getDurationQByLines(lines?: Line[]) {
+    getDurationQByLines(lines?: TLine[]) {
         return LineModel.GetDurationQByLines(Array.isArray(lines) ? lines : this.lines);
     }
 
-    getOffsetsByRow(row: Line): number[] {
+    getOffsetsByRow(row: TLine): number[] {
         const result = []
         const map = {};
 
@@ -609,8 +609,8 @@ export class LineModel {
         return result;
     }
 
-    getNotesListByOffset(row: Line, startOffsetQ: number): LineNote[] {
-        const result: LineNote[] = []
+    getNotesListByOffset(row: TLine, startOffsetQ: number): TLineNote[] {
+        const result: TLineNote[] = []
 
         row.cells.forEach(cell => {
             if (cell.startOffsetQ !== startOffsetQ) {
@@ -623,7 +623,7 @@ export class LineModel {
         return result;
     }
 
-    getNoteById(id: string | number): LineNote {
+    getNoteById(id: string | number): TLineNote {
         if (!id) return null;
 
         for (let line of this.lines) {
@@ -639,8 +639,8 @@ export class LineModel {
         return null;
     }
 
-    getNotesByOffset(offsetQ: number): LineNote[] {
-        const result: LineNote[] = []
+    getNotesByOffset(offsetQ: number): TLineNote[] {
+        const result: TLineNote[] = []
 
         const row = this.getRowByOffset(offsetQ);
 
@@ -658,11 +658,11 @@ export class LineModel {
     }
 
     getCellsByOffset(offsetQ: number): {
-        row: Line,
-        cells: Cell[]
+        row: TLine,
+        cells: TCell[]
     } {
         const result = {
-            row: null as Line,
+            row: null as TLine,
             cells: [],
         }
 
@@ -683,7 +683,7 @@ export class LineModel {
         return result;
     }
 
-    getNotesHashByOffset(row: Line, startOffsetQ: number): {[key: string]: string} {
+    getNotesHashByOffset(row: TLine, startOffsetQ: number): {[key: string]: string} {
         const result: {[key: string]: string} = {};
 
         row.cells.forEach(cell => {
@@ -699,7 +699,7 @@ export class LineModel {
         return result;
     }
 
-    static ClearBlockOffset(rows: Line[]): Line[] {
+    static ClearBlockOffset(rows: TLine[]): TLine[] {
         rows.forEach(row => {
             row.blockOffsetQ = 0;
         });
@@ -707,7 +707,7 @@ export class LineModel {
         return rows;
     }
 
-    static RecalcAndClearBlockOffset(rows: Line[]): Line[] {
+    static RecalcAndClearBlockOffset(rows: TLine[]): TLine[] {
         rows.forEach(row => {
             row.startOffsetQ = row.startOffsetQ + row.blockOffsetQ;
             row.cells.forEach(cell => {
@@ -719,7 +719,7 @@ export class LineModel {
         return rows;
     }
 
-    recalcAndClearBlockOffset(rows: Line[]): Line[] {
+    recalcAndClearBlockOffset(rows: TLine[]): TLine[] {
         return LineModel.RecalcAndClearBlockOffset(rows);
     }
 
@@ -733,7 +733,7 @@ export class LineModel {
         blockName: string,
         track: string,
         instrName: string,
-        rows: Line[]
+        rows: TLine[]
     }): string {
         let blockName = x.blockName || 'no_name';
         let rows = this.CloneLines(x.rows);
@@ -780,7 +780,7 @@ export class LineModel {
         return result;
     }
 
-    static GetDrumNotes(blockName: string, trackName: string, lines: Line[]): string {
+    static GetDrumNotes(blockName: string, trackName: string, lines: TLine[]): string {
         blockName = blockName || 'no_name';
         trackName = trackName || drumsTrack;
 
@@ -877,13 +877,13 @@ export class LineModel {
         return result;
     }
 
-    getDrumNotes(blockName: string, trackName: string, lines: Line[]): string {
+    getDrumNotes(blockName: string, trackName: string, lines: TLine[]): string {
         lines = Array.isArray(lines) ? lines : this.lines;
 
         return LineModel.GetDrumNotes(blockName, trackName, lines);
     }
 
-    static CloneLine(line: Line): Line {
+    static CloneLine(line: TLine): TLine {
         line = {...line};
 
         line.cells = line.cells.map(cell => {
@@ -899,20 +899,20 @@ export class LineModel {
         return line;
     }
 
-    static CloneLines(lines: Line[]): Line[] {
+    static CloneLines(lines: TLine[]): TLine[] {
         lines = Array.isArray(lines) ? lines : [];
 
         return lines.map(line => LineModel.CloneLine(line));
     }
 
-    cloneRows(rows?: Line[]): Line[] {
+    cloneRows(rows?: TLine[]): TLine[] {
         rows = Array.isArray(rows) ? rows : this.lines;
 
         return LineModel.CloneLines(rows);
     }
 
-    getLinesByMask(pMask: string | number): Line[] {
-        const rows: Line[] = [];
+    getLinesByMask(pMask: string | number): TLine[] {
+        const rows: TLine[] = [];
         let startOffsetQ = 0;
 
         if (parseInteger(pMask, 0)) {
@@ -992,10 +992,10 @@ export class LineModel {
         this.lines = this.getLinesByMask(mask);
     }
 
-    static SplitByMask(x: {track: string, type: string, partInfo: SongPartInfo, lines: Line[]}): StoredRow[] {
+    static SplitByMask(x: {track: string, type: string, partInfo: TSongPartInfo, lines: TLine[]}): TStoredRow[] {
         //console.log('SplitMask.x', x);
 
-        let result: StoredRow[] = [];
+        let result: TStoredRow[] = [];
         let mask = (x.partInfo.mask || '').trim();
 
         let maskArr = mask.split('_');
@@ -1097,3 +1097,4 @@ export class LineModel {
         return result;
     }
 }
+ export type TLineModel = typeof LineModel;

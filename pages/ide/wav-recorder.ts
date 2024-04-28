@@ -1,5 +1,3 @@
-'use babel';
-
 import { Sound } from '../../libs/muse';
 //import * as wav from '../../libs/muse/utils/node-wav'
 

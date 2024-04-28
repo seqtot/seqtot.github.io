@@ -1,5 +1,3 @@
-'use babel';
-
 // https://github.com/Jam3/audiobuffer-to-wav
 export class Deferred<T = any> {
     promise: Promise<T>;

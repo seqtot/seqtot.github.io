@@ -1,33 +1,33 @@
 import * as un from './utils';
 import {getInstrumentObj} from './instruments';
-import {WavePreset, WaveZone} from '../waf-player/otypes';
-import {NoteLineInfo, WaveSlide} from './types';
+import {TWavePreset, TWaveZone} from './font/otypes';
+import {TNoteLineInfo, TWaveSlide} from './types';
 import {PAUSE} from './utils';
-import {getSoundsInfoArr, MidiCodeAndZone} from './get-sound-info-arr';
+import {getSoundsInfoArr, TMidiCodeAndZone} from './get-sound-info-arr';
 
 /**
  * Одиночная нота для воспроизведения
  */
-export type NoteForTick = {
+export type TNoteForTick = {
     notes: string; // вид исходных нот переданных для воспроизведения
     offsetFromBeatMs?: number;
     durationMs?: number;
     volume: number,
     pitchShift: number,
-    slides?: WaveSlide[],
+    slides?: TWaveSlide[],
     cent?: number,
 
-    soundsInfo: MidiCodeAndZone[];
+    soundsInfo: TMidiCodeAndZone[];
     instrName: string;
-    instrObj: WavePreset;
-    zone?: WaveZone
+    instrObj: TWavePreset;
+    zone?: TWaveZone
 };
 
-export type TicksInfoMap = {
-    [key: string]: NoteForTick[];
+export type TTicksInfoMap = {
+    [key: string]: TNoteForTick[];
 };
 
-export type LoopInfo = {
+export type TLoopInfo = {
     id: string | number;
     tickCount: number;
     durationQ: number;
@@ -39,7 +39,7 @@ export type LoopInfo = {
     // [key]: TicksInfo
 };
 
-export type LoopAndTicksInfo = LoopInfo & TicksInfoMap;
+export type TLoopAndTicksInfo = TLoopInfo & TTicksInfoMap;
 
 function getBeatIndex(offsetQ: number, dx: {
     restForNextRowQ: number,
@@ -93,15 +93,15 @@ function getDurationMs(
 
 function buildSked (ind: number, dx: {
     offsetQ: number,
-    noteLineInfo: NoteLineInfo,
+    noteLineInfo: TNoteLineInfo,
     beatsMs: number[],
     beatsQ: number[],
-    instrAny?: string | number | WavePreset,
+    instrAny?: string | number | TWavePreset,
     restForNextRowQ: number,
     restFromPrevRowQ,
     lastBeatInd: number,
     parentVolume: number,
-    sked: LoopAndTicksInfo,
+    sked: TLoopAndTicksInfo,
     colLoopDurationQ: number,
 })  {
     //console.log('buildSked', ind, dx);
@@ -113,7 +113,7 @@ function buildSked (ind: number, dx: {
     dx.noteLineInfo.notes.forEach(info => {
         const isDrum = un.isDrum(info.instr);
 
-        let soundsInfoArr: MidiCodeAndZone[];
+        let soundsInfoArr: TMidiCodeAndZone[];
 
         if (info.note === PAUSE) {
             soundsInfoArr = [];
@@ -171,9 +171,9 @@ function buildSked (ind: number, dx: {
 export function getSkedByQuarters(
     props: {
         noteLine: string; // очищенная от {}
-        noteLineInfo: NoteLineInfo;
+        noteLineInfo: TNoteLineInfo;
         isDrum: boolean;
-        instrAny: string | number | WavePreset;
+        instrAny: string | number | TWavePreset;
         beatsMs: number[];
         repeat: number;
         parentVolume: number;
@@ -181,18 +181,18 @@ export function getSkedByQuarters(
         restForNextRowQ: number;  // добавляется только для первого цикла
         colLoopDurationQ: number; // длина одного цикла внутри которого надоходится линейка
     }
-): LoopAndTicksInfo {
+): TLoopAndTicksInfo {
         // все поля обязательно, но проверям их заполненность
         //console.log('getSkedByQuarters.props', props);
 
         const dx = {
-            noteLineInfo: null as NoteLineInfo,
+            noteLineInfo: null as TNoteLineInfo,
             offsetQ: 0,
             lastBeatInd: 0,
             beatsMs: props.beatsMs,
             beatsQ: [] as number[],
             repeat: 0,
-            sked: {} as LoopAndTicksInfo,
+            sked: {} as TLoopAndTicksInfo,
             restForNextRowQ: props.restForNextRowQ || 0,
             restFromPrevRowQ: 0,
             colLoopDurationQ: 0,

@@ -1,5 +1,3 @@
-'use babel';
-
 import {parseInteger} from './parse-integer';
 
 import {
@@ -20,7 +18,7 @@ import {
     vibratoChar,
 
 } from './utils-note';
-import { NoteLineInfo } from '../types';
+import { TNoteLineInfo } from '../types';
 import { noteLatByNoteHash } from '../freq';
 import { getSlides, buildVibratoSlides } from './getSlides';
 
@@ -41,7 +39,7 @@ type Dx = {
     currDecor: string,
     initVolume: number,
     currVolume: number,
-    result: NoteLineInfo,
+    result: TNoteLineInfo,
     pitchShift: number,
 }
 
@@ -261,7 +259,7 @@ function prepare(dx: Dx) {
         .map((item) => /^\d+$/.test(item) ? `${PAUSE}${timeChar}${item}` : item);
 }
 
-export function getNoteLineInfo(noteLine: string): NoteLineInfo {
+export function getNoteLineInfo(noteLine: string): TNoteLineInfo {
     const dx = getDx({noteLine});
 
     prepare(dx);

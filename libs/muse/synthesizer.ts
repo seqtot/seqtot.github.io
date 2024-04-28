@@ -1,10 +1,8 @@
-'use babel';
-
 // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/linearRampToValueAtTime
 // gainNode.gain.linearRampToValueAtTime(1.0, audioCtx.currentTime + 2);
 
 import { freqByNoteHash, noteByKeyHash } from './freq';
-import { Sound, KeyInfo } from './sound';
+import { Sound, TKeyInfo } from './sound';
 import {offsetFotNoteStep} from './drums';
 //import {Editor} from 'codemirror';
 import {getInstrCodeBy} from './instruments';
@@ -23,9 +21,9 @@ interface Editor {
 export class Synthesizer extends Sound {
     isConnected = false;
     playingSounds: {
-        [key: string]: KeyInfo;
+        [key: string]: TKeyInfo;
     } = {};
-    playingTones: KeyInfo[] = [];
+    playingTones: TKeyInfo[] = [];
     outEditor: Editor;
 
     connect({
@@ -153,7 +151,7 @@ export class Synthesizer extends Sound {
     }; // playSound
 
     setPlayingTones() {
-        const result: KeyInfo[] = [];
+        const result: TKeyInfo[] = [];
 
         for (const sound of Object.values(this.playingSounds) ) {
             if (sound.noteLat && sound.code && sound.freq) {
@@ -175,7 +173,7 @@ export class Synthesizer extends Sound {
         this.playingTones = result;
     }
 
-    protected stopSound(info: KeyInfo) {
+    protected stopSound(info: TKeyInfo) {
         let id = info.noteLat + '-' + (info.id || 0);
         const playing = this.playingSounds[id];
 
@@ -223,7 +221,7 @@ export class Synthesizer extends Sound {
     }
 
     protected playSoundMidi = (
-        info: KeyInfo,
+        info: TKeyInfo,
         print: boolean,
         pitchShift: number,
         onlyStop?: boolean,
@@ -276,7 +274,7 @@ export class Synthesizer extends Sound {
         }
       }; // playSoundMidi
 
-    setSettings(settings: any, instrName?: string): { [key: string]: KeyInfo } {
+    setSettings(settings: any, instrName?: string): { [key: string]: TKeyInfo } {
         const keysAndNotes = this.getSettingsForKeysAndNotes(settings);
         instrName = instrName || 'default';
 

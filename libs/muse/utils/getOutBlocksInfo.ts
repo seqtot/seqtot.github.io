@@ -1,6 +1,4 @@
-'use babel';
-
-import { NoteLineInfo } from '../types';
+import { TNoteLineInfo } from '../types';
 import {
     findBlockById,
     getBlockType,
@@ -17,23 +15,23 @@ import {
 } from './utils-note';
 
 import {parseInteger} from './parse-integer'
-import {TextBlock} from '../types'
+import {TTextBlock} from '../types'
 
 import { getNoteLineInfo, isNoteWithDurationOrPause } from './getNoteLineInfo';
 
-export type NoteLn = {
+export type TNoteLn = {
     trackName: string,
     noteLine: string,
     parentVolume: number,
     repeat: number,
-    noteLineInfo: NoteLineInfo,
+    noteLineInfo: TNoteLineInfo,
     colLoopDurationQ: number,
 
     startOffsetQ?: number,
 }
 
-export type OutBlockRowInfo = {
-    trackLns: NoteLn[];
+export type TOutBlockRowInfo = {
+    trackLns: TNoteLn[];
     headLoopRepeat: number;
     headLoopDurationQ: number;
     rowDurationByHeadQ: number;
@@ -45,8 +43,8 @@ export type OutBlockRowInfo = {
     partId: string,
 };
 
-type OutBlocksInfo = {
-    rows: OutBlockRowInfo[],
+type TOutBlocksInfo = {
+    rows: TOutBlockRowInfo[],
     durationQ: number,
 }
 
@@ -100,10 +98,10 @@ export function getNoteLineMetaAndInstr(noteLine: string, instr?: string): {
  *
  */
 export function getOutBlocksInfo(
-    blocks: TextBlock[],
-    pOutBlock: TextBlock | string = 'out'
-): OutBlocksInfo {
-    let outBlock: TextBlock;
+    blocks: TTextBlock[],
+    pOutBlock: TTextBlock | string = 'out'
+): TOutBlocksInfo {
+    let outBlock: TTextBlock;
 
     if (typeof pOutBlock === 'string') {
         outBlock = findBlockById(blocks, pOutBlock);
@@ -111,7 +109,7 @@ export function getOutBlocksInfo(
         outBlock = pOutBlock;
     }
 
-    const result = <OutBlocksInfo>{
+    const result = <TOutBlocksInfo>{
         rows: [],
         durationQ: 0
     };
@@ -180,8 +178,8 @@ export function getOutBlocksInfo(
         let headLoopRepeat = 1;
         let headLoopDurationQ = 0;
         let colRepeat = 1;
-        let block: TextBlock;
-        let rowNoteLns: NoteLn[] = [];
+        let block: TTextBlock;
+        let rowNoteLns: TNoteLn[] = [];
 
         //console.log('findBlockById', colArr);
 
@@ -191,7 +189,7 @@ export function getOutBlocksInfo(
             const colInfoArr = (item || '').split(/[:]/).filter(item => !!item); // [-:]
             const colInfoStr = colInfoArr.join(' ');
             let noteLinesWithTrackName: {trackName: string, noteLine: string}[];
-            let colNoteLns: NoteLn[] = [];
+            let colNoteLns: TNoteLn[] = [];
             let colId = colInfoArr[0].trim();
             let colVolume: number;
             let head = '';

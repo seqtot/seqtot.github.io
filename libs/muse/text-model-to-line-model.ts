@@ -1,11 +1,11 @@
-import { StoredRow, SongNode, TrackInfo, TextBlock, FileSettings, SongPartInfo } from './types';
-import { parseInteger, getVolumeFromString, OutBlockRowInfo, hasDrumChar, getOutBlocksInfo, getPartInfo, NoteLn } from './utils';
+import { TStoredRow, TSongNode, TTrackInfo, TTextBlock, TFileSettings, TSongPartInfo } from './types';
+import { parseInteger, getVolumeFromString, TOutBlockRowInfo, hasDrumChar, getOutBlocksInfo, getPartInfo, TNoteLn } from './utils';
 
 import { getMidiConfig, getTopOutListHash } from './get-midi-config';
 import { LineModel } from './line-model';
 import { Sound } from './sound';
 
-function getOutBlock(blocks: TextBlock[]): TextBlock {
+function getOutBlock(blocks: TTextBlock[]): TTextBlock {
     return  blocks.find((item) => item.id === 'out');
 }
 
@@ -36,7 +36,7 @@ function getNoteLatByOffset(noteLat: string, offset: number) {
     return notesLat[i];
 }
 
-export function sortTracks(tracks: TrackInfo[]) {
+export function sortTracks(tracks: TTrackInfo[]) {
     tracks.sort((a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
@@ -48,19 +48,19 @@ export function sortTracks(tracks: TrackInfo[]) {
 type FnInput = {
     songId: string,
     ns: string,
-    settings: FileSettings,
-    blocks: TextBlock[],
-    sourceSong: SongNode,
-    targetSong: SongNode,
+    settings: TFileSettings,
+    blocks: TTextBlock[],
+    sourceSong: TSongNode,
+    targetSong: TSongNode,
 };
 
-export function textModelToLineModel(x: FnInput): SongNode {
+export function textModelToLineModel(x: FnInput): TSongNode {
     //console.log('textModelToLineModel', x);
 
     const song = x.targetSong;
 
     const partsArr = getTopOutListHash({topBlock: getOutBlock(x.blocks)});
-    const partsHashByNio: {[partNio: string]: SongPartInfo} = Object.create(null);
+    const partsHashByNio: {[partNio: string]: TSongPartInfo} = Object.create(null);
 
     // это новая песня
     if (!song.tracks.length) {
@@ -82,8 +82,8 @@ export function textModelToLineModel(x: FnInput): SongNode {
         }
     });
 
-    const hardTracks: {[trackName: string]: TrackInfo} = Object.create(null);
-    const softTracks: {[trackName: string]: TrackInfo} = Object.create(null);
+    const hardTracks: {[trackName: string]: TTrackInfo} = Object.create(null);
+    const softTracks: {[trackName: string]: TTrackInfo} = Object.create(null);
     const realHardTracks: {[trackName: string]: string} = Object.create(null);
 
     song.tracks.forEach(track => {
@@ -128,9 +128,9 @@ export function textModelToLineModel(x: FnInput): SongNode {
 
     // ТРЭКИ ИЗ поля songNodeHard
     if ((x.sourceSong as any).songNodeHard) {
-        const subSong = (x.sourceSong as any).songNodeHard as SongNode;
-        const tracks = (subSong?.tracks || []) as TrackInfo[];
-        const dynamic = (subSong?.dynamic || []) as StoredRow[];
+        const subSong = (x.sourceSong as any).songNodeHard as TSongNode;
+        const tracks = (subSong?.tracks || []) as TTrackInfo[];
+        const dynamic = (subSong?.dynamic || []) as TStoredRow[];
 
         dynamic.forEach(item => {
             if (!realHardTracks[item.track]) {
@@ -155,8 +155,8 @@ export function textModelToLineModel(x: FnInput): SongNode {
         currBlock: blocks.find((item) => item.id === 'out'),
         currRowInfo: { first: 0, last: 0},
         excludeIndex: [],
-        midiBlockOut: null as TextBlock,
-        playBlockOut: '' as string | TextBlock,
+        midiBlockOut: null as TTextBlock,
+        playBlockOut: '' as string | TTextBlock,
         topBlocksOut: [],
     };
 
@@ -168,7 +168,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
     const parts: {
         partId: string,
         durationQ: number,
-        rows: OutBlockRowInfo[],
+        rows: TOutBlockRowInfo[],
         text: string
     }[] = [];
 
@@ -176,7 +176,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
     let currPart: {
         partId: string,
         durationQ: number,
-        rows: OutBlockRowInfo[],
+        rows: TOutBlockRowInfo[],
         text: string,
     };
 
@@ -295,7 +295,7 @@ export function textModelToLineModel(x: FnInput): SongNode {
         });
 
         Object.keys(tracksByScore).forEach(trackName => {
-            const lns: NoteLn[] = [];
+            const lns: TNoteLn[] = [];
 
             part.rows.forEach(row => {
                 row.trackLns.forEach(ln => {
@@ -361,8 +361,8 @@ export function textModelToLineModel(x: FnInput): SongNode {
 
     // СТРОКИ ИЗ поля songNodeHard
     if ((x.sourceSong as any).songNodeHard) {
-        const subSong = (x.sourceSong as any).songNodeHard as SongNode;
-        const items = (subSong?.dynamic || []) as StoredRow[];
+        const subSong = (x.sourceSong as any).songNodeHard as TSongNode;
+        const items = (subSong?.dynamic || []) as TStoredRow[];
 
         song.dynamic = [...song.dynamic, ...items];
     }

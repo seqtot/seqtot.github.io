@@ -80,7 +80,7 @@ export class UserSettingsPage {
         let useCyrillicNote = false;
 
         getWithDataAttr('board-volume-input', this.pageEl).forEach((el: HTMLInputElement) => {
-            boardVolume = m.parseInteger(el.value, boardVolume);
+            boardVolume = m.utils.parseInteger(el.value, boardVolume);
         });
 
         getWithDataAttr('user-name-input', this.pageEl).forEach((el: HTMLInputElement) => {

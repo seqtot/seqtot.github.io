@@ -1,13 +1,10 @@
 import { byId } from '../src/utils';
-import { Muse as m, Synthesizer, KeyInfo, Sound } from '../libs/muse';
-import { WavePreset } from '../libs/waf-player/otypes';
+import { Muse as m, Synthesizer, TKeyInfo, Sound, TWavePreset } from '../libs/muse';
 import { Anchors } from '../sample-editor/a-wave-form-component';
 
 // SAMPLE EDITOR
 import { SampleEditorWc } from '../sample-editor/a-sample-editor-wc';
 import { EventEmitter } from '../libs/common/event-emitter';
-import { getAudioBufferFromBlobString, getAudioBufferFromString } from '../libs/waf-player/audio-buffer-to-wav';
-import { preparePreset } from '../libs/waf-player/prepare';
 import rawVoiceInst from '../waf-fonts/voice_han';
 import { RouteInfo } from '../src/router';
 
@@ -18,10 +15,10 @@ if (customElements.get(SampleEditorWc.tag) == null) {
 }
 
 let useFont = true;
-let fontSource = rawVoiceInst as WavePreset;
-let voiceInstr: {[key: string]: WavePreset};
+let fontSource = rawVoiceInst as TWavePreset;
+let voiceInstr: {[key: string]: TWavePreset};
 
-function cloneWavePreset(preset: any): WavePreset {
+function cloneWavePreset(preset: any): TWavePreset {
     preset = {...preset};
     preset.zones = preset.zones.map(item => ({...item}));
     return preset;
@@ -122,8 +119,8 @@ export class SamplePage {
     inputMode: InputMode = null;
     downedKeys: { [key: string]: any } = {};
     synthesizer = new Synthesizer();
-    font: WavePreset;
-    fontSource: WavePreset = cloneWavePreset(fontSource);
+    font: TWavePreset;
+    fontSource: TWavePreset = cloneWavePreset(fontSource);
     anchors: Anchors;
     anchorGroup: string;
     currZone = 0;
@@ -283,7 +280,7 @@ export class SamplePage {
         this.ee.emit(ids.repaint);
     }
 
-    addZoneKeys(font: WavePreset, iZone: number) {
+    addZoneKeys(font: TWavePreset, iZone: number) {
         let arr: string[] = [];
 
         font.zones.forEach((item, i) => {
@@ -347,18 +344,18 @@ export class SamplePage {
         }
 
         //await this.synthesizer.fontPlayer.adjustPreset(this.synthesizer.ctx, font); // jjkl
-        const audioBuffer = await getAudioBufferFromString(font.zones[iZone].file);
-        await preparePreset({audioContext: this.synthesizer.ctx, preset: font}); // jjkl
+        const audioBuffer = await m.utils.getAudioBufferFromString(font.zones[iZone].file);
+        await m.font.preparePreset({audioContext: this.synthesizer.ctx, preset: font}); // jjkl
         //const audioBuffer = font.zones[iZone].buffer;
         //this.font = font;
-        this.font = await preparePreset({audioContext: this.synthesizer.ctx, preset: font}); // jjkl
+        this.font = await m.font.preparePreset({audioContext: this.synthesizer.ctx, preset: font}); // jjkl
         this.byId(ids.info).innerHTML = `duration: ${audioBuffer.duration} length: ${audioBuffer.length} fontSampleRate:  ${font.zones[0].sampleRate} `;
         this.ee.emit(ids.data, { audioBuffer: audioBuffer });
     }
 
     async test() {
         let audioBuffer: AudioBuffer;
-        getAudioBufferFromBlobString(blobData).then(result => {
+        m.utils.getAudioBufferFromBlobString(blobData).then(result => {
             audioBuffer = result;
             //console.log('audioBuffer', audioBuffer);
             this.ee.emit(ids.data, {
@@ -391,7 +388,7 @@ export class SamplePage {
                 //console.log('ON LOAD WAV', event);
 
                 const result = event.target.result as string;
-                let audioBuffer = await getAudioBufferFromBlobString(result);
+                let audioBuffer = await m.utils.getAudioBufferFromBlobString(result);
                 this.ee.emit(ids.data, { audioBuffer });
                 this.ee.emit(ids.repaint);
 
@@ -485,7 +482,7 @@ export class SamplePage {
 
         if (evt.repeat) return;
 
-        let soundInfo = this.synthesizer.keysAndNotes[evt.code] || <KeyInfo>{};
+        let soundInfo = this.synthesizer.keysAndNotes[evt.code] || <TKeyInfo>{};
         let instrObj = useFont ? this.font : voiceInstr[soundInfo.noteLat] || null;
         let keyOrNote = evt.code;
 

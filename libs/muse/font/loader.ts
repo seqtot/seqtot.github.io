@@ -1,8 +1,8 @@
-import { CachedPreset, NumPair, PresetInfo, WavePreset } from './otypes';
+import { TCachedPreset, TNumPair, TPresetInfo, TWavePreset } from './otypes';
 import { WebAudioFontPlayer } from './player';
 import { preparePreset } from './prepare';
 import { getInstrumentTitles } from './instrument-titles';
-import { parseInteger } from '../common';
+import { parseInteger } from '../../common';
 
 const localSamples = {
 	162: 'samples/organ/0160_FluidR3_GM_sf2_file.json', // organ:162:_tone_0160_FluidR3_GM_sf2_file
@@ -45,11 +45,11 @@ async function loadFromLocal (fileName: string): Promise<null | string> {
 }
 
 export class WebAudioFontLoader {
-	cached: CachedPreset[] = [];
+	cached: TCachedPreset[] = [];
 	player: WebAudioFontPlayer;
 	instrumentKeyArray: string[] = [];
 	instrumentNamesArray: string[] = [];
-	choosenInfos: NumPair[] = [];
+	choosenInfos: TNumPair[] = [];
 	drumNamesArray: string[] = [];
 	drumKeyArray: string[] = [];
 
@@ -139,7 +139,7 @@ export class WebAudioFontLoader {
 		this.waitOrFinish(variableName, function () {
 			preparePreset({
 				audioContext,
-				preset: (window[variableName] as any) as WavePreset,
+				preset: (window[variableName] as any) as TWavePreset,
 				var: variableName,
 			});
 		});
@@ -160,7 +160,7 @@ export class WebAudioFontLoader {
 		if (!(window[variableName])) {
 			return false;
 		}
-		var preset: WavePreset = (window[variableName] as any) as WavePreset;
+		var preset: TWavePreset = (window[variableName] as any) as TWavePreset;
 		for (var i = 0; i < preset.zones.length; i++) {
 			if (!(preset.zones[i].buffer)) {
 				return false;
@@ -432,7 +432,7 @@ export class WebAudioFontLoader {
 		return this.instrumentKeyArray;
 	};
 
-	instrumentInfo(n: number): PresetInfo {
+	instrumentInfo(n: number): TPresetInfo {
 		var key: string = this.instrumentKeys()[n];
 		var p = 1 * parseInt(key.substring(0, 3));
 		return {
@@ -748,7 +748,7 @@ export class WebAudioFontLoader {
 		return this.drumKeyArray;
 	}
 
-	drumInfo(n: number): PresetInfo {
+	drumInfo(n: number): TPresetInfo {
 		var key = this.drumKeys()[n];
 		var p = 1 * parseInt(key.substring(0, 2));
 		return {

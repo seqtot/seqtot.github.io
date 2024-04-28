@@ -1,15 +1,15 @@
-import { findZone } from '../waf-player/prepare';
+import { findZone } from './font/prepare';
 
 import { freqByNoteHash } from './freq';
-import { Sound, PlayingItem, KeyInfo } from './sound';
+import { Sound, TPlayingItem, TKeyInfo } from './sound';
 import { EventEmitter } from './ee';
 import * as un from './utils';
 import { DEFAULT_TONE_INSTR } from './keyboards';
 import { getInstrCodeBy } from './instruments';
 import { Ticker } from './ticker';
-import { getSkedByQuarters, LoopAndTicksInfo } from './midi-player-utils'
-import { NoteLineInfo, WaveSlide, DataByTracks } from './types';
-import { getSoundsInfoArr, MidiCodeAndZone } from './get-sound-info-arr';
+import { getSkedByQuarters, TLoopAndTicksInfo } from './midi-player-utils'
+import { TNoteLineInfo, TWaveSlide, TDataByTracks } from './types';
+import { getSoundsInfoArr, TMidiCodeAndZone } from './get-sound-info-arr';
 
 const QUANT = 10;
 // 10 10 10 10 10
@@ -32,7 +32,7 @@ export class MidiPlayer extends Sound {
     private pitchShift = 0;
 
     gains: { [key: string]: GainNode } = {} as any;
-    loops: { [key: string]: LoopAndTicksInfo } = {};
+    loops: { [key: string]: TLoopAndTicksInfo } = {};
 
     connect({
                 ctx,
@@ -145,7 +145,7 @@ export class MidiPlayer extends Sound {
         instrCode?: string | number,
         whenSec?: number,
         pitchShift?: number,
-        slides?: WaveSlide[],
+        slides?: TWaveSlide[],
         cent?: number,
     }) {
         const instrCode = getInstrCodeBy(x.instrCode || DEFAULT_TONE_INSTR);
@@ -178,14 +178,14 @@ export class MidiPlayer extends Sound {
     // getNotesMidi
     //   getSoundMidi
     getSoundMidi(x: {
-        soundsInfo: MidiCodeAndZone | MidiCodeAndZone[];
+        soundsInfo: TMidiCodeAndZone | TMidiCodeAndZone[];
         durationMs: number;
         isDrum?: boolean;
         volume?: number;
         instrObj?: any;
         whenSec?: number;
         pitchShift?: number;
-        slides?: WaveSlide[],
+        slides?: TWaveSlide[],
         cent?: number,
     }): any {
         if (!x.instrObj || !x.soundsInfo || !x.durationMs) {
@@ -197,7 +197,7 @@ export class MidiPlayer extends Sound {
         const item = (<any>{
             isSound: true,
             midis: [],
-        }) as PlayingItem;
+        }) as TPlayingItem;
 
         const sounds = Array.isArray(x.soundsInfo)
             ? x.soundsInfo
@@ -230,7 +230,7 @@ export class MidiPlayer extends Sound {
      */
     addLoopByQuarters(x: {
         noteLine: string,
-        noteLineInfo?: NoteLineInfo,
+        noteLineInfo?: TNoteLineInfo,
         repeat?: number,
         isDrum?: boolean,
         instrCode?: string | number,
@@ -241,9 +241,9 @@ export class MidiPlayer extends Sound {
         restFromPrevRowQ?: number,
         restForNextRowQ?: number,
         colLoopDurationQ?: number, // длина одного цикла внутри которого надоходится линейка
-        dataByTracks: DataByTracks,
+        dataByTracks: TDataByTracks,
         trackName?: string,
-    }): LoopAndTicksInfo {
+    }): TLoopAndTicksInfo {
         //console.log('addLoopByQuarter.params', x);
 
         this.loopId++;
@@ -413,7 +413,7 @@ export class MidiPlayer extends Sound {
         }
     }
 
-    setSettings(settings: any, instrName?: string): { [key: string]: KeyInfo } {
+    setSettings(settings: any, instrName?: string): { [key: string]: TKeyInfo } {
         const keysAndNotes = this.getSettingsForKeysAndNotes(settings);
         instrName = instrName || 'default';
 

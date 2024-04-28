@@ -1,20 +1,18 @@
-'use babel';
-
 import { leftKeys, rightKeys } from './freq';
 //import {Editor} from 'codemirror';
 import {MultiPlayer} from './multi-player';
 import * as un from './utils';
 
-type Editor = any;
+type TEditor = any;
 
-export function getCurrRowTextCm(cm: Editor): string {
+export function getCurrRowTextCm(cm: TEditor): string {
     const selections = cm.listSelections(); // [{acnchor, head}]
     const line = selections[0].head.line;
 
     return cm.getLine(line);
 }
 
-type Data = {
+type TData = {
     code: string;
     note: string;
     down: number;
@@ -23,14 +21,14 @@ type Data = {
 };
 // syllable ˈsɪləbl слог, слово, звук
 
-type BpmInfo = {
+type TBpmInfo = {
     bpm: number;
     lastDownTime: number;
     pressCount: number;
     totalMs: number;
 };
 
-const emptyBpmInfo = (): BpmInfo => {
+const emptyBpmInfo = (): TBpmInfo => {
     //console.log('getEmptyBpm');
     return {
         bpm: 0,
@@ -51,16 +49,16 @@ export class BeatRecorder {
     startUpTime = 0;
     noteArr: string[] = [];
     syllArr: string[] = [];
-    keyData: Data;
-    keySequence: Data[] = [];
-    beatInput: Editor;
-    textInput: Editor | string;
-    multiBuffer: Editor;
+    keyData: TData;
+    keySequence: TData[] = [];
+    beatInput: TEditor;
+    textInput: TEditor | string;
+    multiBuffer: TEditor;
     playSound: (x: {keyOrNote: string, onlyStop?: boolean}) => void;
     isNote: (str: string) => boolean;
     mode: string = 'Digit1';
     downedKeys: { [key: string]: boolean } = {};
-    bpmInfo: BpmInfo = emptyBpmInfo();
+    bpmInfo: TBpmInfo = emptyBpmInfo();
     multiPlayer: MultiPlayer;
     lastTickTime: number = 0;
 

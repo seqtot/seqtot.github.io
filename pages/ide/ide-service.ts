@@ -1,13 +1,13 @@
 import { EventEmitter } from '../../libs/common/event-emitter';
-import { Muse as m, Synthesizer, TextBlock, DataByTracks, FileSettings } from '../../libs/muse';
+import { Muse as m, Synthesizer, TTextBlock, TDataByTracks, TFileSettings } from '../../libs/muse';
 import { drumBoards, KeyboardType, toneBoards } from '../keyboard-ctrl';
 import { DEFAULT_OUT_VOLUME, SongNode, SongStore, TrackInfo } from '../song-store';
 
-const multiPlayer = new m.MultiPlayer();
-const metronome = new m.MultiPlayer();
-const ticker = new m.Ticker(m.Sound.ctx);
+const multiPlayer = new m.player.MultiPlayer();
+const metronome = new m.player.MultiPlayer();
+const ticker = new m.ticker.Ticker(m.Sound.ctx);
 
-const synthesizer = new Synthesizer();
+const synthesizer = new m.synth.Synthesizer();
 synthesizer.connect({ ctx: m.Sound.ctx });
 synthesizer.setSettings(m.toneAndDrumPlayerSettings);
 
@@ -48,10 +48,10 @@ class IdeService extends  EventEmitter {
     private _lastBoardView: KeyboardType = '' as any;
 
     songStore: SongStore;
-    dataByTracks = {} as DataByTracks;
+    dataByTracks = {} as TDataByTracks;
 
-    blocks: TextBlock[] = [];
-    settings: FileSettings = m.getFileSettings([]);
+    blocks: TTextBlock[] = [];
+    settings: TFileSettings = m.getFileSettings([]);
     pitchShift = 0;
 
     multiPlayer = multiPlayer;
@@ -62,7 +62,7 @@ class IdeService extends  EventEmitter {
     bpmValue = 90;
 
     get outVolume (): number {
-        return m.parseInteger(this.dataByTracks?.total?.volume, DEFAULT_OUT_VOLUME);
+        return m.utils.parseInteger(this.dataByTracks?.total?.volume, DEFAULT_OUT_VOLUME);
     }
 
     get lastBoardView(): KeyboardType {
@@ -97,12 +97,12 @@ class IdeService extends  EventEmitter {
     useToneInstrument: number = m.DEFAULT_TONE_INSTR;
     currentEdit: {
         songId: string,
-        blocks: TextBlock[],
+        blocks: TTextBlock[],
         allSongParts: string[],
         editPartsNio?: number[],
         freezeStructure: boolean,
         source?: 'my' | 'band' | null | undefined,
-        settings: FileSettings,
+        settings: TFileSettings,
         ns: string,
         useLineModel: boolean,
     } = { } as any;
@@ -115,8 +115,8 @@ class IdeService extends  EventEmitter {
         // jjkl: todo
     }
 
-    getDataByTracks(tracks: TrackInfo[], totalVolume?: number): DataByTracks {
-        let dataByTracks = {} as DataByTracks;
+    getDataByTracks(tracks: TrackInfo[], totalVolume?: number): TDataByTracks {
+        let dataByTracks = {} as TDataByTracks;
 
         if (tracks) {
             tracks.forEach(track => {
@@ -138,7 +138,7 @@ class IdeService extends  EventEmitter {
         }
 
         dataByTracks.total = {
-            volume: m.isPresent(totalVolume) ? totalVolume : DEFAULT_OUT_VOLUME
+            volume: m.utils.isPresent(totalVolume) ? totalVolume : DEFAULT_OUT_VOLUME
         }
 
         return dataByTracks;

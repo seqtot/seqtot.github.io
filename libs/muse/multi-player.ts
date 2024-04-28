@@ -3,14 +3,14 @@ import { MidiPlayer } from './midi-player';
 import { toneAndDrumPlayerSettings, DEFAULT_TONE_INSTR } from './keyboards';
 import { Ticker } from './ticker';
 import { DEFAULT_OUT_VOLUME } from '../../pages/song-store';
-import { TextBlock, DataByTracks } from './types';
+import { TTextBlock, TDataByTracks } from './types';
 import * as u from './utils';
 import { Deferred } from './utils';
 //import * as Fs from 'fs';
 
 const Fs: any = null;
 
-type SoundSourceSet = AudioBufferSourceNode[];
+type TSoundSourceSet = AudioBufferSourceNode[];
 
 // https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext
 // AudioContext: decodeAudioData,
@@ -49,7 +49,7 @@ export class MultiPlayer {
     isPlaying = false;
     ctx: AudioContext;
     files: string[];
-    soundSourceSet: SoundSourceSet = [];
+    soundSourceSet: TSoundSourceSet = [];
     startTime: number;
     durationX: number;
     offset: number;
@@ -118,8 +118,8 @@ export class MultiPlayer {
         beatOffsetMs?: number,
         beatsWithOffsetMs?: number[],
         startDelaySec?: number,
-        playMidiBlock?: string | TextBlock,
-        midiTextBlocks?: string | TextBlock[],
+        playMidiBlock?: string | TTextBlock,
+        midiTextBlocks?: string | TTextBlock[],
     }) {
         //console.log('play.files', files);
         let files = params.files;
@@ -139,7 +139,7 @@ export class MultiPlayer {
         };
         let useTick = false;
         let hasBeats = !!beatsWithOffsetMs.length;
-        let midiOut: TextBlock | string;
+        let midiOut: TTextBlock | string;
 
         if (params.playMidiBlock && Array.isArray(params.midiTextBlocks) && params.midiTextBlocks.length) {
             midiOut = u.getOutBlock(params.playMidiBlock, params.midiTextBlocks);
@@ -340,8 +340,8 @@ export class MultiPlayer {
     }
 
 
-    normalizeDataByTracks(dataByTracks?: DataByTracks, volume?: number): DataByTracks {
-        dataByTracks = dataByTracks || <DataByTracks>{};
+    normalizeDataByTracks(dataByTracks?: TDataByTracks, volume?: number): TDataByTracks {
+        dataByTracks = dataByTracks || <TDataByTracks>{};
 
         if (!dataByTracks.total || !dataByTracks.total.volume) {
             dataByTracks.total = {
@@ -358,13 +358,13 @@ export class MultiPlayer {
      * un.getOutBlocksInfo
      */
     getLoopsInfo(x: {
-        blocks?: TextBlock[] | string,
-        playBlock?: TextBlock | string,
+        blocks?: TTextBlock[] | string,
+        playBlock?: TTextBlock | string,
         repeat?: number, // delete ???
         repeatCount?: number, // delete ???
         beatsMs?: number[],
         bpm?: number,
-        dataByTracks?: DataByTracks,
+        dataByTracks?: TDataByTracks,
         pitchShift?: number
     }): OutLoopsInfo {
         //console.log('getLoopsInfo.params', {...params});
@@ -493,8 +493,8 @@ export class MultiPlayer {
      * -> getLoopsInfo
      */
     async tryPlayMidiBlock(x: {
-        blocks?: TextBlock[] | string,
-        playBlock?: string | TextBlock,
+        blocks?: TTextBlock[] | string,
+        playBlock?: string | TTextBlock,
         repeatCount?: number
         beatOffsetMs?: number,
         beatsWithOffsetMs?: number[],
@@ -504,7 +504,7 @@ export class MultiPlayer {
         dontClear?: boolean;
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
-        dataByTracks?: DataByTracks,
+        dataByTracks?: TDataByTracks,
     }) {
         //console.log('tryPlayMidiBlock', x.dataByTracks);
         if (!x.dontClear) {
@@ -579,8 +579,8 @@ export class MultiPlayer {
     }
 
     async getLoopsPlayer(x: {
-        blocks?: TextBlock[] | string,
-        playBlock?: string | TextBlock,
+        blocks?: TTextBlock[] | string,
+        playBlock?: string | TTextBlock,
         repeatCount?: number
         beatsWithOffsetMs?: number[],
         bpm?: number,
@@ -588,7 +588,7 @@ export class MultiPlayer {
         dontClear?: boolean;
         pitchShift?: number;
         cb?: (type: string, data: any) => void,
-        dataByTracks?: DataByTracks,
+        dataByTracks?: TDataByTracks,
     }) {
         const outLoops = x.outLoops || this.getLoopsInfo(x);
         const cb = x.cb || (() => {}) as any;

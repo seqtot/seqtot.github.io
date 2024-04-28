@@ -1,4 +1,5 @@
-import { Muse as m, LineNote, Line, StoredRow } from '../libs/muse';
+import { Muse as m } from '../libs/muse';
+import { TLineNote, TLine, TStoredRow } from '../libs/muse';
 
 export type StoredSongNodeOld = {
     [key: string]: {
@@ -6,8 +7,8 @@ export type StoredSongNodeOld = {
             rowInPartId: string,
             type: string,
             status: string,
-            rows: Line[],
-            lines: Line[]
+            rows: TLine[],
+            lines: TLine[]
         }[]
     }
 };
@@ -34,7 +35,7 @@ export type SongNode = {
     hideMetronome?: boolean,
     score: string,
     parts: {name: string, id: string}[],
-    dynamic: StoredRow[],
+    dynamic: TStoredRow[],
     source: 'my' | 'band',
     isSongList?: boolean,
     ns?: string,
@@ -57,7 +58,7 @@ function isGuitarInst(val: string | number): boolean {
     return !!m.guitarCodes[val];
 }
 
-function asOrganInst(note: LineNote): boolean {
+function asOrganInst(note: TLineNote): boolean {
     return !isGuitarInst(note.instCode) && !isBassGuitarInst(note.instCode) && !isDrumNote(note.note);
 }
 
@@ -301,7 +302,7 @@ export class SongStore {
     static NormalizeSongNode(song: SongNode): SongNode {
         if (!song) return song;
 
-        song.version = m.parseInteger(song.version, 0);
+        song.version = m.utils.parseInteger(song.version, 0);
         song.parts = Array.isArray(song.parts) ? song.parts : [];
         song.dynamic = Array.isArray(song.dynamic) ? song.dynamic : [];
         song.tracks = Array.isArray(song.tracks) ? song.tracks : [];
@@ -349,7 +350,7 @@ export class SongStore {
     static TransformVersion(song: SongNode): SongNode {
         song = transformOldDrums(song);
 
-        const version = m.parseInteger(song.version, 0);
+        const version = m.utils.parseInteger(song.version, 0);
 
         if (version === versionTransformers.length) {
             return song;
@@ -381,7 +382,7 @@ export class SongStore {
         }
 
         // ПЕСНЯ ЕСТЬ
-        const version = m.parseInteger(song.version, 0);
+        const version = m.utils.parseInteger(song.version, 0);
         song = SongStore.TransformVersion(song);
 
         if (song.version !== version) {
@@ -401,7 +402,7 @@ export class SongStore {
 
         // ПЕСНЯ ЕСТЬ
         if (song) {
-            const version = m.parseInteger(song.version, 0);
+            const version = m.utils.parseInteger(song.version, 0);
             song = SongStore.TransformVersion(song);
 
             if (song.version !== version) {
@@ -605,7 +606,7 @@ export class SongStore {
         return song;
     }
 
-    static GetRowsByPart(rows: StoredRow[], partId: string, partNio: number): StoredRow[] {
+    static GetRowsByPart(rows: TStoredRow[], partId: string, partNio: number): TStoredRow[] {
         const result = rows.reduce((acc, item) => {
             const iPartId = (item.partId || '').trim();
             const iPartNio = m.getPartNio(item.rowInPartId);
@@ -625,7 +626,7 @@ export class SongStore {
             acc.push(item);
 
             return acc;
-        }, <StoredRow[]>[]);
+        }, <TStoredRow[]>[]);
 
         return result;
     }
@@ -658,8 +659,8 @@ export class SongStore {
         return song;
     }
 
-    static GetRowsByInstrument(rows: StoredRow[], check: (note: LineNote) => boolean): StoredRow[] {
-        const result: StoredRow[] = [];
+    static GetRowsByInstrument(rows: TStoredRow[], check: (note: TLineNote) => boolean): TStoredRow[] {
+        const result: TStoredRow[] = [];
 
         rows.forEach(row => {
             let rowNoteCount = 0;
@@ -748,7 +749,7 @@ export class SongStore {
         if (!tracks.find(item => item.name === 'total')) {
             tracks.unshift({
                 name: 'total',
-                volume: m.parseInteger(song.volume, DEFAULT_OUT_VOLUME),
+                volume: m.utils.parseInteger(song.volume, DEFAULT_OUT_VOLUME),
                 board: ''
             });
         }
@@ -778,7 +779,7 @@ export class SongStore {
             if (oldInstSubitems.length) {
                 track.items.forEach(newSubitem => {
                     const oldSubitem = oldInstSubitems.find(oldSubitem => oldSubitem.name === newSubitem.name);
-                    newSubitem.volume = m.isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
+                    newSubitem.volume = m.utils.isPresent(oldSubitem?.volume) ? oldSubitem.volume : newSubitem.volume;
                 });
             }
         });

@@ -1,6 +1,5 @@
-'use babel';
 
-import {TextBlock, SongPartInfo} from './types';
+import {TTextBlock, TSongPartInfo} from './types';
 import * as un from './utils';
 
 export function isRefLine(val: string): boolean {
@@ -27,17 +26,17 @@ export function getNearestCharIndex(char: string, from: number, arr: string[]) {
     return -1;
 }
 
-export type MidiConfig = {
-    blocks: TextBlock[],
+export type TMidiConfig = {
+    blocks: TTextBlock[],
     excludeIndex: number[],
-    currBlock: TextBlock,
+    currBlock: TTextBlock,
     currRowInfo: {first: number, last: number},
-    midiBlockOut: TextBlock,
-    playBlockOut: string | TextBlock,
+    midiBlockOut: TTextBlock,
+    playBlockOut: string | TTextBlock,
     topBlocksOut: string[],
 }
 
-export function getMidiConfig(x: MidiConfig) {
+export function getMidiConfig(x: TMidiConfig) {
     const excludeIndex = Array.isArray(x.excludeIndex) ? x.excludeIndex: [];
 
     if (x.currBlock.type === 'set') {
@@ -82,7 +81,7 @@ export function getMidiConfig(x: MidiConfig) {
 }
 
 export function getTopOutList(x: {
-    topBlock: TextBlock,
+    topBlock: TTextBlock,
     nearestIndex?: number,
     excludeIndex?: number[]
     printN?: boolean,
@@ -138,14 +137,14 @@ export function getTopOutList(x: {
 }
 
 export function getTopOutListHash(x: {
-    topBlock: TextBlock,
+    topBlock: TTextBlock,
     nearestIndex?: number,
     excludeIndex?: number[]
-}): SongPartInfo[] {
+}): TSongPartInfo[] {
     let partNio = 0;
     let nearestIndex = x.nearestIndex | 0;
     let excludeIndex = Array.isArray(x.excludeIndex) ? x.excludeIndex : [];
-    let result: SongPartInfo[] = [];
+    let result: TSongPartInfo[] = [];
     let rows: string[] = [];
 
     x.topBlock.rows.forEach(item => {
@@ -179,7 +178,7 @@ export function getTopOutListHash(x: {
         part.rowInPartId =`${partNio}-${0}`;
 
         return [...acc, part];
-    }, <SongPartInfo[]>[]);
+    }, <TSongPartInfo[]>[]);
 
     return result;
 }

@@ -1,12 +1,10 @@
+import { Muse as m, Sound } from '../../libs/muse';
+
 import { ComponentContainer as GlComponentContainer } from '../../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../../libs/gl/ts/config/resolved-config';
 import { ideService, ideEvents } from './ide-service';
 import Fs from '../../libs/common/file-service';
-
-import { WebAudioFontLoader } from '../../libs/waf-player/loader';
-import { getInstrumentTitles } from '../../libs/waf-player/instrument-titles';
 import { parseInteger } from '../../libs/common';
-import { Sound } from '../../libs/muse';
 
 type FileInfo = {
     path: string,
@@ -15,7 +13,7 @@ type FileInfo = {
     children?: FileInfo[],
 }
 
-const fontLoader = new WebAudioFontLoader(null as any);
+const fontLoader = new m.font.WebAudioFontLoader(null as any);
 
 export class FontViewerGlComponent {
     private glContainer: GlComponentContainer;
@@ -41,7 +39,7 @@ export class FontViewerGlComponent {
     showTopList() {
         this.rootEl.innerHTML = null;
 
-        getInstrumentTitles().forEach((item, i) => {
+        m.font.getInstrumentTitles().forEach((item, i) => {
             const el = document.createElement('div');
             el.style.paddingLeft = '.5rem';
             el.style.cursor = 'pointer';

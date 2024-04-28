@@ -1,4 +1,4 @@
-import { Muse as m, Line, LineNote, LineModel } from '../libs/muse';
+import { Muse as m, TLine, TLineNote, LineModel } from '../libs/muse';
 
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { dyName, getWithDataAttr } from '../src/utils';
@@ -93,7 +93,7 @@ export class KeyboardChessCtrl {
         }));
     }
 
-    getChessCellFor(arr: LineNote[]): hlp.ChessCell {
+    getChessCellFor(arr: TLineNote[]): hlp.ChessCell {
         const result: hlp.ChessCell = {
             colInd: 0,
             noteId: 0,
@@ -214,11 +214,11 @@ export class KeyboardChessCtrl {
         >${char}</span>`.trim();
     }
 
-    getToneChess(rows: Line[]) {
+    getToneChess(rows: TLine[]) {
         let totalOut = '';
 
         const boxedRows: {
-            row: Line,
+            row: TLine,
             cols: hlp.ChessCell[],
             cells: hlp.ChessCell[],
             rowBorderBottom: string,
@@ -231,14 +231,14 @@ export class KeyboardChessCtrl {
 
             box.cols = this.getChessLine(row.durQ / row.cellSizeQ);
             box.cols.forEach((col, i) => {
-                col.startOffsetQ = row.startOffsetQ + (m.CELL_SIZE * i);
+                col.startOffsetQ = row.startOffsetQ + (m.const.CELL_SIZE * i);
                 col.totalOffsetQ = col.startOffsetQ + row.blockOffsetQ;
             });
 
             const offsets = this.liner.getOffsetsByRow(row);
 
             for (let offset of offsets) {
-                const iCell = (offset - row.startOffsetQ) / m.CELL_SIZE;
+                const iCell = (offset - row.startOffsetQ) / m.const.CELL_SIZE;
                 const notes = this.liner.getNotesListByOffset(row, offset);
 
                 const col = box.cols[iCell];
@@ -258,7 +258,7 @@ export class KeyboardChessCtrl {
         // COL - bgColor
         boxedRows.forEach((box, iRow) => {
             box.cells.forEach(cell => {
-                let colCount = cell.durQ ? Math.floor(cell.durQ / m.CELL_SIZE) : 1;
+                let colCount = cell.durQ ? Math.floor(cell.durQ / m.const.CELL_SIZE) : 1;
                 let colInd = cell.colInd;
 
                 for (let i = iRow; i < boxedRows.length; i++) {
@@ -319,7 +319,7 @@ export class KeyboardChessCtrl {
         }
     }
 
-    getDrumChess(rows: Line[]): {
+    getDrumChess(rows: TLine[]): {
         content: string,
         rowCount: number,
     } {
@@ -338,7 +338,7 @@ export class KeyboardChessCtrl {
 
         let totalOut = '';
 
-        const getTextAndColor = (arr: LineNote[]): DrumChessCell => {
+        const getTextAndColor = (arr: TLineNote[]): DrumChessCell => {
             const result: DrumChessCell = {
                 noteId: 0,
                 cellId: 0,
@@ -513,11 +513,11 @@ export class KeyboardChessCtrl {
         return x;
     }
 
-    printDrumChess(rows: Line[]) {
+    printDrumChess(rows: TLine[]) {
         this.printChess(this.getDrumChess(rows));
     }
 
-    printToneChess(rows: Line[]) {
+    printToneChess(rows: TLine[]) {
         this.printChess(this.getToneChess(rows));
     }
 }

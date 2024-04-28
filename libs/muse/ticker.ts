@@ -1,7 +1,5 @@
-'use babel';
-
 import {Sound} from './sound';
-import {WavePreset} from '../waf-player/otypes';
+import {TWavePreset} from './font/otypes';
 
 export function tickOnTime(endTime: number, ctx: AudioContext, cb: () => void): OscillatorNode | undefined {
     if (ctx.currentTime >= endTime) {
@@ -19,7 +17,7 @@ export function tickOnTime(endTime: number, ctx: AudioContext, cb: () => void): 
     return oscil;
 }
 
-export type SignatureType = '1:4' | '3:8' | '2:8';
+export type TSignatureType = '1:4' | '3:8' | '2:8';
 
 export class Ticker {
     private interval: any = null;
@@ -174,9 +172,9 @@ export class Ticker {
 
     createTickSource(x: {
         qMs: number,
-        signature?: SignatureType,
-        preset1: WavePreset,
-        preset2?: WavePreset,
+        signature?: TSignatureType,
+        preset1: TWavePreset,
+        preset2?: TWavePreset,
         startOffsetMs?: number,
         cb: (x: {
             ab: AudioBufferSourceNode,

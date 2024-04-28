@@ -1,4 +1,4 @@
-export type DrumType =
+export type TDrumType =
     | 'hiHatOpened'
     | 'hiHatPedal'
     | 'hiHatClosed'
@@ -52,7 +52,7 @@ export type DrumType =
     | 'nil';
 
 
-export const Drums: Record<DrumType, number> = {
+export const Drums: Record<TDrumType, number> = {
     'bassDrum2': 35, // bd
     'bassDrum1': 36,
     'sideRimshot': 37,
@@ -208,7 +208,7 @@ export const drumIdByAlias = Object.keys(drumMidiCodeByAlias).reduce((acc, key) 
 }, {})  as {[key: string]: string};
 
 export const drumInfo: Record<
-    DrumType,
+    TDrumType,
     {
         octave: string;
         volume: number;

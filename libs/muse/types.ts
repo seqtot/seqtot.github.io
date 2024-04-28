@@ -1,104 +1,6 @@
-export type StringHash = {[key: string]: string};
+export type TStringHash = {[key: string]: string};
 
-export type StoredRow = {
-    partId?: string,
-    rowNio?: number, // jjkl
-    rowInPartId: string,
-    type: string,
-    track: string,
-    status: string,
-    lines: Line[],
-}
-
-export type WaveSlide = {
-    endWhen: number,
-    delta: number,
-    volume?: number | null,
-    isPlato?: boolean,
-    hasVolumeSlide?: boolean,
-};
-
-export type NoteInfo = {
-    note: string,
-    durationQ: number,
-    durationForNextQ: number,
-    volume: number,
-    cent?: number,
-    instr?: string,
-    pitchShift?: number,
-    slides?: WaveSlide[];
-    slidesText?: string;
-}
-
-export type NoteLineInfo = {
-    notes: NoteInfo[],
-    durationQ: number,
-    repeat: number,
-    bpm: number,
-};
-
-export type TrackInfo = {
-    name: string,
-    board: string,
-    volume: number,
-    items?: {name: string, volume: number}[], // громкость по инструментам трека
-
-    label?: string,
-    isHardTrack?: boolean,
-    isExcluded?: boolean,
-}
-
-export type SongNode = {
-    bpmValue: number,
-    volume?: number,
-    version: number,
-    content: string,
-    break: string,
-    drums: string,
-    tracks: TrackInfo[],
-    hideMetronome?: boolean,
-    score: string,
-    parts: {name: string, id: string}[],
-    dynamic: StoredRow[],
-    source: 'my' | 'band',
-    isSongList?: boolean,
-    ns?: string,
-    nsOld?: string,
-    exportToLineModel?: boolean,
-    pitchShift?: number,
-    pitchShiftSrc?: number,
-    songNodeHard?: any,
-};
-
-export type BlockType = 'text' | 'drums' | 'tones' | 'set';
-
-export type TextBlock = {
-    id: string;
-    head: string,
-    rows: string[];
-    nio: number;
-    startRow: number;
-    endRow: number;
-    type: BlockType;
-    repeat?: number;
-    bpm?: number;
-    volume?: number;
-};
-
-export type KeyData = {
-    quarterTime: number;
-    quarterNio: number;
-    code: string;
-    note: string;
-    down: number;
-    up: number;
-    next: number;
-    color: string;
-    color2: string;
-    char: string;
-};
-
-export type LineNote = {
+export type TLineNote = {
     id: number;
     durQ: number;
     note: string;
@@ -116,25 +18,123 @@ export type LineNote = {
     cent?: number;
 };
 
-export type Cell = {
+export type TStoredRow = {
+    partId?: string,
+    rowNio?: number, // jjkl
+    rowInPartId: string,
+    type: string,
+    track: string,
+    status: string,
+    lines: TLine[],
+}
+
+export type TWaveSlide = {
+    endWhen: number,
+    delta: number,
+    volume?: number | null,
+    isPlato?: boolean,
+    hasVolumeSlide?: boolean,
+};
+
+export type TNoteInfo = {
+    note: string,
+    durationQ: number,
+    durationForNextQ: number,
+    volume: number,
+    cent?: number,
+    instr?: string,
+    pitchShift?: number,
+    slides?: TWaveSlide[];
+    slidesText?: string;
+}
+
+export type TNoteLineInfo = {
+    notes: TNoteInfo[],
+    durationQ: number,
+    repeat: number,
+    bpm: number,
+};
+
+export type TTrackInfo = {
+    name: string,
+    board: string,
+    volume: number,
+    items?: {name: string, volume: number}[], // громкость по инструментам трека
+
+    label?: string,
+    isHardTrack?: boolean,
+    isExcluded?: boolean,
+}
+
+export type TSongNode = {
+    bpmValue: number,
+    volume?: number,
+    version: number,
+    content: string,
+    break: string,
+    drums: string,
+    tracks: TTrackInfo[],
+    hideMetronome?: boolean,
+    score: string,
+    parts: {name: string, id: string}[],
+    dynamic: TStoredRow[],
+    source: 'my' | 'band',
+    isSongList?: boolean,
+    ns?: string,
+    nsOld?: string,
+    exportToLineModel?: boolean,
+    pitchShift?: number,
+    pitchShiftSrc?: number,
+    songNodeHard?: any,
+};
+
+export type TBlockType = 'text' | 'drums' | 'tones' | 'set';
+
+export type TTextBlock = {
+    id: string;
+    head: string,
+    rows: string[];
+    nio: number;
+    startRow: number;
+    endRow: number;
+    type: TBlockType;
+    repeat?: number;
+    bpm?: number;
+    volume?: number;
+};
+
+export type TKeyData = {
+    quarterTime: number;
+    quarterNio: number;
+    code: string;
+    note: string;
+    down: number;
+    up: number;
+    next: number;
+    color: string;
+    color2: string;
+    char: string;
+};
+
+export type TCell = {
     id: number;
     startOffsetQ: number;
-    notes: LineNote[]
+    notes: TLineNote[]
     blockOffsetQ?: number;
 }
 
-export type Line = {
+export type TLine = {
     //nio: number,
     durQ: number,
     startOffsetQ: number,
     blockOffsetQ: number,
     rowInPartId: string,
     cellSizeQ: number,
-    cells: Cell[],
+    cells: TCell[],
     endLine?: boolean,
 }
 
-export type DataByTracks = {
+export type TDataByTracks = {
     total: {
         volume: number,
     },
@@ -149,7 +149,7 @@ export type DataByTracks = {
     }
 };
 
-export type SongPartInfo = {
+export type TSongPartInfo = {
     name: string,
     partNio: number,
     rowNio: number,
@@ -159,7 +159,7 @@ export type SongPartInfo = {
     rowInPartId: string,
 };
 
-export type FileSettings = {
+export type TFileSettings = {
     import: string[],
     exclude: string[],
     dataByTracks: {[key: string]: string},
@@ -169,7 +169,7 @@ export type FileSettings = {
     //[key: string]: any,
 };
 
-export type RowInfo = {
+export type TRowInfo = {
     first: number,
     last: number,
 }

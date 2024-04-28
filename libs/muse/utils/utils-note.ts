@@ -1,4 +1,4 @@
-import {TextBlock, BlockType, SongPartInfo} from '../types'
+import {TTextBlock, TBlockType, TSongPartInfo} from '../types'
 import { parseInteger } from './parse-integer';
 
 export const DEFAULT_BPM = 120;
@@ -206,13 +206,13 @@ export function mergeVolume(a: number, b: number): number {
     return a * (b / DEFAULT_VOLUME);
 }
 
-export function getTextBlocks(rows: string | string[]): TextBlock[] {
+export function getTextBlocks(rows: string | string[]): TTextBlock[] {
     rows = Array.isArray(rows) ? rows : (rows || '').replace(/\r\n/g, '\n').trim().split(/\n/);
 
-    let result: TextBlock[] = [];
+    let result: TTextBlock[] = [];
     let blockRows: string[] = [];
     let id: string;
-    let type: TextBlock['type'];
+    let type: TTextBlock['type'];
     let endRow: number = rows.length - 1;
     let head = '';
 
@@ -277,13 +277,13 @@ export function getTextBlocks(rows: string | string[]): TextBlock[] {
 /**
  * Nullable
  */
-export function getOutBlock(block: string | TextBlock, blocks?: TextBlock[]): TextBlock {
+export function getOutBlock(block: string | TTextBlock, blocks?: TTextBlock[]): TTextBlock {
     if (!block) {
         return findBlockById(blocks, 'out');
     }
 
     if (typeof block === 'object') {
-        return block as TextBlock;
+        return block as TTextBlock;
     }
 
     if (typeof block !== 'string') {
@@ -304,15 +304,15 @@ export function getOutBlock(block: string | TextBlock, blocks?: TextBlock[]): Te
 /**
  * Nullable
  */
-export function findBlockById(blocks: TextBlock[], id: string, ifNotFound: Partial<TextBlock> = null): TextBlock {
+export function findBlockById(blocks: TTextBlock[], id: string, ifNotFound: Partial<TTextBlock> = null): TTextBlock {
     if (!Array.isArray(blocks) || !blocks.length || !id) {
-        return ifNotFound as TextBlock;
+        return ifNotFound as TTextBlock;
     }
 
-    return blocks.find((item) => item.id === id) || ifNotFound as TextBlock;
+    return blocks.find((item) => item.id === id) || ifNotFound as TTextBlock;
 }
 
-export function getBlockContent(blocks: TextBlock[], id: string, trimIt: 'trim' = null): string {
+export function getBlockContent(blocks: TTextBlock[], id: string, trimIt: 'trim' = null): string {
     let rows = findBlockById(blocks, id, {rows: []}).rows.slice(1);
 
     if (trimIt) {
@@ -575,7 +575,7 @@ export function isDrum(val: string | number) {
 }
 
 
-export function getBlockType(val: string): BlockType {
+export function getBlockType(val: string): TBlockType {
     if (hasToneChar(val)) return 'tones';
     if (hasDrumChar(val)) return 'drums';
 
@@ -665,7 +665,7 @@ export function getNoteByOffset(
     return noteOrder[index + offset] || '';
 }
 
-export function getPartInfo(val: string): SongPartInfo {
+export function getPartInfo(val: string): TSongPartInfo {
     val = (val || '').trim();
     const arr = val.split(' ').filter(item => item);
 
@@ -726,7 +726,7 @@ export function getNRowInPartId(part: number, row?: number): string {
     return `${nioChar}${part}-${row}`;
 }
 
-export function buildOutBlock(blocks: TextBlock[], rows: string[]): string[] {
+export function buildOutBlock(blocks: TTextBlock[], rows: string[]): string[] {
     const result: string[] = [];
 
     // строка может содержать номер части (№1 и т.п.)
@@ -779,11 +779,11 @@ export function createOutBlock({bpm, volume, currBlock, rows, id, type}: {
     id?: string,
     bpm?: number,
     volume?: number,
-    currBlock?: TextBlock,
+    currBlock?: TTextBlock,
     rows: string[],
-    type?: BlockType,
-}): TextBlock {
-    currBlock = currBlock || <TextBlock>{};
+    type?: TBlockType,
+}): TTextBlock {
+    currBlock = currBlock || <TTextBlock>{};
     id = id || 'out';
     bpm = bpm || currBlock.bpm || DEFAULT_BPM;
     type = type || 'set';
@@ -792,7 +792,7 @@ export function createOutBlock({bpm, volume, currBlock, rows, id, type}: {
 
     const head = `out b${bpm} v${volume}`;
 
-    return <TextBlock>{
+    return <TTextBlock>{
         id,
         head,
         bpm,

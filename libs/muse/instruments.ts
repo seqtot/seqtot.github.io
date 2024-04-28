@@ -1,13 +1,11 @@
-'use babel';
-
 //import '../waf-fonts';
 import { parseInteger } from './utils';
 import { drumIdByAlias } from './drums';
-import { WavePreset } from '../waf-player/otypes';
+import { TWavePreset } from './font/otypes';
 
 const toneChar = '$';
 const drumChar = '@';
-export const instruments: { [code: number | string]: WavePreset } = {};
+export const instruments: { [code: number | string]: TWavePreset } = {};
 
 
 // bass guitar
@@ -292,7 +290,7 @@ export function getInstrCodeBy(val: number | string): number | string {
     return instrCodeByAlias[val] || '';
 }
 
-export function getInstrumentObj(val: any, useDefault = false): WavePreset {
+export function getInstrumentObj(val: any, useDefault = false): TWavePreset {
     let instr = instruments[val];
     if (instr) return instr;
 

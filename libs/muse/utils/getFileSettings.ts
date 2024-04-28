@@ -1,19 +1,17 @@
-'use babel';
-
-import {TextBlock, FileSettings} from '../types';
+import {TTextBlock, TFileSettings} from '../types';
 import { parseInteger } from './parse-integer';
 import {drumChar, toneChar} from './utils-note';
 
 export function getPitchShiftSetting(settings: any): number {
-    if (!Array.isArray((settings as FileSettings)?.pitchShift)) {
+    if (!Array.isArray((settings as TFileSettings)?.pitchShift)) {
         return 0;
     }
 
-    return parseInteger((settings as FileSettings).pitchShift[0], 0);
+    return parseInteger((settings as TFileSettings).pitchShift[0], 0);
 }
 
-export function getFileSettings(blocks: TextBlock[] ): FileSettings {
-    const result: FileSettings = {
+export function getFileSettings(blocks: TTextBlock[] ): TFileSettings {
+    const result: TFileSettings = {
         import: [],
         exclude: [],
         dataByTracks: <any>{},

@@ -1,7 +1,8 @@
+import { TSignatureType } from '../libs/muse';
+
 import { RouteInfo } from '../src/router';
 import { getWithDataAttr } from '../src/utils';
 import { ideService } from './ide/ide-service';
-import { SignatureType } from '../libs/muse/ticker';
 import { standardTicks as ticks } from './ticks';
 
 type RouteType = {id: string, game: string}
@@ -713,7 +714,7 @@ export class GamePage {
         loopsPlayer.play(1000);
     }
 
-    playTick3(signature?: SignatureType) {
+    playTick3(signature?: TSignatureType) {
         //return this.playTick1('8:8');
 
         this.stopTicker();

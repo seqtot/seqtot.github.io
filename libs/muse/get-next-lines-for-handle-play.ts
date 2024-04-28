@@ -1,14 +1,13 @@
-'use babel';
 
-import {NoteInfo, TextBlock} from './types';
+import {TNoteInfo, TTextBlock} from './types';
 import * as un from './utils';
 import {isRefLine} from './get-midi-config';
 import {getFirstLastRow} from './utils/getFirstLastRow';
 
 type Result = {
     notesByChannels: {
-        left: NoteInfo[][],
-        right: NoteInfo[][],
+        left: TNoteInfo[][],
+        right: TNoteInfo[][],
     },
     rowsRange: {
         first: number,
@@ -17,7 +16,7 @@ type Result = {
     gotoTop: boolean
 }
 
-function getNotesArray(text: string): NoteInfo[] {
+function getNotesArray(text: string): TNoteInfo[] {
     text = un.clearNoteLine(text);
     const info = un.getNoteLineMetaAndInstr(text)
 
@@ -27,7 +26,7 @@ function getNotesArray(text: string): NoteInfo[] {
 }
 
 export function getNextLinesForHandlePlay(dx: {
-    block: TextBlock,
+    block: TTextBlock,
     getNextRange: boolean,
     //isInitEvent: boolean,
     currRowInfo: Result['rowsRange'],
@@ -56,8 +55,8 @@ export function getNextLinesForHandlePlay(dx: {
     let nextFirstRow = firstRow;
     let nextLastRow = firstRow;
     let text = '';
-    let leftNoteArr: NoteInfo[][] = [];
-    let rightNoteArr: NoteInfo[][] = [];
+    let leftNoteArr: TNoteInfo[][] = [];
+    let rightNoteArr: TNoteInfo[][] = [];
 
     text = dx.block.rows[firstRow].trim();
 

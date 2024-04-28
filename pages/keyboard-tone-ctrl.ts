@@ -1,6 +1,7 @@
+import { Muse as m, TKeyData, TLine } from '../libs/muse';
+
 import { dyName, getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { ideService } from './ide/ide-service';
-import { Muse as m, KeyData, Line, LineModel } from '../libs/muse';
 import { KeyboardCtrl, ToneKeyboardType, KeyboardPage } from './keyboard-ctrl';
 import * as hlp from './keyboard-tone-ctrl-helper';
 import { isT34 } from './keyboard-tone-ctrl-helper';
@@ -12,6 +13,8 @@ const DOWN = 1;
 const UP = 0;
 const rem = 'rem';
 const monoFont = 'font-family: monospace;';
+
+const getRandomElement = m.utils.getRandomElement;
 
 export class ToneCtrl extends KeyboardCtrl {
     userSettings: UserSettings = UserSettingsStore.GetUserSettings();
@@ -28,8 +31,8 @@ export class ToneCtrl extends KeyboardCtrl {
     recData: {
         startTimeMs: number,
         endTimeMs: number,
-        sequence: KeyData[],
-        keys: {[key: string]: KeyData}
+        sequence: TKeyData[],
+        keys: {[key: string]: TKeyData}
     } | null = {
         startTimeMs: 0,
         endTimeMs: 0,
@@ -435,11 +438,11 @@ export class ToneCtrl extends KeyboardCtrl {
             }
         });
 
-        const lines = LineModel.GetToneLineModelFromRecord(
+        const lines = m.class.LineModel.GetToneLineModelFromRecord(
             bpm, data.startTimeMs, data.sequence
         );
 
-        let oldLine: Line;
+        let oldLine: TLine;
 
         // согласование старого блока с новым
         if (this.hasEditedItems && this.liner.lines) {
@@ -466,7 +469,7 @@ export class ToneCtrl extends KeyboardCtrl {
             const diff = this.liner.lines.length - lines.length;
 
             for (let i = this.liner.lines.length - diff; i < this.liner.lines.length; i++) {
-                const line = LineModel.CloneLine(this.liner.lines[i]);
+                const line = m.class.LineModel.CloneLine(this.liner.lines[i]);
                 lines.push(line);
             }
         }
@@ -615,7 +618,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.addEventListener('pointerdown', () => {
-                this._instrCode = m.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
+                this._instrCode = m.utils.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
                 this.updatePopupBoard();
 
                 ideService.synthesizer.playSound({
@@ -660,7 +663,7 @@ export class ToneCtrl extends KeyboardCtrl {
 
         getWithDataAttr('instrument-code', dialogEl).forEach(el => {
             el.addEventListener('pointerdown', () => {
-                this._instrCode = m.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
+                this._instrCode = m.utils.parseInteger(el.dataset.instrumentCode, m.DEFAULT_TONE_INSTR);
                 this.updatePopupBoard();
 
                 ideService.synthesizer.playSound({
@@ -1026,7 +1029,7 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     setStringCount(stringCount: number | string) {
-        stringCount = m.parseInteger(stringCount, 6);
+        stringCount = m.utils.parseInteger(stringCount, 6);
         let settings = this.getGuitarSettings();
         settings.stringCount = stringCount;
         this.setGuitarSettings(settings);
@@ -1191,7 +1194,7 @@ export class ToneCtrl extends KeyboardCtrl {
         if (el) {
             el.addEventListener('click', () => {
                 const val =
-                    m.getRandomElement('dtrnmfvszlkb') + m.getRandomElement<string>('uoa');
+                    getRandomElement('dtrnmfvszlkb') + getRandomElement<string>('uoa');
 
                 const key = dyName(
                     `note-key-${val}`,
@@ -1217,7 +1220,7 @@ export class ToneCtrl extends KeyboardCtrl {
         this.subscribeBoardEvents();
     }
 
-    printChess(rows: Line[]) {
+    printChess(rows: TLine[]) {
         this.chess.printToneChess(rows);
     }
 

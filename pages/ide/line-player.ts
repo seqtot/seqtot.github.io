@@ -1,7 +1,6 @@
-'use babel';
+import { Muse as m, TFileSettings, TNoteInfo, MultiPlayer, Synthesizer, TTextBlock, TDataByTracks } from '../../libs/muse';
 
-import {Editor} from 'codemirror';
-import { Muse as m, FileSettings, NoteInfo, MultiPlayer, Synthesizer, TextBlock, DataByTracks } from '../../libs/muse';
+import { Editor } from 'codemirror';
 import {
     getAllMusicKeyCodes,
     getRightKeyCodes,
@@ -77,9 +76,9 @@ type RowInfo = {
     last: number,
 }
 
-function getDataByTracksFromSettings(settings: FileSettings): DataByTracks {
+function getDataByTracksFromSettings(settings: TFileSettings): TDataByTracks {
     const dataByTracksSrc = settings?.dataByTracks || {};
-    const dataByTracks = {} as DataByTracks;
+    const dataByTracks = {} as TDataByTracks;
 
     Object.keys(dataByTracksSrc).forEach(name => {
         const volume = m.getVolumeFromString(dataByTracksSrc[name]);
@@ -103,8 +102,8 @@ export class LinePlayer {
     uri = '';
 
     notesByChannels: {
-        left: NoteInfo[][],
-        right: NoteInfo[][],
+        left: TNoteInfo[][],
+        right: TNoteInfo[][],
     } = {
         left: [],
         right: [],
@@ -125,10 +124,10 @@ export class LinePlayer {
     bpmInfo: BpmInfo = emptyBpmInfo();
     multiPlayer: MultiPlayer;
     lastTickTime: number = 0;
-    currBlock: TextBlock;
+    currBlock: TTextBlock;
     currRowInfo: RowInfo = { first: 0, last: 0}; // индекс в текущем блоке
-    blocks: TextBlock[] = [];
-    settings: FileSettings = <any>{};
+    blocks: TTextBlock[] = [];
+    settings: TFileSettings = <any>{};
     bassKeys = getLeftKeyCodes();
     instrCodeByKeyCode = getInstrCodesByKeyCodes();
     musicKeyCodes = getAllMusicKeyCodes();
@@ -155,7 +154,7 @@ export class LinePlayer {
         this.textInput = params.textInput;
         this.multiBuffer = params.multiBuffer;
         this.isNote = params.isNote || ((() => {}) as any);
-        this.multiPlayer = params.multiPlayer || new MultiPlayer();
+        this.multiPlayer = params.multiPlayer || new m.player.MultiPlayer();
         this.synthesizer = params.synthesizer;
         this.uri = params.uri;
 
@@ -259,7 +258,7 @@ export class LinePlayer {
             return;
         }
 
-        let noteArrays: NoteInfo[][] = this.bassKeys[keyCode] ? this.notesByChannels.left : this.notesByChannels.right;
+        let noteArrays: TNoteInfo[][] = this.bassKeys[keyCode] ? this.notesByChannels.left : this.notesByChannels.right;
 
         if (!noteArrays.reduce((acc, item) => acc + item.length, 0)) {
             return;
@@ -305,7 +304,7 @@ export class LinePlayer {
         if (type === DOWN) {
             this.synthesizer.playSound({
                 keyOrNote: evt.code,
-                pitchShift: m.parseInteger(this.settings.boardShift[0], 0),
+                pitchShift: m.utils.parseInteger(this.settings.boardShift[0], 0),
                 print: true,
                 onlyStop: false,
                 instrCode: ideService.useToneInstrument,
@@ -317,7 +316,7 @@ export class LinePlayer {
         if (type === UP) {
             this.synthesizer.playSound({
                 keyOrNote: evt.code,
-                pitchShift: m.parseInteger(this.settings.boardShift[0], 0),
+                pitchShift: m.utils.parseInteger(this.settings.boardShift[0], 0),
                 onlyStop: true,
             });
 
@@ -490,11 +489,11 @@ export class LinePlayer {
     getCurrBlockInfo(evt: KeyboardEvent) {
         const x = {
             blocks: this.blocks,
-            currBlock: null as TextBlock,
+            currBlock: null as TTextBlock,
             currRowInfo: this.currRowInfo,
             excludeIndex: [],
-            midiBlockOut: null as TextBlock,
-            playBlockOut: '' as string | TextBlock,
+            midiBlockOut: null as TTextBlock,
+            playBlockOut: '' as string | TTextBlock,
             topBlocksOut: [],
         };
 
@@ -527,7 +526,7 @@ export class LinePlayer {
                     //console.log(type, data);
                 },
                 dataByTracks: getDataByTracksFromSettings(this.settings),
-                pitchShift: m.parseInteger(this.settings.pitchShift[0]),
+                pitchShift: m.utils.parseInteger(this.settings.pitchShift[0]),
                 //beatsWithOffsetMs: un.getBeatsByBpmWithOffset(90, 8),
             });
         }

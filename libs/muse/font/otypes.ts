@@ -1,4 +1,4 @@
-export type WaveBox = {
+export type TWaveBox = {
 	gain: GainNode,
 	audioBufferSourceNode?: AudioBufferSourceNode | null,
 	target: AudioNode,
@@ -6,9 +6,9 @@ export type WaveBox = {
 	duration: number,
 	cancel: () => void,
 	pitch: number,
-	preset: WavePreset,
+	preset: TWavePreset,
 };
-export type WaveZone = {
+export type TWaveZone = {
 	keyRangeLow: number,
 	keyRangeHigh: number,
 	originalPitch: number,
@@ -19,7 +19,7 @@ export type WaveZone = {
 	buffer?: AudioBuffer,
 	sampleRate: number,
 	delay?: number,
-	ahdsr?: boolean | WaveAHDSR[],
+	ahdsr?: boolean | TWaveAHDSR[],
 	sample?: string,
 	file?: string,
 	sustain?: number,
@@ -33,39 +33,39 @@ export type WaveZone = {
 	tailMs?: number,
 	tailed?: boolean,
 };
-export type WavePreset = {
+export type TWavePreset = {
 	pitchShift?: number,
-	zones: WaveZone[];
+	zones: TWaveZone[];
 };
-export type WaveSlide = {
-    endWhen: number,
-    delta: number,
-    volume?: number | null,
-    isPlato?: boolean,
+export type TWaveSlide = {
+	endWhen: number,
+	delta: number,
+	volume?: number | null,
+	isPlato?: boolean,
 	hasVolumeSlide?: boolean,
 };
-export type WaveAHDSR = {
+export type TWaveAHDSR = {
 	duration: number,
 	volume: number
 };
-export type CachedPreset = {
+export type TCachedPreset = {
 	variableName: string,
 	filePath: string
 };
-export type NumPair = number[];
-export type PresetInfo = {
+export type TNumPair = number[];
+export type TPresetInfo = {
 	variable: string,
 	url: string,
 	title: string,
 	pitch: number,
 	fileName: string,
 };
-export type ChordQueue = {
+export type TChordQueue = {
 	when: number,
 	destination: AudioNode,
-	preset: WavePreset,
+	preset: TWavePreset,
 	pitch: number,
 	duration: number,
 	volume?: number,
-	slides?: WaveSlide[],
+	slides?: TWaveSlide[],
 };

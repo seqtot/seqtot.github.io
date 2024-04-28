@@ -1,5 +1,6 @@
+import { Muse as m, TLine, LineModel, TLineNote, TStoredRow, Synthesizer, MultiPlayer, TSongPartInfo, TMidiConfig, TTextBlock, TOutBlockRowInfo } from '../libs/muse';
+
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import { Muse as m, Line, LineModel, LineNote, StoredRow, Synthesizer, MultiPlayer, SongPartInfo, MidiConfig, TextBlock, OutBlockRowInfo } from '../libs/muse';
 import { parseInteger } from '../libs/common';
 import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
@@ -64,8 +65,8 @@ const iconBtnStl = [
 export class KeyboardCtrl {
     trackName = '';
     liner = new LineModel();
-    notesForCopy: LineNote[] = [];
-    linesForCopy: Line[];
+    notesForCopy: TLineNote[] = [];
+    linesForCopy: TLine[];
 
     activeCell: {
         id: number,
@@ -233,11 +234,11 @@ export class KeyboardCtrl {
 
     subscribeDurationCommands() {
         getWithDataAttrValue('set-cell-duration-action', 'add', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, m.CELL_SIZE));
+            el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, m.const.CELL_SIZE));
         });
 
         getWithDataAttrValue('set-cell-duration-action', 'sub', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, -m.CELL_SIZE));
+            el.addEventListener('pointerdown', () => this.addCellDuration(this.activeCell.id, -m.const.CELL_SIZE));
         });
 
         getWithDataAttr('copy-notes-action', this.page.pageEl).forEach((el: HTMLElement) => {
@@ -263,16 +264,16 @@ export class KeyboardCtrl {
         });
 
         getWithDataAttrValue('action-move-cell', 'left', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, -m.CELL_SIZE));
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, -m.const.CELL_SIZE));
         });
 
         getWithDataAttrValue('action-move-cell', 'right', this.page.pageEl).forEach((el: HTMLElement) => {
-            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, m.CELL_SIZE));
+            el.addEventListener('pointerdown', () => this.moveCell(this.activeCell.id, m.const.CELL_SIZE));
         });
     }
 
     getCellId(el: HTMLElement) {
-        return m.parseInteger(el.dataset['chessCellId'], 0);
+        return m.utils.parseInteger(el.dataset['chessCellId'], 0);
     }
 
     setActiveCell(el?: HTMLElement) {
@@ -326,7 +327,7 @@ export class KeyboardCtrl {
                 getWithDataAttrValue('chess-pony-col-line-ind', el.dataset.chessCellLineInd).forEach(el => {
                     el.style.display = 'block';
 
-                    el.innerHTML = (m.parseInteger(noteForEdit.volume, m.DEFAULT_VOLUME).toString() + (noteForEdit.slides ? '~' : ''));
+                    el.innerHTML = (m.utils.parseInteger(noteForEdit.volume, m.DEFAULT_VOLUME).toString() + (noteForEdit.slides ? '~' : ''));
                 });
             }
 
@@ -552,7 +553,7 @@ export class KeyboardCtrl {
         let blockOffsetQ = 0;
 
         ideService.editedItems.forEach(editedItem => {
-            let lines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
+            let lines: TLine[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
             let duration = LineModel.GetDurationQByLines(lines);
             editedItem.duration = duration;
 
@@ -565,7 +566,7 @@ export class KeyboardCtrl {
         });
     }
 
-    getRowsForPart(song: SongNode, part: SongPartInfo): StoredRow[] {
+    getRowsForPart(song: SongNode, part: TSongPartInfo): TStoredRow[] {
         const partRows = song.dynamic.filter(row => {
             const iPartId = (row.partId || '').trim();
             const iPartNio = m.getPartNio(row.rowInPartId);
@@ -582,7 +583,7 @@ export class KeyboardCtrl {
         return partRows;
     }
 
-    resetBlockOffset(rows: StoredRow[]) {
+    resetBlockOffset(rows: TStoredRow[]) {
         rows.forEach(row => {
             LineModel.ClearBlockOffset(row.lines);
         });
@@ -590,13 +591,13 @@ export class KeyboardCtrl {
 
     getPartsWithRows(x: {
         song: SongNode,
-        parts: SongPartInfo[],
+        parts: TSongPartInfo[],
         resetBlockOffset: boolean,
         useEditingItems: boolean
-    }): {partId: string, rows: StoredRow[][]}[] {
+    }): {partId: string, rows: TStoredRow[][]}[] {
 
         const hash = {};
-        const list: {partId: string, rows: StoredRow[][]}[] = [];
+        const list: {partId: string, rows: TStoredRow[][]}[] = [];
 
         x.parts.forEach(part => {
             const partRows = this.getRowsForPart(x.song, part).filter(row => {
@@ -664,7 +665,7 @@ export class KeyboardCtrl {
     getNotes(id: string, item: {
         type?: string,
         track: string,
-        lines: Line[],
+        lines: TLine[],
     }): string {
         if (item.type === 'drums' || item.track.startsWith(m.drumChar)) {
             const trackName = item.track || m.drumsTrack;
@@ -681,12 +682,12 @@ export class KeyboardCtrl {
     }
 
     buildBlocksForMySong(
-        blocks: TextBlock[],
+        blocks: TTextBlock[],
         resetBlockOffset = false,
         useEditingItems = false
-    ): TextBlock[] {
+    ): TTextBlock[] {
         const song = ideService.songStore.data;
-        const editingParts: SongPartInfo[] = [];
+        const editingParts: TSongPartInfo[] = [];
 
         ideService.currentEdit.editPartsNio.sort();
         ideService.currentEdit.editPartsNio.forEach(partNio => {
@@ -762,7 +763,7 @@ export class KeyboardCtrl {
         const song = ideService.songStore.clone();
 
         ideService.editedItems.forEach(editedItem => {
-            let iLines: Line[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
+            let iLines: TLine[] = this.liner.lines.filter(row => row.rowInPartId === editedItem.rowInPartId);
 
             if (!iLines.length && song) {
                 song.dynamic.forEach(item => {
@@ -818,7 +819,7 @@ export class KeyboardCtrl {
     getMidiConfig(x: {
         resetBlockOffset?: boolean,
         useEditing?: boolean
-    } = {}): MidiConfig {
+    } = {}): TMidiConfig {
         const currentEdit = ideService.currentEdit;
         let blocks = [...currentEdit.blocks];
 
@@ -848,7 +849,7 @@ export class KeyboardCtrl {
             volume: ideService.outVolume,
         });
 
-        const midiConfig: MidiConfig = {
+        const midiConfig: TMidiConfig = {
             blocks,
             excludeIndex: [],
             currRowInfo: {first: 0, last: 0},
@@ -863,7 +864,7 @@ export class KeyboardCtrl {
         return midiConfig;
     }
 
-    getRowsByPartActions(part: SongPartInfo) {
+    getRowsByPartActions(part: TSongPartInfo) {
         const cmdStyle = `
             border-radius: 0.25rem;
             border: 1px solid lightgray;
@@ -916,14 +917,14 @@ export class KeyboardCtrl {
         const outBlocksInfo = m.getOutBlocksInfo(midiConfig.blocks, midiConfig.playBlockOut);
         const partHash: {
             [key: string]: {
-                part: SongPartInfo,
-                rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+                part: TSongPartInfo,
+                rows: {row: TOutBlockRowInfo, partNio: number, rowNio: number}[]
             }
         } = {};
 
         const rowsByParts: {
-            part: SongPartInfo,
-            rows: {row: OutBlockRowInfo, partNio: number, rowNio: number}[]
+            part: TSongPartInfo,
+            rows: {row: TOutBlockRowInfo, partNio: number, rowNio: number}[]
         }[] = [];
 
         // ЗАПОЛНЯЕМ ЧАСТИ
@@ -1177,7 +1178,7 @@ export class KeyboardCtrl {
 
     delete_RowFromPart(partId: string, partNio: number | string) {
         partId = (partId || '').trim();
-        partNio = m.parseInteger(partNio, 0);
+        partNio = m.utils.parseInteger(partNio, 0);
 
         if (!partId && !partNio) return;
 
@@ -1209,7 +1210,7 @@ export class KeyboardCtrl {
     }
 
     addRowInPart(partId: string, partNio: number | string) {
-        partNio = m.parseInteger(partNio, 0);
+        partNio = m.utils.parseInteger(partNio, 0);
         partId = (partId || '').trim();
 
         if (!partId && !partNio) return;
@@ -1356,7 +1357,7 @@ export class KeyboardCtrl {
     replaceInstrument(el: HTMLElement) {
         const inArea = el.dataset.replaceInstrumentAction;
         const rowCol = this.activeCell.rowCol;
-        let notes:LineNote[] = [];
+        let notes:TLineNote[] = [];
 
         //console.log('replaceInstrument', inArea, this.activeCell);
 
@@ -1397,7 +1398,7 @@ export class KeyboardCtrl {
     }
 
     addOrDelNote(x: {
-        note: string | LineNote,
+        note: string | TLineNote,
         rowCol: string,
         totalOffsetQ: number,
         durQ?: number,
@@ -1405,7 +1406,7 @@ export class KeyboardCtrl {
         instName?: string,
     }) {
         const note = typeof x.note === 'string' ? {note: x.note} : x.note;
-        let noteInfo = this.getNoteInfo(note.note) as any as LineNote;
+        let noteInfo = this.getNoteInfo(note.note) as any as TLineNote;
 
         noteInfo = {
             ...noteInfo,
@@ -1466,7 +1467,7 @@ export class KeyboardCtrl {
         this.page.stop();
 
         const midiConfig = this.getMidiConfig({ resetBlockOffset: true });
-        const playBlock = midiConfig.playBlockOut as TextBlock;
+        const playBlock = midiConfig.playBlockOut as TTextBlock;
         const playingRows = playBlock.rows.filter(item => {
             const part = m.getPartInfo(item);
             return !!ideService.editedItems.find(item => item.rowInPartId === part.rowInPartId);
@@ -1538,7 +1539,7 @@ export class KeyboardCtrl {
 
         const midiConfig = this.getMidiConfig({ resetBlockOffset: true, useEditing: true });
         let blocks = midiConfig.blocks;
-        let playBlock = midiConfig.playBlockOut as TextBlock;
+        let playBlock = midiConfig.playBlockOut as TTextBlock;
 
         const playingRows = playBlock.rows.filter(item => {
             const part = m.getPartInfo(item);
@@ -1593,7 +1594,7 @@ export class KeyboardCtrl {
 
         if (!noteForEdit) return;
 
-        new NoteDetailsDialog().openDialog(noteForEdit, (note:LineNote) => {
+        new NoteDetailsDialog().openDialog(noteForEdit, (note:TLineNote) => {
             noteForEdit.volume = note.volume;
             noteForEdit.slides = note.slides;
 
@@ -1619,7 +1620,7 @@ export class KeyboardCtrl {
     }
 
     updateView() {}
-    printChess(rows: Line[]) {}
+    printChess(rows: TLine[]) {}
     highlightInstruments() {}
     getNoteInfo(noteLat: string): {
         note: string,

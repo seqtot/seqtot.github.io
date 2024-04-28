@@ -105,7 +105,7 @@ export class TextEditorGlComponent {
   // downedKeys: { [key: string]: any } = {};
   // synthesizer = new Synthesizer();
   // beatRecorder: BeatRecorder = new BeatRecorder();
-  multiPlayer: MultiPlayer = new MultiPlayer();
+  multiPlayer: MultiPlayer = new m.player.MultiPlayer();
   // sumButtonEl: HTMLButtonElement;
   linePlayer: LinePlayer = new LinePlayer();
   // volumeEl: HTMLElement;

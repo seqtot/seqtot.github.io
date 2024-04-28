@@ -1,6 +1,4 @@
-'use babel';
-
-import {WaveBox, WavePreset, WaveZone, WaveAHDSR, WaveSlide} from './otypes'
+import {TWaveBox, TWavePreset, TWaveZone, TWaveAHDSR, TWaveSlide} from './otypes'
 import {WebAudioFontLoader} from './loader'
 import {WebAudioFontChannel} from './channel';
 import {WebAudioFontReverberator} from './reverberator';
@@ -11,7 +9,7 @@ function isPresent(val: any) {
 }
 
 export  class WebAudioFontPlayer {
-	wboxes: WaveBox[] = [];
+	wboxes: TWaveBox[] = [];
 	loader = new WebAudioFontLoader(this);
 	//onCacheFinish = null;
 	//onCacheProgress = null;
@@ -112,16 +110,16 @@ export  class WebAudioFontPlayer {
 	queueWaveTableSrc(x: {
 		audioContext: AudioContext,
 		targetNode: AudioNode,
-		preset: WavePreset,
-		zone?: WaveZone,
+		preset: TWavePreset,
+		zone?: TWaveZone,
 		when: number,
 		pitch: number,
 		duration: number,
 		volume?: number,
-		slides?: WaveSlide[],
+		slides?: TWaveSlide[],
 		cent?: number,
 		asdf?: boolean,
-	}): WaveBox | null {
+	}): TWaveBox | null {
 		//console.log(x.pitch, x.zone);
 
 		let pitch = x.pitch + x.preset.pitchShift;
@@ -129,7 +127,7 @@ export  class WebAudioFontPlayer {
 		let cent = x.cent || 0;
 
 		this.resumeContext(x.audioContext);
-		var zone: WaveZone = x.zone || findZone(x.audioContext, x.preset, pitch);
+		var zone: TWaveZone = x.zone || findZone(x.audioContext, x.preset, pitch);
 
 		if (!zone) {
 			return null;
@@ -161,7 +159,7 @@ export  class WebAudioFontPlayer {
 		let lastSlideVolume = volume;
 		let lastSlideDelta = 0;
 		let lastSlidePlaybackRate = playbackRate;
-		let envelope: WaveBox = this.findWaveBox(x.audioContext, x.targetNode);
+		let envelope: TWaveBox = this.findWaveBox(x.audioContext, x.targetNode);
 		envelope.audioBufferSourceNode = x.audioContext.createBufferSource();
 
 		// SLIDES (volume and playbackRate)
@@ -243,8 +241,8 @@ export  class WebAudioFontPlayer {
 
 	setupWaveBox(
 		audioContext: AudioContext,
-		wbox: WaveBox,
-		zone: WaveZone,
+		wbox: TWaveBox,
+		zone: TWaveZone,
 		volume: number,
 		startWhen: number,
 		sampleDuration: number,
@@ -254,7 +252,7 @@ export  class WebAudioFontPlayer {
 		var lastTime = 0;
 		var lastVolume = 0;
 		var duration = noteDuration;
-		var zoneahdsr: undefined | boolean | WaveAHDSR[] = zone.ahdsr;
+		var zoneahdsr: undefined | boolean | TWaveAHDSR[] = zone.ahdsr;
 		if (sampleDuration < duration + this.afterTime) {
 			duration = sampleDuration - this.afterTime;
 		}
@@ -287,7 +285,7 @@ export  class WebAudioFontPlayer {
 			];
 		}
 
-		let ahdsr: WaveAHDSR[] = zoneahdsr as WaveAHDSR[];
+		let ahdsr: TWaveAHDSR[] = zoneahdsr as TWaveAHDSR[];
 
 		const gain = wbox.gain.gain;
 		gain.setValueAtTime(this.noZeroVolume(ahdsr[0].volume * volume), startWhen);
@@ -309,8 +307,8 @@ export  class WebAudioFontPlayer {
 		gain.linearRampToValueAtTime(this.noZeroVolume(0), startWhen + duration + this.afterTime);
 	};
 
-	findWaveBox(audioContext: AudioContext, targetNode: AudioNode): WaveBox {
-		let wbox: WaveBox | null = null;
+	findWaveBox(audioContext: AudioContext, targetNode: AudioNode): TWaveBox {
+		let wbox: TWaveBox | null = null;
 
 		//console.log('wboxes', this.wboxes);
 
@@ -347,7 +345,7 @@ export  class WebAudioFontPlayer {
 		// }
 
 		if (!(wbox)) {
-			wbox = {} as WaveBox;
+			wbox = {} as TWaveBox;
 			wbox.gain = audioContext.createGain();
 			wbox.target = targetNode;
 			wbox.gain.connect(targetNode);

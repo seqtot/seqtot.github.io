@@ -1,9 +1,7 @@
-'use babel';
-
 import { parseInteger } from './parse-integer';
 
 import { getVolumeFromString, isPresent, negativeChar, vibratoChar, timeCharRE } from './utils-note';
-import { WaveSlide } from '../types';
+import { TWaveSlide } from '../types';
 
 // дтрн мфвс злкб
 // хлнм щшзв фжс
@@ -110,12 +108,12 @@ export function buildVibratoSlides(durationQ: number, val: string): string | und
 export function getSlides (
     arr: string[],
     note: { durationQ: number }
-): WaveSlide[] | undefined {
+): TWaveSlide[] | undefined {
     if (!arr.length) {
         return undefined;
     }
 
-    const result: WaveSlide[] = [];
+    const result: TWaveSlide[] = [];
     const plato = arr.shift() || '';
     let firstDuration = parseInteger(plato.split(':')[0], 0);
     let firstVolume = getVolumeFromString(plato.split(':')[1], null);

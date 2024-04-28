@@ -1,18 +1,18 @@
 import * as un from './utils';
 import { freqInfoHash } from './freq';
-import { WaveZone } from '../waf-player/otypes';
+import { TWaveZone } from './font/otypes';
 import { Sound } from './sound';
 import {drumMidiCodeByAlias} from './drums';
 import {DEFAULT_VOLUME} from './utils';
 
-export type MidiCodeAndZone = {
+export type TMidiCodeAndZone = {
     code: number,
-    zone?: WaveZone,
+    zone?: TWaveZone,
     volume: number,
 }
 
-export function getSoundsInfoArr(notes: string): MidiCodeAndZone[] {
-    const result: MidiCodeAndZone[] = [];
+export function getSoundsInfoArr(notes: string): TMidiCodeAndZone[] {
+    const result: TMidiCodeAndZone[] = [];
 
     //ifDef = (ifDef || '').replace(un.toneChar, '').replace(un.drumChar, '').trim();
     notes = (notes || '').trim();

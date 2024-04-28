@@ -1,4 +1,4 @@
-import {UserSettingsStore} from './user-settings-store';
+import { UserSettingsStore } from './user-settings-store';
 
 const attrs = {
     actionDrumKey: 'action-drum-key',

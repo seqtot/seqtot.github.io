@@ -1,5 +1,3 @@
-'use babel';
-
 export function parseInteger(val: string | number, ifError: number = 0): number {
     if (typeof val === 'number') {
         return isNaN(val) ? ifError : val;

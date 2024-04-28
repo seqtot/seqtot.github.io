@@ -1,7 +1,5 @@
-'use babel';
-
-import { WebAudioFontPlayer } from '../waf-player/player';
-import { preparePreset } from '../waf-player/prepare';
+import { WebAudioFontPlayer } from './font/player';
+import { preparePreset } from './font/prepare';
 
 import {
     freqByNoteHash,
@@ -12,13 +10,13 @@ import * as un from './utils';
 import { DEFAULT_TONE_INSTR } from './keyboards';
 import { drumIdByAlias } from './drums';
 import { hardcodedInstruments, instruments as instruments2 } from './instruments';
-import { WaveZone } from '../waf-player/otypes';
+import { TWaveZone } from './font/otypes';
 
 export const instruments = instruments2;
 const loadingInstruments: { [code: number]: boolean } = {};
 const drumKeys: { [code: string]: number } = {};
 
-export type KeyInfo = {
+export type TKeyInfo = {
     oscil?: OscillatorNode;
     midi?: any;
     volume: number;
@@ -35,10 +33,10 @@ export type KeyInfo = {
     isDrum?: boolean;
     freq?: number;
 
-    zone?: WaveZone;
+    zone?: TWaveZone;
 };
 
-export type PlayingItem = {
+export type TPlayingItem = {
     oscil?: OscillatorNode;
     midi?: any;
     volume: GainNode;
@@ -59,10 +57,10 @@ masterGain.connect(ctx.destination);
 
 export class Sound {
     oscills: { [key: string]: OscillatorNode };
-    keysAndNotes: { [key: string]: KeyInfo } = {};
+    keysAndNotes: { [key: string]: TKeyInfo } = {};
     static MasterVolume = 100;
 
-    readonly instrSettings: {[key: string]: { [key: string]: KeyInfo }} = {};
+    readonly instrSettings: {[key: string]: { [key: string]: TKeyInfo }} = {};
 
     readonly fontPlayer = fontPlayer;
     readonly fontLoader = fontLoader;
@@ -387,8 +385,8 @@ export class Sound {
     //   return keysAndNotes;
     // }
 
-    getSettingsForKeysAndNotes(settings: any): { [key: string]: KeyInfo } {
-        const keysAndNotes: { [key: string]: KeyInfo } = {};
+    getSettingsForKeysAndNotes(settings: any): { [key: string]: TKeyInfo } {
+        const keysAndNotes: { [key: string]: TKeyInfo } = {};
 
         if (settings.keys) {
             const obj = un.getKeysFromText(settings.keys, DEFAULT_TONE_INSTR);
@@ -398,7 +396,7 @@ export class Sound {
                 const noteLat = this.getNoteLat(item.note || item.note);
                 const noteRus = item.note;
 
-                keysAndNotes[key] = <KeyInfo>{
+                keysAndNotes[key] = <TKeyInfo>{
                     noteStep: noteLat[0],
                     octave: noteLat[1],
                     volume: item.volume,
@@ -421,7 +419,7 @@ export class Sound {
         }
 
         Object.keys(settings.drums).forEach((key) => {
-            const info = settings.drums[key] as KeyInfo;
+            const info = settings.drums[key] as TKeyInfo;
             const drumIndex = fontLoader.findDrum(info.instrCode);
             const drumInfo = fontLoader.drumInfo(drumIndex);
             this.addDrumSound(info.instrCode);

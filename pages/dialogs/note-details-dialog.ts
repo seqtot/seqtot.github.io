@@ -1,10 +1,10 @@
+import { Muse as m, TLineNote } from '../../libs/muse';
 import { getWithDataAttr } from '../../src/utils';
-import { Muse as m, LineNote } from '../../libs/muse';
 import { AppDialog } from './app-dialog';
 
 export class NoteDetailsDialog extends AppDialog {
-    cb: (note: LineNote) => void;
-    note: LineNote;
+    cb: (note: TLineNote) => void;
+    note: TLineNote;
 
     get slidesTextFromInput(): string {
         let result = '';
@@ -20,7 +20,7 @@ export class NoteDetailsDialog extends AppDialog {
         let result = 0;
 
         getWithDataAttr('duration-input', this.dialogEl).forEach((el: HTMLInputElement) => {
-            result = m.parseInteger(el.value, result);
+            result = m.utils.parseInteger(el.value, result);
         });
 
         return result;
@@ -30,20 +30,20 @@ export class NoteDetailsDialog extends AppDialog {
         let result = 0;
 
         getWithDataAttr('volume-input', this.dialogEl).forEach((el: HTMLInputElement) => {
-            result = m.parseInteger(el.value, result);
+            result = m.utils.parseInteger(el.value, result);
         });
 
         return result;
     }
 
-    openDialog(note: LineNote, cb: NoteDetailsDialog['cb']  = null) {
+    openDialog(note: TLineNote, cb: NoteDetailsDialog['cb']  = null) {
         this.cb = cb;
 
         this.note = {
             ...note
         };
 
-        this.note.volume = m.parseInteger(this.note.volume, m.DEFAULT_VOLUME);
+        this.note.volume = m.utils.parseInteger(this.note.volume, m.DEFAULT_VOLUME);
 
         // durQ:60
         // id: 2
@@ -115,7 +115,7 @@ export class NoteDetailsDialog extends AppDialog {
         this.closeDialog();
     }
 
-    getSlidesContent(note: LineNote): string {
+    getSlidesContent(note: TLineNote): string {
         let result = `
             <div style="margin: 1rem;">
                 <div>слайды</div>            
@@ -130,7 +130,7 @@ export class NoteDetailsDialog extends AppDialog {
         return result;
     }
 
-    getDurationContent(note: LineNote): string {
+    getDurationContent(note: TLineNote): string {
         let result = `
             <div style="margin: 1rem;">
                 <div>длительность</div>
@@ -146,7 +146,7 @@ export class NoteDetailsDialog extends AppDialog {
         return result;
     }
 
-    getVolumeContent(note: LineNote): string {
+    getVolumeContent(note: TLineNote): string {
         let result = `
             <div style="margin: 1rem;">
                 <div>громкость</div>

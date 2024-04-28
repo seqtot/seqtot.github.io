@@ -1,5 +1,3 @@
-'use babel';
-
 import {
     parseInteger,
 } from './utils';
@@ -27,6 +25,7 @@ import {
     getNoteByOffset,
     clearEndComment,
     getVolumeFromString,
+    getEndPointVolume,
 } from './utils/utils-note';
 
 import { textModelToLineModel, sortTracks } from './text-model-to-line-model';
@@ -46,25 +45,66 @@ import { guitarCodes, bassGuitarCodes, getInstrNameByCode, getInstrCodeBy, getIn
 import { LineModel, CELL_SIZE } from './line-model';
 import { Synthesizer } from './synthesizer';
 import { MultiPlayer } from './multi-player';
+import { freqInfoHash, freqInfoList } from './freq';
 
+import { WebAudioFontLoader } from './font/loader';
+import { getInstrumentTitles } from './font/instrument-titles';
+import { getAudioBufferFromBlobString, getAudioBufferFromString } from './font/audio-buffer-to-wav';
+import { preparePreset } from './font/prepare';
 
 export const Muse = {
+    const: {
+        CELL_SIZE,
+        freqInfoHash,
+        freqInfoList,
+    },
+    utils: {
+        isPresent,
+        getSafeVolume,
+        mergeVolume,
+        parseInteger,
+        getRandomElement,
+        getEndPointVolume,
+        getAudioBufferFromBlobString,
+        getAudioBufferFromString,
+        isNil,
+    },
+    parser: {
+
+    },
+    player: {
+        MultiPlayer,
+    },
+    ticker: {
+        Ticker,
+    },
+    font: {
+        WebAudioFontLoader,
+        getInstrumentTitles,
+        preparePreset,
+    },
+    class: {
+        LineModel,
+        Sound,
+        Synthesizer,
+        MultiPlayer,
+        WebAudioFontLoader,
+    },
+    synth: {
+        Synthesizer,
+    },
+
     // simple
-    parseInteger,
-    mergeVolume,
-    getSafeVolume,
     getPartInfo,
     guid,
     getRowNio,
     getPartNio,
     getTextBlocks,
     isDrum,
-    isPresent,
-    isNil,
     createOutBlock,
     getNRowInPartId,
     getPartRowNio,
-    getRandomElement,
+
     getInstrNameByCode,
     getNoteByOffset,
     getInstrCodeBy,
@@ -109,27 +149,31 @@ export const Muse = {
     Ticker,
     tickOnTime,
     LineModel,
-    CELL_SIZE,
     Synthesizer,
     MultiPlayer,
 } as const;
 
 // TYPES
-export { MidiConfig } from './get-midi-config';
+export { TMidiConfig } from './get-midi-config';
 export { LineModel } from './line-model';
 export { Synthesizer } from './synthesizer';
 export { MultiPlayer } from './multi-player';
-export { OutBlockRowInfo } from './utils/getOutBlocksInfo';
+export { TOutBlockRowInfo } from './utils/getOutBlocksInfo';
 export {
-    NoteInfo, NoteLineInfo,
-    WaveSlide, StoredRow, SongNode,
-    TrackInfo, DataByTracks,
-    Line, Cell, LineNote,
-    KeyData,
-    TextBlock,
-    SongPartInfo,
-    FileSettings,
-    RowInfo,
+    TNoteInfo, TNoteLineInfo,
+    TWaveSlide, TStoredRow, TSongNode,
+    TTrackInfo, TDataByTracks,
+    TLine, TCell, TLineNote,
+    TKeyData,
+    TTextBlock,
+    TSongPartInfo,
+    TFileSettings,
+    TRowInfo,
 } from './types';
 export { Ticker } from './ticker';
-export { Sound,KeyInfo, PlayingItem } from './sound';
+export { Sound,TKeyInfo, TPlayingItem } from './sound';
+export { TFreqInfo } from './freq';
+export { TSignatureType } from './ticker';
+
+export { TWavePreset } from './font/otypes';
+export { WebAudioFontLoader } from './font/loader';

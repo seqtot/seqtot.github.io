@@ -1,5 +1,5 @@
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
-import { Muse as m, LineModel, Line, KeyData } from '../libs/muse';
+import { Muse as m, LineModel, TLine, TKeyData } from '../libs/muse';
 
 import { DrumBoard, drumNotesInfo } from './drum-board';
 import { KeyboardCtrl, BpmInfo, KeyboardPage, DrumKeyboardType } from './keyboard-ctrl';
@@ -47,8 +47,8 @@ const UP = 0;
 export class DrumCtrl extends KeyboardCtrl {
     bpmInfo: BpmInfo = this.getEmptyBpmInfo();
     mode: 'record' | null = null;
-    keyData: KeyData | null = null;
-    keySequence: KeyData[] = [];
+    keyData: TKeyData | null = null;
+    keySequence: TKeyData[] = [];
     tickStartMs: number = 0;
     board: DrumBoard;
     chess: KeyboardChessCtrl;
@@ -487,7 +487,7 @@ export class DrumCtrl extends KeyboardCtrl {
         this.printChess(rows);
     }
 
-    printChess(rows: Line[]) {
+    printChess(rows: TLine[]) {
         this.chess.printDrumChess(rows);
     }
 

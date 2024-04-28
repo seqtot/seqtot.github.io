@@ -1,8 +1,5 @@
-'use babel';
-//'use strict'
-
 import {WebAudioFontPlayer} from './player'
-import {ChordQueue} from './otypes'
+import {TChordQueue} from './otypes'
 
 export class WebAudioFontTicker {
 	stateStop = 1;
@@ -11,7 +8,7 @@ export class WebAudioFontTicker {
 	state = this.stateStop;
 	stepDuration = 0.1;
 	lastPosition = 0;
-	playLoop(player: WebAudioFontPlayer, audioContext: AudioContext, loopStart: number, loopPosition: number, loopEnd: number, queue: ChordQueue[]) {
+	playLoop(player: WebAudioFontPlayer, audioContext: AudioContext, loopStart: number, loopPosition: number, loopEnd: number, queue: TChordQueue[]) {
 		this.startTicks(audioContext, function (when: number, from: number, to: number) {
 			for (var i = 0; i < queue.length; i++) {
 				var note = queue[i];

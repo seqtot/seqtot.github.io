@@ -34,7 +34,7 @@ const octaveLatToRus = {u: 'ы', y: 'у', o: 'о', a: 'а', e: 'е', i: 'и'};
 // контроктава    24-35
 // большая        36-47
 
-export type FreqInfo = {
+export type TFreqInfo = {
   step: string,
   code: number,
   octave: string,
@@ -49,7 +49,7 @@ export type FreqInfo = {
   topF: number,
 }
 
-const freqListSrc: FreqInfo[] = [
+const freqListSrc: TFreqInfo[] = [
   /* КОНТРОКТАВА 1 Ы */
   // { step: 'd', code: 24, value: 32.703197 },
   // { step: 't', code: 25, value: 34.647827 },
@@ -147,14 +147,14 @@ const freqListSrc: FreqInfo[] = [
   { step: 'l', code: 105, value: 3520.000000, octave: 'i', volume: 0.660 },
   { step: 'k', code: 106, value: 3729.310059, octave: 'i', volume: 0.655 },
   { step: 'b', code: 107, value: 3951.066406, octave: 'i', volume: 0.650 },
-] as FreqInfo[];
+] as TFreqInfo[];
 
-export const freqInfoList: FreqInfo[] = freqListSrc.map((srcItem, i) => {
+export const freqInfoList: TFreqInfo[] = freqListSrc.map((srcItem, i) => {
   const prev = freqListSrc[i-1];
   const next = freqListSrc[i+1];
   const item = {
     ...(srcItem as any)
-  } as FreqInfo;
+  } as TFreqInfo;
 
   item.code = item.code - 12;
   item.noteLat = item.step + item.octave;
@@ -179,7 +179,7 @@ export const freqInfoList: FreqInfo[] = freqListSrc.map((srcItem, i) => {
   return item;
 });
 
-export const freqInfoHash: {[key: string | number]: FreqInfo} = freqInfoList.reduce(
+export const freqInfoHash: {[key: string | number]: TFreqInfo} = freqInfoList.reduce(
     (acc, item) => {
       acc[item.noteLat] = item;
       acc[item.noteRus] = item;
