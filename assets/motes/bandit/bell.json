@@ -1,10 +1,8 @@
 {
-    "ns": "band-song",
+    "exportToLineModel": true,
     "bpmValue": 120,
     "content": "",
     "break": "",
-    "drums": "",
-    "source": "my",
     "isNewCreated": false,
     "pitchShift": 0,
     "pitchShiftSrc": 0,

@@ -1,4 +1,4 @@
-import { RollPage, KeyboardPage, MBoxPage } from '../pages';
+import { RollPage, KeyboardPage, Page_mbox } from '../pages';
 import { MuseEditorPage } from '../pages/page_muse_editor';
 import { UserSettingsPage } from '../pages/page_user_settings';
 import { ThereminPage } from '../pages/theremin/theremin.page';
@@ -7,16 +7,18 @@ import { appRouter } from './router';
 import { getWithDataAttr, getWithDataAttrValue } from './utils';
 import { ConfirmDialog } from '../pages/dialogs';
 import { GamePage } from '../pages/page_game';
+import { PageSongList } from '../pages/page-song-list';
 
 const pages = {
     page_roll: RollPage,
     page_keyboard: KeyboardPage,
     page_muse_editor: MuseEditorPage,
-    mbox: MBoxPage,
     userSettings: UserSettingsPage,
     theremin: ThereminPage,
     page_sample_editor: SamplePage,
     game: GamePage,
+    song: Page_mbox,
+    song_list: PageSongList,
 };
 
 const isDev = /localhost/.test(window.location.href);
@@ -24,7 +26,7 @@ const isDev = /localhost/.test(window.location.href);
 //     /devitband/.test(window.location.href) ||
 //     /local/.test(window.location.href);
 
-const defRoute = isDev ? '/game/test' : '/mbox/setBand';
+const defRoute = isDev ? '/game/test' : '/song_list/bandit';
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
@@ -39,9 +41,9 @@ type Link = {
 }
 
 const linksToPage: Link[]  = [
-    { href: '/mbox/setBand', name: 'Список' },
-    { href: '/mbox/setBandDraft', name: 'Черновики' },
-    { href: '/mbox/setMy', name: 'Мои вещи' },
+    { href: '/song_list/bandit', name: 'Список' },
+    { href: '/song_list/bandit_draft', name: 'Черновики' },
+    { href: '/song_list/setMy', name: 'Мои вещи' },
     { href: '/page/page_keyboard', name: 'keyboard', isDev: false },
     { href: '/page/userSettings', name: 'Settings', isDev: false},
     { href: '/page/theremin', name: 'Theremin', isDev: false},
@@ -147,11 +149,22 @@ class App {
     }
 
     subscribeRouter() {
-        appRouter.on('mbox', this, (song) =>  {
-            console.log('/mbox/:song', song);
+        appRouter.on('song_list', this, (id) =>  {
+            console.log('/song_list/:id', id);
 
-            this.setComponentByRoute(MBoxPage, {
-                    id: 'mbox',
+            this.setComponentByRoute(PageSongList, {
+                route: 'song_list',
+                id,
+            });
+
+            return true;
+        });
+
+        appRouter.on('song', this, (song) =>  {
+            console.log('/song/:song', song);
+
+            this.setComponentByRoute(Page_mbox, {
+                    id: 'song',
                     song: song,
                 });
 

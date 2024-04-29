@@ -1,0 +1,36 @@
+{
+  "bandit": {
+    "ns": "band-song",
+    "dir": "bandit",
+    "items": [
+      {"id":  "noSystems", "label": "No systems"},
+      {"id":  "threeDots", "label": "Продолжение следует, Three dots"},
+      {"id":  "engine", "label": "Мотор, Engine"},
+      {"id":  "billy", "label": "Билли, Billy"},
+      {"id":  "partingGlass", "label": "The parting glass, Чарка на посошок"},
+      {"id":  "carcassiOp60n7", "label": "Matteo Carcassi, opus 60-7"},
+      {"id":  "tiriTiri", "label": "Тыры-тыры, Tiri-tiri"},
+      {"id":  "bell", "label": "Колокольчик, Bell"}
+    ]
+  },
+  "bandit_draft": {
+    "ns": "band-song",
+    "dir": "bandit_draft",
+    "items": [
+      {"id":  "shipsAreSailing", "label": "Ships are sailing (bpm215)"},
+      {"id":  "brotherBilly", "label": "Брат Билли (Brother Billy)"},
+      {"id":  "cage", "label": "Клетка (Cage)"},
+      {"id":  "mosquito", "label": "Комар (Mosquito)"},
+      {"id":  "inSystem", "label": "В системе (In system)"},
+      {"id":  "glass", "label": "Стакан (Glass)"},
+      {"id":  "butterflyEffect", "label": "Эффект бабочки (Butterfly effect)"},
+      {"id":  "roundtrip", "label": "Туда-сюда (Roundtrip)"},
+      {"id":  "abt1", "label": "Abt 1 (вокализ)"}
+    ]
+  },
+  "setMy": {
+    "ns": "my-song",
+    "dir": "",
+    "items": []
+  }
+}

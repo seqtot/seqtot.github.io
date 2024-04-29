@@ -66,7 +66,9 @@ export type TTrackInfo = {
     isExcluded?: boolean,
 }
 
+// jjkl
 export type TSongNode = {
+    id: string,
     bpmValue: number,
     volume?: number,
     version: number,
@@ -78,11 +80,8 @@ export type TSongNode = {
     score: string,
     parts: {name: string, id: string}[],
     dynamic: TStoredRow[],
-    source: 'my' | 'band',
     isSongList?: boolean,
     ns?: string,
-    nsOld?: string,
-    exportToLineModel?: boolean,
     pitchShift?: number,
     pitchShiftSrc?: number,
     songNodeHard?: any,

@@ -3,47 +3,47 @@ function getInnerLink(name: string, href: string): string {
 }
 
 const shipsAreSailing = `<div style="margin: .5rem;">
-    ${getInnerLink('Ships are sailing (215)', '/mbox/shipsAreSailing')}
+    ${getInnerLink('Ships are sailing (215)', '/song/shipsAreSailing')}
 </div>
 `.trim();
 
 const brotherBilly = `<div style="margin: .5rem;">
-    ${getInnerLink('Брат Билли (Brother Billy)', '/mbox/brotherBilly')}
+    ${getInnerLink('Брат Билли (Brother Billy)', '/song/brotherBilly')}
 </div>
 `.trim();
 
 const cage = `<div style="margin: .5rem;">
-    ${getInnerLink('Клетка (Cage)', '/mbox/cage')}
+    ${getInnerLink('Клетка (Cage)', '/song/cage')}
 </div>
 `.trim();
 
 const mosquito = `<div style="margin: .5rem;">
-    ${getInnerLink('Комар (Mosquito)', '/mbox/mosquito')}
+    ${getInnerLink('Комар (Mosquito)', '/song/mosquito')}
 </div>
 `.trim();
 
 const inSystem = `<div style="margin: .5rem;">
-    ${getInnerLink('В системе (In system)', '/mbox/inSystem')}
+    ${getInnerLink('В системе (In system)', '/song/inSystem')}
 </div>
 `.trim();
 
 const glass = `<div style="margin: .5rem;">
-    ${getInnerLink('Стакан (Glass)', '/mbox/glass')}
+    ${getInnerLink('Стакан (Glass)', '/song/glass')}
 </div>
 `.trim();
 
 const butterflyEffect = `<div style="margin: .5rem;">
-    ${getInnerLink('Эффект бабочки (Butterfly effect)', '/mbox/butterflyEffect')}
+    ${getInnerLink('Эффект бабочки (Butterfly effect)', '/song/butterflyEffect')}
 </div>
 `.trim();
 
 const roundtrip = `<div style="margin: .5rem;">
-    ${getInnerLink('Туда-сюда (Roundtrip)', '/mbox/roundtrip')}
+    ${getInnerLink('Туда-сюда (Roundtrip)', '/song/roundtrip')}
 </div>
 `.trim();
 
 const abt1 = `<div style="margin: .5rem;">
-    ${getInnerLink('Abt 1 (вокализ)', '/mbox/abt1')}
+    ${getInnerLink('Abt 1 (вокализ)', '/song/abt1')}
 </div>
 `.trim();
 

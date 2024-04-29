@@ -331,11 +331,9 @@ export class ToneCtrl extends KeyboardCtrl {
     getContent(boardType?: ToneKeyboardType, trackName = ''): string {
         boardType = boardType || 'soloSolo34';
 
-        if (this.useLineModel) {
-            const song = ideService.songStore.data;
-            const tracks = song.tracks.filter(track => track.name === trackName);
-            this.trackName = tracks[0] ? tracks[0].name: '';
-        }
+        const song = ideService.songStore.data;
+        const tracks = song.tracks.filter(track => track.name === trackName);
+        this.trackName = tracks[0] ? tracks[0].name: '';
 
         this.realBoardType = boardType;
         const useThisBoard = this.useThisBoard;

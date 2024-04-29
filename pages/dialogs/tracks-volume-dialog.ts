@@ -1,12 +1,12 @@
-import { Muse as m } from '../../libs/muse';
+import { Muse as m, TSongNode } from '../../libs/muse';
 import { getWithDataAttr, getWithDataAttrValue } from '../../src/utils';
-import { DEFAULT_OUT_VOLUME, SongNode, TrackInfo } from '../song-store';
+import { DEFAULT_OUT_VOLUME, TrackInfo } from '../song-store';
 import { ideService } from '../ide/ide-service';
 import { AppDialog } from './app-dialog';
 
 export class TracksVolumeDialog extends AppDialog {
     cb: (ok: boolean) => void;
-    song: SongNode = null;
+    song: TSongNode = null;
     tracks: TrackInfo[] = null;
     tracksSrc: TrackInfo[] = null;
 

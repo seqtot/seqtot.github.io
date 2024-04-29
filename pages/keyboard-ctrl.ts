@@ -1,10 +1,10 @@
-import { Muse as m, TLine, LineModel, TLineNote, TStoredRow, Synthesizer, MultiPlayer, TSongPartInfo, TMidiConfig, TTextBlock, TOutBlockRowInfo } from '../libs/muse';
+import { Muse as m, TLine, LineModel, TLineNote, TStoredRow, Synthesizer, MultiPlayer, TSongPartInfo, TMidiConfig, TTextBlock, TOutBlockRowInfo, TSongNode } from '../libs/muse';
 
 import { getWithDataAttr, getWithDataAttrValue } from '../src/utils';
 import { parseInteger } from '../libs/common';
 import { EditedItem, ideService } from './ide/ide-service';
 import { sings } from './sings';
-import { SongNode, SongStore } from './song-store';
+import { SongStore } from './song-store';
 import * as svg from './svg-icons';
 import { NoteDetailsDialog } from './dialogs/note-details-dialog';
 import { ConfirmDialog } from './dialogs/confirm-dialog';
@@ -90,14 +90,6 @@ export class KeyboardCtrl {
 
     get hasEditedItems(): boolean {
         return !!ideService.editedItems.length;
-    }
-
-    get isMy(): boolean {
-        return !!(ideService.currentEdit && ideService.currentEdit.source === 'my');
-    }
-
-    get useLineModel(): boolean {
-        return !!(ideService.currentEdit && (ideService.currentEdit.useLineModel));
     }
 
     get ns(): string {
@@ -566,7 +558,7 @@ export class KeyboardCtrl {
         });
     }
 
-    getRowsForPart(song: SongNode, part: TSongPartInfo): TStoredRow[] {
+    getRowsForPart(song: TSongNode, part: TSongPartInfo): TStoredRow[] {
         const partRows = song.dynamic.filter(row => {
             const iPartId = (row.partId || '').trim();
             const iPartNio = m.getPartNio(row.rowInPartId);
@@ -590,7 +582,7 @@ export class KeyboardCtrl {
     }
 
     getPartsWithRows(x: {
-        song: SongNode,
+        song: TSongNode,
         parts: TSongPartInfo[],
         resetBlockOffset: boolean,
         useEditingItems: boolean
@@ -823,9 +815,7 @@ export class KeyboardCtrl {
         const currentEdit = ideService.currentEdit;
         let blocks = [...currentEdit.blocks];
 
-        if (this.useLineModel) {
-            blocks = this.buildBlocksForMySong(blocks, x.resetBlockOffset, x.useEditing);
-        }
+        blocks = this.buildBlocksForMySong(blocks, x.resetBlockOffset, x.useEditing);
 
         const rows = currentEdit.editPartsNio.reduce((acc, partNio) => {
             const part = currentEdit.allSongParts[partNio - 1];
@@ -1173,7 +1163,7 @@ export class KeyboardCtrl {
     }
 
     gotoSong() {
-        appRouter.navigate(`/mbox/${this.songId}`);
+        appRouter.navigate(`/song/${this.songId}`);
     }
 
     delete_RowFromPart(partId: string, partNio: number | string) {
@@ -1547,26 +1537,22 @@ export class KeyboardCtrl {
         });
 
         playingRows.forEach(rowText => {
-            if (!this.useLineModel) {
-                const part = m.getPartInfo(rowText);
-                let lines = this.liner.lines.filter(line => line.rowInPartId === part.rowInPartId)
-                lines = this.liner.cloneRows(lines);
-                LineModel.ClearBlockOffset(lines);
+            const part = m.getPartInfo(rowText);
+            let lines = this.liner.lines.filter(line => line.rowInPartId === part.rowInPartId)
+            lines = this.liner.cloneRows(lines);
+            LineModel.ClearBlockOffset(lines);
 
-                const notes = this.getNotes(ideService.guid.toString(), {
-                    track: this.trackName,
-                    type: this.boardType,
-                    lines
-                });
+            const notes = this.getNotes(ideService.guid.toString(), {
+                track: this.trackName,
+                type: this.boardType,
+                lines
+            });
 
-                if (notes) {
-                    const block = m.getTextBlocks(notes)[0];
+            if (notes) {
+                const block = m.getTextBlocks(notes)[0];
 
-                    rowsForPlay.push(`${rowText} ${block.id}`);
-                    blocks = [...blocks, block];
-                } else {
-                    rowsForPlay.push(`${rowText}`);
-                }
+                rowsForPlay.push(`${rowText} ${block.id}`);
+                blocks = [...blocks, block];
             } else {
                 rowsForPlay.push(`${rowText}`);
             }

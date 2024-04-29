@@ -1,10 +1,11 @@
+import { TSongNode } from '../../libs/muse';
 import { getWithDataAttr } from '../../src/utils';
-import { SongNode, SongStore, TrackInfo } from '../song-store';
+import { SongStore, TrackInfo } from '../song-store';
 import { AppDialog } from './app-dialog';
 
 export class GetTrackDialog extends AppDialog {
     cb: (tracks: string[] | null) => void;
-    song: SongNode = null;
+    song: TSongNode = null;
     tracks: TrackInfo[] = [];
 
     getTracksForChoice(): string {
@@ -36,7 +37,7 @@ export class GetTrackDialog extends AppDialog {
         `.trim();
     }
 
-    openTrackDialog(song: SongNode, cb: GetTrackDialog['cb']  = null) {
+    openTrackDialog(song: TSongNode, cb: GetTrackDialog['cb']  = null) {
         this.cb = cb || (() => {}) as any;
         this.song = song;
         this.tracks = SongStore.GetTracksNodeBySong(JSON.parse(JSON.stringify(song)));

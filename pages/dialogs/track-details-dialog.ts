@@ -1,12 +1,13 @@
+import { TSongNode } from '../../libs/muse';
 import { getWithDataAttr } from '../../src/utils';
 import { toneBoards, drumBoards } from '../keyboard-ctrl';
-import { SongNode, TrackInfo } from '../song-store';
+import { TrackInfo } from '../song-store';
 import { AppDialog } from './app-dialog';
 
 export class TrackDetailsDialog extends AppDialog {
     cb: (ok: boolean) => void;
     trackName = '';
-    song: SongNode = null;
+    song: TSongNode = null;
     track: TrackInfo = null;
     trackSrc: TrackInfo = null;
     ns: string;
@@ -69,7 +70,7 @@ export class TrackDetailsDialog extends AppDialog {
         });
     }
 
-    openTrackDialog(song: SongNode, trackName = '', cb: TrackDetailsDialog['cb']  = null) {
+    openTrackDialog(song: TSongNode, trackName = '', cb: TrackDetailsDialog['cb']  = null) {
         this.trackName = trackName;
         this.cb = cb;
         this.song = song;

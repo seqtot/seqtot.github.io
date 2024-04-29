@@ -1,4 +1,4 @@
-import { Muse as m } from '../libs/muse';
+import {Muse as m, TTrackInfo, TSongNode as SongNode} from '../libs/muse';
 import { TLineNote, TLine, TStoredRow } from '../libs/muse';
 
 export type StoredSongNodeOld = {
@@ -23,28 +23,6 @@ export type TrackInfo = {
     isHardTrack?: boolean,
     isExcluded?: boolean,
 }
-
-export type SongNode = {
-    bpmValue: number,
-    volume?: number,
-    version: number,
-    content: string,
-    break: string,
-    drums: string,
-    tracks: TrackInfo[],
-    hideMetronome?: boolean,
-    score: string,
-    parts: {name: string, id: string}[],
-    dynamic: TStoredRow[],
-    source: 'my' | 'band',
-    isSongList?: boolean,
-    ns?: string,
-    nsOld?: string,
-    exportToLineModel?: boolean,
-    pitchShift?: number,
-    pitchShiftSrc?: number,
-    songNodeHard?: any,
-};
 
 function isDrumNote(val: string): boolean {
     return !!m.drumIdByAlias[val];
@@ -445,6 +423,7 @@ export class SongStore {
         // $bass: v30; $organ: v50; $guit: v50;
 
         return {
+            id: '',
             bpmValue: DEFAULT_BPM_VALUE,
             volume: DEFAULT_OUT_VOLUME,
             content: '',
@@ -455,7 +434,6 @@ export class SongStore {
             parts: [],
             score: '',
             dynamic: [],
-            source: 'my',
             version: versionTransformers.length
         };
     }

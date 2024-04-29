@@ -23,52 +23,52 @@ function getBpmLink(bpm: number): string {
 // `;
 
 const noSystems = `<div style="margin: .5rem;">
-    ${getInnerLink('No systems', '/mbox/noSystems/')}
+    ${getInnerLink('No systems', '/song/noSystems/')}
 </div>
 `.trim();
 
 const threeDots = `<div style="margin: .5rem;">
-    ${getInnerLink('Продолжение следует', '/mbox/threeDots/')} (Three dots)
+    ${getInnerLink('Продолжение следует', '/song/threeDots/')} (Three dots)
 </div>
 `.trim();
 
 const engine = `<div style="margin: .5rem;">
-    ${getInnerLink('Мотор', '/mbox/engine/')} (Engine)
+    ${getInnerLink('Мотор', '/song/engine/')} (Engine)
 </div>
 `.trim();
 
 const sweetLeaf = `<div style="margin: .5rem;">
-    ${getInnerLink('Sweet Leaf', '/mbox/sweetLeaf/')}
+    ${getInnerLink('Sweet Leaf', '/song/sweetLeaf/')}
 </div>
 `.trim();
 
 const peterGunn = `<div style="margin: .5rem;">
-    ${getInnerLink('Peter Gunn', '/mbox/peterGunn/')}
+    ${getInnerLink('Peter Gunn', '/song/peterGunn/')}
 </div>
 `.trim();
 
 const billy = `<div style="margin: .5rem;">
-    ${getInnerLink('Билли', '/mbox/billy/')} (Billy)
+    ${getInnerLink('Билли', '/song/billy/')} (Billy)
 </div>
 `.trim();
 
 const partingGlass = `<div style="margin: .5rem;">
-    ${getInnerLink('The parting glass', '/mbox/partingGlass/')} (Чарка на посошок)
+    ${getInnerLink('The parting glass', '/song/partingGlass/')} (Чарка на посошок)
 </div>
 `.trim();
 
 const carcassiOp60n7 = `<div style="margin: .5rem;">
-    ${getInnerLink('Matteo Carcassi, opus 60-7', '/mbox/carcassiOp60n7/')}
+    ${getInnerLink('Matteo Carcassi, opus 60-7', '/song/carcassiOp60n7/')}
 </div>
 `.trim();
 
 const tiriTiri = `<div style="margin: .5rem;">
-    ${getInnerLink('тырыТыры', '/mbox/tiriTiri/')} (tiriTiri)
+    ${getInnerLink('тырыТыры', '/song/tiriTiri/')} (tiriTiri)
 </div>
 `.trim();
 
 const bell = `<div style="margin: .5rem;">
-    ${getInnerLink('Колокольчик', '/mbox/bell/')} (bell)
+    ${getInnerLink('Колокольчик', '/song/bell/')} (bell)
 </div>
 `.trim();
 

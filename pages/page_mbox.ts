@@ -9,15 +9,15 @@ import {
     TLine,
     TCell,
     TLineNote,
+    TSongNode as SongNode,
     Sound,
 } from '../libs/muse';
 
 import { getWithDataAttr } from '../src/utils';
 import { standardTicks as ticks } from './ticks';
 import { getBassCells } from './get-bass-cells';
-import mboxes from '../mboxes';
-import { ideService } from './ide/ide-service';
-import { SongStore, SongNode, MY_SONG } from './song-store';
+import {ideService, TSongInfo} from './ide/ide-service';
+import { SongStore, MY_SONG } from './song-store';
 import * as svg from './svg-icons';
 import { ConfirmDialog, TrackDetailsDialog, TracksVolumeDialog, GetTrackDialog, NameDialog } from './dialogs';
 import { WavRecorder } from './ide/wav-recorder';
@@ -30,15 +30,11 @@ const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>
 const isDev = /localhost/.test(window.location.href);
 const isDevUser = UserSettingsStore.GetUserSettings().userName === 'dev' || isDev;
 
-export class MBoxPage {
-    view: 'list' | 'song' = 'list';
-
+export class Page_mbox {
     recorder: WavRecorder;
     playingTick = '';
     excludePartNio: number [] = [];
-    selectedSong = '';
-    selectedSongName = '';
-
+    pageData: SongNode;
     ns = '';
     isMy = false;
 
@@ -64,10 +60,6 @@ export class MBoxPage {
 
     get outBlock(): TTextBlock {
         return  this.blocks.find((item) => item.id === 'out');
-    }
-
-    get useLineModel():boolean {
-        return !!(this.isMy || this.pageData.exportToLineModel || false);
     }
 
     get blocks (): TTextBlock[] {
@@ -96,91 +88,96 @@ export class MBoxPage {
 
     constructor(public props: RouteInfo<{id: string, song?: string}>) {}
 
-    pageData: SongNode;
+    setPageData(info: TSongInfo): SongNode {
+        let song: SongNode = {} as any;
 
-    getPageData(): SongNode {
-        console.log('getPageData', this.songId);
-
-        if (mboxes[this.songId]) {
-            return mboxes[this.songId];
+        if (this.ns === MY_SONG) {
+            song = SongStore.GetSong(this.songId, MY_SONG, true);
         }
 
-        const song = SongStore.GetSong(this.songId, MY_SONG, true);
-        song.source = 'my';
-        song.ns = MY_SONG;
+        song.id = info.id;
+        song.ns = info.ns;
 
         return song;
     }
 
     async initData(force: boolean) {
-        const songId = this.songId;
-        const pageData = this.pageData = this.getPageData();
-        this.isMy = pageData.source === 'my';
-        this.view = pageData.isSongList ? 'list' : 'song';
-        this.ns   = pageData.ns;
+        let songInfo = await ideService.findSong(this.songId);
+        songInfo = songInfo || {
+            id: this.songId,
+            dir: '',
+            ns: MY_SONG,
+            label: 'Song not found'
+        };
 
-        if (this.view === 'song') {
-            if (pageData['pathNotesText']) {
-                try {
-                    const url = isDev ? '/' + pageData['pathNotesText'] : `/assets/${pageData['pathNotesText']}`;
+        this.isMy = songInfo.ns === MY_SONG;
+        this.ns   = songInfo.ns;
 
-                    console.log('url', isDev, url);
+        const pageData = this.pageData = this.setPageData(songInfo);
 
-                    const res = await fetch(url); //  // motes/bandit/bell.notes.mid
+        // load midi file
+        if (!this.isMy) {
+            const fileUrl = `motes/${songInfo.dir}/${songInfo.id}.midi`;
 
-                    if (res.ok) {
-                        const text = await res.text(); // res.json(); res.blob();
-                        pageData.score = text;
-                    } else {
-                        throw new Error(`${res.status} ${res.statusText}`);
-                    }
-                }
-                catch (error){
-                    console.log('load notesText', error);
+            try {
+                const url = isDev ? `/${fileUrl}` : `/assets/${fileUrl}`;
+
+                console.log('url', isDev, url);
+
+                const res = await fetch(url); //  // motes/bandit/bell.notes.mid
+
+                if (res.ok) {
+                    const text = await res.text(); // res.json(); res.blob();
+                    pageData.score = text;
+                } else {
+                    //throw new Error(`${res.status} ${res.statusText}`);
                 }
             }
-
-            if (pageData['pathNotesJson']) {
-                try {
-                    const url = isDev ? '/' + pageData['pathNotesJson'] : `/assets/${pageData['pathNotesJson']}`;
-                    const res = await fetch(url); //  // motes/bandit/bell.notes.json
-
-                    if (res.ok) {
-                        const json = await res.json(); // res.json(); res.blob();
-                        pageData.songNodeHard = SongStore.TransformOldDrums(json);
-                    } else {
-                        throw new Error(`${res.status} ${res.statusText}`);
-                    }
-                }
-                catch (error){
-                    console.log('load notesJson', error);
-                }
+            catch (error){
+                console.log('load notesText', error);
             }
         }
 
-        if (this.view === 'song') {
-            let songData: SongNode;
+        if (!this.isMy) {
+            const fileUrl = `motes/${songInfo.dir}/${songInfo.id}.json`;
 
-            if (ideService?.songStore?.songId && ideService.songStore.songId === songId && !force) {
-                // таже самая песня
-            } else {
-                ideService.blocks = m.getTextBlocks(pageData.score) || [];
-                ideService.settings = m.getFileSettings(ideService.blocks);
-                //ideService.pitchShift = getPitchShiftSetting(ideService.settings);
-                ideService.pitchShift = 0;
+            try {
+                const url = isDev ? `/${fileUrl}` : `/assets/${fileUrl}`;
+                const res = await fetch(url); //  // motes/bandit/bell.notes.json
 
-                if (!mboxes[songId]) {
-                    songData = pageData;
+                if (res.ok) {
+                    const json = await res.json(); // res.json(); res.blob();
+                    pageData.songNodeHard = SongStore.TransformOldDrums(json);
                 } else {
-                    songData = mboxes[this.songId];
-                    songData = this.textModelToLineModel(this.songId, songData);
+                    // throw new Error(`${res.status} ${res.statusText}`);
                 }
-
-                songData.ns = this.ns;
-
-                ideService.songStore = new SongStore(songId, this.ns, songData);
-                ideService.setDataByTracks(ideService.songStore.data);
             }
+            catch (error){
+                console.log('load notesJson', error);
+            }
+        }
+
+
+        let songData: SongNode;
+
+        if (ideService?.songStore?.songId && ideService.songStore.songId === this.songId && !force) {
+            // таже самая песня
+        } else {
+            ideService.blocks = m.getTextBlocks(pageData.score) || [];
+            ideService.settings = m.getFileSettings(ideService.blocks);
+            //ideService.pitchShift = getPitchShiftSetting(ideService.settings);
+            ideService.pitchShift = 0;
+
+            songData = pageData;
+
+            if (!this.isMy) {
+                songData = this.textModelToLineModel(this.songId, songData);
+            }
+
+            songData.ns = this.ns;
+
+            ideService.songStore = new SongStore(this.songId, this.ns, songData);
+            ideService.setDataByTracks(ideService.songStore.data);
         }
     }
 
@@ -229,57 +226,6 @@ export class MBoxPage {
         return bpmView;
     }
 
-    getSongListContent(): string {
-        let content = this.pageData.content;
-        let songListContent = '';
-        let commands = '';
-
-        if (this.isMy) {
-            songListContent = '';
-            const songs = SongStore.GetSongs(this.ns);
-
-            songs.forEach(song => {
-                content += `<div style="margin: .5rem; align-items: center; display: flex; justify-content: space-between;">
-                    <div style="font-size: 1rem;">
-                        <span
-                            style="font-weight: 400; user-select: none;"
-                            data-song-id="${song.id}"
-                            data-song-item="${song.id}"
-                            data-song-name="${song.name}"                                                    
-                        >${song.name}</span>
-                    </div>
-                    <div style="margin-right: 1rem;">
-                        ${svg.editBtn(`
-                            data-edit-song-action
-                            data-song-id="${song.id}"
-                        `, '', 24)}
-                    </div>
-                </div>`;
-            });
-
-            commands = `
-            <div style="margin: .5rem; margin-top: 1rem;">
-                ${svg.moveTopBtn('data-move-song-up-action', '', 24)}
-                ${svg.moveDownBtn('data-move-song-up-action', '', 24)}
-                ${svg.renameBtn('data-rename-song-action', '', 24)}                
-                ${svg.plusBtn('data-add-song-action', '', 24)}
-                ${svg.minusBtn('data-delete-song-action', '', 24)}
-            </div>
-        `.trim();
-        }
-
-        let metronome = `
-            <div style="padding: 1rem .5rem 1rem .5rem;">${this.getMetronomeContent()}</div>        
-        `.trim();
-
-        return `
-            ${metronome}
-            ${commands}
-            ${songListContent}
-            <div data-name="pageContent">${content}</div>
-        `.trim();
-    }
-
     getSongPageContent(): string {
         return `
             <div style="padding: 1rem .5rem 1rem .5rem;">
@@ -309,17 +255,15 @@ export class MBoxPage {
         // SET BPM
         let bpmValue = this.bpmValue;
 
-        if (this.view === 'song') {
-            if (this.songId === ideService.currentEdit.songId) {
-                bpmValue = this.bpmValue;
-            } else {
-                bpmValue = ideService.songStore?.data?.bpmValue || 90;
-            }
+        if (this.songId === ideService.currentEdit.songId) {
+            bpmValue = this.bpmValue;
+        } else {
+            bpmValue = ideService.songStore?.data?.bpmValue || 90;
         }
 
         this.bpmValue = bpmValue;
 
-        console.log('bpmValue', bpmValue);
+        //console.log('bpmValue', bpmValue);
 
         // CONTENT
         const wrapper = `
@@ -329,19 +273,9 @@ export class MBoxPage {
             >%content%</div>`.trim();
 
         let content = '';
-
-        if (this.view === 'list') {
-            content = wrapper.replace('%content%', this.getSongListContent());
-            this.pageEl.innerHTML = content;
-            this.updateSongListView();
-
-            appRouter.updatePageLinks();
-        }
-        else {
-            content = wrapper.replace('%content%', this.getSongPageContent());
-            this.pageEl.innerHTML = content;
-            this.updatePartListView();
-        }
+        content = wrapper.replace('%content%', this.getSongPageContent());
+        this.pageEl.innerHTML = content;
+        this.updatePartListView();
 
         setTimeout(() => {
             this.subscribeEvents();
@@ -670,14 +604,6 @@ export class MBoxPage {
         this.update_TracksView();
     }
 
-    gotoEditSong(songId?: string) {
-        songId = (songId || '').trim();
-
-        if(!songId) return;
-
-        appRouter.navigate(`/mbox/${songId}`);
-    }
-
     getSelectedParts(): string[] {
         const parts =  this.allSongParts
             .filter((nio, i) => !this.excludePartNio.includes(i + 1));
@@ -711,11 +637,9 @@ export class MBoxPage {
         ideService.currentEdit.allSongParts = this.allSongParts;
         ideService.currentEdit.blocks = this.blocks;
         ideService.currentEdit.editPartsNio = editPartsNio;
-        ideService.currentEdit.source = this.pageData.source;
         ideService.currentEdit.freezeStructure = !isMy;
         ideService.currentEdit.settings = this.settings;
         ideService.currentEdit.ns = isMy ? MY_SONG : this.pageData.ns || '';
-        ideService.currentEdit.useLineModel = isMy || this.pageData.exportToLineModel || false;
 
         //console.log('currentEdit', ideService.currentEdit);
 
@@ -723,31 +647,6 @@ export class MBoxPage {
     }
 
     subscribeSongsAndPartsActions() {
-        // SONG ACTIONS
-        getWithDataAttr('delete-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerup', () => this.deleteSong(this.selectedSong));
-        });
-
-        getWithDataAttr('edit-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerup', () => this.gotoEditSong(el.dataset.songId));
-        });
-
-        getWithDataAttr('rename-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerup', () => this.renameSong(this.selectedSong));
-        });
-
-        getWithDataAttr('move-song-up-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerup', () => this.moveSong(this.selectedSong, -1));
-        });
-
-        getWithDataAttr('move-song-down-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerup', () => this.moveSong(this.selectedSong, 1));
-        });
-
-        getWithDataAttr('song-item', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerup', () => this.selectSong(el.dataset.songId, el.dataset.songName));
-        });
-
         // PART ACTIONS
         getWithDataAttr('part-item', this.pageEl).forEach((el) => {
             el.addEventListener('pointerup', () => this.selectPart(el.dataset.partNio));
@@ -879,7 +778,6 @@ export class MBoxPage {
     updateView() {
         this.update_TracksView();
         this.updatePartListView();
-        this.updateSongListView();
     }
 
     updatePartListView() {
@@ -892,26 +790,6 @@ export class MBoxPage {
                 el.style.fontWeight = '700';
             }
         });
-    }
-
-    updateSongListView() {
-        getWithDataAttr('song-item', this.pageEl).forEach(el => {
-           el.style.fontWeight = '400';
-           if (el.dataset.songId === this.selectedSong) {
-               el.style.fontWeight = '700';
-           }
-        });
-    }
-
-    selectSong(songId: string, songName = '') {
-        this.selectedSongName = songName;
-        this.selectedSong = this.selectedSong === songId ? '' : songId;
-        this.updateSongListView();
-    }
-
-    moveSong(songId: string, offset: number) {
-        SongStore.MoveSong(songId, offset, this.ns);
-        this.setPageContent();
     }
 
     editTracksVolume() {
@@ -955,34 +833,6 @@ export class MBoxPage {
             '',
             cb
         );
-    }
-
-    renameSong(songId: string) {
-        songId = (songId || '').trim();
-
-        if (!songId) return;
-
-        new NameDialog().openNameDialog({name: this.selectedSongName}, ({name}) => {
-            name = name.trim();
-
-            if (name !== this.selectedSongName) {
-                SongStore.RenameSong(songId, name.trim(), this.ns);
-                this.setPageContent();
-            }
-        });
-    }
-
-    deleteSong(songId: string) {
-        songId = (songId || '').trim();
-
-        if (!songId) return;
-
-        const action = () => {
-            SongStore.DeleteSong(songId, this.ns);
-            this.setPageContent();
-        }
-
-        new ConfirmDialog().openConfirmDialog('Удалить?', ok => ok && action());
     }
 
     clonePart() {
@@ -1506,11 +1356,6 @@ export class MBoxPage {
         new ConfirmDialog().openConfirmDialog('Удалить?', ok => ok && action());
     }
 
-    addSong(name: string) {
-        const song = SongStore.AddSongToList(name, this.ns);
-        this.setPageContent();
-    }
-
     addPart(name: string) {
         if (SongStore.AddPartToSong(ideService.songStore.data, name)) {
             this.setPageContent();
@@ -1526,12 +1371,6 @@ export class MBoxPage {
                         this.addPart(name);
                     }
                 });
-            });
-        });
-
-        getWithDataAttr('add-song-action', this.pageEl).forEach((el) => {
-            el.addEventListener('pointerup', () => {
-                new NameDialog().openNameDialog({name: ''}, ({name}) => this.addSong(name));
             });
         });
 
@@ -1739,7 +1578,7 @@ export class MBoxPage {
         this.stop();
 
         let currRowInfo: TRowInfo = { first: 0, last: 0}; // индекс в текущем блоке
-        let blocks = this.useLineModel ? this.buildBlocksForMySong(this.blocks) : [...this.blocks];
+        let blocks = this.buildBlocksForMySong(this.blocks);
 
         const x = {
             blocks,
@@ -1751,20 +1590,16 @@ export class MBoxPage {
             topBlocksOut: [],
         };
 
-        if (this.useLineModel) {
-            const rows = this.getSelectedParts().map(row => `> ${row}`);
+        const rows = this.getSelectedParts().map(row => `> ${row}`);
 
-            x.excludeIndex = []; // либо надо билдить ВСЕ части
-            x.currBlock = m.createOutBlock({
-                id: 'out',
-                type: 'text',
-                bpm: this.bpmValue,
-                rows,
-                volume: ideService.outVolume,
-            });
-        } else {
-            x.currBlock = x.blocks.find((item) => item.id === 'out');
-        }
+        x.excludeIndex = []; // либо надо билдить ВСЕ части
+        x.currBlock = m.createOutBlock({
+            id: 'out',
+            type: 'text',
+            bpm: this.bpmValue,
+            rows,
+            volume: ideService.outVolume,
+        });
 
         //console.log('BLOCK', blocks);
 
@@ -1978,18 +1813,3 @@ export class MBoxPage {
         downloader(data, type, name)
     }
 }
-
-// action-type:
-// add-song  add-part
-// stop
-
-// SONGS:
-// move-song-up-action move-song-down-action rename-song-action add-song-action delete-song-action
-
-// PARTS:
-// unselect-all-parts-action select-all-parts-action edit-selected-parts-action add-part-action
-// move-part-up-action move-part-down-action rename-part-action clone-part-action delete-part-action
-
-// PLAY: playAll
-
-// SAVE: save-song-action

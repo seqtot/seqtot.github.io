@@ -54,10 +54,6 @@ export class KeyboardPage implements Page {
         return ideService.currentEdit.songId || DEF_SONG;
     }
 
-    get isMy(): boolean {
-        return !!(ideService.currentEdit && ideService.currentEdit.source === 'my');
-    }
-
     get ns(): string {
         return (ideService.currentEdit && ideService.currentEdit.ns) || '';
     }
@@ -167,7 +163,7 @@ export class KeyboardPage implements Page {
     }
 
     setTrackName(name?: string) {
-        const href = this.songId ? `href="/mbox/${this.songId}/"`: '';
+        const href = this.songId ? `href="/song/${this.songId}/"`: '';
         const mainLink = '<a style="user-select: none; touch-action: none;"><b>MAIN</b></a>';
         const backLink = href ? `&emsp;<a style="user-select: none; touch-action: none;" ${href}><b>BACK</b></a>` : '';
 
