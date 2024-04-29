@@ -30,7 +30,7 @@ const blankHalfRem = '<span style="width: .5rem; display: inline-block;"></span>
 const isDev = /localhost/.test(window.location.href);
 const isDevUser = UserSettingsStore.GetUserSettings().userName === 'dev' || isDev;
 
-export class Page_mbox {
+export class PageSong {
     recorder: WavRecorder;
     playingTick = '';
     excludePartNio: number [] = [];

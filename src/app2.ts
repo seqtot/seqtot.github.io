@@ -1,4 +1,4 @@
-import { RollPage, KeyboardPage, Page_mbox } from '../pages';
+import { RollPage, KeyboardPage, PageSong } from '../pages';
 import { MuseEditorPage } from '../pages/page_muse_editor';
 import { UserSettingsPage } from '../pages/page_user_settings';
 import { ThereminPage } from '../pages/theremin/theremin.page';
@@ -17,7 +17,7 @@ const pages = {
     theremin: ThereminPage,
     page_sample_editor: SamplePage,
     game: GamePage,
-    song: Page_mbox,
+    song: PageSong,
     song_list: PageSongList,
 };
 
@@ -163,7 +163,7 @@ class App {
         appRouter.on('song', this, (song) =>  {
             console.log('/song/:song', song);
 
-            this.setComponentByRoute(Page_mbox, {
+            this.setComponentByRoute(PageSong, {
                     id: 'song',
                     song: song,
                 });
