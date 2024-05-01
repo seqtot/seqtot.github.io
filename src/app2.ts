@@ -9,6 +9,7 @@ import { ConfirmDialog } from '../pages/dialogs';
 import { GamePage } from '../pages/page_game';
 import { PageSongList } from '../pages/page-song-list';
 import { MY_SONG } from '../pages/song-store';
+import {UserSettingsStore} from '../pages/user-settings-store';
 
 const pages = {
     page_roll: RollPage,
@@ -23,6 +24,7 @@ const pages = {
 };
 
 const isDev = /localhost/.test(window.location.href);
+const isDevUser = UserSettingsStore.GetUserSettings().userName === 'dev' || isDev;
 // const isDev =
 //     /devitband/.test(window.location.href) ||
 //     /local/.test(window.location.href);
@@ -45,13 +47,13 @@ const linksToPage: Link[]  = [
     { href: '/song_list/bandit', name: 'Список' },
     { href: '/song_list/bandit_draft', name: 'Черновики' },
     { href: `/song_list/${MY_SONG}`, name: 'Мои вещи' },
-    { href: '/page/page_keyboard', name: 'keyboard', isDev: false },
-    { href: '/page/userSettings', name: 'Settings', isDev: false},
-    { href: '/page/theremin', name: 'Theremin', isDev: false},
-    { href: '/page/page_muse_editor', name: 'museEditor', isDev: true },
-    { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: true },
-    { href: '/page/page_roll', name: 'roll', isDev: true },
-    { href: '/game/test', name: 'game', isDev: false },
+    { href: '/page/page_keyboard', name: 'keyboard' },
+    { href: '/page/userSettings', name: 'Settings' },
+    { href: '/page/theremin', name: 'Theremin' },
+    { href: '/page/page_muse_editor', name: 'museEditor', isDev: isDev || isDevUser },
+    { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: isDev || isDevUser },
+    { href: '/page/page_roll', name: 'roll', isDev: isDev || isDevUser },
+    { href: '/game/test', name: 'game' },
 ];
 
 class App {
