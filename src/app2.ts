@@ -8,6 +8,7 @@ import { getWithDataAttr, getWithDataAttrValue } from './utils';
 import { ConfirmDialog } from '../pages/dialogs';
 import { GamePage } from '../pages/page_game';
 import { PageSongList } from '../pages/page-song-list';
+import { MY_SONG } from '../pages/song-store';
 
 const pages = {
     page_roll: RollPage,
@@ -26,7 +27,7 @@ const isDev = /localhost/.test(window.location.href);
 //     /devitband/.test(window.location.href) ||
 //     /local/.test(window.location.href);
 
-const defRoute = isDev ? '/game/test' : '/song_list/bandit';
+const defRoute = isDev ? 'page/page_muse_editor' : '/song_list/bandit'; // ; '/game/test'
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
@@ -43,7 +44,7 @@ type Link = {
 const linksToPage: Link[]  = [
     { href: '/song_list/bandit', name: 'Список' },
     { href: '/song_list/bandit_draft', name: 'Черновики' },
-    { href: '/song_list/setMy', name: 'Мои вещи' },
+    { href: `/song_list/${MY_SONG}`, name: 'Мои вещи' },
     { href: '/page/page_keyboard', name: 'keyboard', isDev: false },
     { href: '/page/userSettings', name: 'Settings', isDev: false},
     { href: '/page/theremin', name: 'Theremin', isDev: false},

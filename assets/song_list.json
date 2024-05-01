@@ -2,6 +2,7 @@
   "bandit": {
     "ns": "band-song",
     "dir": "bandit",
+    "tags": ["band-song"],
     "items": [
       {"id":  "noSystems", "label": "No systems"},
       {"id":  "threeDots", "label": "Продолжение следует, Three dots"},
@@ -16,6 +17,7 @@
   "bandit_draft": {
     "ns": "band-song",
     "dir": "bandit_draft",
+    "tags": ["band-song"],
     "items": [
       {"id":  "shipsAreSailing", "label": "Ships are sailing (bpm215)"},
       {"id":  "brotherBilly", "label": "Брат Билли (Brother Billy)"},
@@ -28,9 +30,10 @@
       {"id":  "abt1", "label": "Abt 1 (вокализ)"}
     ]
   },
-  "setMy": {
+  "my-song": {
     "ns": "my-song",
     "dir": "",
-    "items": []
+    "items": [],
+    "tags": ["my-song"]
   }
 }

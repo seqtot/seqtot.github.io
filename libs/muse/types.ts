@@ -66,21 +66,18 @@ export type TTrackInfo = {
     isExcluded?: boolean,
 }
 
-// jjkl
 export type TSongNode = {
     id: string,
     bpmValue: number,
     volume?: number,
     version: number,
     content: string,
-    break: string,
-    drums: string,
     tracks: TTrackInfo[],
     hideMetronome?: boolean,
     score: string,
+    tags: string[],
     parts: {name: string, id: string}[],
     dynamic: TStoredRow[],
-    isSongList?: boolean,
     ns?: string,
     pitchShift?: number,
     pitchShiftSrc?: number,

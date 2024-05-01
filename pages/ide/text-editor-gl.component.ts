@@ -12,9 +12,11 @@ import { ComponentContainer as GlComponentContainer } from '../../libs/gl/ts/con
 import { ResolvedComponentItemConfig } from '../../libs/gl/ts/config/resolved-config';
 import { Editor as CmEditor } from 'codemirror';
 import { Muse as m, Synthesizer, Sound, MultiPlayer } from '../../libs/muse';
-import { FileInfo } from '../../libs/common/file-service';
+import { FSFileInfo } from '../../libs/common/file-service';
 import Fs from '../../libs/common/file-service';
 import { LinePlayer } from './line-player';
+import { MY_SONG } from '../song-store';
+import { SongDB} from './my-song-db';
 
 const texts = {
 
@@ -91,7 +93,7 @@ export class TextEditorGlComponent {
 
   cmWrapper: HTMLElement;
   menuEl: HTMLElement;
-  fileInfo: FileInfo;
+  fileInfo: FSFileInfo;
 
   // element: HTMLElement
   // uri: string = '';
@@ -164,7 +166,7 @@ export class TextEditorGlComponent {
 
     this.addCongifBlocks(data);
 
-    this.fileInfo = (itemConfig?.componentState as any)?.fileInfo as FileInfo;
+    this.fileInfo = (itemConfig?.componentState as any)?.fileInfo as FSFileInfo;
 
     if (this.fileInfo) {
       this.setValueByFileInfo(this.fileInfo)
@@ -208,8 +210,19 @@ export class TextEditorGlComponent {
     });
   }
 
-  async setValueByFileInfo(fileInfo: FileInfo) {
-    let value = await Fs.readTextFile(fileInfo.path);
+  async setValueByFileInfo(fileInfo: FSFileInfo) {
+    console.log('TextEditorGl.setValueByFileInfo', fileInfo);
+    let value = '';
+
+    if (fileInfo.path === MY_SONG) {
+      const song = await SongDB.GetSongById(fileInfo.name);
+      if (song) {
+        value = song.score ?? '';
+      }
+    } else {
+      value = await Fs.readTextFile(fileInfo.path);
+    }
+
     this.mainEditor.setOption("mode", 'musa');
     this.mainEditor.setValue(value);
   }
@@ -437,7 +450,7 @@ export class TextEditorGlComponent {
     // СОХРАНЕНИЕ: TODO
     if (evt.ctrlKey && evt.code === 'KeyS') {
       if (this.inputMode === 'text' && this.fileInfo) {
-        Fs.writeTextFile(this.mainEditor.getValue(), this.fileInfo.path)
+        Fs.writeTextFile(this.mainEditor.getValue(), this.fileInfo)
       }
 
       return skipEvent(evt, true);

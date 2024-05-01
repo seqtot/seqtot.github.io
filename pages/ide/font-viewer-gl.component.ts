@@ -5,6 +5,7 @@ import { ResolvedComponentItemConfig } from '../../libs/gl/ts/config/resolved-co
 import { ideService, ideEvents } from './ide-service';
 import Fs from '../../libs/common/file-service';
 import { parseInteger } from '../../libs/common';
+import { getWithDataAttr } from '../../src/utils';
 
 type FileInfo = {
     path: string,
@@ -59,18 +60,9 @@ export class FontViewerGlComponent {
         this.rootEl.innerHTML = null;
 
         const backEl = document.createElement('div');
-        backEl.style.paddingLeft = '.5rem';
-        backEl.style.cursor = 'pointer';
-        backEl.innerText = '...';
-        backEl.style.fontWeight = '700';
-
-        const titleEl = document.createElement('div');
-        titleEl.style.paddingLeft = '.5rem';
-        titleEl.innerText = title;
-        titleEl.style.fontWeight = '700';
-
+        backEl.setAttribute('style', 'padding: .5rem; padding-bottom: 1rem; color: blue; cursor: pointer; font-weight: 700;')
+        backEl.innerHTML = `&larr; ${title}`;
         this.rootEl.appendChild(backEl);
-        this.rootEl.appendChild(titleEl);
 
         backEl.addEventListener('click', () => {
            this.showTopList();
@@ -78,16 +70,19 @@ export class FontViewerGlComponent {
 
         fontLoader.getInstrumentsByGroup(index).forEach(item => {
             const el = document.createElement('div');
-            el.style.paddingLeft = '1rem';
-            el.style.cursor = 'pointer';
-            el.style.userSelect = 'none';
-            backEl.style.cursor = 'pointer';
+            el.setAttribute('style', 'padding-left: .5rem; cursor: pointer; user-select: none;')
             el.dataset['index'] = item.variable;
+            el.dataset.instrumentTreeItem = '';
             el.innerText = item.variable + ' - ' + item.index;
 
             this.rootEl.appendChild(el);
 
             el.addEventListener('click', async () => {
+                getWithDataAttr('instrument-tree-item').forEach(el => {
+                    el.style.fontWeight = '400';
+                });
+                el.style.fontWeight = '700';
+
                 this.loadInstrument(item.index);
             });
         });

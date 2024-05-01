@@ -1,4 +1,4 @@
-import {Muse as m, TTrackInfo, TSongNode as SongNode} from '../libs/muse';
+import {Muse as m, TTrackInfo, TSongNode as SongNode, TSongNode} from '../libs/muse';
 import { TLineNote, TLine, TStoredRow } from '../libs/muse';
 
 export type StoredSongNodeOld = {
@@ -22,6 +22,22 @@ export type TrackInfo = {
     label?: string,
     isHardTrack?: boolean,
     isExcluded?: boolean,
+}
+
+export function getEmptySongNode(): TSongNode {
+    return {
+        id: '',
+        bpmValue: DEFAULT_BPM_VALUE,
+        volume: DEFAULT_OUT_VOLUME,
+        version: versionTransformers.length,
+        content: '',
+        tracks: [],
+        hideMetronome: false,
+        score: '',
+        tags: [],
+        parts: [],
+        dynamic: [],
+    };
 }
 
 function isDrumNote(val: string): boolean {
@@ -419,23 +435,7 @@ export class SongStore {
     }
 
     static GetEmptySong(): SongNode {
-        // <settings>
-        // $bass: v30; $organ: v50; $guit: v50;
-
-        return {
-            id: '',
-            bpmValue: DEFAULT_BPM_VALUE,
-            volume: DEFAULT_OUT_VOLUME,
-            content: '',
-            break: '',
-            drums: '',
-            tracks: [],
-            hideMetronome: false,
-            parts: [],
-            score: '',
-            dynamic: [],
-            version: versionTransformers.length
-        };
+        return getEmptySongNode();
     }
 
     static CloneAndAddTrack(song: SongNode, trackName: string): TrackInfo | null {

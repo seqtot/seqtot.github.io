@@ -2,7 +2,7 @@ import { EventEmitter } from '../../libs/common/event-emitter';
 import { Muse as m, TTextBlock, TDataByTracks, TFileSettings } from '../../libs/muse';
 import { drumBoards, KeyboardType, toneBoards } from '../keyboard-ctrl';
 import { DEFAULT_OUT_VOLUME, SongStore, TrackInfo } from '../song-store';
-import {Deferred} from '../../libs/common';
+import { Deferred } from '../../libs/common';
 
 const multiPlayer = new m.player.MultiPlayer();
 const metronome = new m.player.MultiPlayer();

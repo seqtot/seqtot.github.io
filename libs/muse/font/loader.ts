@@ -2,7 +2,7 @@ import { TCachedPreset, TNumPair, TPresetInfo, TWavePreset } from './otypes';
 import { WebAudioFontPlayer } from './player';
 import { preparePreset } from './prepare';
 import { getInstrumentTitles } from './instrument-titles';
-import { parseInteger } from '../../common';
+import { parseInteger } from '../utils/parse-integer';
 
 const localSamples = {
 	162: 'samples/organ/0160_FluidR3_GM_sf2_file.json', // organ:162:_tone_0160_FluidR3_GM_sf2_file

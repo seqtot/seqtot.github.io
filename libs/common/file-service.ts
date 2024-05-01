@@ -1,14 +1,30 @@
-import {Deferred} from './utils';
+import { Deferred } from './utils';
+import { TSongInfo } from '../../pages/ide/ide-service';
+import { MY_SONG } from '../../pages/song-store';
+import { SongDB } from '../../pages/ide/my-song-db';
+import { TSongNode } from '../muse';
 
-export type FileInfo = {
+export type TSongList = {
+    [key: string]: {
+        dir: string,
+        ns:string,
+        items: TSongInfo[]
+    }};
+
+export type FSFileInfo = {
     path: string,
     name: string,
     isFile?: boolean,
-    children?: FileInfo[],
+    children?: FSFileInfo[],
 }
+
+const isDev = /localhost/.test(window.location.href);
 
 class FileService {
     async readTextFile(path: string): Promise<string> {
+        if (path.startsWith('motes/')) return this.readTextFileFromStatic(path);
+        if (path === MY_SONG) return this.readTextFileFromIndexDB(path);
+
         const dfr: Deferred = new Deferred<any>();
         const root = 'D:/seqtot.github.io/assets'; // TODO: delete ???
 
@@ -32,12 +48,87 @@ class FileService {
         return dfr.promise;
     }
 
-    async readdir(path: string): Promise<FileInfo[]> {
+    async readTextFileFromIndexDB(path: string): Promise<string> {
+        const dfr: Deferred = new Deferred();
+        let result = '';
+
+        try {
+            const url = isDev ? `/${path}` : `/assets/${path}`;
+            const res = await fetch(url);
+
+            if (res.ok) {
+                result = await res.text();
+            } else {
+                console.log(`error on load 1: ${path}`);
+            }
+        }
+        catch (error){
+            console.log(`error on load 2: ${path}`, error);
+        }
+
+        dfr.resolve(result);
+
+        return dfr.promise;
+    }
+
+    async readTextFileFromStatic(path: string): Promise<string> {
+        const dfr: Deferred = new Deferred();
+        let result = '';
+
+        try {
+            const url = isDev ? `/${path}` : `/assets/${path}`;
+            const res = await fetch(url);
+
+            if (res.ok) {
+                result = await res.text();
+            } else {
+                console.log(`error on load 1: ${path}`);
+            }
+        }
+        catch (error){
+            console.log(`error on load 2: ${path}`, error);
+        }
+
+        dfr.resolve(result);
+
+        return dfr.promise;
+    }
+
+    async readMotes(): Promise<FSFileInfo[]> {
+        const dfr: Deferred = new Deferred();
+        const songList = await this.loadSongList();
+        const result = [];
+
+        Object.keys(songList).forEach(key => {
+            const group = songList[key];
+
+            const folder = {
+                name: key,
+                path: `motes/${group.dir}`,
+                children: []
+            };
+
+            group.items.forEach(song => {
+                folder.children.push({
+                    name: `${song.id}`,
+                    path: `motes/${group.dir}/${song.id}.midi`,
+                    isFile: true,
+                });
+            });
+
+            result.push(folder);
+        });
+
+        dfr.resolve(result);
+
+        return dfr.promise;
+    }
+
+    async readdir(path: string): Promise<FSFileInfo[]> {
+        if (path === 'motes' && !isDev) return this.readMotes();
+
         const dfr: Deferred = new Deferred<any>();
         const root = 'assets';
-
-        console.log('Path', path);
-
         //const reader = new FileReader();
         fetch(`/api/readdir?path=${path}&root=${root}`)
             .then( res => {
@@ -47,7 +138,7 @@ class FileService {
             } )
             .then( data => {
                 dfr.resolve(data);
-                console.log('RESULT', data);
+                //console.log('readdir.RESULT', data);
                 //reader.readAsDataURL(blob);
                 // https://learn.javascript.ru/blob
                 // var file = window.URL.createObjectURL(blob);
@@ -59,9 +150,26 @@ class FileService {
         return dfr.promise;
     }
 
-    async writeTextFile(text: string, path: string): Promise<unknown> {
-        const dfr: Deferred = new Deferred<any>();
+    async writeTextFileInDB(text: string, fileInfo: {path?: string, name?: string}): Promise<TSongNode> {
+        let song = await SongDB.GetSongById(fileInfo.name);
+        song = song || <TSongNode>{
+            id: fileInfo.name!,
+            score: text || '',
+            tags: [MY_SONG],
+        };
 
+        return SongDB.PutSong(<TSongNode>{
+            ...song,
+            score: text || '',
+        });
+    }
+
+    async writeTextFile(text: string, fileInfo: {path?: string, name?: string}): Promise<unknown> {
+        //console.log('FS.writeTextFile', text, fileInfo);
+
+        if (fileInfo.path === MY_SONG) return this.writeTextFileInDB(text, fileInfo);
+
+        const dfr: Deferred = new Deferred<any>();
         // const root = 'D:/motes';
         // async function postData(url = "", data = {}) {
         //     // Default options are marked with *
@@ -89,7 +197,7 @@ class FileService {
                 // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({
-                path,
+                path: fileInfo.path,
                 text
             })
         })
@@ -107,6 +215,37 @@ class FileService {
             }).catch(err => {
                 dfr.reject(err);
             });
+
+        return dfr.promise;
+    }
+
+    async loadSongList(): Promise<TSongList> {
+        const dfr = new Deferred();
+        let data: TSongList = {};
+
+        try {
+            const url = isDev ? '/' + 'song_list.json' : `/assets/song_list.json`;
+            const res = await fetch(url);
+
+            if (res.ok) {
+                data = await res.json();
+            } else {
+                console.log('error on load song_list.json: 1');
+            }
+        }
+        catch (error){
+            console.log('error on load song_list.json: 2', error);
+        }
+
+        Object.keys(data).forEach(key => {
+            const item = data[key];
+            data[key].items.forEach(song => {
+                song.dir = item.dir;
+                song.ns = item.ns;
+            })
+        });
+
+        dfr.resolve(data);
 
         return dfr.promise;
     }
