@@ -50,9 +50,9 @@ const linksToPage: Link[]  = [
     { href: '/page/page_keyboard', name: 'keyboard' },
     { href: '/page/userSettings', name: 'Settings' },
     { href: '/page/theremin', name: 'Theremin' },
-    { href: '/page/page_muse_editor', name: 'museEditor', isDev: isDev || isDevUser },
-    { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: isDev || isDevUser },
-    { href: '/page/page_roll', name: 'roll', isDev: isDev || isDevUser },
+    { href: '/page/page_muse_editor', name: 'museEditor', isDev: true },
+    { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: true },
+    { href: '/page/page_roll', name: 'roll', isDev: true },
     { href: '/game/test', name: 'game' },
 ];
 
@@ -124,7 +124,7 @@ class App {
         const wrapper = `%content%`;
         let content = '';
         linksToPage.forEach(item => {
-            if (item.isDev && !isDev) return;
+            if (item.isDev && !(isDev || isDevUser)) return;
 
             content += `
                 <div
