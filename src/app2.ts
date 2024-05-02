@@ -141,7 +141,7 @@ class App {
         dialog.openConfirmDialog(wrapper.replace('%content%', content));
 
         linksToPage.forEach(item => {
-            if (item.isDev && !isDev) return;
+            //if (item.isDev && !(isDev || isDevUser)) return;
 
             const el = getWithDataAttrValue('main-menu-item', item.href)[0];
             el.addEventListener('pointerup', e => {
