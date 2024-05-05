@@ -19,6 +19,7 @@
     "dir": "bandit_draft",
     "tags": ["band-song"],
     "items": [
+      {"id":  "mountain", "label": "Гора, Mountain"},
       {"id":  "shipsAreSailing", "label": "Ships are sailing (bpm215)"},
       {"id":  "brotherBilly", "label": "Брат Билли (Brother Billy)"},
       {"id":  "cage", "label": "Клетка (Cage)"},
