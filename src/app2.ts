@@ -10,6 +10,7 @@ import { GamePage } from '../pages/page_game';
 import { PageSongList } from '../pages/page-song-list';
 import { MY_SONG } from '../pages/song-store';
 import {UserSettingsStore} from '../pages/user-settings-store';
+import {RelativeKeysPage} from '../pages/theremin/relative-keys.page';
 
 const pages = {
     page_roll: RollPage,
@@ -21,6 +22,7 @@ const pages = {
     game: GamePage,
     song: PageSong,
     song_list: PageSongList,
+    relativeKeys: RelativeKeysPage,
 };
 
 const isDev = /localhost/.test(window.location.href);
@@ -50,6 +52,7 @@ const linksToPage: Link[]  = [
     { href: '/page/page_keyboard', name: 'keyboard' },
     { href: '/page/userSettings', name: 'Settings' },
     { href: '/page/theremin', name: 'Theremin' },
+    { href: '/page/relativeKeys', name: 'RelativeKeys', isDev: true },
     { href: '/page/page_muse_editor', name: 'museEditor', isDev: true },
     { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: true },
     { href: '/page/page_roll', name: 'roll', isDev: true },

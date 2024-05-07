@@ -1,142 +1,3 @@
-
-// 'use strict';
-//
-// const audioCtx = new AudioContext();
-// const muse = {
-//
-// };
-//
-// function parseInteger(val, ifError) {
-//   if (typeof val === 'number') {
-//       return isNaN(val) ? ifError : val;
-//   }
-//
-//   val = (val || '').toString().trim();
-//   const num = parseInt(val, 10);
-//
-//   return isNaN(num) ? ifError : num;
-// }
-//
-// function getStringWithBlanks(val) {
-//   return ' ' + (val || '').trim() + ' ';
-// }
-//
-// function getBpmFromString(str, byDefault = 120) {
-//   str = getStringWithBlanks(str);
-//
-//   const regExp = / b\d+ /;
-//
-//   if (!regExp.test(str)) {
-//       return byDefault;
-//   }
-//
-//   str = str.match(regExp)[0].trim().replace('b', '');
-//
-//   return parseInteger(str, byDefault);
-// }
-//
-// function getRepeatFromString(str, byDefault = 1) {
-//   str = getStringWithBlanks(str);
-//
-//   const regExp = / r\d+ /;
-//
-//   if (!regExp.test(str)) {
-//       return byDefault;
-//   }
-//
-//   str = str.match(regExp)[0].trim().replace('r', '');
-//
-//   return parseInteger(str, byDefault);
-// }
-//
-// function getPrebeatFromString(str, byDefault = 1) {
-//   str = getStringWithBlanks(str);
-//
-//   const regExp = / r\d+ /;
-//
-//   if (!regExp.test(str)) {
-//       return byDefault;
-//   }
-//
-//   str = str.match(regExp)[0].trim().replace('p', '');
-//
-//   return parseInteger(str, byDefault);
-// }
-//
-// muse.parseInteger = parseInteger;
-// muse.getStringWithBlanks = getStringWithBlanks;
-// muse.getBpmFromString = getBpmFromString;
-// muse.getRepeatFromString = getRepeatFromString;
-// muse.getPrebeatFromString = getPrebeatFromString;
-//
-// class Sound {
-//   static ctx = audioCtx;
-// }
-//
-// const DEFAULT_VOLUME = 50;
-// const octaveListLat = 'uyoaei'.split('');
-// const octaveListRus = 'ыуоаеи'.split('');
-// const stepListLat = 'dtrnmfvszlkb'.split('');
-// const stepListRus = 'дтрнмфвсзлкб'.split('');
-//
-//
-// const keysToNoteLat = {
-//   Backquote:   'du',
-//   Tab:         'tu',
-//   CapsLock:    'ru',
-//   ShiftLeft:   'nu',
-//   Digit1:      'mu',
-//   KeyQ:        'fu',
-//   KeyA:        'vu',
-//   KeyZ:        'su',
-//   Digit2:      'zu',
-//   KeyW:        'lu',
-//   KeyS:        'ku',
-//   KeyX:        'bu',
-//
-//   Digit3:      'dy',
-//   KeyE:        'ty',
-//   KeyD:        'ry',
-//   KeyC:        'ny',
-//   Digit4:      'my',
-//   KeyR:        'fy',
-//   KeyF:        'vy',
-//   KeyV:        'sy',
-//   Digit5:      'zy',
-//   KeyT:        'ly',
-//   KeyG:        'ky',
-//   KeyB:        'by',
-//
-//   Digit6:      'do',
-//   KeyY:        'to',
-//   KeyH:        'ro',
-//   KeyN:        'no',
-//   Digit7:      'mo',
-//   KeyU:        'fo',
-//   KeyJ:        'vo',
-//   KeyM:        'so',
-//   Digit8:      'zo',
-//   KeyI:        'lo',
-//   KeyK:        'ko',
-//   Comma:       'bo',
-//
-//   Digit9:      'da',
-//   KeyO:        'ta',
-//   KeyL:        'ra',
-//   Period:      'na',
-//   Digit0:      'ma',
-//   KeyP:        'fa',
-//   Semicolon:   'va',
-//   Slash:       'sa',
-//   Minus:       'za',
-//   BracketLeft: 'la',
-//   Quote:       'ka',
-//   ShiftRight:  'ba',
-//
-//   Equal:        'di',
-//   BracketRight: 'ti',
-// }
-
 export type FreqItem = {
     step: string;
     code: number;
@@ -281,237 +142,44 @@ freqListSrc.forEach((srcItem, i) => {
   freqList.push(item);
 });
 
-// Object.keys(keysToNoteLat).forEach(key => {
-//   const noteLat = keysToNoteLat[key];
-//   keysToNoteLat[key] = freqList.find(item => item.noteLat === noteLat);
-// });
+export const colorHash = {
+  '12':   { mask: '!__', val: 12,   name: 'йа',  rgb: '250,25,25'   },
+  '-12':  { mask: '!__', val: -12,   name: 'йу',  rgb: '125,25,25'   },
 
-//console.log('freqList', freqList);
-//console.log('keysToNoteLat', keysToNoteLat);
+  '11':   { mask: '!.:', val: 11,   name: 'га',  rgb: '250,175,200' },
+  '-11':  { mask: '!.:', val: -11,  name:  'гу', rgb: '125,75,100'  },
 
+  '10':   { mask: '_!_', val: 10,   name: 'жа', rgb: '25,250,25'   },
+  '-10':  { mask: '_!_', val: -10,  name: 'жу', rgb: '25,100,25'   },
 
-// let volumeList = [
-//   {value: 100},
-//   {value: 100},
-//
-//   // {value: 60},
-//   // {value: 60},
-//   {value: 60},
-//   {value: 60},
-//   {value: 60},
-//
-//   {value: 52.5, isMiddle: true},
-//   //{value: 47.5},
-//
-//   // {value: 60},
-//   //{value: 60},
-//   {value: 60},
-//   {value: 60},
-//
-//   {value: 0},
-//   {value: 0},
-// ]
-//
-//
-// function isNil(val) {
-//   return val === null || val === undefined;
-// }
-//
-// function isPresent(val) {
-//   return val !== null && val !== undefined;
-// }
-//
-// function getWithDataAttr(name, el) {
-//   return ((el || document).querySelectorAll(`[data-${name}]`)) || [];
-// }
-//
-// function getWithDataAttrValue(name, val, el) {
-//   return ((el || document).querySelectorAll(`[data-${name}="${val}"]`)) || [];
-// }
-//
-// function getEndPointVolume(val) {
-//   let valOut;
-//   let mid = 20;
-//
-//   if (val === 0 || val === 100) {
-//       valOut = val;
-//   } else {
-//       valOut = val / 100;
-//       valOut = (1 - Math.sqrt(1 - (valOut * valOut))) * 100;
-//   }
-//
-//   return valOut;
-// }
-//
-// function mergeVolume(a, b) {
-//   return a * (b / DEFAULT_VOLUME);
-// }
-//
-//
-// class Deferred {
-//   constructor() {
-//     this.promise = null;
-//     this.resolve = null;
-//     this.reject = null;
-//
-//     this.promise = new Promise((resolve, reject) => {
-//         this.resolve = resolve;
-//         this.reject = reject;
-//     });
-//   }
-// }
-//
-// // https://github.com/audiojs/audio-buffer-utils
-// async function getBufferFromFile(
-//   ctx /*AudioContext*/,
-//   file /*string*/
-// ) /*Promise<AudioBuffer>*/ {
-// 	const dfr = new Deferred();
-//
-// 	let len = file.length;
-// 	let arraybuffer = new ArrayBuffer(len);
-// 	let view = new Uint8Array(arraybuffer);
-// 	let decoded = atob(file);
-// 	let b;
-// 	for (let i = 0; i < decoded.length; i++) {
-// 		b = decoded.charCodeAt(i);
-// 		view[i] = b;
-// 	}
-// 	ctx.decodeAudioData(arraybuffer, audioBuffer => {
-// 		// dfr.resolve(fill({
-// 		// 	buffer: audioBuffer,
-// 		// 	fn: transformWithZero,
-// 		// 	//value: .001,
-// 		// 	// fn: (val, i, channel) => {
-// 		// 	// 	if (Math.abs(val) < 0.02) { // 0.05 много
-// 		// 	// 		return 0;
-// 		// 	// 	}
-// 		// 	//
-// 		// 	// 	return val;
-// 		// 	// 	//return Math.sin(Math.PI * 2 * frequency * i / rate);
-// 		// 	// }
-// 		// }));
-//
-// 		dfr.resolve(audioBuffer);
-// 	});
-//
-// 	return dfr.promise;
-// }
-//
-// function getBufferFromSample(
-//   ctx  /*AudioContext*/,
-//   zone /*WaveZone*/
-// ) /*AudioBuffer*/ {
-// 	const decoded = atob(zone.sample);
-// 	const buffer = ctx.createBuffer(1, decoded.length / 2, zone.sampleRate);
-// 	const float32Array = buffer.getChannelData(0);
-// 	let b1,
-// 		b2,
-// 		n;
-// 	for (let i = 0; i < decoded.length / 2; i++) {
-// 		b1 = decoded.charCodeAt(i * 2);
-// 		b2 = decoded.charCodeAt(i * 2 + 1);
-// 		if (b1 < 0) {
-// 			b1 = 256 + b1;
-// 		}
-// 		if (b2 < 0) {
-// 			b2 = 256 + b2;
-// 		}
-// 		n = b2 * 256 + b1;
-// 		if (n >= 65536 / 2) {
-// 			n = n - 65536;
-// 		}
-// 		float32Array[i] = n / 65536.0;
-// 	}
-//
-// 	return buffer;
-// }
-//
-// function numValue(aValue, defValue) {
-//   if (typeof aValue === 'number') {
-//     return aValue;
-//   } else {
-//     return defValue;
-//   }
-// }
-//
-// async function prepareZone (
-//   ctx /*AudioContext*/,
-//   zone /*WaveZone*/
-// ) /*Promise<WaveZone>*/ {
-// 	if (zone.buffer) return Promise.resolve(zone);
-//
-// 	const dfr = new Deferred();
-//
-// 	zone.delay = zone.delay || 0;
-// 	zone.startOffsetSec = zone.startOffsetSec || zone.delay;
-// 	zone.loopStart = numValue(zone.loopStart, 0);
-// 	zone.loopEnd = numValue(zone.loopEnd, 0);
-// 	zone.coarseTune = numValue(zone.coarseTune, 0);
-// 	zone.fineTune = numValue(zone.fineTune, 0);
-// 	zone.originalPitch = numValue(zone.originalPitch, 6000);
-// 	zone.sampleRate = numValue(zone.sampleRate, 44100);
-// 	zone.sustain = numValue(zone.originalPitch, 0);
-//
-// 	if (zone.loopStartSec && zone.loopEndSec && zone.loopEndSec > zone.loopStartSec) {
-// 		zone.loop = true;
-// 	}
-//
-// 	if (zone.sampleRate &&
-// 		zone.loopStart && zone.loopEnd &&
-// 		zone.loopStart>1 && zone.loopEnd >= zone.loopStart &&
-// 		!zone.loopStartSec && !zone.loopEndSec
-// 	) {
-// 		zone.loop = true;
-// 		zone.loopStartSec = zone.loopStart / zone.sampleRate;
-// 		zone.loopEndSec = zone.loopEnd / zone.sampleRate;
-// 	}
-//
-// 	// create buffer
-// 	if (zone.file) {
-// 		zone.buffer = await getBufferFromFile(ctx, zone.file);
-// 		dfr.resolve(zone);
-// 	}
-// 	else if (zone.sample) {
-// 		zone.buffer = getBufferFromSample(ctx, zone);
-// 		dfr.resolve(zone);
-// 	}
-// 	else {
-// 		dfr.resolve(zone);
-// 	}
-//
-// 	return dfr.promise;
-// } // prepareZone
-//
-// async function preparePreset (x
-//   /*{
-// 		audioContext: AudioContext,
-// 		preset: WavePreset,
-// 		var?: string,
-// 		id?: number | string
-// 	} & {[key: string]: any}
-//   */
-// ) /* Promise<WavePreset | null> */ {
-// 	if (!x.preset) {
-// 		console.log('preparePreset: preset is null', x);
-//
-// 		return Promise.resolve(null);
-// 	}
-//
-// 	x.preset.pitchShift = numValue(x.preset.pitchShift, 0);
-//
-// 	// TODO: сделать нормальный override костыль
-// 	if (x.var === '_tone_0180_FluidR3_GM_sf2_file') {
-// 		x.preset.pitchShift = 12;
-// 	}
-// 	else if (x.var === '_tone_0130_GeneralUserGS_sf2_file') {
-// 		x.preset.pitchShift = 12;
-// 	}
-//
-// 	for (let i = 0; i < x.preset.zones.length; i++) {
-// 		prepareZone(x.audioContext, x.preset.zones[i]);
-// 	}
-//
-// 	return Promise.resolve(x.preset);
-// } // preparePreset
+  '9':   { mask: '_!!', val: 9,  name: 'фа', rgb: '25,250,250'   },
+  '-9':  { mask: '_!!', val: -9,  name: 'фу', rgb: '25,125,125'   },
 
+  '8':  { mask: ':.!', val: 8, name: 'ва',  rgb: '200,150,250' },
+  '-8': { mask: ':.!', val: -8, name:  'ву', rgb: '100,75,125'  },
+
+  '7':   { mask: '!_!', val: 7,   name: 'за', rgb: '250,25,250'  },
+  '-7':  { mask: '!_!', val: -7,   name: 'зу', rgb: '120,25,125'  },
+
+  '6':   { mask: '__!', val: 6,  name: 'ща',      rgb: '25,25,250'    },
+  '-6':  { mask: '__!', val: -6,  name: 'щу',      rgb: '25,25,125'   },
+
+  '5':   { mask: '!:_', val: 5,  name: 'ла',  rgb: '250,175,25'   },
+  '-5':  { mask: '!:_', val: -5,  name: 'лу',  rgb: '125,50,25'    },
+
+  '4':  { mask: '.!:', val: 4,  name: 'ра', rgb: '150,250,200'  },
+  '-4': { mask: '.!:', val: -4,  name: 'ру', rgb: '50,150,100'   },
+
+  '3':   { mask: '.:!', val: 3,  name: 'ша', rgb: '150,200,250'  },
+  '-3':  { mask: '.:!', val: -3,   name: 'шу', rgb: '50,100,150'   },
+
+  '2':   { mask: '!!_', val: 2,   name: 'са', rgb: '250,250,25'   },
+  '-2':  { mask: '!!_', val: -2,  name: 'су', rgb: '125,125,25'   },
+
+  '1':  { mask: '!::', val: 1,  name:  'ха',  rgb: '200,190,190'  },
+  '-1': { mask: '!::', val: -1, name:  'ху',  rgb: '100,100,110'  },
+
+  '0':   { mask: '!!!', val: 0,   name: 'мо', rgb: '150,150,150' },
+} as const;
+
+export const colorArr = Object.values(colorHash);
