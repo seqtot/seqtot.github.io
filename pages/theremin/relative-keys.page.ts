@@ -4,10 +4,22 @@ import { getWithDataAttr } from '../../src/utils';
 import { WaveSource2 } from './wave-source';
 import { RouteInfo } from '../../src/router';
 
+import { colorHash } from './utils';
+
+const bassColors = [colorHash['0'], colorHash['-1'], colorHash['-2'], colorHash['-3'], colorHash['-4'], colorHash['-5'], colorHash['-6'], colorHash['-7'], colorHash['-8'], colorHash['-9'], colorHash['-10'], colorHash['-11'], colorHash['-12']];
+const soloColors = [colorHash['0'], colorHash['1'],  colorHash['2'],  colorHash['3'],  colorHash['4'],  colorHash['5'],  colorHash['6'],  colorHash['7'],  colorHash['8'],  colorHash['9'],  colorHash['10'],  colorHash['11'],  colorHash['12']];
+
 type WithId = {id: string}
 
 const outVol = 80;
 const freqInfoList = m.const.freqInfoList;
+
+type ColorInfo = {
+    mask: string,
+    val: number,
+    name: string,
+    rgb: string,
+}
 
 function getPosition(element) {
     let xPosition = 0;
@@ -151,39 +163,48 @@ class Board {
         //const midStroke = 'rgb(250, 190, 190)';
         const midStroke = defStroke;
 
-        // линия cверху ячейки
-        this.freqList.forEach((item, i) => {
+        this.colorList.forEach((item, i) => {
+            const defFill = `rgb(${item.rgb})`;
             ctx.strokeStyle = defStroke;
             ctx.lineWidth = 1;
 
-            // if ((i % 6) === 0) {
-            //   canvasCtx.lineWidth = 1;
-            //   canvasCtx.strokeStyle = 'gray';
-            // }
+            ctx.fillStyle = defFill;
+            ctx.fillRect(this.type === 'bass' ? gutter : 0, zeroY + (i * cellSize), width, cellSize);
+        })
 
-            if (item.step === 'd' || item.step === 'm' || item.step === 'z') { // && this.type === 'freqAndVol'
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'red';
-                ctx.fillRect(gutter/2, zeroY + (i * cellSize) + cellSize/2, 2, 2);
-                ctx.fillRect(gutter + width + gutter/2 , zeroY + (i * cellSize) + cellSize/2, 2, 2);
-            }
-
-            ctx.strokeStyle = defStroke;
-            ctx.lineWidth = .5;
-            ctx.beginPath();
-            ctx.moveTo(zeroX, zeroY + (i * cellSize));
-            ctx.lineTo(zeroX + width, zeroY + (i * cellSize));
-            ctx.stroke();
-
-            if (i === (this.freqList.length - 1)) {
-                ctx.strokeStyle = defStroke;
-                ctx.lineWidth = .5;
-                ctx.beginPath();
-                ctx.moveTo(zeroX, zeroY + ((i+1) * cellSize));
-                ctx.lineTo(zeroX + width, zeroY + ((i+1) * cellSize));
-                ctx.stroke();
-            }
-        });
+        // линия cверху ячейки
+        // this.freqList.forEach((item, i) => {
+        //     ctx.strokeStyle = defStroke;
+        //     ctx.lineWidth = 1;
+        //
+        //     // if ((i % 6) === 0) {
+        //     //   canvasCtx.lineWidth = 1;
+        //     //   canvasCtx.strokeStyle = 'gray';
+        //     // }
+        //
+        //     if (item.step === 'd' || item.step === 'm' || item.step === 'z') { // && this.type === 'freqAndVol'
+        //         ctx.lineWidth = 2;
+        //         ctx.strokeStyle = 'red';
+        //         ctx.fillRect(gutter/2, zeroY + (i * cellSize) + cellSize/2, 2, 2);
+        //         ctx.fillRect(gutter + width + gutter/2 , zeroY + (i * cellSize) + cellSize/2, 2, 2);
+        //     }
+        //
+        //     ctx.strokeStyle = defStroke;
+        //     ctx.lineWidth = .5;
+        //     ctx.beginPath();
+        //     ctx.moveTo(zeroX, zeroY + (i * cellSize));
+        //     ctx.lineTo(zeroX + width, zeroY + (i * cellSize));
+        //     ctx.stroke();
+        //
+        //     if (i === (this.freqList.length - 1)) {
+        //         ctx.strokeStyle = defStroke;
+        //         ctx.lineWidth = .5;
+        //         ctx.beginPath();
+        //         ctx.moveTo(zeroX, zeroY + ((i+1) * cellSize));
+        //         ctx.lineTo(zeroX + width, zeroY + ((i+1) * cellSize));
+        //         ctx.stroke();
+        //     }
+        // });
 
         // volumeList.forEach((item, i) => {
         //     if (item.value === 100 ) {
@@ -257,6 +278,12 @@ class Board {
         //     // canvasCtx.stroke();
         // });
     } // drawCells
+
+    colorList: ColorInfo[] = [];
+
+    setColorList(list: any[]) {
+        this.colorList = [...list];
+    }
 
     setFreqList(freqList: TFreqInfo[], botNote: string, topNote: string) {
         freqList = [...freqList];
@@ -603,6 +630,7 @@ export class RelativeKeysPage {
         // BASS BOARD
         this.bassBoard = new Board('bass', 'leftToRight');
         this.bassBoard.setFreqList(freqInfoList, 'do', 'be');
+        this.bassBoard.setColorList(bassColors);
         this.bassBoard.createCanvas({
                 ...sizes,
                 width: sizes.boardBassWidth
@@ -610,14 +638,15 @@ export class RelativeKeysPage {
             canvasBassEl
         );
         this.bassBoard.drawCells();
-        this.bassBoard.wave = new WaveSource2();
-        this.bassBoard.wave.connect(Sound.ctx.destination);
-        this.bassBoard.wave.start();
-        this.bassBoard.subscribe();
+        // this.bassBoard.wave = new WaveSource2();
+        // this.bassBoard.wave.connect(Sound.ctx.destination);
+        // this.bassBoard.wave.start();
+        // this.bassBoard.subscribe();
 
         // SOLO BOARD
         this.soloBoard = new Board('solo', 'rightToLeft');
         this.soloBoard.setFreqList(freqInfoList, 'da', 'bi');
+        this.soloBoard.setColorList([...soloColors].reverse());
         this.soloBoard.createCanvas({
                 ...sizes,
                 width: sizes.boardSoloWidth
@@ -625,10 +654,10 @@ export class RelativeKeysPage {
             canvasSoloEl
         );
         this.soloBoard.drawCells();
-        this.soloBoard.wave = new WaveSource2();
-        this.soloBoard.wave.connect(Sound.ctx.destination);
-        this.soloBoard.wave.start();
-        this.soloBoard.subscribe();
+        // this.soloBoard.wave = new WaveSource2();
+        // this.soloBoard.wave.connect(Sound.ctx.destination);
+        // this.soloBoard.wave.start();
+        // this.soloBoard.subscribe();
     }
 }
 
