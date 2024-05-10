@@ -6,6 +6,8 @@ import { RouteInfo } from '../../src/router';
 
 import { colorHash } from './utils';
 
+import { ideService } from '../ide/ide-service';
+
 const bassColors = [colorHash['0'], colorHash['-1'], colorHash['-2'], colorHash['-3'], colorHash['-4'], colorHash['-5'], colorHash['-6'], colorHash['-7'], colorHash['-8'], colorHash['-9'], colorHash['-10'], colorHash['-11'], colorHash['-12']];
 const soloColors = [colorHash['0'], colorHash['1'],  colorHash['2'],  colorHash['3'],  colorHash['4'],  colorHash['5'],  colorHash['6'],  colorHash['7'],  colorHash['8'],  colorHash['9'],  colorHash['10'],  colorHash['11'],  colorHash['12']];
 
@@ -110,12 +112,18 @@ function getSizes(x: {
 }
 
 class Board {
+    instrCode = m.DEFAULT_TONE_INSTR;
     isSilent = false;
     lastX = -1;
     lastY = -1;
     lastFreqObj: TFreqInfo;
+    lastColorInfo: ColorInfo;
     lastFreqVal = 0;
     lastVolVal = 0;
+    lastNote: string = 'do';
+    share: {
+        note: string,
+    };
 
     sizes: Sizes;
     gutter: number;
@@ -131,6 +139,7 @@ class Board {
     canvasCtxBot: CanvasRenderingContext2D;
 
     freqList: TFreqInfo[];
+    colorList: ColorInfo[];
 
     wave: WaveSource2;
 
@@ -279,8 +288,6 @@ class Board {
         // });
     } // drawCells
 
-    colorList: ColorInfo[] = [];
-
     setColorList(list: any[]) {
         this.colorList = [...list];
     }
@@ -292,6 +299,8 @@ class Board {
 
         this.freqList = newFreqList;
     }
+
+
 
     createCanvas(sizes: Sizes, canvasEl: HTMLElement) {
         this.sizes = sizes;
@@ -324,11 +333,25 @@ class Board {
         this.canvasCtxTop = this.canvasTop.getContext("2d");
     }
 
-    update(e: PointerEvent) {
-        const gutter = this.gutter;
-        const cellSize = this.sizes.cellSize;
-        const halfSize = this.sizes.halfSize;
+    update(e: PointerEvent, onlyStop = false) {
+        if (onlyStop) {
+            ideService.synthesizer.playSound({
+                id: this.type,
+                keyOrNote: this.lastNote,
+                instrCode: this.instrCode,
+                onlyStop: true,
+            });
+
+            this.lastY = -1;
+            this.lastX = -1;
+
+            return;
+        }
+
         const sizes = this.sizes;
+        const cellSize = sizes.cellSize;
+        const gutter = cellSize;
+        const halfSize = sizes.halfSize;
 
         // const offsetX = e.touches[0].clientX - this.sizes.boardLeftOffset;
         // const offsetY = e.touches[0].clientY - this.sizes.boardTopOffset;
@@ -337,15 +360,13 @@ class Board {
         const offsetY = e.offsetY;
 
         if (offsetX <= gutter ||
-            offsetX >= (sizes.width - gutter) ||
+            offsetX >= (sizes.boardBassWidth - gutter) ||
             offsetY <= gutter ||
             offsetY >= (sizes.boardHeight - gutter) ||
             this.isSilent
         ) {
             return;
         }
-
-        //console.log(offsetX, offsetY);
 
         // // if (e.buttons) {
         // //   canvasCtx.fillStyle = "green";
@@ -355,6 +376,7 @@ class Board {
         let curX = Math.round(offsetX);
         let curY = Math.round(offsetY);
         let changed = false;
+        let prevColorInfo = this.lastColorInfo;
 
         if (curY !== this.lastY) {
             this.lastY = curY;
@@ -363,95 +385,74 @@ class Board {
             const locY = curY - gutter;
             const indFreq = Math.floor(locY / cellSize);
 
-            if (this.freqList[indFreq]) {
-                this.lastFreqObj = this.freqList[indFreq];
+            if (this.colorList[indFreq]) {
+                this.lastColorInfo = this.colorList[indFreq];
             }
 
-            let freqVal = this.lastFreqObj.value;
+            //console.log(this.type, indFreq, locY, this.lastColorInfo);
+            const note = m.utils.getNoteByOffset(this.share.note, this.lastColorInfo.val);
 
-            let type2 = this.wave.type1;
-
-            if (this.isSmoothMode) {
-                let botFRange = this.lastFreqObj.midF  - this.lastFreqObj.botF;
-                let topFRange = this.lastFreqObj.topF - this.lastFreqObj.midF;
-
-                let topY = (cellSize * indFreq);
-                let botY = (cellSize * (indFreq + 1)) - 1;
-                let midY = topY + halfSize + 1;
-
-                let botFact = botFRange / (botY - midY);
-                let topFact = topFRange / (midY - topY);
-
-                if (locY === midY) {
-                    type2 = 'sawtooth';
-                }
-                else if (locY > midY) {
-                    // ниже
-                    freqVal = freqVal - (botFact * ((locY - midY)));
-                }
-                else {
-                    // выше
-                    freqVal = freqVal + (topFact * ((midY - locY)));
-                }
+            if (note) {
+                this.lastNote = note;
+                this.share.note = note;
+                ideService.synthesizer.playSound({
+                    id: this.type,
+                    keyOrNote: note,
+                    instrCode: this.instrCode,
+                });
             }
-
-            //console.log(this.lastFreqObj);
-
-            this.lastFreqVal = freqVal;
-            this.wave.setFreq(freqVal);
-            this.wave.setType2(type2);
         }
 
-        if (curX !== this.lastX) {
-            this.lastX = curX;
-            changed = true;
-
-            let vol = 0;
-            let lastVolVal = 0;
-            let freqVol = 0;
-
-            if (this.volDirection === 'rightToLeft') {
-                if (curX <= (gutter + cellSize + cellSize)) {
-                    vol = 100;
-                }
-                else if (curX >= (sizes.width - gutter - cellSize - cellSize)) {
-                    vol = 0;
-                }
-                else {
-                    const width = sizes.width - (gutter*2) - (cellSize*4);
-                    const locX = curX - gutter - (cellSize*2);
-                    vol = (1 - (locX / width)) * 100;
-                }
-
-                //console.log(outVol, vol, getEndPointVolume(vol) * (outVol/100));
-                freqVol = this.lastFreqObj ? this.lastFreqObj.volume : 0;
-            }
-
-            if (this.volDirection === 'leftToRight') {
-                if (curX <= (gutter + cellSize + cellSize)) {
-                    vol = 0;
-                }
-                else if (curX >= (sizes.width - gutter - cellSize - cellSize)) {
-                    vol = 100;
-                }
-                else {
-                    const width = sizes.width - (gutter * 2) - (cellSize * 4);
-                    const locX = curX - gutter - (cellSize * 2);
-                    vol = ((locX / width)) * 100;
-                }
-
-                //console.log(outVol, vol, getEndPointVolume(vol) * (outVol/100));
-                freqVol = this.lastFreqObj ? this.lastFreqObj.volume : 0;
-            }
-
-
-            lastVolVal = vol * freqVol;
-            this.lastVolVal = lastVolVal;
-
-            this.wave.setVol(
-                m.utils.getEndPointVolume(lastVolVal * outVol / 100) / 100
-            );
-        }
+        // if (curX !== this.lastX) {
+        //     this.lastX = curX;
+        //     changed = true;
+        //
+        //     let vol = 0;
+        //     let lastVolVal = 0;
+        //     let freqVol = 0;
+        //
+        //     if (this.volDirection === 'rightToLeft') {
+        //         if (curX <= (gutter + cellSize + cellSize)) {
+        //             vol = 100;
+        //         }
+        //         else if (curX >= (sizes.width - gutter - cellSize - cellSize)) {
+        //             vol = 0;
+        //         }
+        //         else {
+        //             const width = sizes.width - (gutter*2) - (cellSize*4);
+        //             const locX = curX - gutter - (cellSize*2);
+        //             vol = (1 - (locX / width)) * 100;
+        //         }
+        //
+        //         //console.log(outVol, vol, getEndPointVolume(vol) * (outVol/100));
+        //         freqVol = this.lastFreqObj ? this.lastFreqObj.volume : 0;
+        //     }
+        //
+        //     if (this.volDirection === 'leftToRight') {
+        //         if (curX <= (gutter + cellSize + cellSize)) {
+        //             vol = 0;
+        //         }
+        //         else if (curX >= (sizes.width - gutter - cellSize - cellSize)) {
+        //             vol = 100;
+        //         }
+        //         else {
+        //             const width = sizes.width - (gutter * 2) - (cellSize * 4);
+        //             const locX = curX - gutter - (cellSize * 2);
+        //             vol = ((locX / width)) * 100;
+        //         }
+        //
+        //         //console.log(outVol, vol, getEndPointVolume(vol) * (outVol/100));
+        //         freqVol = this.lastFreqObj ? this.lastFreqObj.volume : 0;
+        //     }
+        //
+        //
+        //     lastVolVal = vol * freqVol;
+        //     this.lastVolVal = lastVolVal;
+        //
+        //     this.wave.setVol(
+        //         m.utils.getEndPointVolume(lastVolVal * outVol / 100) / 100
+        //     );
+        // }
 
         // if (changed && this.record) {
         //     if (!this.lastVolVal && !this.record[this.record.length - 1]) {
@@ -481,32 +482,32 @@ class Board {
             }
         });
 
-        this.canvasTop.addEventListener('pointerenter', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (!this.pointerId && e.buttons) {
-                this.pointerId = e.pointerId;
-            }
-
-            if (e.pointerId === this.pointerId && e.buttons) {
-                this.update(e);
-            }
-        });
-
-        this.canvasTop.addEventListener('pointermove', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (!this.pointerId && e.buttons) {
-                this.pointerId = e.pointerId;
-            }
-
-            if (e.pointerId === this.pointerId && e.buttons) {
-                this.update(e);
-            }
-
-        });
+        // this.canvasTop.addEventListener('pointerenter', (e) => {
+        //     e.preventDefault();
+        //     e.stopPropagation();
+        //
+        //     if (!this.pointerId && e.buttons) {
+        //         this.pointerId = e.pointerId;
+        //     }
+        //
+        //     if (e.pointerId === this.pointerId && e.buttons) {
+        //         this.update(e);
+        //     }
+        // });
+        //
+        // this.canvasTop.addEventListener('pointermove', (e) => {
+        //     e.preventDefault();
+        //     e.stopPropagation();
+        //
+        //     if (!this.pointerId && e.buttons) {
+        //         this.pointerId = e.pointerId;
+        //     }
+        //
+        //     if (e.pointerId === this.pointerId && e.buttons) {
+        //         this.update(e);
+        //     }
+        //
+        // });
 
         this.canvasTop.addEventListener('pointerup', (e) => {
             e.preventDefault();
@@ -514,6 +515,7 @@ class Board {
 
             if (e.pointerId === this.pointerId) {
                 this.pointerId = null;
+                this.update(e, true);
             }
         });
 
@@ -523,6 +525,7 @@ class Board {
 
             if (e.pointerId === this.pointerId && e.buttons) {
                 this.pointerId = null;
+                this.update(e, true);
             }
         });
 
@@ -532,6 +535,7 @@ class Board {
 
             if (e.pointerId === this.pointerId) {
                 this.pointerId = null;
+                this.update(e, true);
             }
         });
     }
@@ -628,6 +632,10 @@ export class RelativeKeysPage {
         canvasSoloEl.style.width = `${sizes.boardSoloWidth}px`;
         canvasSoloEl.style.height = `${sizes.boardHeight}px`;
 
+        const share = {
+            note: 'do',
+        }
+
         // BASS BOARD
         this.bassBoard = new Board('bass', 'leftToRight');
         this.bassBoard.setFreqList(freqInfoList, 'do', 'be');
@@ -639,10 +647,12 @@ export class RelativeKeysPage {
             canvasBassEl
         );
         this.bassBoard.drawCells();
+        this.bassBoard.share = share;
         // this.bassBoard.wave = new WaveSource2();
         // this.bassBoard.wave.connect(Sound.ctx.destination);
         // this.bassBoard.wave.start();
-        // this.bassBoard.subscribe();
+        this.bassBoard.subscribe();
+
 
         // SOLO BOARD
         this.soloBoard = new Board('solo', 'rightToLeft');
@@ -655,10 +665,11 @@ export class RelativeKeysPage {
             canvasSoloEl
         );
         this.soloBoard.drawCells();
+        this.soloBoard.share = share;
         // this.soloBoard.wave = new WaveSource2();
         // this.soloBoard.wave.connect(Sound.ctx.destination);
         // this.soloBoard.wave.start();
-        // this.soloBoard.subscribe();
+        this.soloBoard.subscribe();
     }
 }
 

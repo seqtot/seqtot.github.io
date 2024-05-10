@@ -68,6 +68,7 @@ export const Muse = {
         getAudioBufferFromBlobString,
         getAudioBufferFromString,
         isNil,
+        getNoteByOffset,
     },
     parser: {
 
@@ -106,7 +107,6 @@ export const Muse = {
     getPartRowNio,
 
     getInstrNameByCode,
-    getNoteByOffset,
     getInstrCodeBy,
     getInstrumentObj,
     clearEndComment,
