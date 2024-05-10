@@ -179,113 +179,7 @@ class Board {
 
             ctx.fillStyle = defFill;
             ctx.fillRect(gutter, zeroY + (i * cellSize), width, cellSize);
-        })
-
-        // линия cверху ячейки
-        // this.freqList.forEach((item, i) => {
-        //     ctx.strokeStyle = defStroke;
-        //     ctx.lineWidth = 1;
-        //
-        //     // if ((i % 6) === 0) {
-        //     //   canvasCtx.lineWidth = 1;
-        //     //   canvasCtx.strokeStyle = 'gray';
-        //     // }
-        //
-        //     if (item.step === 'd' || item.step === 'm' || item.step === 'z') { // && this.type === 'freqAndVol'
-        //         ctx.lineWidth = 2;
-        //         ctx.strokeStyle = 'red';
-        //         ctx.fillRect(gutter/2, zeroY + (i * cellSize) + cellSize/2, 2, 2);
-        //         ctx.fillRect(gutter + width + gutter/2 , zeroY + (i * cellSize) + cellSize/2, 2, 2);
-        //     }
-        //
-        //     ctx.strokeStyle = defStroke;
-        //     ctx.lineWidth = .5;
-        //     ctx.beginPath();
-        //     ctx.moveTo(zeroX, zeroY + (i * cellSize));
-        //     ctx.lineTo(zeroX + width, zeroY + (i * cellSize));
-        //     ctx.stroke();
-        //
-        //     if (i === (this.freqList.length - 1)) {
-        //         ctx.strokeStyle = defStroke;
-        //         ctx.lineWidth = .5;
-        //         ctx.beginPath();
-        //         ctx.moveTo(zeroX, zeroY + ((i+1) * cellSize));
-        //         ctx.lineTo(zeroX + width, zeroY + ((i+1) * cellSize));
-        //         ctx.stroke();
-        //     }
-        // });
-
-        // volumeList.forEach((item, i) => {
-        //     if (item.value === 100 ) {
-        //         if (i > 0) {
-        //             return;
-        //         }
-        //
-        //         ctx.lineWidth = .5;
-        //         ctx.strokeStyle = defStroke;
-        //         ctx.beginPath();
-        //         ctx.moveTo(zeroX, zeroY);
-        //         ctx.lineTo(zeroX + width, zeroY);
-        //         ctx.stroke();
-        //
-        //         return;
-        //     }
-        //
-        //     // if (item.value === 52.5 || item.value === 47.5 ) {
-        //     //   ctx.lineWidth = .5;
-        //     //   ctx.strokeStyle = 'red';
-        //     //   ctx.beginPath();
-        //     //   ctx.moveTo(zeroX, (i * cellSize) + zeroY);
-        //     //   ctx.lineTo(zeroX + width, (i * cellSize) + zeroY);
-        //     //   ctx.stroke();
-        //
-        //     //   return;
-        //     // }
-        //
-        //     if (item.value === 0) {
-        //         ctx.lineWidth = .5;
-        //         ctx.strokeStyle = defStroke;
-        //
-        //         if (i === (volumeList.length - 1)) {
-        //             ctx.beginPath();
-        //             ctx.moveTo(zeroX, ((i+1) * cellSize) + zeroY);
-        //             ctx.lineTo(zeroX + width, ((i+1) * cellSize) + zeroY);
-        //             ctx.stroke();
-        //
-        //             return;
-        //         }
-        //     }
-        //
-        //
-        //     ctx.strokeStyle = defStroke;
-        //
-        //     if (item.isMiddle) {
-        //         ctx.strokeStyle = midStroke;
-        //     }
-        //
-        //     ctx.lineWidth = .5;
-        //
-        //     ctx.beginPath();
-        //     ctx.moveTo(zeroX, (i * cellSize) + zeroY);
-        //     ctx.lineTo(zeroX + width, (i * cellSize) + zeroY);
-        //     ctx.stroke();
-        //
-        //     // if ((i % 6) === 0) {
-        //     //   canvasCtx.lineWidth = 1;
-        //     //   canvasCtx.strokeStyle = 'gray';
-        //     // }
-        //
-        //     // if (i=== 0 || (i % 12) === 0) {
-        //     //   canvasCtx.lineWidth = 2;
-        //     //   canvasCtx.strokeStyle = 'red';
-        //     // }
-        //
-        //
-        //     // canvasCtx.beginPath();
-        //     // canvasCtx.moveTo(0, i * cellSize);
-        //     // canvasCtx.lineTo(BOARD_WIDTH, i * cellSize);
-        //     // canvasCtx.stroke();
-        // });
+        });
     } // drawCells
 
     setColorList(list: any[]) {
@@ -299,8 +193,6 @@ class Board {
 
         this.freqList = newFreqList;
     }
-
-
 
     createCanvas(sizes: Sizes, canvasEl: HTMLElement) {
         this.sizes = sizes;
@@ -378,29 +270,26 @@ class Board {
         let changed = false;
         let prevColorInfo = this.lastColorInfo;
 
-        if (curY !== this.lastY) {
-            this.lastY = curY;
-            changed = true;
+        this.lastY = curY;
 
-            const locY = curY - gutter;
-            const indFreq = Math.floor(locY / cellSize);
+        const locY = curY - gutter;
+        const indY = Math.floor(locY / cellSize);
 
-            if (this.colorList[indFreq]) {
-                this.lastColorInfo = this.colorList[indFreq];
-            }
+        if (this.colorList[indY]) {
+            this.lastColorInfo = this.colorList[indY];
+        }
 
-            //console.log(this.type, indFreq, locY, this.lastColorInfo);
-            const note = m.utils.getNoteByOffset(this.share.note, this.lastColorInfo.val);
+        //console.log(this.type, indFreq, locY, this.lastColorInfo);
+        const note = m.utils.getNoteByOffset(this.share.note, this.lastColorInfo.val);
 
-            if (note) {
-                this.lastNote = note;
-                this.share.note = note;
-                ideService.synthesizer.playSound({
-                    id: this.type,
-                    keyOrNote: note,
-                    instrCode: this.instrCode,
-                });
-            }
+        if (note) {
+            this.lastNote = note;
+            this.share.note = note;
+            ideService.synthesizer.playSound({
+                id: this.type,
+                keyOrNote: note,
+                instrCode: this.instrCode,
+            });
         }
 
         // if (curX !== this.lastX) {
@@ -559,17 +448,50 @@ export class RelativeKeysPage {
 
     onMounted() {
         this.setContent();
+        this.subscribeEvents();
     }
 
     onUnmounted() {
 
     }
 
+    subscribeEvents() {
+        getWithDataAttr('set-note', this.pageEl).forEach(el => {
+            el.addEventListener('pointerup', (e: MouseEvent) => {
+                const note = el.dataset.setNote || 'do';
+                this.soloBoard.share.note = note;
+            });
+        });
+    }
+
     setContent() {
         const stl = 'position: absolute; box-sizing: border-box; user-select: none; touch-action: none;'
-        const stl2 = 'style="box-sizing: border-box; user-select: none; touch-action: none;"';
+        const stl2 = 'box-sizing: border-box; user-select: none; touch-action: none; position: relative;';
+        const noteStl = 'padding: 4px; box-sizing: border-box; user-select: none; touch-action: none; position: relative;'
+        const notesTpl = `
+            <span style="${noteStl}" data-set-note="do">Д</span>
+            <span style="${noteStl}" data-set-note="to">т</span>
+            <span style="${noteStl}" data-set-note="ro">Р</span>                                
+            <span style="${noteStl}" data-set-note="no">н</span>
+            <span style="${noteStl}" data-set-note="mo">М</span>
+            <span style="${noteStl}" data-set-note="fo">Ф</span>
+            <span style="${noteStl}" data-set-note="vo">в</span>
+            <span style="${noteStl}" data-set-note="so">С</span>                
+            <span style="${noteStl}" data-set-note="zo">з</span>
+            <span style="${noteStl}" data-set-note="lo">Л</span>
+            <span style="${noteStl}" data-set-note="ko">к</span>                                
+            <span style="${noteStl}" data-set-note="bo">Б</span>        
+        `.trim();
 
         this.pageEl.innerHTML = `
+            <!--div style="padding: 8px 8px 16px 8px; height: 32px; box-sizing: border-box;">
+                <button data-set-do>DO</button>
+            </div-->
+            
+            <div style="padding: 16px 8px 16px 8px;">
+                ${notesTpl}
+            </div>
+                        
             <div data-boards-container style="${stl2}">
                 <div data-board-bass-container style="${stl}">
                     <div data-board-bass-canvas-container style="${stl}"></div>                
@@ -579,20 +501,9 @@ export class RelativeKeysPage {
                     <div data-board-solo-canvas-container style="${stl}"></div>                
                 </div>
             </div>
-            <!--div style="${stl2}">
-                <span style="${stl2}">Д</span>
-                <span style="${stl2}">т</span>
-                <span style="${stl2}">Р</span>
-                <span style="${stl2}">н</span>
-                <span style="${stl2}">М</span>
-                <span style="${stl2}">Ф</span>                
-                <span style="${stl2}">в</span>
-                <span style="${stl2}">С</span>
-                <span style="${stl2}">з</span>                
-                <span style="${stl2}">Л</span>                
-                <span style="${stl2}">к</span>
-                <span style="${stl2}">Б</span>                                
-            </div-->
+            <div style="padding: 16px 8px 16px 8px;">
+                ${notesTpl}
+            </div>
         `.trim();
 
         const sizes = getSizes({
