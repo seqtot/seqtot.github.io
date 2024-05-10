@@ -509,7 +509,7 @@ export class RelativeKeysPage {
             </div-->
             <div style="padding: 16px; margin: 0; user-select: none; touch-action: none;">
                 <div style="padding: 4px; display: flex; justify-content: space-between;">
-                    ${this.getNoteLine('u')}
+                    ${this.getNoteLine('y')}
                 </div>
                 <div style="padding: 4px; display: flex; justify-content: space-between;">
                     ${this.getNoteLine('o')}
@@ -522,8 +522,6 @@ export class RelativeKeysPage {
                 </div>            
             </div>
             
-                        
-                        
             <div data-boards-container style="${stl2}">
                 <div data-board-bass-container style="${stl}">
                     <div data-board-bass-canvas-container style="${stl}"></div>                
