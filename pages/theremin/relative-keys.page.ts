@@ -68,7 +68,8 @@ type Sizes = {
 function getSizes(x: {
     width: number,
     height: number,
-    cellCount: number,
+    colCount: number,
+    rowCount: number,
 }): Sizes {
     //console.log(getPosition(this.bassBoard.canvasEl));
 
@@ -76,26 +77,27 @@ function getSizes(x: {
 
     let width = x.width ; // window.innerWidth;
     let height = x.height - (headerHeight * 2); //window.innerHeight;
+    width = width > height? height: width;
+
+    let colWidth = Math.floor(width / (x.colCount + 4));
+    colWidth = Math.floor(colWidth / 2) * 2;
+
     // let boardWidth = pageWidth - 64;
     // let boardHeight = 0;
-    let halfSize = Math.floor((((height - (x.cellCount + 2)) / (x.cellCount + 2))) / 2);
-    let cellSize = (halfSize * 2) + 1;
+    let halfSize = colWidth / 2;
+    let cellSize = colWidth;
 
-    const halfWidth = Math.floor(width / cellSize / 2) * cellSize;
+    const boardWidth = width/2;
 
-    let boardSoloWidth = halfWidth; //Math.floor(width / cellSize);
-    //boardSoloWidth = boardSoloWidth - 3;
-    //boardSoloWidth = boardSoloWidth * cellSize;
+    let boardSoloWidth = boardWidth;
     let boardBassLeft = 0;
-    let boardBassWidth = halfWidth; // cellSize * 3;
-    let boardSoloLeft = width - 1 - halfWidth; // cellSize * 3;
-
-    let boardHeight = (x.cellCount * cellSize) + (cellSize * 2);
+    let boardBassWidth = boardWidth;
+    let boardSoloLeft = boardWidth;
 
     return {
-        width,
-        height,
-        boardHeight,
+        width: cellSize * (x.colCount + 4),
+        height: cellSize * (x.rowCount + 2),
+        boardHeight: cellSize * (x.rowCount + 2),
         cellSize,
         halfSize,
         boardSoloWidth,
@@ -150,13 +152,11 @@ class Board {
     }
 
     drawCells() {
-        const gutter = this.gutter;
-        const zeroY = gutter;
-        const zeroX = gutter;
-        const height = this.sizes.height - (gutter*2);
-        const width = this.sizes.width - (gutter*2);
-        const ctx = this.canvasCtxMid;
         const cellSize = this.sizes.cellSize;
+        const gutter = cellSize;
+        const zeroY = cellSize;
+        const width = (this.sizes.boardSoloWidth) - cellSize - cellSize;
+        const ctx = this.canvasCtxMid;
 
         this.clearCanvasMid();
         const defStroke = 'rgb(200, 200, 200)';
@@ -169,7 +169,7 @@ class Board {
             ctx.lineWidth = 1;
 
             ctx.fillStyle = defFill;
-            ctx.fillRect(this.type === 'bass' ? gutter : 0, zeroY + (i * cellSize), width, cellSize);
+            ctx.fillRect(gutter, zeroY + (i * cellSize), width, cellSize);
         })
 
         // линия cверху ячейки
@@ -594,7 +594,8 @@ export class RelativeKeysPage {
         const sizes = getSizes({
             width: this.pageEl.clientWidth, // this.pageEl.getBoundingClientRect().width,
             height: this.pageEl.clientHeight, // this.pageEl.getBoundingClientRect().height,
-            cellCount: 12
+            colCount: 12,
+            rowCount: 13,
         });
 
         //console.log('sizes', sizes);
