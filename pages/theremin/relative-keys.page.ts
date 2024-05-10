@@ -457,40 +457,72 @@ export class RelativeKeysPage {
 
     subscribeEvents() {
         getWithDataAttr('set-note', this.pageEl).forEach(el => {
-            el.addEventListener('pointerup', (e: MouseEvent) => {
+            el.addEventListener('pointerdown', (e: MouseEvent) => {
                 const note = el.dataset.setNote || 'do';
+                ideService.synthesizer.playSound({
+                    id: 'note-line',
+                    keyOrNote: note,
+                    instrCode: this.bassBoard.instrCode,
+                });
                 this.soloBoard.share.note = note;
             });
+            el.addEventListener('pointerup', (e: MouseEvent) => {
+                const note = el.dataset.setNote || 'do';
+                ideService.synthesizer.playSound({
+                    id: 'note-line',
+                    keyOrNote: note,
+                    instrCode: this.bassBoard.instrCode,
+                    onlyStop: true,
+                });
+            });
         });
+    }
+
+
+    getNoteLine(octave: string): string {
+        const noteStl = 'margin: 0; padding: 0; box-sizing: border-box; user-select: none; touch-action: none;'
+        const notesTpl = `
+            <p style="${noteStl}" data-set-note="d${octave}">Д</p>
+            <p style="${noteStl}" data-set-note="t${octave}">т</p>
+            <p style="${noteStl}" data-set-note="r${octave}">Р</p>                                
+            <p style="${noteStl}" data-set-note="n${octave}">н</p>
+            <p style="${noteStl}" data-set-note="m${octave}">М</p>
+            <p style="${noteStl}" data-set-note="f${octave}">Ф</p>
+            <p style="${noteStl}" data-set-note="v${octave}">в</p>
+            <p style="${noteStl}" data-set-note="s${octave}">С</p>                
+            <p style="${noteStl}" data-set-note="z${octave}">з</p>
+            <p style="${noteStl}" data-set-note="l${octave}">Л</p>
+            <p style="${noteStl}" data-set-note="k${octave}">к</p>                                
+            <p style="${noteStl}" data-set-note="b${octave}">Б</p>        
+        `.trim();
+
+        return notesTpl;
     }
 
     setContent() {
         const stl = 'position: absolute; box-sizing: border-box; user-select: none; touch-action: none;'
         const stl2 = 'box-sizing: border-box; user-select: none; touch-action: none; position: relative;';
-        const noteStl = 'padding: 4px; box-sizing: border-box; user-select: none; touch-action: none; position: relative;'
-        const notesTpl = `
-            <span style="${noteStl}" data-set-note="do">Д</span>
-            <span style="${noteStl}" data-set-note="to">т</span>
-            <span style="${noteStl}" data-set-note="ro">Р</span>                                
-            <span style="${noteStl}" data-set-note="no">н</span>
-            <span style="${noteStl}" data-set-note="mo">М</span>
-            <span style="${noteStl}" data-set-note="fo">Ф</span>
-            <span style="${noteStl}" data-set-note="vo">в</span>
-            <span style="${noteStl}" data-set-note="so">С</span>                
-            <span style="${noteStl}" data-set-note="zo">з</span>
-            <span style="${noteStl}" data-set-note="lo">Л</span>
-            <span style="${noteStl}" data-set-note="ko">к</span>                                
-            <span style="${noteStl}" data-set-note="bo">Б</span>        
-        `.trim();
 
         this.pageEl.innerHTML = `
             <!--div style="padding: 8px 8px 16px 8px; height: 32px; box-sizing: border-box;">
                 <button data-set-do>DO</button>
             </div-->
-            
-            <div style="padding: 16px 8px 16px 8px;">
-                ${notesTpl}
+            <div style="padding: 16px; margin: 0; user-select: none; touch-action: none;">
+                <div style="padding: 4px; display: flex; justify-content: space-between;">
+                    ${this.getNoteLine('u')}
+                </div>
+                <div style="padding: 4px; display: flex; justify-content: space-between;">
+                    ${this.getNoteLine('o')}
+                </div>            
+                <div style="padding: 4px; display: flex; justify-content: space-between;">
+                    ${this.getNoteLine('a')}
+                </div>
+                <div style="padding: 4px; display: flex; justify-content: space-between;">
+                    ${this.getNoteLine('e')}
+                </div>            
             </div>
+            
+                        
                         
             <div data-boards-container style="${stl2}">
                 <div data-board-bass-container style="${stl}">
@@ -500,9 +532,6 @@ export class RelativeKeysPage {
                 <div data-board-solo-container style="${stl}">
                     <div data-board-solo-canvas-container style="${stl}"></div>                
                 </div>
-            </div>
-            <div style="padding: 16px 8px 16px 8px;">
-                ${notesTpl}
             </div>
         `.trim();
 
