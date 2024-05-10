@@ -52,12 +52,11 @@ function getFreqList(freqList: TFreqInfo[], botNote: string, topNote: string): T
 }
 
 type Sizes = {
-    width: number,
-    height: number,
+    boardWidth: number,
     boardHeight: number,
 
-    cellSize: number,
-    halfSize: number,
+    cellWidth: number,
+    rowHeight: number,
 
     boardSoloWidth: number,
     boardSoloLeft: number,
@@ -79,17 +78,14 @@ function getSizes(x: {
 
     let width = x.width ; // window.innerWidth;
     let height = x.height - (headerHeight * 2); //window.innerHeight;
-    width = width > height? height: width;
+    let size = width > height? height: width;
 
-    let colWidth = Math.floor(width / (x.colCount + 4));
+    let colWidth = Math.floor(size / (x.colCount + 4));
     colWidth = Math.floor(colWidth / 2) * 2;
+    let rowHeight = Math.floor(size / (x.rowCount * 2)) * 2;
+    let cellWidth = colWidth;
 
-    // let boardWidth = pageWidth - 64;
-    // let boardHeight = 0;
-    let halfSize = colWidth / 2;
-    let cellSize = colWidth;
-
-    const boardWidth = width/2;
+    const boardWidth = (cellWidth * (x.colCount + 4)) / 2;
 
     let boardSoloWidth = boardWidth;
     let boardBassLeft = 0;
@@ -97,11 +93,10 @@ function getSizes(x: {
     let boardSoloLeft = boardWidth;
 
     return {
-        width: cellSize * (x.colCount + 4),
-        height: cellSize * (x.rowCount + 2),
-        boardHeight: cellSize * (x.rowCount + 2),
-        cellSize,
-        halfSize,
+        boardHeight: (rowHeight * x.rowCount) + (cellWidth * 2),
+        boardWidth,
+        rowHeight,
+        cellWidth,
         boardSoloWidth,
         boardSoloLeft,
         boardBassLeft,
@@ -161,10 +156,11 @@ class Board {
     }
 
     drawCells() {
-        const cellSize = this.sizes.cellSize;
-        const gutter = cellSize;
-        const zeroY = cellSize;
-        const width = (this.sizes.boardSoloWidth) - cellSize - cellSize;
+        const cellWidth = this.sizes.cellWidth;
+        const gutter = cellWidth;
+        const zeroY = gutter;
+        const width = (this.sizes.boardWidth) - (gutter * 2);
+        const rowHeight = this.sizes.rowHeight;
         const ctx = this.canvasCtxMid;
 
         this.clearCanvasMid();
@@ -178,7 +174,7 @@ class Board {
             ctx.lineWidth = 1;
 
             ctx.fillStyle = defFill;
-            ctx.fillRect(gutter, zeroY + (i * cellSize), width, cellSize);
+            ctx.fillRect(gutter, zeroY + (i * rowHeight), width, rowHeight);
         });
     } // drawCells
 
@@ -196,14 +192,14 @@ class Board {
 
     createCanvas(sizes: Sizes, canvasEl: HTMLElement) {
         this.sizes = sizes;
-        this.gutter = sizes.cellSize;
+        this.gutter = sizes.cellWidth;
         this.canvasEl = canvasEl;
 
         // BOT TOM
         this.canvasBot = document.createElement('canvas');
         this.canvasBot.style.position = "absolute";
-        this.canvasBot.width  = sizes.width;
-        this.canvasBot.height = sizes.height;
+        this.canvasBot.width  = sizes.boardWidth;
+        this.canvasBot.height = sizes.boardHeight;
         // this.canvasEl.style.border   = "1px solid gray";
         this.canvasEl.appendChild(this.canvasBot);
         this.canvasCtxBot = this.canvasBot.getContext("2d");
@@ -211,16 +207,16 @@ class Board {
         // MID CANVAS
         this.canvasMid = document.createElement('canvas');
         this.canvasMid.style.position = "absolute";
-        this.canvasMid.width  = sizes.width;
-        this.canvasMid.height = sizes.height;
+        this.canvasMid.width  = sizes.boardWidth;
+        this.canvasMid.height = sizes.boardHeight;
         this.canvasEl.appendChild(this.canvasMid);
         this.canvasCtxMid = this.canvasMid.getContext("2d");
 
         // TOP CANVAS
         this.canvasTop = document.createElement('canvas');
         this.canvasTop.style.position = "absolute";
-        this.canvasTop.width  = sizes.width;
-        this.canvasTop.height = sizes.height;
+        this.canvasTop.width  = sizes.boardWidth;
+        this.canvasTop.height = sizes.boardHeight;
         this.canvasEl.appendChild(this.canvasTop);
         this.canvasCtxTop = this.canvasTop.getContext("2d");
     }
@@ -241,9 +237,8 @@ class Board {
         }
 
         const sizes = this.sizes;
-        const cellSize = sizes.cellSize;
-        const gutter = cellSize;
-        const halfSize = sizes.halfSize;
+        const rowHeight = sizes.rowHeight;
+        const gutter = this.gutter;
 
         // const offsetX = e.touches[0].clientX - this.sizes.boardLeftOffset;
         // const offsetY = e.touches[0].clientY - this.sizes.boardTopOffset;
@@ -273,7 +268,7 @@ class Board {
         this.lastY = curY;
 
         const locY = curY - gutter;
-        const indY = Math.floor(locY / cellSize);
+        const indY = Math.floor(locY / rowHeight);
 
         if (this.colorList[indY]) {
             this.lastColorInfo = this.colorList[indY];
@@ -480,7 +475,17 @@ export class RelativeKeysPage {
 
 
     getNoteLine(octave: string): string {
-        const noteStl = 'margin: 0; padding: 0; box-sizing: border-box; user-select: none; touch-action: none;'
+        const noteStl = `
+            height: 16px;
+            width: 16px;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            touch-action: none;
+            text-align: center;
+            background-color: whitesmoke;
+        `.trim();
+
         const notesTpl = `
             <p style="${noteStl}" data-set-note="d${octave}">Д</p>
             <p style="${noteStl}" data-set-note="t${octave}">т</p>
@@ -543,31 +548,31 @@ export class RelativeKeysPage {
         //console.log('sizes', sizes);
 
         let boardsEl = getWithDataAttr('boards-container')[0];
-        boardsEl.style.width = `${sizes.width}px`;
+        boardsEl.style.width = `${sizes.boardWidth}px`;
         boardsEl.style.height = `${sizes.boardHeight}px`;
 
         let boardBassEl = getWithDataAttr('board-bass-container')[0];
         boardBassEl.style.top = `0px`;
         boardBassEl.style.left = `${sizes.boardBassLeft}px`;
-        boardBassEl.style.width = `${sizes.boardBassWidth}px`;
+        boardBassEl.style.width = `${sizes.boardWidth}px`;
         boardBassEl.style.height = `${sizes.boardHeight}px`;
 
         let canvasBassEl = getWithDataAttr('board-bass-canvas-container')[0];
         canvasBassEl.style.top = `0px`;
         canvasBassEl.style.left = `0px`;
-        canvasBassEl.style.width = `${sizes.boardBassWidth}px`;
+        canvasBassEl.style.width = `${sizes.boardWidth}px`;
         canvasBassEl.style.height = `${sizes.boardHeight}px`;
 
         let boardSoloEl = getWithDataAttr('board-solo-container')[0];
         boardSoloEl.style.top = `0px`;
         boardSoloEl.style.left = `${sizes.boardSoloLeft}px`;
-        boardSoloEl.style.width = `${sizes.boardSoloWidth}px`;
+        boardSoloEl.style.width = `${sizes.boardWidth}px`;
         boardSoloEl.style.height = `${sizes.boardHeight}px`;
 
         let canvasSoloEl = getWithDataAttr('board-solo-canvas-container')[0];
         canvasSoloEl.style.top = `0px`;
         canvasSoloEl.style.left = `0px`;
-        canvasSoloEl.style.width = `${sizes.boardSoloWidth}px`;
+        canvasSoloEl.style.width = `${sizes.boardWidth}px`;
         canvasSoloEl.style.height = `${sizes.boardHeight}px`;
 
         const share = {
@@ -580,7 +585,6 @@ export class RelativeKeysPage {
         this.bassBoard.setColorList(bassColors);
         this.bassBoard.createCanvas({
                 ...sizes,
-                width: sizes.boardBassWidth
             },
             canvasBassEl
         );
@@ -598,7 +602,6 @@ export class RelativeKeysPage {
         this.soloBoard.setColorList([...soloColors].reverse());
         this.soloBoard.createCanvas({
                 ...sizes,
-                width: sizes.boardSoloWidth
             },
             canvasSoloEl
         );
