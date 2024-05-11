@@ -142,6 +142,13 @@ freqListSrc.forEach((srcItem, i) => {
   freqList.push(item);
 });
 
+// https://en.wikipedia.org/wiki/Web_colors#Color_selection
+// R       G       B       Y      M      C     |
+// 12!__   04_!_   03__!   02!!_  07!_!  09_!! |
+// 05!:_   01:!.   08:.!                       |
+// 11!.:   10.!:   06.:!                       |
+//
+
 export const colorHash = {
   '12':   { mask: '!__', val: 12,   name: 'йа',  rgb: '250,25,25'   },
   '-12':  { mask: '!__', val: -12,   name: 'йу',  rgb: '125,25,25'   },

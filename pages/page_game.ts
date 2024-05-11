@@ -4,6 +4,8 @@ import { RouteInfo } from '../src/router';
 import { getWithDataAttr } from '../src/utils';
 import { ideService } from './ide/ide-service';
 import { standardTicks as ticks } from './ticks';
+import { colorHash } from './theremin/utils';
+import { Muse as m } from '../libs/muse';
 
 type RouteType = {id: string, game: string}
 
@@ -37,52 +39,6 @@ const colors2 = {
     black: '0,0,0',
     white: '255,255,255',
 }
-
-// R       G       B       Y      M      C     |
-// 12!__   04_!_   03__!   02!!_  07!_!  09_!! |
-// 05!:_   01:!.   08:.!                       |
-// 11!.:   10.!:   06.:!                       |
-//
-
-const colorHash = {
-'12':   { mask: '!__', val: 12,   name: 'йа',  rgb: '250,25,25'   },
-'-12':  { mask: '!__', val: -12,   name: 'йу',  rgb: '125,25,25'   },
-
-'11':   { mask: '!.:', val: 11,   name: 'га',  rgb: '250,175,200' },
-'-11':  { mask: '!.:', val: -11,  name:  'гу', rgb: '125,75,100'  },
-
-'10':   { mask: '_!_', val: 10,   name: 'жа', rgb: '25,250,25'   },
-'-10':  { mask: '_!_', val: -10,  name: 'жу', rgb: '25,100,25'   },
-
-'9':   { mask: '_!!', val: 9,  name: 'фа', rgb: '25,250,250'   },
-'-9':  { mask: '_!!', val: -9,  name: 'фу', rgb: '25,125,125'   },
-
-'8':  { mask: ':.!', val: 8, name: 'ва',  rgb: '200,150,250' },
-'-8': { mask: ':.!', val: -8, name:  'ву', rgb: '100,75,125'  },
-
-'7':   { mask: '!_!', val: 7,   name: 'за', rgb: '250,25,250'  },
-'-7':  { mask: '!_!', val: -7,   name: 'зу', rgb: '120,25,125'  },
-
-'6':   { mask: '__!', val: 6,  name: 'ща',      rgb: '25,25,250'    },
-'-6':  { mask: '__!', val: -6,  name: 'щу',      rgb: '25,25,125'   },
-
-'5':   { mask: '!:_', val: 5,  name: 'ла',  rgb: '250,175,25'   },
-'-5':  { mask: '!:_', val: -5,  name: 'лу',  rgb: '125,50,25'    },
-
-'4':  { mask: '.!:', val: 4,  name: 'ра', rgb: '150,250,200'  },
-'-4': { mask: '.!:', val: -4,  name: 'ру', rgb: '50,150,100'   },
-
-'3':   { mask: '.:!', val: 3,  name: 'ша', rgb: '150,200,250'  },
-'-3':  { mask: '.:!', val: -3,   name: 'шу', rgb: '50,100,150'   },
-
-'2':   { mask: '!!_', val: 2,   name: 'са', rgb: '250,250,25'   },
-'-2':  { mask: '!!_', val: -2,  name: 'су', rgb: '125,125,25'   },
-
-'1':  { mask: '!::', val: 1,  name:  'ха',  rgb: '200,190,190'  },
-'-1': { mask: '!::', val: -1, name:  'ху',  rgb: '100,100,110'  },
-
-'0':   { mask: '!!!', val: 0,   name: 'мо', rgb: '150,150,150' },
-};
 
 const colorArr = Object.values(colorHash);
 
@@ -121,77 +77,19 @@ function getSizes(x: {
     return result;
 }
 
-type ModelType = {
-    lines: {
-        restQ?: number,
-        cells: {
-            offsetQ: number,
-            durQ: number,
-        }[]
-    }[]
+type ModelLine = {
+    restQ?: number,
+    cells: {
+        offsetQ: number,
+        durQ: number,
+        note?: string,
+        prevNoteOffset?: number,
+    }[];
 }
 
-const topTestBlock: ModelType = {
-    lines: [
-        {
-            cells: [
-                { offsetQ: 0, durQ: 30 },
-                { offsetQ: 60, durQ: 30 },
-            ]
-        },
-        {
-            cells: [
-                { offsetQ: 0, durQ: 30 },
-                { offsetQ: 60, durQ: 30 },
-            ]
-        },
-        {
-            cells: [
-                { offsetQ: 0, durQ: 30 },
-                { offsetQ: 60, durQ: 30 },
-            ]
-        },
-        {
-            cells: [
-                { offsetQ: 0, durQ: 30 },
-                { offsetQ: 60, durQ: 30 },
-            ]
-        }
-    ]
-};
-
-const midTestBlock: ModelType = {
-    lines: [
-        {
-            restQ: 0,
-            cells: [{
-                offsetQ: 0,
-                durQ: 30,
-            }]
-        },
-        {
-            restQ: 0,
-            cells: [{
-                offsetQ: 30,
-                durQ: 30,
-            }]
-        },
-        {
-            restQ: 0,
-            cells: [{
-                offsetQ: 60,
-                durQ: 30,
-            }]
-        },
-        {
-            restQ: 0,
-            cells: [{
-                offsetQ: 90,
-                durQ: 30,
-            }]
-        }
-    ]
-};
+type ModelType = {
+    lines: ModelLine[]
+}
 
 function getRandomBlock(rowCount: number): ModelType {
     let lines = new Array(rowCount).fill(null) as ModelType['lines'];
@@ -230,13 +128,84 @@ function getRandomBlock(rowCount: number): ModelType {
     }
 }
 
-const model: {top: ModelType, mid: ModelType, bot: ModelType} = {
-    top: topTestBlock,
-    mid: getRandomBlock(4),
-    bot: getRandomBlock(4),
+const model: {one: ModelType, two: ModelType, three: ModelType, four: ModelType} = {
+    one: getRandomBlock(4),
+    two: getRandomBlock(4),
+    three: getRandomBlock(4),
+    four: getRandomBlock(4),
 }
 
+const notesLatArr = [
+    'dy', 'ty', 'ry', 'ny', 'my', 'fy', 'vy', 'sy', 'zy', 'ly', 'ky', 'by',
+    'do', 'to', 'ro', 'no', 'mo', 'fo', 'vo', 'so', 'zo', 'lo', 'ko', 'bo',
+    'da', 'ta', 'ra', 'na', 'ma', 'fa', 'va', 'sa', 'za', 'la', 'ka', 'ba',
+    'de', 'te', 're', 'ne', 'me', 'fe', 've', 'se', 'ze', 'le', 'ke', 'be',
+];
+
+const notesLatHash = notesLatArr.reduce((acc, note, i) => {
+    acc[note] = i;
+
+    return acc;
+}, <{[note: string]: number}>{})
+
+const offsetRange = [
+    0,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+    -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12,
+];
+
+function setModelColor(blocks: ModelType[])  {
+    let firstNote = '';
+    let prevNote = '';
+
+    blocks.forEach(block => {
+        block.lines.forEach(line => {
+            line.cells.forEach(cell => {
+                if (!firstNote && !cell.note) {
+                    cell.note = m.utils.getRandomElement(notesLatArr);
+                }
+
+                if (!firstNote) {
+                    firstNote = cell.note;
+                    prevNote = firstNote;
+                }
+
+                if (!cell.note) {
+                    let note = '';
+                    while (!notesLatHash[note]) {
+                        const offset = m.utils.getRandomElement(offsetRange);
+                        note = m.utils.getNoteByOffset(prevNote, offset);
+                    }
+                    cell.note = note;
+                }
+
+                cell.prevNoteOffset = notesLatHash[cell.note] - notesLatHash[prevNote];
+                prevNote = cell.note;
+            });
+        })
+    })
+
+}
+
+setModelColor([model.one, model.two, model.three, model.four]);
+
+function getPosition(element) {
+    let xPosition = 0;
+    let yPosition = 0;
+
+    while(element) {
+        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+        yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+        element = element.offsetParent;
+    }
+    return { x: xPosition, y: yPosition };
+}
+
+const DOWN = 1;
+const UP = 0;
+
 class Board {
+    pointerId: number | null;
     canvasTop: HTMLCanvasElement;
     canvasCtxTop: CanvasRenderingContext2D;
 
@@ -299,22 +268,27 @@ class Board {
         const ctx = this.canvasCtxMid;
         const defStroke = 'rgb(222, 222, 222)';
         const sizes = this.sizes;
-
-        ctx.strokeStyle = defStroke;
-        ctx.lineWidth = 1;
         let lastY = 0;
 
         const paintSection = (block: ModelType, lastY: number, rowHeight): number => {
-            block.lines.forEach((line, iLine) => {
-                ctx.beginPath();
-                ctx.moveTo(0, lastY);
-                ctx.lineTo(sizes.boardWidth, lastY);
-                ctx.stroke();
+            ctx.strokeStyle = defStroke;
+            ctx.lineWidth = 1;
 
-                ctx.beginPath();
-                ctx.moveTo(0, lastY + rowHeight);
-                ctx.lineTo(sizes.boardWidth, lastY + rowHeight);
-                ctx.stroke();
+            block.lines.forEach((line, iLine) => {
+
+                // ctx.strokeStyle = 'rgb(255, 0, 0)';
+                //
+                // ctx.beginPath();
+                // ctx.moveTo(0, lastY);
+                // ctx.lineTo(sizes.boardWidth, lastY);
+                // ctx.stroke();
+                //
+                // ctx.beginPath();
+                // ctx.moveTo(0, lastY + rowHeight);
+                // ctx.lineTo(sizes.boardWidth, lastY + rowHeight);
+                // ctx.stroke();
+
+                ctx.strokeStyle = defStroke;
 
                 for (let i = 0; i < this.sizes.cellCount; i++) {
                     ctx.strokeRect(i * sizes.cellWidth, lastY, sizes.cellWidth, rowHeight);
@@ -323,12 +297,22 @@ class Board {
                 lastY += rowHeight;
             });
 
+            // конец блока
+            ctx.strokeStyle = 'rgb(0, 0, 0)';
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.moveTo(0, lastY);
+            ctx.lineTo(sizes.boardWidth, lastY);
+            ctx.stroke();
+
             return lastY;
         }
 
-        lastY = paintSection(model.top, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.mid, lastY, this.sizes.rowHeight);
-        lastY = paintSection(model.bot, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.one, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.two, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.three, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.four, lastY, this.sizes.halfRowHeight);
     }
 
     paintCellFill() {
@@ -347,13 +331,11 @@ class Board {
                 line.cells.forEach((cell, iCell) => {
                     const startX = cell.offsetQ * w;
                     const endX = (cell.offsetQ + cell.durQ) * w;
-                    const realClr = colorArr.filter(item => item.val !== null);
-                    let clrItem = realClr[Math.round(Math.random() * (realClr.length - 1))];
+                    let clrItem = colorHash[cell.prevNoteOffset];
 
-                    if (firstCell) {
-                        clrItem = colorHash['0'];
-                        firstCell = false;
-                    }
+                    // if (!clrItem) {
+                    //     console.log('cell without color', cell);
+                    // }
 
                     ctx.fillStyle = `rgba(${clrItem.rgb}, 1)`;
                     ctx.fillRect(startX, lastY, endX - startX, rowHeight);
@@ -374,9 +356,10 @@ class Board {
             return lastY;
         }
 
-        lastY = paintSection(model.top, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.mid, lastY, this.sizes.rowHeight);
-        lastY = paintSection(model.bot, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.one, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.two, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.three, lastY, this.sizes.halfRowHeight);
+        lastY = paintSection(model.four, lastY, this.sizes.halfRowHeight);
     }
 
 
@@ -406,14 +389,14 @@ class Board {
         this.paintCellFill();
         this.paintCellGrid();
 
-        ctx.fillStyle = `rgba(${colors2.black}, .4)`;
-
-        lastY = 0;
-        height = sizes.rowInBlockCount * sizes.halfRowHeight;
-        ctx.fillRect(0, lastY, sizes.boardWidth , height);
-
-        lastY = (sizes.rowInBlockCount * sizes.rowHeight) +  (sizes.rowInBlockCount * sizes.halfRowHeight);
-        ctx.fillRect(0, lastY, sizes.boardWidth , height);
+        // ctx.fillStyle = `rgba(${colors2.black}, .4)`;
+        //
+        // lastY = 0;
+        // height = sizes.rowInBlockCount * sizes.halfRowHeight;
+        // ctx.fillRect(0, lastY, sizes.boardWidth , height);
+        //
+        // lastY = (sizes.rowInBlockCount * sizes.rowHeight) +  (sizes.rowInBlockCount * sizes.halfRowHeight);
+        // ctx.fillRect(0, lastY, sizes.boardWidth , height);
     }
 
     createCanvas(sizes: Sizes, canvasEl: HTMLElement) {
@@ -445,6 +428,60 @@ class Board {
         setStyle(this.canvasTop);
         this.canvasEl.appendChild(this.canvasTop);
         this.canvasCtxTop = this.canvasTop.getContext("2d");
+    }
+
+    update(e: PointerEvent, type: number) {
+        const offsetX = e.offsetX;
+        const offsetY = e.offsetY;
+        const lines: ModelLine[] = [model.one, model.two, model.three, model.four].reduce((acc, block) => {
+            return [...acc, ...block.lines];
+        }, <ModelLine[]>[]);
+
+        const lineInd = Math.floor(offsetY / this.sizes.halfRowHeight);
+        const cellInd = Math.floor(offsetX / this.sizes.cellWidth);
+        const cellOffset = cellInd * 30;
+        const pointerId = e.pointerId;
+        const line = lines[lineInd];
+        const cell = line.cells.find(cell => cell && (cellOffset >= cell.offsetQ && cellOffset < (cell.offsetQ + cell.durQ )));
+
+        if (cell && type === UP) {
+            ideService.synthesizer.playSound({
+                id: pointerId,
+                keyOrNote: cell.note,
+                instrCode: m.const.DEFAULT_TONE_INSTR,
+                onlyStop: true,
+            });
+        }
+
+        if (cell && type === DOWN) {
+            ideService.synthesizer.playSound({
+                id: pointerId,
+                keyOrNote: cell.note,
+                instrCode: m.const.DEFAULT_TONE_INSTR,
+            });
+        }
+    }
+
+    subscribe() {
+        this.canvasTop.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!this.pointerId) {
+                this.pointerId = e.pointerId;
+                this.update(e, DOWN);
+            }
+        });
+
+        this.canvasTop.addEventListener('pointerup', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.pointerId === this.pointerId) {
+                this.pointerId = null;
+                this.update(e, UP);
+            }
+        });
     }
 }
 
@@ -524,7 +561,6 @@ export class GamePage {
             cellCount: 4,
         });
 
-
         this.pageEl.innerHTML = `
             <div>
                 <div style="padding: 8px 8px 0 8px; height: 32px; box-sizing: border-box;">
@@ -552,53 +588,7 @@ export class GamePage {
                 <div></div>            
             </div>
             
-            <div style="padding: 1rem;">
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['0'].rgb});">+0</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['0'].rgb});">-0</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-1'].rgb});">-1</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['1'].rgb});">+1</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-2'].rgb});">-2</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['2'].rgb});">+2</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-3'].rgb});">-3</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['3'].rgb});">+3</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-4'].rgb});">-4</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['4'].rgb});">+4</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-5'].rgb});">-5</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['5'].rgb});">+5</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-6'].rgb});">-6</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['6'].rgb});">+6</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-7'].rgb});">-7</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['7'].rgb});">+7</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-8'].rgb});">-8</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['8'].rgb});">+8</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-9'].rgb});">-9</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['9'].rgb});">+9</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-10'].rgb});">-10</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['10'].rgb});">+10</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-11'].rgb});">-11</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['11'].rgb});">+11</span><br/>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['-12'].rgb});">-12</span>
-                <span style="display: inline-block; width: 2rem; background-color: rgb(${colorHash['12'].rgb});">+12</span>                                
-                <!--
-                span style="background-color: lightgray;">lightgray</span>
-                <span style="background-color: gray;">gray</span><br/>
-                <span style="background-color: deepskyblue;">deepskyblue</span>
-                <span style="background-color: blue;">blue</span><br/>
-                <span style="background-color: aquamarine;">aquamarine</span>
-                <span style="background-color: darkcyan;">darkcyan</span><br/>                    
-                <span style="background-color: lime;">lime</span>                    
-                <span style="background-color: green;">green</span><br/>
-                <span style="background-color: orange;">orange</span>
-                <span style="background-color: saddlebrown;">saddlebrown</span><br/>                    
-                <span style="background-color: lightcoral;">lightcoral</span>
-                <span style="background-color: red;">red</span><br/>
-                <span style="background-color: cyan;">cyan</span>
-                <span style="background-color: violet;">violet</span><br/>                    
-                <span style="background-color: yellow;">yellow</span>
-                <span style="background-color: bisque;">bisque</span><br/>
-                <span style="background-color: darkkhaki;">darkkhaki</span>
-                <span style="background-color: white;">unkonow</span
-                -->                                        
+            <div style="padding: 1rem;">                                       
             </div>
         `;
 
@@ -606,14 +596,20 @@ export class GamePage {
         this.board = new Board();
         this.board.createCanvas(this.sizes, gameBoardEl);
         this.board.paint();
+        this.board.subscribe();
     }
 
     subscribeEvents() {
         getWithDataAttr('next-game-action', this.pageEl).forEach(el => {
             el.addEventListener('pointerup', (e: MouseEvent) => {
-                model.top = model.mid;
-                model.mid = model.bot;
-                model.bot = getRandomBlock(this.board.sizes.rowInBlockCount);
+                model.one = model.two;
+                model.two = model.three;
+                model.three = model.four;
+                model.four = getRandomBlock(this.board.sizes.rowInBlockCount);
+                setModelColor([model.one, model.two, model.three, model.four]);
+
+                console.log('MODEL', model);
+
                 this.board.paint();
             });
         });
@@ -785,22 +781,3 @@ export class GamePage {
         ideService.multiPlayer.stopAndClearMidiPlayer();
     }
 }
-
-/*
-00:Gray:   |                 | DarkGray  |                |
-01:ColorG  | SlateGray       |           | LightSteelBlue |
-02:Yellow: | Gold            |           | Yellow         |
-03:Blue:   | RoyalBlue       |           | LightSkyBlue   |
-04:Green:  | Green           |           | Lime           |
-05:Orange: | Chocolate       |           | Orange         |
-06:Pink:   | MediumVioletRed |           | Pink           |
-07:Red:    | Red             |           | Salmon         |
-08:Brown:  | SaddleBrown     |           | Peru           |
-09:Cyan:   | DarkCyan        |           | Cyan           |
-10:Purple  | MediumPurple    |           | Thistle        |
-11:Purple: | Purple          |           | Plum           |
-12:        | DimGray         |           | LightGray      |
-
-https://en.wikipedia.org/wiki/Web_colors#Color_selection
-
-*/

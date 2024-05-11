@@ -57,6 +57,7 @@ export const Muse = {
         CELL_SIZE,
         freqInfoHash,
         freqInfoList,
+        DEFAULT_TONE_INSTR,
     },
     utils: {
         isPresent,
