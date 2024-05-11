@@ -216,6 +216,7 @@ class Board {
     canvasCtxBot: CanvasRenderingContext2D;
 
     canvasEl: HTMLElement;
+    lastNote: string;
 
     sizes: Sizes;
     blocks: {
@@ -344,10 +345,11 @@ class Board {
                     ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
 
                     const fontSize = Math.floor(rowHeight/3);
-                    ctx.fillStyle = `rgba(${colorHash[-clrItem.val].rgb}, 1)`;
+                    ctx.fillStyle = clrItem.val >= 0 ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
+                    //ctx.fillStyle = `rgba(${colorHash[-clrItem.val].rgb}, 1)`;
                     ctx.textBaseline = 'middle'; // 'top';
                     ctx.font = `${Math.floor(rowHeight/2)}px serif`;
-                    ctx.fillText(clrItem.mask, startX + fontSize, lastY + (rowHeight /2));
+                    ctx.fillText(clrItem.name, startX + fontSize, lastY + (rowHeight /2));
                 });
 
                 lastY += rowHeight;
@@ -444,21 +446,23 @@ class Board {
         const line = lines[lineInd];
         const cell = line.cells.find(cell => cell && (cellOffset >= cell.offsetQ && cellOffset < (cell.offsetQ + cell.durQ )));
 
-        if (cell && type === UP) {
-            ideService.synthesizer.playSound({
-                id: pointerId,
-                keyOrNote: cell.note,
-                instrCode: m.const.DEFAULT_TONE_INSTR,
-                onlyStop: true,
-            });
-        }
+        //if (cell && type === UP) {
+        ideService.synthesizer.playSound({
+            id: 'page-game',
+            keyOrNote: this.lastNote,
+            instrCode: 136, //m.const.DEFAULT_TONE_INSTR,
+            onlyStop: true,
+        });
+        //}
 
         if (cell && type === DOWN) {
             ideService.synthesizer.playSound({
-                id: pointerId,
+                id: 'page-game',
                 keyOrNote: cell.note,
-                instrCode: m.const.DEFAULT_TONE_INSTR,
+                instrCode: 136, // m.const.DEFAULT_TONE_INSTR,
             });
+
+            this.lastNote = cell.note;
         }
     }
 

@@ -186,7 +186,7 @@ export const colorHash = {
   '1':  { mask: '!::', val: 1,  name:  'ха',  rgb: '200,190,190'  },
   '-1': { mask: '!::', val: -1, name:  'ху',  rgb: '100,100,110'  },
 
-  '0':   { mask: '!!!', val: 0,   name: 'мо', rgb: '150,150,150' },
+  '0':   { mask: '!!!', val: 0,   name: 'но', rgb: '150,150,150' },
 } as const;
 
 export const colorArr = Object.values(colorHash);
