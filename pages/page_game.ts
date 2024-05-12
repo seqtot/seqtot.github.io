@@ -42,7 +42,7 @@ const colors2 = {
 }
 
 const colorArr = Object.values(colorHash);
-const blockCount = 3;
+const blockCount = 2;
 const rowInBlockCount = 4;
 
 function getSizes(x: {
