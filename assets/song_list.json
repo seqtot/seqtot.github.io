@@ -19,6 +19,7 @@
     "dir": "bandit_draft",
     "tags": ["band-song"],
     "items": [
+      {"id":  "spider", "label": "Паук, Spider"},
       {"id":  "overTheRiver", "label": "За рекой, Over the river"},
       {"id":  "mountain", "label": "Гора, Mountain"},
       {"id":  "shipsAreSailing", "label": "Ships are sailing (bpm215)"},
