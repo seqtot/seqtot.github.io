@@ -26,6 +26,7 @@ type Sizes = {
     rowInBlockCount: number;
     cellCount: number;
     cellWidth: number;
+    gutter: number;
 };
 
 
@@ -41,6 +42,8 @@ const colors2 = {
 }
 
 const colorArr = Object.values(colorHash);
+const blockCount = 3;
+const rowInBlockCount = 4;
 
 function getSizes(x: {
     width: number,
@@ -50,12 +53,13 @@ function getSizes(x: {
     paddingTop: number,
     paddingSide: number,
     cellCount: number,
+    gutter: number,
 }): Sizes {
     let pageWidth = Math.floor(x.width);
     let pageHeight = Math.floor(x.height);
     let rowWidth = (Math.floor((pageWidth - (x.paddingSide * 2)) / 2) * 2);
     let boardHeight = pageHeight - x.paddingTop;
-    let rowHeight = Math.floor((boardHeight / (x.rowInBlockCount * 2)) / 2) * 2;
+    let rowHeight = Math.floor((boardHeight / (x.rowInBlockCount * x.blockCount)) / 2) * 2;
     let halfRowHeight = rowHeight / 2;
     let cellWidth = rowWidth / x.cellCount;
 
@@ -72,6 +76,7 @@ function getSizes(x: {
         rowInBlockCount: x.rowInBlockCount,
         cellCount: x.cellCount,
         cellWidth,
+        gutter: x.gutter,
     };
 
     return result;
@@ -128,12 +133,9 @@ function getRandomBlock(rowCount: number): ModelType {
     }
 }
 
-const model: {one: ModelType, two: ModelType, three: ModelType, four: ModelType} = {
-    one: getRandomBlock(4),
-    two: getRandomBlock(4),
-    three: getRandomBlock(4),
-    four: getRandomBlock(4),
-}
+const model = new Array(blockCount).fill(null).map(() => getRandomBlock(rowInBlockCount));
+
+console.log('model', model);
 
 const notesLatArr = [
     'dy', 'ty', 'ry', 'ny', 'my', 'fy', 'vy', 'sy', 'zy', 'ly', 'ky', 'by',
@@ -157,6 +159,8 @@ const offsetRange = [
 function setModelColor(blocks: ModelType[])  {
     let firstNote = '';
     let prevNote = '';
+
+    console.log('blocks', blocks);
 
     blocks.forEach(block => {
         block.lines.forEach(line => {
@@ -187,7 +191,7 @@ function setModelColor(blocks: ModelType[])  {
 
 }
 
-setModelColor([model.one, model.two, model.three, model.four]);
+setModelColor(model);
 
 function getPosition(element) {
     let xPosition = 0;
@@ -257,12 +261,12 @@ class Board {
 
         ctx.fillStyle = `rgba(${colors1.red}, 1)`;
 
-        let yOffset = this.sizes.halfRowHeight * this.sizes.rowInBlockCount;
-        yOffset += ((this.sizes.rowHeight * rowInd) + (this.sizes.halfRowHeight / 2));
+        let yOffset = this.sizes.rowHeight * this.sizes.rowInBlockCount;
+        yOffset += ((this.sizes.rowHeight * rowInd) + (this.sizes.rowHeight / 2));
 
-        const x = cellInRowInd * (this.sizes.cellWidth * tickInRow) + ((this.sizes.cellWidth - this.sizes.halfRowHeight) / 2);
+        const x = cellInRowInd * (this.sizes.cellWidth * tickInRow) + ((this.sizes.cellWidth - this.sizes.halfRowHeight) / 2); // ???
 
-        ctx.fillRect(x, yOffset , this.sizes.halfRowHeight , this.sizes.halfRowHeight);
+        ctx.fillRect(x, yOffset , this.sizes.rowHeight , this.sizes.rowHeight);
     }
 
     paintCellGrid() {
@@ -310,10 +314,9 @@ class Board {
             return lastY;
         }
 
-        lastY = paintSection(model.one, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.two, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.three, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.four, lastY, this.sizes.halfRowHeight);
+        for (let i = 0; i < model.length; i++) {
+            lastY = paintSection(model[i], lastY, this.sizes.rowHeight);
+        }
     }
 
     paintCellFill() {
@@ -341,8 +344,8 @@ class Board {
                     ctx.fillStyle = `rgba(${clrItem.rgb}, 1)`;
                     ctx.fillRect(startX, lastY, endX - startX, rowHeight);
 
-                    ctx.fillStyle = `rgba(${colors2.black}, 1)`;
-                    ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
+                    // ctx.fillStyle = `rgba(${colors2.black}, 1)`;
+                    // ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
 
                     const fontSize = Math.floor(rowHeight/3);
                     ctx.fillStyle = clrItem.val >= 0 ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
@@ -358,12 +361,11 @@ class Board {
             return lastY;
         }
 
-        lastY = paintSection(model.one, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.two, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.three, lastY, this.sizes.halfRowHeight);
-        lastY = paintSection(model.four, lastY, this.sizes.halfRowHeight);
-    }
 
+        for (let i = 0; i < model.length; i++) {
+            lastY = paintSection(model[i], lastY, this.sizes.rowHeight);
+        }
+    }
 
     paint() {
         this.clearCanvasMid();
@@ -374,19 +376,17 @@ class Board {
         ctx.strokeStyle = defStroke;
         ctx.lineWidth = 1;
 
-        let lastY = 0;
-        let height = sizes.rowInBlockCount * sizes.halfRowHeight;
-        ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
-
-        lastY = lastY + height;
-        height = sizes.rowInBlockCount * sizes.rowHeight;
-        ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
-
-        lastY = lastY + height;
-        height = sizes.rowInBlockCount * sizes.halfRowHeight;
-        ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
-
-        const w = sizes.boardWidth / 120;
+        // let lastY = 0;
+        // let height = sizes.rowInBlockCount * sizes.halfRowHeight;
+        // ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
+        //
+        // lastY = lastY + height;
+        // height = sizes.rowInBlockCount * sizes.rowHeight;
+        // ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
+        //
+        // lastY = lastY + height;
+        // height = sizes.rowInBlockCount * sizes.halfRowHeight;
+        // ctx.strokeRect(0, 0, sizes.boardWidth, lastY + height);
 
         this.paintCellFill();
         this.paintCellGrid();
@@ -435,11 +435,11 @@ class Board {
     update(e: PointerEvent, type: number) {
         const offsetX = e.offsetX;
         const offsetY = e.offsetY;
-        const lines: ModelLine[] = [model.one, model.two, model.three, model.four].reduce((acc, block) => {
+        const lines: ModelLine[] = model.reduce((acc, block) => {
             return [...acc, ...block.lines];
         }, <ModelLine[]>[]);
 
-        const lineInd = Math.floor(offsetY / this.sizes.halfRowHeight);
+        const lineInd = Math.floor(offsetY / this.sizes.rowHeight);
         const cellInd = Math.floor(offsetX / this.sizes.cellWidth);
         const cellOffset = cellInd * 30;
         const pointerId = e.pointerId;
@@ -558,10 +558,11 @@ export class GamePage {
         const sizes = this.sizes = getSizes({
             width: this.width,
             height: this.height,
-            blockCount: 3,
-            rowInBlockCount: 4,
+            blockCount,
+            rowInBlockCount,
             paddingTop: 8 + 32 + 32 + 8, // 80
             paddingSide: 8,
+            gutter: 16,
             cellCount: 4,
         });
 
@@ -606,11 +607,15 @@ export class GamePage {
     subscribeEvents() {
         getWithDataAttr('next-game-action', this.pageEl).forEach(el => {
             el.addEventListener('pointerup', (e: MouseEvent) => {
-                model.one = model.two;
-                model.two = model.three;
-                model.three = model.four;
-                model.four = getRandomBlock(this.board.sizes.rowInBlockCount);
-                setModelColor([model.one, model.two, model.three, model.four]);
+                for (let i = 0; i < model.length; i++) {
+                    if (i === model.length - 1) {
+                        model[i] = getRandomBlock(this.board.sizes.rowInBlockCount);
+                    } else {
+                        model[i] = model[i+1];
+                    }
+                }
+
+                setModelColor(model);
 
                 console.log('MODEL', model);
 
