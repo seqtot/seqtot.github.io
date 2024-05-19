@@ -6,9 +6,20 @@ import { parseInteger } from '../utils/parse-integer';
 
 const localSamples = {
 	162: 'samples/organ/0160_FluidR3_GM_sf2_file.json', // organ:162:_tone_0160_FluidR3_GM_sf2_file
-    176: 'samples/organ/0170_SoundBlasterOld_sf2.json', // organ*p:176:_tone_0170_SoundBlasterOld_sf2
-    182: 'samples/organ/0180_FluidR3_GM_sf2_file.json', // 'organ*r:182:_tone_0180_FluidR3_GM_sf2_file'
+	176: 'samples/organ/0170_SoundBlasterOld_sf2.json', // organ*p:176:_tone_0170_SoundBlasterOld_sf2
+	182: 'samples/organ/0180_FluidR3_GM_sf2_file.json', // 'organ*r:182:_tone_0180_FluidR3_GM_sf2_file'
+	'voice_a_waf': 'samples/voice/voice_a_waf.json',
+	'voice_n_waf': 'samples/voice/voice_n_waf.json',
+	'voice_v_waf': 'samples/voice/voice_v_waf.json',
+	'voice_o_waf': 'samples/voice/voice_o_waf.json',
+	'voice_e_waf': 'samples/voice/voice_e_waf.json',
+	'voice_s_waf': 'samples/voice/voice_s_waf.json',
+	'harmonica_waf': 'samples/harmonica/harmonica_waf.json',
 };
+
+const defaultInstrumentsSource = {
+	'$voice*а': 'samples/voice/voice_a_waf.json',
+}
 
 const isDev = /localhost/.test(window.location.href);
 
@@ -57,7 +68,8 @@ export class WebAudioFontLoader {
 		this.player = player;
 	}
 
-	async startLoad(audioContext: AudioContext, filePath: string, variableName: string, id?: string | number) {
+	async startLoad(audioContext: AudioContext, filePath: string, variableName: string, id?: string | number, isLocal: boolean = false) {
+		filePath = filePath || '';
 		const fileName = filePath.split('/').pop();
 
 		//console.log('startLoad', fileName, filePath, variableName, id);
@@ -77,9 +89,10 @@ export class WebAudioFontLoader {
 			variableName: variableName
 		});
 
-		if (localSamples[id]) {
+		const localSampleUrl = localSamples[id] || localSamples[variableName];
+		if (localSampleUrl) {
                 try {
-                    const url = isDev ? `${localSamples[id]}` : `assets/${localSamples[id]}`;
+                    const url = isDev ? `${localSampleUrl}` : `assets/${localSampleUrl}`;
                     const res = await fetch(url);
 
                     if (res.ok) {

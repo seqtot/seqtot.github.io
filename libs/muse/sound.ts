@@ -10,7 +10,7 @@ import * as un from './utils';
 import { DEFAULT_TONE_INSTR } from './keyboards';
 import { drumIdByAlias } from './drums';
 import { hardcodedInstruments, instruments as instruments2 } from './instruments';
-import { TWaveZone } from './font/otypes';
+import { TWaveZone, TPresetInfo } from './font/otypes';
 
 export const instruments = instruments2;
 const loadingInstruments: { [code: number]: boolean } = {};
@@ -178,13 +178,22 @@ export class Sound {
             return;
         }
 
+        let fontInfo: TPresetInfo;
+
         if (id > 10000) {
-            return;
+            console.log('hardcoded', hardcodedInstruments[id]);
+            fontInfo = {
+                variable: hardcodedInstruments[id],
+            } as TPresetInfo;
+
+            //return;
+        }
+
+        if (!fontInfo) {
+            fontInfo = fontLoader.instrumentInfo(id);
         }
 
         //console.log('AddToneSound', id);
-
-        const fontInfo = fontLoader.instrumentInfo(id);
 
         Sound.LoadingInstruments[id] = true;
         fontLoader.startLoad(
