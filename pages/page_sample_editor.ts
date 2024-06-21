@@ -141,7 +141,7 @@ export class SamplePage {
         public props: RouteInfo<WithId>,
     ) {
         this.mouseDownListener = (event: MouseEvent) => {
-            //console.log('MousePressed', this.context);
+            //console.log('MousePressed');
             // this.ee.emit('setInFocus', this.pageEl.contains(event.target as HTMLElement));
         }
 

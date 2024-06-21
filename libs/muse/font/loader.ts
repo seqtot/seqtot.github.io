@@ -8,13 +8,16 @@ const localSamples = {
 	162: 'samples/organ/0160_FluidR3_GM_sf2_file.json', // organ:162:_tone_0160_FluidR3_GM_sf2_file
 	176: 'samples/organ/0170_SoundBlasterOld_sf2.json', // organ*p:176:_tone_0170_SoundBlasterOld_sf2
 	182: 'samples/organ/0180_FluidR3_GM_sf2_file.json', // 'organ*r:182:_tone_0180_FluidR3_GM_sf2_file'
+	'harmonica_waf': 'samples/harmonica/harmonica_waf.json',
 	'voice_a_waf': 'samples/voice/voice_a_waf.json',
 	'voice_n_waf': 'samples/voice/voice_n_waf.json',
 	'voice_v_waf': 'samples/voice/voice_v_waf.json',
 	'voice_o_waf': 'samples/voice/voice_o_waf.json',
 	'voice_e_waf': 'samples/voice/voice_e_waf.json',
 	'voice_s_waf': 'samples/voice/voice_s_waf.json',
-	'harmonica_waf': 'samples/harmonica/harmonica_waf.json',
+	'voice_d_waf': 'samples/voice/voice_d_waf.json',
+	'voice_j_waf': 'samples/voice/voice_j_waf.json',
+	'voice_ii_waf': 'samples/voice/voice_ii_waf.json',
 };
 
 const defaultInstrumentsSource = {

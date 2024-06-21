@@ -27,14 +27,18 @@ export const guitarCodes = {
 };
 
 // https://surikov.github.io/webaudiofont/examples/customsample.html
+// а н в о э с д
 const instrAliasCodeVariable = [
     // voice
-    'voice*а:voice_a_waf',
-    'voice*н:voice_n_waf',
-    'voice*в:voice_v_waf',
-    'voice*о:voice_o_waf',
-    'voice*э:voice_e_waf',
-    'voice*с:voice_s_waf',
+    // 'voice*а:voice_a_waf',
+    // 'voice*н:voice_n_waf',
+    // 'voice*в:voice_v_waf',
+    // 'voice*о:voice_o_waf',
+    // 'voice*э:voice_e_waf',
+    // 'voice*с:voice_s_waf',
+    // 'voice*д:voice_d_waf',
+    // 'voice*ж:voice_j_waf',
+    // 'voice*ы:voice_ii_waf',
     // my harm
     'harm:harmonica_waf',
 

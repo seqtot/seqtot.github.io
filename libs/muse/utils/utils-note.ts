@@ -13,6 +13,7 @@ export const timeChar = '=';
 export const timeCharRE = new RegExp(/[=]/); // [-=]
 
 export const vibratoChar = '~';
+export const slideChar = '_';
 export const decorChar = '*';
 export const negativeChar = '-';
 export const drumChar = '@';

@@ -1,6 +1,6 @@
 import { parseInteger } from './parse-integer';
 
-import { getVolumeFromString, isPresent, negativeChar, vibratoChar, timeCharRE } from './utils-note';
+import { getVolumeFromString, isPresent, negativeChar, vibratoChar, slideChar, timeCharRE } from './utils-note';
 import { TWaveSlide } from '../types';
 
 // дтрн мфвс злкб
@@ -86,9 +86,9 @@ export function buildVibratoSlides(durationQ: number, val: string): string | und
         odd = !odd;
 
         if(odd) {
-            result = result + '_' + pitch.asStringA + '=' + durationByItemQ + '=' + speed;
+            result = result + slideChar + pitch.asStringA + '=' + durationByItemQ + '=' + speed;
         } else {
-            result = result + '_' + pitch.asStringB + '=' + durationByItemQ + '=' + speed;
+            result = result + slideChar + pitch.asStringB + '=' + durationByItemQ + '=' + speed;
         }
     }
 
@@ -107,10 +107,43 @@ export function buildVibratoSlides(durationQ: number, val: string): string | und
 // }
 export function getSlides (
     arr: string[],
-    note: { durationQ: number }
+    note: { durationQ: number, volume?: number }
 ): TWaveSlide[] | undefined {
     if (!arr.length) {
         return undefined;
+    }
+
+    const isOnlyVolumeSlides = !arr.find(item => item.includes('='));
+
+    if (isOnlyVolumeSlides) {
+        let targetVolume = note.volume ?? 0;
+        for (let item of arr) {
+            const a = item.split(':');
+            const itemVolume = getVolumeFromString(a[1], null);
+            if (isPresent(itemVolume)) {
+                targetVolume = itemVolume;
+
+                break;
+            }
+        }
+
+        const a = arr.map(item => {
+            const itemArr = item.split(':');
+            return parseInteger(itemArr[0], 0);
+        });
+
+        a[0] = parseInteger(arr[0], 0);
+        a[1] = parseInteger(arr[1], 0);
+        a[2] = parseInteger(arr[2], 0);
+
+        // 3:v0_0=27=3:v30_0=5=
+        arr = [
+            `${a[0]}:v0`,
+            `0=${note.durationQ - a[0] + a[2]}=${a[0]}:v${targetVolume}`,
+            `0=0=${a[1] + a[2]}:v0`,
+        ];
+
+        //console.log('arr', note, arr);
     }
 
     const result: TWaveSlide[] = [];
@@ -155,6 +188,8 @@ export function getSlides (
         });
     });
 
+    //console.log('pre', JSON.parse(JSON.stringify(pre)));
+
     // Пример
     // до=240_60_1=120=10_2=120=20
     //        0_ 1_______ 2_________
@@ -162,7 +197,7 @@ export function getSlides (
     // 1: deltaCent: 100, speed: 10, duration: 120, volume: null
     // 2: deltaCent: 200, speed: 20, duration: 120, volume: null
 
-    pre.filter((curr, i) => {
+    pre.forEach((curr, i) => {
         // const next = pre[i+1] ? pre[i+1] : {
         //     deltaCent: curr.deltaCent,
         //     duration: 0,

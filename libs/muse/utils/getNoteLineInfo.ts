@@ -16,7 +16,7 @@ import {
     timeCharRE,
     timeChar,
     vibratoChar,
-
+    slideChar,
 } from './utils-note';
 import { TNoteLineInfo } from '../types';
 import { noteLatByNoteHash } from '../freq';
@@ -168,7 +168,7 @@ function getNoteFullInfo(val: string): {
 }
 
 function handleNote (dx: Dx) {
-    let arrSlides = dx.$item.split('_').filter(item => !!item);
+    let arrSlides = dx.$item.split(slideChar).filter(item => !!item);
     const firstSegment = arrSlides.shift() || '';
     const note = getNoteFullInfo(firstSegment); // note volume pitch
 
@@ -177,19 +177,17 @@ function handleNote (dx: Dx) {
     let slidesText: string;
 
     if (arrSlides.length) {
-        slidesText = arrSlides.join('_');
+        slidesText = arrSlides.join(slideChar);
     }
 
     if (note.vibrato) {
         slidesText = note.vibrato;
-        arrSlides = note.vibrato.split('_');
+        arrSlides = note.vibrato.split(slideChar);
     }
 
     const slides = getSlides(arrSlides, note);
 
-    //console.log('note', note);
-
-    dx.result.notes.push({
+    const note2 = {
         note: note.note,
         durationQ: note.durationQ,
         durationForNextQ: note.durationForNextQ,
@@ -199,7 +197,11 @@ function handleNote (dx: Dx) {
         cent: note.cent,
         slides,
         slidesText,
-    });
+    };
+
+    dx.result.notes.push(note2);
+
+    //console.log('note', note2);
 }
 
 function handleNotNote (dx: Dx) {

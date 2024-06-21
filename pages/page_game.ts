@@ -42,7 +42,7 @@ const colors2 = {
 }
 
 const colorArr = Object.values(colorHash);
-const blockCount = 3;
+const blockCount = 2;
 const rowInBlockCount = 4;
 
 function getSizes(x: {
@@ -208,6 +208,22 @@ function getPosition(element) {
 const DOWN = 1;
 const UP = 0;
 
+
+function getSlog(): string {
+    const a = 'аэиоуы';
+    const b = 'бвгджзйклмнпрстфхцчшщ';
+
+    const arr = [
+        m.utils.getRandomElement(b) + m.utils.getRandomElement(a),
+        m.utils.getRandomElement(a) + m.utils.getRandomElement(b),
+        m.utils.getRandomElement(b) + m.utils.getRandomElement(a) + m.utils.getRandomElement(a),
+        m.utils.getRandomElement(b) + m.utils.getRandomElement(b) + m.utils.getRandomElement(a),
+        m.utils.getRandomElement(a) + m.utils.getRandomElement(b) + m.utils.getRandomElement(b),
+    ];
+
+    return m.utils.getRandomElement(arr);
+}
+
 class Board {
     pointerId: number | null;
     canvasTop: HTMLCanvasElement;
@@ -347,12 +363,15 @@ class Board {
                     // ctx.fillStyle = `rgba(${colors2.black}, 1)`;
                     // ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
 
-                    const fontSize = Math.floor(rowHeight/3);
+                    //const text = clrItem.name;
+                    const text = getSlog();
+
+                    const fontSize = Math.floor(rowHeight * 0.9);
                     ctx.fillStyle = clrItem.val >= 0 ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                     //ctx.fillStyle = `rgba(${colorHash[-clrItem.val].rgb}, 1)`;
                     ctx.textBaseline = 'middle'; // 'top';
-                    ctx.font = `${Math.floor(rowHeight/2)}px serif`;
-                    ctx.fillText(clrItem.name, startX + fontSize, lastY + (rowHeight /2));
+                    ctx.font = `${fontSize}px serif`;
+                    ctx.fillText(text, startX + 4, lastY + (fontSize/2));
                 });
 
                 lastY += rowHeight;

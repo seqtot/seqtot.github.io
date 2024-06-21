@@ -171,7 +171,10 @@ export  class WebAudioFontPlayer {
 
 		//console.log('slides', startWhen, slides);
 
-		for (var i = 0; i < slides.length; i++) {
+		//const volumeSlideMap = {};
+
+		const platoMap = {};
+		for (let i = 0; i < slides.length; i++) {
 			let slide = slides[i];
 			let endWhen = startWhen + slide.endWhen;
 			let volumeIsPresent = isPresent(slide.volume);
@@ -181,17 +184,27 @@ export  class WebAudioFontPlayer {
 				? volume * (slide.volume / 50)
 				: lastSlideVolume;
 
+			const noZeroVolume = this.noZeroVolume(lastSlideVolume);
+
 			if (i === 0) {
 				envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, endWhen);
 				// иначе установится в setupWaveBox, но возможно нужен будет рефакторинг
 				if (slide.hasVolumeSlide) {
-					gain.setValueAtTime(this.noZeroVolume(lastSlideVolume), startWhen);
-					gain.setValueAtTime(this.noZeroVolume(lastSlideVolume), endWhen);
+					gain.setValueAtTime(noZeroVolume, startWhen);
+					platoMap[startWhen] = true;
+					if (!platoMap[endWhen]) {
+						gain.setValueAtTime(noZeroVolume, endWhen);
+						platoMap[endWhen] = true;
+					}
 				}
 			}
 			else {
 				if (slide.isPlato) {
-					gain.setValueAtTime(this.noZeroVolume(lastSlideVolume), endWhen);
+					if (!platoMap[endWhen]) {
+						gain.setValueAtTime(noZeroVolume, endWhen);
+						platoMap[endWhen] = true;
+					}
+
 					envelope.audioBufferSourceNode.playbackRate.setValueAtTime(lastSlidePlaybackRate, endWhen);
 				} else {
 					if (slide.delta !== lastSlideDelta) {
@@ -201,18 +214,22 @@ export  class WebAudioFontPlayer {
 					}
 
 					if (volumeIsPresent) {
-						gain.linearRampToValueAtTime(this.noZeroVolume(lastSlideVolume), endWhen);
+						//if (!volumeSlideMap[`${endWhen}-${noZeroVolume}`]) {
+							gain.linearRampToValueAtTime(noZeroVolume, endWhen);
+							//volumeSlideMap[`${endWhen}-${noZeroVolume}`] = true;
+						//}
 					}
 				}
 			}
-		}
+		} // end slides
 
-		//console.log('volume', hasVolumeSlide, volume);
+		//console.log('volumeSlideMap', volumeSlideMap);
 
 		if (hasVolumeSlide) {
 			gain.linearRampToValueAtTime(this.noZeroVolume(0), startWhen + soundDuration);
 		}
 		else {
+			//gain.linearRampToValueAtTime(this.noZeroVolume(0), startWhen + soundDuration);
 			this.setupWaveBox(x.audioContext, envelope, zone, volume, startWhen, soundDuration, x.duration);
 		}
 
