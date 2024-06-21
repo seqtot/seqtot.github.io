@@ -212,13 +212,16 @@ const UP = 0;
 function getSlog(): string {
     const a = 'аэиоуы';
     const b = 'бвгджзйклмнпрстфхцчшщ';
+    const p = 'кпт';
+    const l = 'йлмн';
+    const bb = 'бгд';
+    const s = 'cфхшщ';
+    const z = 'вжзр';
+    const j = 'цч';
 
     const arr = [
         m.utils.getRandomElement(b) + m.utils.getRandomElement(a),
         m.utils.getRandomElement(a) + m.utils.getRandomElement(b),
-        m.utils.getRandomElement(b) + m.utils.getRandomElement(a) + m.utils.getRandomElement(a),
-        m.utils.getRandomElement(b) + m.utils.getRandomElement(b) + m.utils.getRandomElement(a),
-        m.utils.getRandomElement(a) + m.utils.getRandomElement(b) + m.utils.getRandomElement(b),
     ];
 
     return m.utils.getRandomElement(arr);
@@ -366,12 +369,12 @@ class Board {
                     //const text = clrItem.name;
                     const text = getSlog();
 
-                    const fontSize = Math.floor(rowHeight * 0.9);
+                    const fontSize = Math.floor(rowHeight * 0.8);
                     ctx.fillStyle = clrItem.val >= 0 ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                     //ctx.fillStyle = `rgba(${colorHash[-clrItem.val].rgb}, 1)`;
                     ctx.textBaseline = 'middle'; // 'top';
                     ctx.font = `${fontSize}px serif`;
-                    ctx.fillText(text, startX + 4, lastY + (fontSize/2));
+                    ctx.fillText(text, startX + 4, lastY + (fontSize * 0.55));
                 });
 
                 lastY += rowHeight;
