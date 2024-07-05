@@ -2,7 +2,7 @@ import { GoldenLayout } from '../libs/gl/ts/golden-layout';
 import { LayoutConfig } from '../libs/gl/ts/config/config';
 import { ComponentContainer } from '../libs/gl/ts/container/component-container';
 import { ResolvedComponentItemConfig } from '../libs/gl/ts/config/resolved-config';
-import {FSFileInfo} from '../libs/common/file-service';
+import { FSFileInfo } from '../libs/common/file-service';
 import { ContentItem } from '../libs/gl/ts/items/content-item';
 import {LayoutManager} from '../libs/gl/ts/layout-manager';
 import { Stack } from 'libs/gl/ts/items/stack';

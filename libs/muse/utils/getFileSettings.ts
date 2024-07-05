@@ -17,6 +17,7 @@ export function getFileSettings(blocks: TTextBlock[] ): TFileSettings {
         dataByTracks: <any>{},
         pitchShift: [],
         boardShift: [],
+        boardInstr: [],
         bpm: [],
     };
 

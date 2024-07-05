@@ -307,7 +307,7 @@ export class LinePlayer {
                 pitchShift: m.utils.parseInteger(this.settings.boardShift[0], 0),
                 print: true,
                 onlyStop: false,
-                instrCode: ideService.useToneInstrument,
+                instrCode: this.settings.boardInstr[0] || ideService.useToneInstrument,
             });
 
             return;

@@ -161,6 +161,7 @@ export type TFileSettings = {
     dataByTracks: {[key: string]: string},
     pitchShift: string[],
     boardShift: string[],
+    boardInstr: string[],
     bpm: string[],
     //[key: string]: any,
 };
