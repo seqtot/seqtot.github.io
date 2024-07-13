@@ -156,6 +156,12 @@ const offsetRange = [
     -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12,
 ];
 
+const toneOffsetSymbol = {
+    'но': '',
+    'ха': 'X', 'са': 'C', 'ща': 'E', 'жа': 'J', 'ла': 'L', 'ша': 'W', 'за': 'Z', 'ва': 'V', 'фа': 'F', 'ра': 'R', 'га': 'G', 'йа': 'Y',
+    'ху': 'x', 'су': 'c', 'щу': 'e', 'жу': 'j', 'лу': 'l', 'шу': 'w', 'зу': 'z', 'ву': 'v', 'фу': 'f', 'ру': 'r', 'гу': 'g', 'йу': 'y',
+}
+
 function setModelColor(blocks: ModelType[])  {
     let firstNote = '';
     let prevNote = '';
@@ -366,13 +372,13 @@ class Board {
                     // ctx.fillStyle = `rgba(${colors2.black}, 1)`;
                     // ctx.fillRect(startX + 1, lastY + 1, 6 , rowHeight - 2);
 
-                    //const text = clrItem.name;
-                    const text = getSlog();
+                    const text = toneOffsetSymbol[clrItem.name] || '';
+                    //const text = getSlog();
 
                     const fontSize = Math.floor(rowHeight * 0.8);
-                    ctx.fillStyle = clrItem.val >= 0 ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
+                    ctx.fillStyle = clrItem.val >= 0 ? 'rgba(0, 0, 0, 1)' : 'rgba(255, 255, 255, 1)';
                     //ctx.fillStyle = `rgba(${colorHash[-clrItem.val].rgb}, 1)`;
-                    ctx.textBaseline = 'middle'; // 'top';
+                    ctx.textBaseline = 'middle'; // 'top'; bottom"
                     ctx.font = `${fontSize}px serif`;
                     ctx.fillText(text, startX + 4, lastY + (fontSize * 0.55));
                 });
