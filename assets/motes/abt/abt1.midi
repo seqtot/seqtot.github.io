@@ -1,9 +1,10 @@
 # https://musescore.com/user/385716/scores/5607115
 
 <settings>
-  boardShift: -12;
+  #boardShift: -12;
   pitchShift: 0
   $guit: v40; $voic: v50; $H: v20; $Z: v50;
+  boardVolume: 10;
 
 <out b120>
 > СЧЁТ       %_ [1*4*120]

@@ -106,12 +106,9 @@ export class KeyboardPage implements Page {
     }
 
     onMounted() {
-        console.log('KeyboardPage.onMounted');
-
+        //console.log('KeyboardPage.onMounted');
         this.initData();
-
         window.addEventListener('resize', this.onWindowResize);
-
         this.pageEl.innerHTML = `
             <div style="padding-top: 0; padding-bottom: 10rem;">
                 <div

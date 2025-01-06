@@ -146,7 +146,7 @@ export function getGuitarСellStyles(note: string, iRow: number, iCol: number): 
     };
 }
 
-export function getHarmonicaCellStyles(note: string): {
+export function getHarmonicaVerticalCellStyles(note: string): {
     bgColor: string,
     borders: string,
     text: string,
@@ -348,7 +348,15 @@ export const guitarKeys: string[][] = [
     ['ko', 'na', 'za', 'te', 've', 'ke', 'ni',],
 ];
 
-export const harmonicaKeys: string[][] = [
+export const harmonicaHorizontalKeys: string[][] = [
+    // 0                 3                  6                   9                 12                  15              ]
+    [ 'du', 'mu', 'zu',  'dy', 'my', 'zy',  'do', 'mo', 'zo',  'da', 'ma', 'za',  'de', 'me', 'ze',  'di', 'mi', 'zi' ],
+    [ 'tu', 'fu', 'lu',  'ty', 'fy', 'ly',  'to', 'fo', 'lo',  'ta', 'fa', 'la',  'te', 'fe', 'le',  'ti', 'fi', 'li' ],
+    [ 'ru', 'vu', 'ku',  'ry', 'vy', 'ky',  'ro', 'vo', 'ko',  'ra', 'va', 'ka',  're', 've', 'ke',  'ri', 'vi', 'ki' ],
+    [ 'nu', 'su', 'bu',  'ny', 'sy', 'by',  'no', 'so', 'bo',  'na', 'sa', 'ba',  'ne', 'se', 'be',  'ni', 'si', 'bi' ],
+];
+
+export const harmonicaVerticalKeys: string[][] = [
     ['zi', 'li', 'ki', 'bi'],
     ['mi', 'fi', 'vi', 'si'],
     ['di', 'ti', 'ri', 'ni'],
@@ -415,6 +423,62 @@ export function isT34(val: any): boolean {
     return val === 'bassSolo34' || val === 'soloSolo34' || val === 'bassBass34' || val === 'bass34' || val === 'solo34';
 }
 
+export function getHorisontalKeyboard(x: {
+    keyboardId: number | string,
+    type: ToneKeyboardType,
+    keys: string[][],
+    cellSize?: number,
+    cellWidth?: number,
+    cellHeight?: number,
+}): string {
+    const keyboardId = x.keyboardId || '';
+
+    const isT34Type = isT34(x.type);
+
+    const cellWidth = x.cellWidth || x.cellSize || 1.8;
+    const cellHeight = x.cellHeight || x.cellSize || 1.8;
+
+    const getKey = getKeyFn({
+        keyboardId,
+        cellWidth: `${cellWidth}rem`,
+        cellHeight: `${cellHeight}rem`,
+        fontSize: '1.3rem',
+        cellStylesFn: isT34Type ? getHarmonicaVerticalCellStyles: getGuitarСellStyles,
+    });
+
+    let minWidth = '';
+
+    if (x.keys[0] && x.keys[0].length) {
+        minWidth = `min-width: ${cellWidth * x.keys[0].length + 0.1}rem;`;
+    }
+
+    // padding: 0.5rem 0 0.5rem 0.5rem;"
+    let keyboard = `
+        <div style="
+            font-family: monospace;
+            user-select: none;
+            touch-action: none;
+            ${minWidth}                
+            data-name="keyboard-${keyboardId}"
+        >%tpl%</div>
+    `.trim();
+
+    let tpl = '';
+    x.keys.forEach((row, iRow) => {
+        tpl = tpl + '<div>';
+
+        row.forEach((note, iCol) => {
+            tpl = tpl + getKey(note, note, iRow, iCol)
+        })
+
+        tpl = tpl + '</div>';
+    });
+
+    keyboard = keyboard.replace('%tpl%', tpl);
+
+    return keyboard;
+}
+
 export function getVerticalKeyboard(x: {
     keyboardId: number | string,
     type: ToneKeyboardType,
@@ -435,7 +499,7 @@ export function getVerticalKeyboard(x: {
         cellWidth: `${cellWidth}rem`,
         cellHeight: `${cellHeight}rem`,
         fontSize: '1.3rem',
-        cellStylesFn: isT34Type ? getHarmonicaCellStyles: getGuitarСellStyles,
+        cellStylesFn: isT34Type ? getHarmonicaVerticalCellStyles: getGuitarСellStyles,
     });
 
     let minWidth = '';
@@ -446,11 +510,13 @@ export function getVerticalKeyboard(x: {
 
     // padding: 0.5rem 0 0.5rem 0.5rem;"
     let keyboard = `
-        <div style="
+        <div
+        data-keyboard-wrapper
+        style="
             font-family: monospace;
             user-select: none;
             touch-action: none;
-            ${minWidth}                
+            ${minWidth}
             data-name="keyboard-${keyboardId}"
         >%tpl%</div>
     `.trim();

@@ -11,6 +11,7 @@ import { PageSongList } from '../pages/page-song-list';
 import { MY_SONG } from '../pages/song-store';
 import {UserSettingsStore} from '../pages/user-settings-store';
 import {RelativeKeysPage} from '../pages/theremin/relative-keys.page';
+import { FragPage } from '../pages/frag/frag-page';
 
 const pages = {
     page_roll: RollPage,
@@ -23,6 +24,7 @@ const pages = {
     song: PageSong,
     song_list: PageSongList,
     relativeKeys: RelativeKeysPage,
+    frag: FragPage,
 };
 
 const isDev = /localhost/.test(window.location.href);
@@ -31,13 +33,14 @@ const isDevUser = UserSettingsStore.GetUserSettings().userName === 'dev' || isDe
 //     /devitband/.test(window.location.href) ||
 //     /local/.test(window.location.href);
 
-const defRoute = isDev ? 'page/page_muse_editor' : '/song_list/bandit'; // ; '/game/test'
+// const defRoute = isDev ? 'page/frag' : '/song_list/bandit'; // page/frag page_muse_editor, game/test
+const defRoute = isDev ? '/page/page_keyboard/' : '/song_list/bandit';
+
 // const defRoute = '/set/set_E/';
 // const defRoute = '/set/set_Battle/';
 // const defRoute = '/set/set_ItsMyLife/';
 // const defRoute = !isDev ? '/page/page_keyboard/' : '/page/page_keyboard/';
 // const defRoute = isDev ? '/page/page_sample_editor/' : '/set/set_all/';
-// const defRoute = isDev ? '/mbox/tiriTiri/' : '/set/set_all/';
 
 type Link = {
     href: string,
@@ -57,6 +60,7 @@ const linksToPage: Link[]  = [
     { href: '/page/page_sample_editor', name: 'sampleEditor', isDev: true },
     { href: '/page/page_roll', name: 'roll', isDev: true },
     { href: '/game/test', name: 'game' },
+    { href: '/page/frag', name: 'frag' },
 ];
 
 class App {

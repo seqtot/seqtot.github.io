@@ -162,6 +162,20 @@ const toneOffsetSymbol = {
     'ху': 'x', 'су': 'c', 'щу': 'e', 'жу': 'j', 'лу': 'l', 'шу': 'w', 'зу': 'z', 'ву': 'v', 'фу': 'f', 'ру': 'r', 'гу': 'g', 'йу': 'y',
 }
 
+const symbolOffset = {
+    'm': 0, 'n': 0,
+    'X': 1,  'C': 2,  'E': 3,  'J': 4,  'L': 5,  'W': 6,  'Z': 7,  'V': 8,  'F': 9,  'R': 10,  'G': 11,  'Y': 12,
+    'x': -1, 'c': -2, 'e': -3, 'j': -4, 'l': -5, 'w': -6, 'z': -7, 'v': -8, 'f': -9, 'r': -10, 'g': -11, 'y': -12,
+}
+
+const patters = [
+  'mLlCCzE',
+  'mLseLl',
+  'mZLlEeLy',
+  'mZLzCVlSy',
+  'mZLECXxc,e',
+]
+
 function setModelColor(blocks: ModelType[])  {
     let firstNote = '';
     let prevNote = '';

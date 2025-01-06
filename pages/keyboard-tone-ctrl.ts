@@ -197,16 +197,52 @@ export class ToneCtrl extends KeyboardCtrl {
     }
 
     getHarmonicaBoard(boardType: ToneKeyboardType): string {
-        let baseKeys = hlp.harmonicaKeys.slice(3);
-        let soloKeys = hlp.harmonicaKeys.slice(0, 15);
+        let baseKeys = hlp.harmonicaVerticalKeys.slice(3);
+        let soloKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
 
-        if (boardType === 'solo34' || boardType === 'soloSolo34') {
-            baseKeys = hlp.harmonicaKeys.slice(0, 15);
-            soloKeys = hlp.harmonicaKeys.slice(0, 15);
-        } else if (boardType === 'bass34' || boardType === 'bassBass34') {
-            baseKeys = hlp.harmonicaKeys.slice(3);
-            soloKeys = hlp.harmonicaKeys.slice(3);
+        if (boardType === 'soloSolo34') {
+            baseKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
         }
+        else if (boardType === 'solo34') {
+            baseKeys = hlp.harmonicaVerticalKeys.slice(3, 15);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(3, 15);            
+        }
+        else if (boardType === 'bassBass34') {
+            baseKeys = hlp.harmonicaVerticalKeys.slice(3);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(3);
+        }
+        else if (boardType === 'bass34') {
+            baseKeys = hlp.harmonicaVerticalKeys.slice(6);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(6);
+        }
+
+        let boardContent = `
+            ${hlp.getVerticalKeyboard({
+                keyboardId: 'base',
+                type: boardType,
+                keys: baseKeys,
+                cellWidth: 2,
+                cellHeight: 2
+            })}
+            <div style="width: 1rem; height: {size*rows}rem; user-select: none; touch-action: none;"></div>
+            ${hlp.getVerticalKeyboard({
+                keyboardId: 'solo',
+                type: boardType,
+                keys: soloKeys,
+                cellWidth: 2,
+                cellHeight: 2
+            })}`;
+
+        if (boardType === 'bass34' || boardType === 'solo34') (
+            boardContent = hlp.getVerticalKeyboard({
+                keyboardId: 'base',
+                type: boardType,
+                keys: baseKeys,
+                cellWidth: 2.5,
+                cellHeight: 2.5
+            })
+        )
 
         return `
             <div style="
@@ -218,9 +254,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 justify-content: space-between;
                 position: relative;"
             >
-                ${hlp.getVerticalKeyboard({keyboardId: 'base', type: boardType, keys: baseKeys, cellWidth: 2, cellHeight: 2})}            
-                <div style="width: 1rem; height: {size*rows}rem; user-select: none; touch-action: none;"></div>
-                ${hlp.getVerticalKeyboard({keyboardId: 'solo', type: boardType, keys: soloKeys, cellWidth: 2, cellHeight: 2})}
+                ${boardContent}
                 <div
                     style="font-size: 2rem;
                     font-family: monospace;
@@ -277,6 +311,8 @@ export class ToneCtrl extends KeyboardCtrl {
             
             <div style="margin: 1rem;">
                 use board:&emsp;
+                ${getBoardButton("bass34", "B1")}&emsp;
+                ${getBoardButton("solo34", "S1")}&emsp;
                 ${getBoardButton("soloSolo34", "SS")}&emsp;
                 ${getBoardButton("bassSolo34", "BS")}&emsp;
                 ${getBoardButton("bassBass34", "BB")}&emsp;
@@ -1047,6 +1083,13 @@ export class ToneCtrl extends KeyboardCtrl {
 
     subscribeBoardEvents() {
         const pageEl = this.page.pageEl;
+        // data-keyboard-wrapper
+        // getWithDataAttr('keyboard-wrapper', pageEl).forEach((el: HTMLElement) => {
+        //     el.addEventListener('pointerdown', (evt: MouseEvent) => {
+        //         console.log('## el', el.offsetTop, evt.clientY, el.offsetLeft, evt.clientX);
+        //         //console.log('keyboard-wrapper', evt)
+        //     }, true)
+        // })
 
         getWithDataAttr('note-key', pageEl).forEach((el: HTMLElement) => {
             const keyboardId = el.dataset.keyboardId;

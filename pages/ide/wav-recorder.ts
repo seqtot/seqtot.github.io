@@ -1,4 +1,5 @@
 import { Sound } from '../../libs/muse';
+import {Deferred} from '../../libs/common';
 //import * as wav from '../../libs/muse/utils/node-wav'
 
 // https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext
@@ -14,17 +15,19 @@ export async function getAudioBufferFromBlob(blob: Blob): Promise<AudioBuffer> {
 }
 
 export class WavRecorder {
-    chunks = [];
+    chunks: number[] = [];
     ctx: AudioContext;
     dest: MediaStreamAudioDestinationNode;
     mediaRecorder: MediaRecorder;
     private breakMe = false;
+    private result: Deferred;
+    isRecording = false;
 
     constructor(ctx: AudioContext) {
         this.ctx = ctx;
     }
 
-    downloadBlob(fileName: string = '', blob: Blob) {
+    static DownloadBlob(fileName: string = '', blob: Blob) {
         let link = document.createElement("a"); // Or maybe get it from the current document
         link.href = URL.createObjectURL(blob)
         link.innerHTML = "Click here to download the file";
@@ -44,6 +47,62 @@ export class WavRecorder {
         document.body.appendChild(link);
     }
 
+    async initMic(): Promise<boolean> {
+        const dfr = new Deferred();
+
+        if (!navigator.mediaDevices.getUserMedia) {
+            dfr.resolve(false);
+        }
+
+        const constraints = { audio: true };
+
+        let onSuccess = (stream: any) => {
+            this.mediaRecorder = new MediaRecorder(stream);
+            dfr.resolve(true);
+        };
+
+        let onError = (err: Error) => {
+            console.log('The following error occured: ' + err);
+            dfr.resolve(false);
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
+
+        return dfr.promise;
+    } // initialize
+
+    prepareMicRecord() {
+        this.result = new Deferred();
+
+        this.mediaRecorder.ondataavailable = (e: any) => {
+            this.chunks.push(e.data);
+        };
+
+        this.mediaRecorder.onstop = (evt: any) => {
+            this.mediaRecorder.onstop = null;
+            this.mediaRecorder.ondataavailable = null;
+            this.result.resolve(this.chunks);
+        };
+
+        this.isRecording = true;
+        this.chunks = [];
+    }
+
+    startMic(): Promise<number[]> {
+        this.mediaRecorder.start();
+
+        return this.result.promise;
+    }
+
+    stopMic(): Promise<number[]> {
+        if (this.mediaRecorder) {
+            this.mediaRecorder.stop();
+        }
+        this.isRecording = false;
+
+        return this.result.promise;
+    }
+
     start(fileName: string = '') {
         fileName = fileName || 'record';
 
@@ -53,7 +112,7 @@ export class WavRecorder {
         Sound.masterGain.connect(this.dest);
 
         this.mediaRecorder.ondataavailable = (evt) => {
-            this.chunks.push(evt.data);
+            this.chunks.push(evt.data as any);
         };
 
         this.mediaRecorder.onstop = async (evt) => {
@@ -61,7 +120,7 @@ export class WavRecorder {
                 return;
             }
 
-            const blob = new Blob(this.chunks, { type: "audio/ogg; codecs=opus" });
+            const blob = new Blob((this.chunks as any), { type: "audio/ogg; codecs=opus" });
             //const buffer = await getAudioBufferFromBlob(blob);
 
             function writeWavFile (channelData: any, sampleRate: number) {
@@ -71,7 +130,7 @@ export class WavRecorder {
 
             //writeWavFile([buffer.getChannelData(0), buffer.getChannelData(1)], this.ctx.sampleRate);
 
-            this.downloadBlob(fileName, blob);
+            WavRecorder.DownloadBlob(fileName, blob);
         };
 
         this.mediaRecorder.start();

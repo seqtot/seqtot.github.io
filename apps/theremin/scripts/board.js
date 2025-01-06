@@ -411,7 +411,7 @@ class FreqAndVolBoard {
       }
     });
   
-    console.log('outList', outList);
+    //console.log('outList', outList);
   } // setFreqListByNote
 
 } // FreqAndVolBoard.class

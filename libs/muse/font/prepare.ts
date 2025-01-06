@@ -1,5 +1,7 @@
-import {TWavePreset, TWaveZone} from './otypes'
-import {Deferred} from './utils';
+import { TWavePreset, TWaveZone } from './otypes'
+import { Deferred } from './utils';
+import { getAudioBufferFromString } from './get-audio-buffer-from-string';
+import { getAudioBufferFromSample } from './get-audio-buffer-from-sample';
 
 function isNeg (number): boolean {
 	return number === 0 && (1 / number) === -Infinity;
@@ -139,66 +141,6 @@ function transformWithZero(val: number, i: number, channel: any, data: number[])
 	return val;
 }
 
-// https://github.com/audiojs/audio-buffer-utils
-async function getBufferFromFile(ctx: AudioContext, file: string): Promise<AudioBuffer> {
-	const dfr = new Deferred();
-
-	let len = file.length;
-	let arraybuffer = new ArrayBuffer(len);
-	let view = new Uint8Array(arraybuffer);
-	let decoded = atob(file);
-	let b;
-	for (let i = 0; i < decoded.length; i++) {
-		b = decoded.charCodeAt(i);
-		view[i] = b;
-	}
-	ctx.decodeAudioData(arraybuffer, audioBuffer => {
-		// dfr.resolve(fill({
-		// 	buffer: audioBuffer,
-		// 	fn: transformWithZero,
-		// 	//value: .001,
-		// 	// fn: (val, i, channel) => {
-		// 	// 	if (Math.abs(val) < 0.02) { // 0.05 много
-		// 	// 		return 0;
-		// 	// 	}
-		// 	//
-		// 	// 	return val;
-		// 	// 	//return Math.sin(Math.PI * 2 * frequency * i / rate);
-		// 	// }
-		// }));
-
-		dfr.resolve(audioBuffer);
-	});
-
-	return dfr.promise;
-}
-
-function getBufferFromSample(ctx: AudioContext, zone: TWaveZone): AudioBuffer {
-	const decoded = atob(zone.sample);
-	const buffer = ctx.createBuffer(1, decoded.length / 2, zone.sampleRate);
-	const float32Array = buffer.getChannelData(0);
-	let b1,
-		b2,
-		n;
-	for (let i = 0; i < decoded.length / 2; i++) {
-		b1 = decoded.charCodeAt(i * 2);
-		b2 = decoded.charCodeAt(i * 2 + 1);
-		if (b1 < 0) {
-			b1 = 256 + b1;
-		}
-		if (b2 < 0) {
-			b2 = 256 + b2;
-		}
-		n = b2 * 256 + b1;
-		if (n >= 65536 / 2) {
-			n = n - 65536;
-		}
-		float32Array[i] = n / 65536.0;
-	}
-
-	return buffer;
-}
-
 export function findZone(audioContext: AudioContext, preset: TWavePreset, pitch: number): TWaveZone | null {
 	var zone: TWaveZone | null = null;
 	for (let i = preset.zones.length - 1; i >= 0; i--) {
@@ -215,6 +157,7 @@ export function findZone(audioContext: AudioContext, preset: TWavePreset, pitch:
 	}
 	return zone;
 }
+
 
 export async function prepareZone (ctx: AudioContext, zone: TWaveZone): Promise<TWaveZone> {
 	if (zone.buffer) return Promise.resolve(zone);
@@ -247,11 +190,11 @@ export async function prepareZone (ctx: AudioContext, zone: TWaveZone): Promise<
 
 	// create buffer
 	if (zone.file) {
-		zone.buffer = await getBufferFromFile(ctx, zone.file);
+		zone.buffer = await getAudioBufferFromString(zone.file, ctx);
 		dfr.resolve(zone);
 	}
 	else if (zone.sample) {
-		zone.buffer = getBufferFromSample(ctx, zone);
+		zone.buffer = await getAudioBufferFromSample(zone.sample, zone.sampleRate, ctx);
 		dfr.resolve(zone);
 	}
 	else {

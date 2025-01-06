@@ -12,11 +12,11 @@ export class Deferred<T = any> {
     }
 }
 
-export function audioBufferToWav (buffer, opt?) {
+export function audioBufferToWav (buffer, opt?: {numberOfChannels?: number, sampleRate?: number, float32?: boolean}) {
     opt = opt || {}
 
-    var numChannels = buffer.numberOfChannels
-    var sampleRate = buffer.sampleRate
+    var numChannels = buffer.numberOfChannels || 1;
+    var sampleRate = opt.sampleRate || buffer.sampleRate;
     var format = opt.float32 ? 3 : 1
     var bitDepth = format === 3 ? 32 : 16
 
@@ -152,48 +152,6 @@ export async function getAudioBufferFromBlobString(blobStr: string): Promise<Aud
     return getAudioBufferFromBlob(blob);
 }
 
-export async function getAudioBufferFromString(audioFile: string, ctx?: AudioContext): Promise<AudioBuffer> {
-    const dfr = new Deferred();
-    let arrayBuffer = new ArrayBuffer(audioFile.length);
-    let view = new Uint8Array(arrayBuffer);
-    let decoded = atob(audioFile);
-    let b;
-    for (let i = 0; i < decoded.length; i++) {
-        b = decoded.charCodeAt(i);
-        view[i] = b;
-    }
-
-    ctx = ctx || new AudioContext();
-    ctx.decodeAudioData(arrayBuffer, async (val) => dfr.resolve(val));
-
-    return dfr.promise;
-}
-
-// {
-//     let arrayBuffer: ArrayBuffer;
-//     arrayBuffer = new ArrayBuffer(audioFile.length);
-//     let view = new Uint8Array(arrayBuffer);
-//     let decoded = atob(audioFile);
-//     let b;
-//
-//     for (let i = 0; i < decoded.length; i++) {
-//         b = decoded.charCodeAt(i);
-//         view[i] = b;
-//     }
-//
-//     ctx.decodeAudioData(arrayBuffer, async (val) => {
-//         audioBuffer = val;
-//console.log('audioBuffer', audioBuffer);
-//
-//         //const blob = await getBlobFromAudioBuffer(audioBuffer);
-//         //console.log('BLOB', blob);
-//         //const blobString = await getBlobString(blob);
-//         //console.log('BLOB STRING', blobString);
-//     });
-// }
-
-
-
 /**
  * FileReader.readAsDataURL
  */
@@ -217,7 +175,33 @@ export async function getBlobString(blob: Blob): Promise<string> {
     return dfr.promise;
 }
 
-export function getBlobFromAudioBuffer(audioBuffer: AudioBuffer): Blob {
-    return new Blob([audioBufferToWav(audioBuffer)], { type: 'audio/wav' });
+export function getBlobFromAudioBuffer(audioBuffer: AudioBuffer, sampleRate?: number): Blob {
+    return new Blob([audioBufferToWav(audioBuffer, {sampleRate})], { type: 'audio/wav' });
     // blob = new Blob(<any>bufferAsBlob, { type: 'audio/wav' }); // 'audio/webm;codecs=opus', 'audio/ogg; codecs=opus', 'audio/wav'
+}
+
+export function getBlobOggFromAudioBuffer(audioBuffer: AudioBuffer): Blob {
+    return new Blob([audioBufferToWav(audioBuffer)], { type: 'audio/ogg; codecs=opus' });
+    // blob = new Blob(<any>bufferAsBlob, { type: 'audio/wav' }); // 'audio/webm;codecs=opus', 'audio/ogg; codecs=opus', 'audio/wav'
+}
+
+export async function getStringFromBlob(blob: Blob): Promise<string> {
+    const dfr = new Deferred();
+    const reader = new FileReader();
+
+    reader.onload = function() {
+        let dataUrl = reader.result as string;
+        let base64 = dataUrl.split(',')[1];
+        dfr.resolve(base64);
+    };
+    reader.readAsDataURL(blob);
+
+    return dfr.promise;
+}
+
+
+export async function getStringFromAudioBuffer(audioBuffer: AudioBuffer, sampleRate?: number): Promise<string> {
+    const blob = getBlobFromAudioBuffer(audioBuffer, sampleRate);
+
+    return getStringFromBlob(blob);
 }

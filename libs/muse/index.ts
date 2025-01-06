@@ -49,8 +49,18 @@ import { freqInfoHash, freqInfoList } from './freq';
 
 import { WebAudioFontLoader } from './font/loader';
 import { getInstrumentTitles } from './font/instrument-titles';
-import { getAudioBufferFromBlobString, getAudioBufferFromString } from './font/audio-buffer-to-wav';
+import {
+    getStringFromAudioBuffer,
+    getAudioBufferFromBlobString,
+    getAudioBufferFromArrayBuffer,
+    getBlobOggFromAudioBuffer,
+    getAudioBufferFromBlob,
+} from './font/audio-buffer-to-wav';
+import { getAudioBufferFromString } from './font/get-audio-buffer-from-string';
+import { getAudioBufferFromSample } from './font/get-audio-buffer-from-sample';
+
 import { preparePreset } from './font/prepare';
+
 
 export const Muse = {
     const: {
@@ -70,6 +80,11 @@ export const Muse = {
         getAudioBufferFromString,
         isNil,
         getNoteByOffset,
+        getAudioBufferFromArrayBuffer,
+        getStringFromAudioBuffer,
+        getBlobOggFromAudioBuffer,
+        getAudioBufferFromBlob,
+        getAudioBufferFromSample,
     },
     parser: {
 

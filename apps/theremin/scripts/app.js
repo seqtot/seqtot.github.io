@@ -109,7 +109,7 @@ class App {
         repeat,
         //signature,
         cb: (data) => {
-          console.log('data', data);
+        //console.log('data', data);
         },
     });
 
@@ -151,7 +151,7 @@ class App {
         //signature,
         cb: (data) => {
           if (data.type === 'stop') {
-            console.log('record.data', board ? board.record : null);
+            //console.log('record.data', board ? board.record : null);
             //board.record = null;
           }
         },

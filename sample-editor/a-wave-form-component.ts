@@ -429,7 +429,7 @@ export class WaveFormComponent extends CanvasComponent {
 
 
     public normalizeAudioData(arr: number[], max: number, min: number): number[] {
-        const rate = 1 / Math.max(Math.abs(max), Math.abs(min));;
+        const rate = 1 / Math.max(Math.abs(max), Math.abs(min));
         return arr.map(item => item * rate);
     }
 
