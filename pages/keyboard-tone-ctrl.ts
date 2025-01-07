@@ -205,18 +205,19 @@ export class ToneCtrl extends KeyboardCtrl {
             soloKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
         }
         else if (boardType === 'solo34') {
-            baseKeys = hlp.harmonicaVerticalKeys.slice(3, 15);
-            soloKeys = hlp.harmonicaVerticalKeys.slice(3, 15);            
+            baseKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
         }
         else if (boardType === 'bassBass34') {
             baseKeys = hlp.harmonicaVerticalKeys.slice(3);
             soloKeys = hlp.harmonicaVerticalKeys.slice(3);
         }
         else if (boardType === 'bass34') {
-            baseKeys = hlp.harmonicaVerticalKeys.slice(6);
-            soloKeys = hlp.harmonicaVerticalKeys.slice(6);
+            baseKeys = hlp.harmonicaVerticalKeys.slice(3);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(3);
         }
 
+        let boardWidth = '100%'
         let boardContent = `
             ${hlp.getVerticalKeyboard({
                 keyboardId: 'base',
@@ -234,15 +235,16 @@ export class ToneCtrl extends KeyboardCtrl {
                 cellHeight: 2
             })}`;
 
-        if (boardType === 'bass34' || boardType === 'solo34') (
+        if (boardType === 'bass34' || boardType === 'solo34') {
+            boardWidth = '80%';
             boardContent = hlp.getVerticalKeyboard({
                 keyboardId: 'base',
                 type: boardType,
                 keys: baseKeys,
-                cellWidth: 3,
-                cellHeight: 3
+                cellWidth: 2.5,
+                cellHeight: 2.5
             })
-        )
+        }
 
         return `
             <div style="
@@ -252,6 +254,7 @@ export class ToneCtrl extends KeyboardCtrl {
                 touch-action: none;
                 display: flex;
                 justify-content: space-between;
+                width: ${boardWidth};
                 position: relative;"
             >
                 ${boardContent}
