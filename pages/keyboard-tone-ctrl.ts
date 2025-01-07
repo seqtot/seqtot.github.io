@@ -239,8 +239,8 @@ export class ToneCtrl extends KeyboardCtrl {
                 keyboardId: 'base',
                 type: boardType,
                 keys: baseKeys,
-                cellWidth: 2.5,
-                cellHeight: 2.5
+                cellWidth: 3,
+                cellHeight: 3
             })
         )
 

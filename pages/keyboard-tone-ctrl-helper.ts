@@ -74,7 +74,7 @@ export const mapNoteToCharRus = {
     b: 'Б'
 }
 
-export function getGuitarСellStyles(note: string, iRow: number, iCol: number): {
+export function getGuitarCellStyles(note: string, iRow: number, iCol: number): {
     bgColor: string,
     borders: string,
     text: string,
@@ -443,7 +443,7 @@ export function getHorisontalKeyboard(x: {
         cellWidth: `${cellWidth}rem`,
         cellHeight: `${cellHeight}rem`,
         fontSize: '1.3rem',
-        cellStylesFn: isT34Type ? getHarmonicaVerticalCellStyles: getGuitarСellStyles,
+        cellStylesFn: isT34Type ? getHarmonicaVerticalCellStyles: getGuitarCellStyles,
     });
 
     let minWidth = '';
@@ -479,7 +479,7 @@ export function getHorisontalKeyboard(x: {
     return keyboard;
 }
 
-export function getVerticalKeyboard(x: {
+export function getVerticalKeyboard(o: {
     keyboardId: number | string,
     type: ToneKeyboardType,
     keys: string[][],
@@ -487,25 +487,25 @@ export function getVerticalKeyboard(x: {
     cellWidth?: number,
     cellHeight?: number,
 }): string {
-    const keyboardId = x.keyboardId || '';
+    const keyboardId = o.keyboardId || '';
 
-    const isT34Type = isT34(x.type);
+    const isT34Type = isT34(o.type);
 
-    const cellWidth = x.cellWidth || x.cellSize || 1.8;
-    const cellHeight = x.cellHeight || x.cellSize || 1.8;
+    const cellWidth = o.cellWidth || o.cellSize || 1.8;
+    const cellHeight = o.cellHeight || o.cellSize || 1.8;
 
     const getKey = getKeyFn({
         keyboardId,
         cellWidth: `${cellWidth}rem`,
         cellHeight: `${cellHeight}rem`,
         fontSize: '1.3rem',
-        cellStylesFn: isT34Type ? getHarmonicaVerticalCellStyles: getGuitarСellStyles,
+        cellStylesFn: isT34Type ? getHarmonicaVerticalCellStyles: getGuitarCellStyles,
     });
 
     let minWidth = '';
 
-    if (x.keys[0] && x.keys[0].length) {
-        minWidth = `min-width: ${cellWidth * x.keys[0].length + 0.1}rem;`;
+    if (o.keys[0] && o.keys[0].length) {
+        minWidth = `min-width: ${cellWidth * o.keys[0].length + 0.1}rem;`;
     }
 
     // padding: 0.5rem 0 0.5rem 0.5rem;"
@@ -522,7 +522,7 @@ export function getVerticalKeyboard(x: {
     `.trim();
 
     let tpl = '';
-    x.keys.forEach((row, iRow) => {
+    o.keys.forEach((row, iRow) => {
         tpl = tpl + '<div>';
 
         row.forEach((note, iCol) => {
