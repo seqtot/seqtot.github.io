@@ -205,16 +205,16 @@ export class ToneCtrl extends KeyboardCtrl {
             soloKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
         }
         else if (boardType === 'solo34') {
-            baseKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
-            soloKeys = hlp.harmonicaVerticalKeys.slice(0, 15);
+            baseKeys = hlp.harmonicaVerticalKeys.slice(3, 15);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(3, 15);
         }
         else if (boardType === 'bassBass34') {
             baseKeys = hlp.harmonicaVerticalKeys.slice(3);
             soloKeys = hlp.harmonicaVerticalKeys.slice(3);
         }
         else if (boardType === 'bass34') {
-            baseKeys = hlp.harmonicaVerticalKeys.slice(3);
-            soloKeys = hlp.harmonicaVerticalKeys.slice(3);
+            baseKeys = hlp.harmonicaVerticalKeys.slice(6);
+            soloKeys = hlp.harmonicaVerticalKeys.slice(6);
         }
 
         let boardWidth = '100%'
@@ -241,8 +241,8 @@ export class ToneCtrl extends KeyboardCtrl {
                 keyboardId: 'base',
                 type: boardType,
                 keys: baseKeys,
-                cellWidth: 2.5,
-                cellHeight: 2.5
+                cellWidth: 3,
+                cellHeight: 3
             })
         }
 
