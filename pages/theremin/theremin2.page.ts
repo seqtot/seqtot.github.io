@@ -49,9 +49,6 @@ type Sizes = {
   height: number;
   boardHeight: number;
 
-  cellSize: number;
-  halfSize: number;
-
   colSize: number;
   rowSize: number;
   headerHeight: number;
@@ -75,11 +72,9 @@ function getSizes(x: {
     getWithDataAttr('app-header-first-row-area')[0].clientHeight
   );
 
-  console.log('headerHeight', headerHeight);
-
   const rowCount = 52;
-  const colCount = 14;
-  const halfColCount = 7;
+  const colCount = 13;
+  const halfColCount = colCount / 2
 
   let width = x.width; // window.innerWidth;
   let height = x.height - headerHeight * 2; //window.innerHeight;
@@ -87,34 +82,16 @@ function getSizes(x: {
   let colSize = Math.floor(width / colCount);
   let rowSize = Math.floor(height / rowCount);
 
-  // let boardWidth = pageWidth - 64;
-  // let boardHeight = 0;
-  let halfSize = Math.floor(
-    (height - (x.cellCount + 2)) / (x.cellCount + 2) / 2
-  );
-  let cellSize = halfSize * 2 + 1;
-
-  const halfWidth = Math.floor(width / cellSize / 2) * cellSize;
-
-  //let boardSoloWidth = halfWidth; //Math.floor(width / cellSize);
-  //boardSoloWidth = boardSoloWidth - 3;
-  //boardSoloWidth = boardSoloWidth * cellSize;
-  //let boardBassLeft = 0;
-  // let boardBassWidth = halfWidth; // cellSize * 3;
   let boardBassLeft = 0;
   let boardBassWidth = colSize * halfColCount;
   let boardSoloLeft = boardBassWidth;
   let boardSoloWidth = colSize * halfColCount;
   let boardHeight = rowSize * rowCount;
 
-  // let boardHeight = x.cellCount * cellSize + cellSize * 2;
-
   return {
     width,
     height,
     boardHeight,
-    cellSize,
-    halfSize,
     boardSoloWidth,
     boardSoloLeft,
     boardBassLeft,
@@ -152,11 +129,16 @@ class Board {
   canvasBot: HTMLCanvasElement;
   canvasCtxBot: CanvasRenderingContext2D;
 
-  freqList: TFreqInfo[];
+  freqListLeft: TFreqInfo[];
+  freqListRight: TFreqInfo[];
 
   wave: WaveSource2;
 
   isSmoothMode = false;
+
+  pointerIds: any = {
+
+  }
 
   constructor(
     public type: 'bass' | 'solo',
@@ -190,50 +172,58 @@ class Board {
     );
   }
 
-  drawCells() {
+
+  drawSide(type: string) {
     const sizes = this.sizes;
+    const colSize = sizes.colSize
+    const rowSize = sizes.rowSize
+    const halfRow = rowSize / 2;
+    const halfCol = colSize / 2;
+    const twoRow = rowSize * 2;
+    const fourRow = rowSize * 4;
+
+    const leftX = type === 'left' ? colSize : colSize * 9
+
     const ctx = this.canvasCtxMid;
     const defStroke = 'rgb(0, 0, 0)';
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = defStroke;
     ctx.fillStyle = `rgba(100, 100, 100, 1)`;
+    
+    ctx.beginPath();
+    ctx.moveTo(leftX, twoRow);
+    ctx.lineTo(leftX, sizes.boardHeight);
+    ctx.stroke();    
 
-    const halfRow = sizes.rowSize / 2;
-    const halfCol = sizes.colSize / 2;
-    const twoRow = sizes.rowSize * 2;
-    const fourRow = sizes.rowSize * 4;
+    ctx.beginPath();
+    ctx.moveTo(leftX + colSize*3, twoRow);
+    ctx.lineTo(leftX + colSize*3, sizes.boardHeight);
+    ctx.stroke();    
 
-    ctx.strokeRect(
-      sizes.colSize * 5 + halfCol,
-      twoRow,
-      sizes.colSize * 2 - halfCol,
-      sizes.height - fourRow
-    );
-
-    const fs = 4;
-    const hs = 2;
+    const fs = 6;
+    const hs = 3;
 
     for (let j = 0; j < 48; j++) {
       const restJ = j % 4;
 
-      ctx.strokeStyle = 'rgb(200, 200, 200)';
+      // горизонтальные разделители блоков
+      ctx.strokeStyle = 'rgb(150, 150, 150)';
       ctx.lineWidth = 0.5;
       if (restJ === 3) {
         ctx.beginPath();
         ctx.moveTo(
-          sizes.colSize + halfCol,
-          j * sizes.rowSize + twoRow + halfRow
+          leftX,
+          j * rowSize + twoRow + halfRow
         );
-        ctx.lineTo(sizes.boardBassWidth, j * sizes.rowSize + twoRow + halfRow);
+        ctx.lineTo(sizes.boardBassWidth, j * rowSize + twoRow + halfRow);
         ctx.stroke();
       }
 
       for (let i = 0; i < 4; i++) {
         const restI = i % 4;
-        console.log(i, i % 4);
 
-        const x = sizes.colSize + i * sizes.colSize + sizes.colSize / 2 - hs;
+        const x = leftX + i * colSize - hs;
         const y = twoRow + j * sizes.rowSize + sizes.rowSize / 2 - hs;
 
         if (
@@ -245,19 +235,32 @@ class Board {
           ctx.fillRect(x, y, fs, fs);
       }
     }
+  }
+
+  drawCells() {
+    this.drawSide('left')
+    this.drawSide('right')
   } // drawCells
 
-  setFreqList(freqList: TFreqInfo[], botNote: string, topNote: string) {
+  setFreqListLeft(freqList: TFreqInfo[], botNote: string, topNote: string) {
     freqList = [...freqList];
 
     const newFreqList = getFreqList(freqList.reverse(), botNote, topNote);
 
-    this.freqList = newFreqList;
+    this.freqListLeft = newFreqList;
+  }
+
+  setFreqListRigth(freqList: TFreqInfo[], botNote: string, topNote: string) {
+    freqList = [...freqList];
+
+    const newFreqList = getFreqList(freqList.reverse(), botNote, topNote);
+
+    this.freqListRight = newFreqList;
   }
 
   createCanvas(sizes: Sizes, canvasEl: HTMLElement) {
     this.sizes = sizes;
-    this.gutter = sizes.cellSize;
+    // this.gutter = sizes.cellSize;
     this.canvasEl = canvasEl;
 
     // BOT TOM
@@ -288,15 +291,18 @@ class Board {
 
   update(e: PointerEvent, onlyStop = false) {
     if (onlyStop) {
-      ideService.synthesizer.playSound({
-        id: this.type,
-        keyOrNote: this.lastNote,
-        instrCode: this.instrCode,
-        onlyStop: true,
-      });
+      const cell = this.pointerIds[e.pointerId] as {pointerId: number, note: string, instrCode: number}
 
-      this.lastY = -1;
-      this.lastX = -1;
+      if (cell) {
+        ideService.synthesizer.playSound({
+          id: cell.pointerId,
+          keyOrNote: cell.note,
+          instrCode: cell.instrCode,
+          onlyStop: true,
+        });
+      }
+
+      delete this.pointerIds[e.pointerId]
 
       return;
     }
@@ -313,6 +319,17 @@ class Board {
     const fillStyle = `rgba(250, 0, 0, .5)`;
     const ctx = this.canvasCtxTop;
 
+    let boardSide = ''
+    if (offsetX < (colSize*4 + halfColSize)) {
+      boardSide = 'left'
+    } else if (offsetX > (colSize*8 + halfColSize)){
+      boardSide = 'fight'
+    }
+
+    if (!boardSide) return
+
+    const leftX = boardSide === 'left' ? colSize : colSize * 9
+
     this.clearCanvasTop();
     ctx.fillStyle = fillStyle;
 
@@ -324,18 +341,23 @@ class Board {
       note: '',
     };
 
+    const colX0 = leftX - halfColSize
+    const colX1 = leftX - halfColSize + colSize
+    const colX2 = leftX - halfColSize + colSize * 2
+    const colX3 = leftX - halfColSize + colSize * 3
+
     // определение колонки
-    if (offsetX < colSize * 2) {
-      cell.x = colSize;
+    if (offsetX < colX1) {
+      cell.x = colX0 + halfColSize;
       cell.i = 0;
-    } else if (offsetX >= colSize * 2 && offsetX < colSize * 3) {
-      cell.x = colSize * 2;
+    } else if (offsetX < colX2) {
+      cell.x = colX1 + halfColSize;
       cell.i = 1;
-    } else if (offsetX >= colSize * 3 && offsetX < colSize * 4) {
-      cell.x = colSize * 3;
+    } else if (offsetX < colX3) {
+      cell.x = colX2 + halfColSize;
       cell.i = 2;
     } else {
-      cell.x = colSize * 4;
+      cell.x = colX3 + halfColSize;
       cell.i = 3;
     }
 
@@ -377,32 +399,46 @@ class Board {
       }
     }
 
-    console.log('rowInBox', row, rowInBox);
-
     cell.j = row;
     cell.y = rowSize * 2 + halfRowSize + row * rowSize - rowSize * 2;
 
-    const note = this.freqList[row];
-    ctx.fillRect(cell.x, cell.y, sizes.colSize, fourRowSize);
-    ctx.fillRect(
-      colSize * 5 + halfColSize,
-      cell.j * rowSize + twoRowSize + halfRowSize - 3,
-      colSize + halfColSize,
-      6
-    );
+    const note = boardSide === 'left' ? this.freqListLeft[row] : this.freqListRight[row];
+
+    const pointInfo = {
+      pointerId: e.pointerId,
+      note: note?.noteLat,
+      instrCode: this.instrCode,
+      cell,
+      boardSide
+    }
+
+    if (note) {
+      this.pointerIds[e.pointerId] = pointInfo
+    }    
 
     if (note) {
       this.lastNote = note.noteLat;
       cell.note = note.noteLat;
       ideService.synthesizer.playSound({
-        id: this.type,
+        id: e.pointerId,
         keyOrNote: note.noteLat,
         instrCode: this.instrCode,
       });
     }
-  } // update
 
-  pointerId: any;
+    Object.values(this.pointerIds).forEach((info: any) => {
+      const leftX2 = info.boardSide === 'left' ? leftX + (colSize*4) : leftX - (colSize*2) - halfColSize;
+      const cell = info.cell;
+
+      ctx.fillRect(cell.x - halfColSize, cell.y, sizes.colSize, fourRowSize);
+      ctx.fillRect(
+        leftX2,
+        cell.j * rowSize + twoRowSize + halfRowSize - 3,
+        colSize + halfColSize,
+        6
+      );      
+    })
+  } // update
 
   subscribe() {
     const pos = getPosition(this.canvasTop);
@@ -413,8 +449,7 @@ class Board {
       e.preventDefault();
       e.stopPropagation();
 
-      if (!this.pointerId) {
-        this.pointerId = e.pointerId;
+      if (!this.pointerIds[e.pointerId]) {
         this.update(e);
       }
     });
@@ -449,8 +484,7 @@ class Board {
       e.preventDefault();
       e.stopPropagation();
 
-      if (e.pointerId === this.pointerId) {
-        this.pointerId = null;
+      if (this.pointerIds[e.pointerId]) {
         this.update(e, true);
       }
     });
@@ -459,8 +493,7 @@ class Board {
       e.preventDefault();
       e.stopPropagation();
 
-      if (e.pointerId === this.pointerId && e.buttons) {
-        this.pointerId = null;
+      if (this.pointerIds[e.pointerId] && e.buttons) {
         this.update(e, true);
       }
     });
@@ -469,8 +502,7 @@ class Board {
       e.preventDefault();
       e.stopPropagation();
 
-      if (e.pointerId === this.pointerId) {
-        this.pointerId = null;
+      if (this.pointerIds[e.pointerId]) {
         this.update(e, true);
       }
     });
@@ -538,41 +570,30 @@ export class ThereminPage2 {
     console.log('sizes', sizes);
 
     let boardsEl = getWithDataAttr('boards-container')[0];
-    boardsEl.style.width = `${sizes.width}px`;
+    boardsEl.style.width = `${sizes.width * 2}px`;
     boardsEl.style.height = `${sizes.boardHeight}px`;
 
     let boardBassEl = getWithDataAttr('board-bass-container')[0];
     boardBassEl.style.top = `0px`;
     boardBassEl.style.left = `${sizes.boardBassLeft}px`;
-    boardBassEl.style.width = `${sizes.boardBassWidth}px`;
+    boardBassEl.style.width = `${sizes.boardBassWidth * 2}px`;
     boardBassEl.style.height = `${sizes.boardHeight}px`;
 
     let canvasBassEl = getWithDataAttr('board-bass-canvas-container')[0];
     canvasBassEl.style.top = `0px`;
     canvasBassEl.style.left = `0px`;
-    canvasBassEl.style.width = `${sizes.boardBassWidth}px`;
+    canvasBassEl.style.width = `${sizes.boardBassWidth * 2}px`;
     canvasBassEl.style.height = `${sizes.boardHeight}px`;
-
-    let boardSoloEl = getWithDataAttr('board-solo-container')[0];
-    boardSoloEl.style.top = `0px`;
-    boardSoloEl.style.left = `${sizes.boardSoloLeft}px`;
-    boardSoloEl.style.width = `${sizes.boardSoloWidth}px`;
-    boardSoloEl.style.height = `${sizes.boardHeight}px`;
-
-    let canvasSoloEl = getWithDataAttr('board-solo-canvas-container')[0];
-    canvasSoloEl.style.top = `0px`;
-    canvasSoloEl.style.left = `0px`;
-    canvasSoloEl.style.width = `${sizes.boardSoloWidth}px`;
-    canvasSoloEl.style.height = `${sizes.boardHeight}px`;
 
     // BASS BOARD
     this.bassBoard = new Board('bass', 'leftToRight');
     // du dy do da
-    this.bassBoard.setFreqList(freqInfoList, 'du', 'ba');
+    this.bassBoard.setFreqListLeft(freqInfoList, 'du', 'ba');
+    this.bassBoard.setFreqListRigth(freqInfoList, 'dy', 'be');
     this.bassBoard.createCanvas(
       {
         ...sizes,
-        width: sizes.boardBassWidth,
+        width: sizes.boardBassWidth * 2,
         height: sizes.boardHeight,
       },
       canvasBassEl
@@ -582,22 +603,6 @@ export class ThereminPage2 {
     // this.bassBoard.wave.connect(Sound.ctx.destination);
     // this.bassBoard.wave.start();
     this.bassBoard.subscribe();
-
-    // // SOLO BOARD
-    // this.soloBoard = new Board("solo", "rightToLeft");
-    // this.soloBoard.setFreqList(freqInfoList, "da", "bi");
-    // this.soloBoard.createCanvas(
-    //   {
-    //     ...sizes,
-    //     width: sizes.boardSoloWidth,
-    //   },
-    //   canvasSoloEl
-    // );
-    // this.soloBoard.drawCells();
-    // this.soloBoard.wave = new WaveSource2();
-    // this.soloBoard.wave.connect(Sound.ctx.destination);
-    // this.soloBoard.wave.start();
-    // this.soloBoard.subscribe();
   } // setContent
 }
 
