@@ -289,6 +289,33 @@ class Board {
     this.canvasCtxTop = this.canvasTop.getContext('2d')!;
   }
 
+  drawCurrentCells() {
+    this.clearCanvasTop();
+
+    const ctx = this.canvasCtxTop;
+    const sizes = this.sizes;
+    const colSize = sizes.colSize;
+    const rowSize = sizes.rowSize;
+    const halfColSize = colSize / 2;
+    const halfRowSize = rowSize / 2;
+    const twoRowSize = rowSize * 2;
+    const fourRowSize = rowSize * 4;
+
+    Object.values(this.pointerIds).forEach((info: any) => {
+      const leftX = info.boardSide === 'left' ? colSize : colSize * 9
+      const leftX2 = info.boardSide === 'left' ? leftX + (colSize*4) : leftX - (colSize*2) - halfColSize;
+      const cell = info.cell;
+
+      ctx.fillRect(cell.x - halfColSize, cell.y, sizes.colSize, fourRowSize);
+      ctx.fillRect(
+        leftX2,
+        cell.j * rowSize + twoRowSize + halfRowSize - 3,
+        colSize + halfColSize,
+        6
+      );      
+    })    
+  }
+
   update(e: PointerEvent, onlyStop = false) {
     if (onlyStop) {
       const cell = this.pointerIds[e.pointerId] as {pointerId: number, note: string, instrCode: number}
@@ -303,6 +330,7 @@ class Board {
       }
 
       delete this.pointerIds[e.pointerId]
+      // this.drawCurrentCells()
 
       return;
     }
@@ -323,10 +351,13 @@ class Board {
     if (offsetX < (colSize*4 + halfColSize)) {
       boardSide = 'left'
     } else if (offsetX > (colSize*8 + halfColSize)){
-      boardSide = 'fight'
+      boardSide = 'right'
     }
 
-    if (!boardSide) return
+    if (!boardSide) {
+      this.drawCurrentCells()
+      return
+    }
 
     const leftX = boardSide === 'left' ? colSize : colSize * 9
 
@@ -424,20 +455,9 @@ class Board {
         keyOrNote: note.noteLat,
         instrCode: this.instrCode,
       });
+
+      this.drawCurrentCells()
     }
-
-    Object.values(this.pointerIds).forEach((info: any) => {
-      const leftX2 = info.boardSide === 'left' ? leftX + (colSize*4) : leftX - (colSize*2) - halfColSize;
-      const cell = info.cell;
-
-      ctx.fillRect(cell.x - halfColSize, cell.y, sizes.colSize, fourRowSize);
-      ctx.fillRect(
-        leftX2,
-        cell.j * rowSize + twoRowSize + halfRowSize - 3,
-        colSize + halfColSize,
-        6
-      );      
-    })
   } // update
 
   subscribe() {
