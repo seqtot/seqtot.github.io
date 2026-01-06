@@ -1,4 +1,7 @@
 {
+  "search.exclude": {
+    "**/dist": true
+  }
   // "editor.theme": "vs-dark",
   /**
    * Render vertical lines at the specified columns.

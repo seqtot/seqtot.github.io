@@ -63,7 +63,7 @@ function backendApi(middlewares, devServer) {
         //const filePath = `${req.query.root}/${req.query.path}`;
         let filePath = `${req.query.path}`;
 
-        if (Os.type() === 'Linux') {
+        if (Os.type() === 'Linux' || Os.type() === 'Darwin') {
             filePath = filePath.replace('D:', `${Os.homedir()}/d`);
         }
 

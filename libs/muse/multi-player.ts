@@ -366,9 +366,10 @@ export class MultiPlayer {
         bpm?: number,
         dataByTracks?: TDataByTracks,
         pitchShift?: number
+        quarterSize?: number
     }): OutLoopsInfo {
         //console.log('getLoopsInfo.params', {...params});
-
+        const quarterSize = x.quarterSize || u.QUARTER_SIZE;
         const pitchShift = x.pitchShift || 0;
         let beatsMs: number[] = Array.isArray(x.beatsMs) ? [...x.beatsMs]: [];
         let playBlock = x.playBlock || 'out';
@@ -417,10 +418,10 @@ export class MultiPlayer {
             const addPauseQ = addPauseToNextRowQ;
             const fullRowDuration = (rowLoop.rowDurationByHeadQ * rowLoop.rowRepeat) + addPauseQ;
             let beatsByRowMs: number[];
-            let rowBeatCountCeil = Math.ceil(fullRowDuration  / u.NUM_120);
-            let rowBeatCountFloor = Math.floor(fullRowDuration / u.NUM_120);
+            let rowBeatCountCeil = Math.ceil(fullRowDuration  / quarterSize);
+            let rowBeatCountFloor = Math.floor(fullRowDuration / quarterSize);
 
-            addPauseToNextRowQ = fullRowDuration - (rowBeatCountFloor * u.NUM_120);
+            addPauseToNextRowQ = fullRowDuration - (rowBeatCountFloor * quarterSize);
 
             //console.log('negOffsetQ',
             //     rowLoop.rowDurationQ,
@@ -439,7 +440,7 @@ export class MultiPlayer {
             }
 
             result.beatsMs = beatsByRowMs;
-            durationInFullQ = durationInFullQ + (beatsByRowMs.length * u.NUM_120);
+            durationInFullQ = durationInFullQ + (beatsByRowMs.length * quarterSize);
             durationInFullQMs = durationInFullQMs + beatsByRowMs.reduce((acc, item) => (acc + item), 0);
 
             rowLoop.trackLns.forEach((noteLn) => {

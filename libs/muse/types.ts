@@ -163,6 +163,8 @@ export type TFileSettings = {
     boardShift: string[],
     boardInstr: string[],
     bpm: string[],
+    volume: string[],
+    quarterSize: string[],
     //[key: string]: any,
 };
 

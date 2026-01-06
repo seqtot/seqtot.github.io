@@ -4,7 +4,7 @@ import { getWithDataAttr } from '../../src/utils';
 import { WaveSource2 } from './wave-source';
 import { RouteInfo } from '../../src/router';
 
-type WithId = {id: string}
+type WithId = { id: string }
 
 const outVol = 80;
 const freqInfoList = m.const.freqInfoList;
@@ -27,14 +27,14 @@ function getFreqList(freqList: TFreqInfo[], botNote: string, topNote: string): T
 
     let list = freqList
         .filter(item => item.code >= botCode && item.code <= topCode)
-        .map(item => ({...item}));
+        .map(item => ({ ...item }));
 
     list.forEach((item, i) => {
         item.relatives = list.map((iItem, i) => iItem.step === item.step ? i : -1).filter(ind => ind > -1);
         item.index = i;
     });
 
-    return  list;
+    return list;
 }
 
 type Sizes = {
@@ -63,7 +63,7 @@ function getSizes(x: {
 
     let headerHeight = getWithDataAttr('app-header-first-row-area')[0].clientHeight;
 
-    let width = x.width ; // window.innerWidth;
+    let width = x.width; // window.innerWidth;
     let height = x.height - (headerHeight * 2); //window.innerHeight;
     // let boardWidth = pageWidth - 64;
     // let boardHeight = 0;
@@ -142,8 +142,8 @@ class Board {
         const gutter = this.gutter;
         const zeroY = gutter;
         const zeroX = gutter;
-        const height = this.sizes.height - (gutter*2);
-        const width = this.sizes.width - (gutter*2);
+        const height = this.sizes.height - (gutter * 2);
+        const width = this.sizes.width - (gutter * 2);
         const ctx = this.canvasCtxMid;
         const cellSize = this.sizes.cellSize;
 
@@ -165,8 +165,8 @@ class Board {
             if (item.step === 'd' || item.step === 'm' || item.step === 'z') { // && this.type === 'freqAndVol'
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = 'red';
-                ctx.fillRect(gutter/2, zeroY + (i * cellSize) + cellSize/2, 2, 2);
-                ctx.fillRect(gutter + width + gutter/2 , zeroY + (i * cellSize) + cellSize/2, 2, 2);
+                ctx.fillRect(gutter / 2, zeroY + (i * cellSize) + cellSize / 2, 2, 2);
+                ctx.fillRect(gutter + width + gutter / 2, zeroY + (i * cellSize) + cellSize / 2, 2, 2);
             }
 
             ctx.strokeStyle = defStroke;
@@ -180,8 +180,8 @@ class Board {
                 ctx.strokeStyle = defStroke;
                 ctx.lineWidth = .5;
                 ctx.beginPath();
-                ctx.moveTo(zeroX, zeroY + ((i+1) * cellSize));
-                ctx.lineTo(zeroX + width, zeroY + ((i+1) * cellSize));
+                ctx.moveTo(zeroX, zeroY + ((i + 1) * cellSize));
+                ctx.lineTo(zeroX + width, zeroY + ((i + 1) * cellSize));
                 ctx.stroke();
             }
         });
@@ -275,7 +275,7 @@ class Board {
         // BOT TOM
         this.canvasBot = document.createElement('canvas');
         this.canvasBot.style.position = "absolute";
-        this.canvasBot.width  = sizes.width;
+        this.canvasBot.width = sizes.width;
         this.canvasBot.height = sizes.height;
         // this.canvasEl.style.border   = "1px solid gray";
         this.canvasEl.appendChild(this.canvasBot);
@@ -284,7 +284,7 @@ class Board {
         // MID CANVAS
         this.canvasMid = document.createElement('canvas');
         this.canvasMid.style.position = "absolute";
-        this.canvasMid.width  = sizes.width;
+        this.canvasMid.width = sizes.width;
         this.canvasMid.height = sizes.height;
         this.canvasEl.appendChild(this.canvasMid);
         this.canvasCtxMid = this.canvasMid.getContext("2d");
@@ -292,7 +292,7 @@ class Board {
         // TOP CANVAS
         this.canvasTop = document.createElement('canvas');
         this.canvasTop.style.position = "absolute";
-        this.canvasTop.width  = sizes.width;
+        this.canvasTop.width = sizes.width;
         this.canvasTop.height = sizes.height;
         this.canvasEl.appendChild(this.canvasTop);
         this.canvasCtxTop = this.canvasTop.getContext("2d");
@@ -346,7 +346,7 @@ class Board {
             let type2 = this.wave.type1;
 
             if (this.isSmoothMode) {
-                let botFRange = this.lastFreqObj.midF  - this.lastFreqObj.botF;
+                let botFRange = this.lastFreqObj.midF - this.lastFreqObj.botF;
                 let topFRange = this.lastFreqObj.topF - this.lastFreqObj.midF;
 
                 let topY = (cellSize * indFreq);
@@ -392,8 +392,8 @@ class Board {
                     vol = 0;
                 }
                 else {
-                    const width = sizes.width - (gutter*2) - (cellSize*4);
-                    const locX = curX - gutter - (cellSize*2);
+                    const width = sizes.width - (gutter * 2) - (cellSize * 4);
+                    const locX = curX - gutter - (cellSize * 2);
                     vol = (1 - (locX / width)) * 100;
                 }
 
@@ -441,6 +441,73 @@ class Board {
     pointerId: any;
 
     subscribe() {
+        let topRight = 0
+
+        function gameLoop() {
+            const gamepads = navigator.getGamepads();
+
+            if (!gamepads) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            const gp = gamepads[0];
+            let value = parseFloat((100*gp.axes[2]).toFixed(1))
+            console.log(gp.axes[2])
+
+            if (topRight !== value) {
+              topRight = value
+
+              //console.log(value)
+            }
+
+            // console.log(gamepads)
+            // if (gp.buttons[0].pressed) {
+                // b--;
+            // }
+            // if (gp.buttons[2].pressed) {
+                // b++;
+            // }
+            // if (gp.buttons[1].pressed) {
+                // a++;
+            // }
+            // if (gp.buttons[3].pressed) {
+                // a--;
+            // }
+// 
+            // ball.style.left = `${a * 2}px`;
+            // ball.style.top = `${b * 2}px`;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        //gameLoop()
+
+        // 2-left 1-right 
+        // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
+        window.addEventListener("gamepadconnected", (e) => {
+            console.log(navigator.getGamepads())
+            // console.log(
+                // "Gamepad connected at index %d: %s. %d buttons, %d axes.",
+                // e.gamepad.index,
+                // e.gamepad.id,
+                // e.gamepad.buttons.length,
+                // e.gamepad.axes.length,
+            // );
+
+            if (this.type === 'bass') {
+              gameLoop()
+            }
+        });
+// 
+        // window.addEventListener("gamepaddisconnected", (e) => {
+            // console.log(
+                // "Gamepad disconnected from index %d: %s",
+                // e.gamepad.index,
+                // e.gamepad.id,
+            // );
+        // });
+
         const pos = getPosition(this.canvasTop);
         this.sizes.boardTopOffset = pos.y;
         this.sizes.boardLeftOffset = pos.x;
@@ -525,7 +592,7 @@ export class ThereminPage {
 
     constructor(
         public props: RouteInfo<WithId>,
-    ) {}
+    ) { }
 
     onMounted() {
         this.setContent();
@@ -605,9 +672,9 @@ export class ThereminPage {
         this.bassBoard = new Board('bass', 'leftToRight');
         this.bassBoard.setFreqList(freqInfoList, 'do', 'be');
         this.bassBoard.createCanvas({
-                ...sizes,
-                width: sizes.boardBassWidth
-            },
+            ...sizes,
+            width: sizes.boardBassWidth
+        },
             canvasBassEl
         );
         this.bassBoard.drawCells();
@@ -620,9 +687,9 @@ export class ThereminPage {
         this.soloBoard = new Board('solo', 'rightToLeft');
         this.soloBoard.setFreqList(freqInfoList, 'da', 'bi');
         this.soloBoard.createCanvas({
-                ...sizes,
-                width: sizes.boardSoloWidth
-            },
+            ...sizes,
+            width: sizes.boardSoloWidth
+        },
             canvasSoloEl
         );
         this.soloBoard.drawCells();

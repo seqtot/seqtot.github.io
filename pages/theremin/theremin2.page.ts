@@ -204,6 +204,8 @@ class Board {
     const fs = 6;
     const hs = 3;
 
+    const texts = '"{-/?:P0>LO9<KI8MJU7NHY6BGT5VFR4CDE3XSW2ZAQ1#@!~'
+
     for (let j = 0; j < 48; j++) {
       const restJ = j % 4;
 
@@ -231,8 +233,17 @@ class Board {
           (restI === 1 && restJ === 2) ||
           (restI === 2 && restJ === 1) ||
           (restI === 3 && restJ === 0)
-        )
-          ctx.fillRect(x, y, fs, fs);
+        ) {
+          ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+          ctx.fillRect(x, y - 1, 8, 8);
+
+          ctx.fillStyle = `rgba(0, 0, 0, 1)`;
+          ctx.font = `8px sans-serif`;
+          ctx.textBaseline = "top"
+          // fillText(text, x, y)
+          ctx.fillText(texts[j], x, y);
+          //ctx.fillRect(x, y, fs, fs);
+        }
       }
     }
   }

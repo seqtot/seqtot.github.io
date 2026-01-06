@@ -19,6 +19,8 @@ export function getFileSettings(blocks: TTextBlock[] ): TFileSettings {
         boardShift: [],
         boardInstr: [],
         bpm: [],
+        volume: [],
+        quarterSize: [],
     };
 
     const block = blocks.find(

@@ -1,4 +1,4 @@
-import {DEFAULT_VOLUME, NUM_120, drumsTrack} from './utils/utils-note';
+import {DEFAULT_VOLUME, QUARTER_SIZE, drumsTrack} from './utils/utils-note';
 import { TStoredRow, TLine, TLineNote, TCell, TKeyData, TSongPartInfo } from './types';
 import { parseInteger } from './utils';
 
@@ -220,9 +220,9 @@ export class LineModel {
         this.lines = [...topArr, ...botArr];
     }
 
-    static GetEmptyLine(rowInPartId: string = ''): TLine {
+    static GetEmptyLine(rowInPartId: string = '', quarterSize = QUARTER_SIZE): TLine {
         return  {
-            durQ: 120,
+            durQ: quarterSize,
             startOffsetQ: 0,
             cells: [],
             cellSizeQ: CELL_SIZE,
@@ -236,8 +236,8 @@ export class LineModel {
         return LineModel.GetEmptyLine(rowInPartId);
     }
 
-    addLineAfter(i: number, rowInPartId: string = '') {
-        const newLine = LineModel.GetEmptyLine();
+    addLineAfter(i: number, rowInPartId: string = '', quarterSize = QUARTER_SIZE) {
+        const newLine = LineModel.GetEmptyLine(rowInPartId, quarterSize);
 
         newLine.rowInPartId = rowInPartId;
 
@@ -251,7 +251,7 @@ export class LineModel {
         const lastEl = topArr[topArr.length-1];
         const botArr = this.lines.slice(i+1);
 
-        this.addOffset(botArr, 120, rowInPartId);
+        this.addOffset(botArr, quarterSize, rowInPartId);
 
         newLine.startOffsetQ = lastEl ? lastEl.startOffsetQ + lastEl.durQ : 0;
         topArr.push(newLine);
@@ -321,7 +321,7 @@ export class LineModel {
         return LineModel.GetToneLineModelFromRecord(bpm, startTimeMs, seq);
     }
 
-    static GetToneLineModelFromRecord(bpm: number, startTimeMs, seq: TKeyData[] ): TLine[] {
+    static GetToneLineModelFromRecord(bpm: number, startTimeMs: number, seq: TKeyData[], quarterSize = QUARTER_SIZE ): TLine[] {
         let qms = Math.round(60000/ bpm); // ms в четверти
         let rows: TLine[] = [];
 
@@ -348,8 +348,8 @@ export class LineModel {
 
         for (let ind = 0; ind < rowCount; ind++) {
             rows.push({
-                durQ: 120,
-                startOffsetQ: ind * 120,
+                durQ: quarterSize,
+                startOffsetQ: ind * quarterSize,
                 cellSizeQ: CELL_SIZE,
                 cells: [],
                 blockOffsetQ: 0,
@@ -380,11 +380,11 @@ export class LineModel {
                 char: item.char,
             }
 
-            const startOffsetQ = Math.floor((item.down - firstTime) / qms * NUM_120 / 10) * 10;
+            const startOffsetQ = Math.floor((item.down - firstTime) / qms * quarterSize / 10) * 10;
 
             itemNew.startOffsetQ = startOffsetQ;
             itemNew.durQ = Math.floor(
-                (item.up - item.down) / qms * NUM_120 / 10
+                (item.up - item.down) / qms * quarterSize / 10
             ) * 10 || 10;
             itemNew.headColor = item.color;
             itemNew.note = item.note;
@@ -412,7 +412,7 @@ export class LineModel {
         return rows;
     }
 
-    static GetLineModelFromRecord(bpm: number, startTimeMs, seq: TKeyData[] ): TLine[] {
+    static GetLineModelFromRecord(bpm: number, startTimeMs: number, seq: TKeyData[], quarterSize = QUARTER_SIZE ): TLine[] {
         let qms = Math.round(60000/ bpm); // ms в четверти
         let rows: TLine[] = [];
 
@@ -439,8 +439,8 @@ export class LineModel {
 
         for (let ind = 0; ind < rowCount; ind++) {
             rows.push({
-                durQ: 120,
-                startOffsetQ: ind * 120,
+                durQ: quarterSize,
+                startOffsetQ: ind * quarterSize,
                 cellSizeQ: CELL_SIZE,
                 cells: [],
                 blockOffsetQ: 0,
@@ -471,11 +471,11 @@ export class LineModel {
                 char: item.char,
             }
 
-            const startOffsetQ = Math.floor((item.down - firstTime) / qms * NUM_120 / 10) * 10;
+            const startOffsetQ = Math.floor((item.down - firstTime) / qms * quarterSize / 10) * 10;
 
             itemNew.startOffsetQ = startOffsetQ;
             itemNew.durQ = Math.floor(
-                (item.up - item.down) / qms * NUM_120 / 10
+                (item.up - item.down) / qms * quarterSize / 10
             ) * 10 || 10;
             itemNew.headColor = item.color;
             itemNew.note = item.note;
@@ -911,25 +911,25 @@ export class LineModel {
         return LineModel.CloneLines(rows);
     }
 
-    getLinesByMask(pMask: string | number): TLine[] {
+    getLinesByMask(pMask: string | number, quarterSize = QUARTER_SIZE): TLine[] {
         const rows: TLine[] = [];
         let startOffsetQ = 0;
 
         if (parseInteger(pMask, 0)) {
             const durQ = parseInteger(pMask);
-            const fullLineCount = Math.floor(durQ / NUM_120);
-            const endLineDurQ = durQ % NUM_120;
+            const fullLineCount = Math.floor(durQ / quarterSize);
+            const endLineDurQ = durQ % quarterSize;
 
             for (let i = 0; i < fullLineCount; i++) {
                 rows.push({
-                    durQ: 120,
+                    durQ: quarterSize,
                     cells: [],
                     startOffsetQ,
                     cellSizeQ: CELL_SIZE,
                     blockOffsetQ: 0,
                     rowInPartId: '',
                 });
-                startOffsetQ = startOffsetQ + 120;
+                startOffsetQ = startOffsetQ + quarterSize;
             }
 
             if (endLineDurQ) {
@@ -992,9 +992,15 @@ export class LineModel {
         this.lines = this.getLinesByMask(mask);
     }
 
-    static SplitByMask(x: {track: string, type: string, partInfo: TSongPartInfo, lines: TLine[]}): TStoredRow[] {
+    static SplitByMask(x: {
+        track: string,
+        type: string,
+        partInfo: TSongPartInfo,
+        lines: TLine[],
+        quarterSize?: number,
+    }): TStoredRow[] {
         //console.log('SplitMask.x', x);
-
+        const quarterSize = QUARTER_SIZE
         let result: TStoredRow[] = [];
         let mask = (x.partInfo.mask || '').trim();
 
@@ -1024,23 +1030,23 @@ export class LineModel {
         maskArr.forEach(maskItem => {
             maskArr = maskItem.split('*');
 
-            let lineDurQ = 120;
+            let lineDurQ = quarterSize;
             let lineInBlock = 1;
             let blockCount = 1;
 
             if (maskArr.length === 1) {
-                lineDurQ = parseInteger(maskArr[0], 120);
+                lineDurQ = parseInteger(maskArr[0], quarterSize);
             }
 
             if (maskArr.length === 2) {
                 lineInBlock = parseInteger(maskArr[0], 4);
-                lineDurQ = parseInteger(maskArr[1], 120);
+                lineDurQ = parseInteger(maskArr[1], quarterSize);
             }
 
             if (maskArr.length === 3) {
                 blockCount = parseInteger(maskArr[0], 1);
                 lineInBlock = parseInteger(maskArr[1], 4);
-                lineDurQ = parseInteger(maskArr[2], 120);
+                lineDurQ = parseInteger(maskArr[2], quarterSize);
             }
 
             for (let i = 0; i < blockCount; i++) {

@@ -44,8 +44,10 @@ export type TLoopAndTicksInfo = TLoopInfo & TTicksInfoMap;
 function getBeatIndex(offsetQ: number, dx: {
     restForNextRowQ: number,
     lastBeatInd: number
+    quarterSize?: number,
 }): number {
-    const index = Math.floor(offsetQ/un.NUM_120);
+    const quarterSize = dx.quarterSize || un.QUARTER_SIZE
+    const index = Math.floor(offsetQ/quarterSize);
     if (dx.restForNextRowQ && index === dx.lastBeatInd + 1) return dx.lastBeatInd;
     return index;
 }
@@ -53,10 +55,11 @@ function getBeatIndex(offsetQ: number, dx: {
 function getOffsetFromBeatMs(
     startBeat: number,
     offsetFromBeatQ: number,
-    dx: {beatsMs: number[]}
+    dx: {beatsMs: number[], quarterSize?: number}
 ): number {
+    const quarterSize = dx.quarterSize || un.QUARTER_SIZE
     // смещение от начала бита в ms
-    return Math.round(offsetFromBeatQ * (dx.beatsMs[startBeat] / un.NUM_120));
+    return Math.round(offsetFromBeatQ * (dx.beatsMs[startBeat] / quarterSize));
 }
 
 function getDurationMs(
@@ -67,9 +70,11 @@ function getDurationMs(
         beatsMs: number[],
         beatsQ: number[],
         restForNextRowQ: number,
-        lastBeatInd: number
+        lastBeatInd: number,
+        quarterSize?: number,
     }
 ): { durationMs: number, hundredthMs: number } {
+    const quarterSize = dx.quarterSize || un.QUARTER_SIZE
     let lastBeat = getBeatIndex(
         dx.beatsQ[startBeat] + offsetFromBeatQ + durationQ,
         dx
@@ -83,7 +88,7 @@ function getDurationMs(
             return acc + val;
         }, 0);
 
-    let hundredthMs = beatsDurationMs / ((lastBeat - startBeat + 1) * un.NUM_120);
+    let hundredthMs = beatsDurationMs / ((lastBeat - startBeat + 1) * quarterSize);
 
     return {
         durationMs: Math.round(durationQ * hundredthMs),
@@ -180,10 +185,12 @@ export function getSkedByQuarters(
         restFromPrevRowQ: number; // добавляется только для первого цикла
         restForNextRowQ: number;  // добавляется только для первого цикла
         colLoopDurationQ: number; // длина одного цикла внутри которого надоходится линейка
+        quarterSize?: number,
     }
 ): TLoopAndTicksInfo {
         // все поля обязательно, но проверям их заполненность
         //console.log('getSkedByQuarters.props', props);
+        const quarterSize = props.quarterSize || un.QUARTER_SIZE
 
         const dx = {
             noteLineInfo: null as TNoteLineInfo,
@@ -208,16 +215,16 @@ export function getSkedByQuarters(
         dx.noteLineInfo = props.noteLineInfo || un.getNoteLineInfo(props.noteLine);
         dx.colLoopDurationQ = props.colLoopDurationQ  || dx.noteLineInfo.durationQ | 0;
         dx.sked.isDrum = isDrum;
-        dx.beatsQ = dx.beatsMs.map((item, i) => i * un.NUM_120); // jjkl
+        dx.beatsQ = dx.beatsMs.map((item, i) => i * quarterSize); // jjkl
         dx.restFromPrevRowQ = props.restFromPrevRowQ || 0;
         dx.offsetQ = dx.restFromPrevRowQ;
         dx.lastBeatInd = dx.beatsMs.length - 1;
         dx.repeat = props.repeat || dx.noteLineInfo.repeat || 1;
 
-        dx.durationByBeatsCountQ = dx.beatsMs.length * un.NUM_120;
+        dx.durationByBeatsCountQ = dx.beatsMs.length * quarterSize;
         //console.log('доступное количество повторов', beatsMs, beatsQ, durationByBeatsCountQ, noteLineInfo.durationQ);
-        //dx.buildCount = Math.ceil(dx.durationByBeatsCountQ / dx.noteLineInfo.durationQ); //let buildCount = Math.ceil((beatsMs.length * un.NUM_120) / noteLineInfo.durationQ );
-        dx.buildCount = Math.ceil(dx.durationByBeatsCountQ / dx.colLoopDurationQ); //let buildCount = Math.ceil((beatsMs.length * un.NUM_120) / noteLineInfo.durationQ );
+        //dx.buildCount = Math.ceil(dx.durationByBeatsCountQ / dx.noteLineInfo.durationQ); //let buildCount = Math.ceil((beatsMs.length * quarterSize) / noteLineInfo.durationQ );
+        dx.buildCount = Math.ceil(dx.durationByBeatsCountQ / dx.colLoopDurationQ); //let buildCount = Math.ceil((beatsMs.length * quarterSize) / noteLineInfo.durationQ );
         dx.buildCount = Math.min(dx.repeat, dx.buildCount);
 
         for (let i = 0; i < dx.buildCount; i++) {
@@ -227,7 +234,7 @@ export function getSkedByQuarters(
         dx.sked.repeat = 1;
         dx.sked.tickCount = dx.beatsMs.length;
         dx.sked.isHead = isHead;
-        //sked.durationQ = beatsMs.length  * un.NUM_120; // sked.durationQ = noteLineInfo.durationQ;
+        //sked.durationQ = beatsMs.length * quarterSize; // sked.durationQ = noteLineInfo.durationQ;
 
         //console.log('getSkedByQuarters.sked', dx);
 

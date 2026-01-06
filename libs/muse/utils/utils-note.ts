@@ -5,7 +5,8 @@ export const DEFAULT_BPM = 120;
 export const DEFAULT_VOLUME = 50;
 export const NUM_100 = 100;
 export const VOLUME_100 = 100;
-export const NUM_120 = 120;
+export const NUM_120 = 120; // jjkl
+export const QUARTER_SIZE = 120;
 export const THOUSAND = 1000;
 export const msInMin = 60000;
 export const toneChar = '$';
@@ -53,9 +54,9 @@ export function isNil (val: any): boolean {
 }
 
 function trimLeft(val: any): string {
-    val = (val || '').toString();
+    val = isNil(val) ? '': val.toString();
 
-    return val.toString().replace(/^\s+/, '');
+    return val.replace(/^\s+/, '');
 }
 
 export class Deferred<T = any> {
@@ -95,7 +96,7 @@ export function getRepeatFromString(str: string, byDefault = 1) {
 }
 
 // b120
-export function getBpmFromString(str: string, byDefault = 120) {
+export function getBpmFromString(str: string, byDefault = DEFAULT_BPM) {
     str = getStringWithBlanks(str);
 
     const regExp = / b\d+ /;
@@ -324,7 +325,7 @@ export function getBlockContent(blocks: TTextBlock[], id: string, trimIt: 'trim'
 }
 
 // return: [[25, 25, 25, 25], [50, 50]]
-export function getDrumQuartersInfo(arr: string[]): {
+export function getDrumQuartersInfo(arr: string[], quaterSize = QUARTER_SIZE): {
     quarters: number[][],
     trackName?: string,
 } {
@@ -342,7 +343,7 @@ export function getDrumQuartersInfo(arr: string[]): {
         .filter((item) => !!item);
 
     let result = quarters.map((quarter) => {
-        return Array(quarter.length).fill(Math.round(NUM_120 / quarter.length));
+        return Array(quarter.length).fill(Math.round(quaterSize / quarter.length));
     });
 
     return {
@@ -478,6 +479,9 @@ export function clearEndComment(val: any) {
     return str.replace(/#.*$/, ''); // коммент в конце строки
 }
 
+/**
+ * Удаление двойных/ведущих пробелов, комментариев, некоторых символов
+ */
 export function clearNoteLine(val: string): string {
     val = getString(val).replace(/\r\n/g, '\n').trim();
     val = val.split('\n').map(item => clearEndComment(item).trim()).filter(item => item).join(' ');
